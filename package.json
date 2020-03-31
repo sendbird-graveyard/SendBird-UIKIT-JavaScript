@@ -11,7 +11,6 @@
     "test-update-snapshot": "jest -u",
     "build": "rollup -c",
     "start": "rollup -c -w",
-    "prepare": "npm run build",
     "predeploy": "cd example && npm install && npm run build",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
