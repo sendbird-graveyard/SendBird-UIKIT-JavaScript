@@ -336,6 +336,10 @@ var handleConnection = function handleConnection(_ref2, dispatchers) {
         } else {
           newSdk.connect(userId, connectCb);
         }
+      } else {
+        sdkDispatcher({
+          type: SDK_ERROR
+        });
       }
     }
   });
@@ -1350,7 +1354,6 @@ var Type = {
   GIF: 'GIF',
   INFO: 'INFO',
   LEAVE: 'LEAVE',
-  NEW_MESSAGE: 'NEW_MESSAGE',
   MEMBERS: 'MEMBERS',
   NOTIFICATIONS: 'NOTIFICATIONS',
   PHOTO: 'PHOTO',
@@ -1360,7 +1363,8 @@ var Type = {
   REFRESH: 'REFRESH',
   SEND: 'SEND',
   SENT: 'SENT',
-  SHEVRON_RIGHT: 'SHEVRON_RIGHT',
+  SHEVRON: 'SHEVRON',
+  SHEVRON_DOWN: 'SHEVRON_DOWN',
   SPINNER: 'SPINNER',
   USER: 'USER'
 };
@@ -1831,13 +1835,13 @@ function _extends$q() { _extends$q = Object.assign || function (target) { for (v
 var _ref$q =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-new-message_svg__fill",
+  className: "icon-members_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M6.045 8.205a1.125 1.125 0 10-1.59 1.59l6.75 6.75c.439.44 1.151.44 1.59 0l6.75-6.75a1.125 1.125 0 10-1.59-1.59L12 14.159 6.045 8.205z"
+  d: "M13 14a5 5 0 014.995 4.783L18 19v2a1 1 0 01-1.993.117L16 21v-2a3 3 0 00-2.824-2.995L13 16H5a3 3 0 00-2.995 2.824L2 19v2a1 1 0 01-1.993.117L0 21v-2a5 5 0 014.783-4.995L5 14h8zm7.25.162a5 5 0 013.745 4.611L24 19v2a1 1 0 01-1.993.117L22 21v-2a3 3 0 00-2.25-2.902 1 1 0 11.5-1.936zM9 2a5 5 0 110 10A5 5 0 019 2zm7.248.161a5 5 0 010 9.688 1 1 0 01-.496-1.938 3 3 0 000-5.812 1 1 0 11.496-1.938zM9 4a3 3 0 100 6 3 3 0 000-6z"
 });
 
-function SvgIconNewMessage(props) {
+function SvgIconMembers(props) {
   return React__default.createElement("svg", _extends$q({
     viewBox: "0 0 24 24"
   }, props), _ref$q);
@@ -1848,13 +1852,13 @@ function _extends$r() { _extends$r = Object.assign || function (target) { for (v
 var _ref$r =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-members_svg__fill",
+  className: "icon-notifications_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M13 14a5 5 0 014.995 4.783L18 19v2a1 1 0 01-1.993.117L16 21v-2a3 3 0 00-2.824-2.995L13 16H5a3 3 0 00-2.995 2.824L2 19v2a1 1 0 01-1.993.117L0 21v-2a5 5 0 014.783-4.995L5 14h8zm7.25.162a5 5 0 013.745 4.611L24 19v2a1 1 0 01-1.993.117L22 21v-2a3 3 0 00-2.25-2.902 1 1 0 11.5-1.936zM9 2a5 5 0 110 10A5 5 0 019 2zm7.248.161a5 5 0 010 9.688 1 1 0 01-.496-1.938 3 3 0 000-5.812 1 1 0 11.496-1.938zM9 4a3 3 0 100 6 3 3 0 000-6z"
+  d: "M13.73 20a1 1 0 01.865 1.502 3 3 0 01-5.19 0 1 1 0 01.752-1.496L10.27 20h3.46zM12 1a8 8 0 017.996 7.75L20 9v5a2 2 0 001.85 1.995l.283.012c1.111.12 1.154 1.73.128 1.965l-.128.021L22 18H2l-.133-.007c-1.156-.124-1.156-1.862 0-1.986l.282-.012a2 2 0 001.845-1.838L4 14V9a8 8 0 018-8zm0 2a6 6 0 00-5.996 5.775L6 9v5c0 .586-.126 1.142-.352 1.643l-.103.212-.082.145h13.073l-.08-.145a3.973 3.973 0 01-.43-1.402l-.021-.253L18 14V9a6 6 0 00-6-6z"
 });
 
-function SvgIconMembers(props) {
+function SvgIconNotifications(props) {
   return React__default.createElement("svg", _extends$r({
     viewBox: "0 0 24 24"
   }, props), _ref$r);
@@ -1865,13 +1869,13 @@ function _extends$s() { _extends$s = Object.assign || function (target) { for (v
 var _ref$s =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-notifications_svg__fill",
+  className: "icon-photo_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M13.73 20a1 1 0 01.865 1.502 3 3 0 01-5.19 0 1 1 0 01.752-1.496L10.27 20h3.46zM12 1a8 8 0 017.996 7.75L20 9v5a2 2 0 001.85 1.995l.283.012c1.111.12 1.154 1.73.128 1.965l-.128.021L22 18H2l-.133-.007c-1.156-.124-1.156-1.862 0-1.986l.282-.012a2 2 0 001.845-1.838L4 14V9a8 8 0 018-8zm0 2a6 6 0 00-5.996 5.775L6 9v5c0 .586-.126 1.142-.352 1.643l-.103.212-.082.145h13.073l-.08-.145a3.973 3.973 0 01-.43-1.402l-.021-.253L18 14V9a6 6 0 00-6-6z"
+  d: "M19 2a3 3 0 013 3v14a3 3 0 01-3 3H4.941v-.002l-.117-.003A3 3 0 012 19V5a3 3 0 013-3zm-3 9.415L7.414 20H19a1 1 0 00.993-.883L20 19v-3.585l-4-4zM19 4H5a1 1 0 00-1 1v14a1 1 0 00.65.937L15.292 9.293a1 1 0 011.32-.083l.094.083L20 12.585V5a1 1 0 00-.883-.993L19 4zM8.5 6a2.5 2.5 0 110 5 2.5 2.5 0 010-5zm0 2a.5.5 0 100 1 .5.5 0 000-1z"
 });
 
-function SvgIconNotifications(props) {
+function SvgIconPhoto(props) {
   return React__default.createElement("svg", _extends$s({
     viewBox: "0 0 24 24"
   }, props), _ref$s);
@@ -1880,23 +1884,6 @@ function SvgIconNotifications(props) {
 function _extends$t() { _extends$t = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$t.apply(this, arguments); }
 
 var _ref$t =
-/*#__PURE__*/
-React__default.createElement("path", {
-  className: "icon-photo_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M19 2a3 3 0 013 3v14a3 3 0 01-3 3H4.941v-.002l-.117-.003A3 3 0 012 19V5a3 3 0 013-3zm-3 9.415L7.414 20H19a1 1 0 00.993-.883L20 19v-3.585l-4-4zM19 4H5a1 1 0 00-1 1v14a1 1 0 00.65.937L15.292 9.293a1 1 0 011.32-.083l.094.083L20 12.585V5a1 1 0 00-.883-.993L19 4zM8.5 6a2.5 2.5 0 110 5 2.5 2.5 0 010-5zm0 2a.5.5 0 100 1 .5.5 0 000-1z"
-});
-
-function SvgIconPhoto(props) {
-  return React__default.createElement("svg", _extends$t({
-    viewBox: "0 0 24 24"
-  }, props), _ref$t);
-}
-
-function _extends$u() { _extends$u = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$u.apply(this, arguments); }
-
-var _ref$u =
 /*#__PURE__*/
 React__default.createElement("g", {
   fill: "none",
@@ -1915,14 +1902,14 @@ React__default.createElement("g", {
 }));
 
 function SvgIconPlay(props) {
-  return React__default.createElement("svg", _extends$u({
+  return React__default.createElement("svg", _extends$t({
     viewBox: "0 0 56 56"
-  }, props), _ref$u);
+  }, props), _ref$t);
 }
 
-function _extends$v() { _extends$v = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$v.apply(this, arguments); }
+function _extends$u() { _extends$u = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$u.apply(this, arguments); }
 
-var _ref$v =
+var _ref$u =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-plus_svg__fill",
@@ -1932,6 +1919,23 @@ React__default.createElement("path", {
 });
 
 function SvgIconPlus(props) {
+  return React__default.createElement("svg", _extends$u({
+    viewBox: "0 0 24 24"
+  }, props), _ref$u);
+}
+
+function _extends$v() { _extends$v = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$v.apply(this, arguments); }
+
+var _ref$v =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-read_svg__fill",
+  fill: "#2EBA9F",
+  fillRule: "evenodd",
+  d: "M2.207 11.793l5 5a1 1 0 01-1.414 1.414l-5-5a1 1 0 011.414-1.414zm19.586-6a1 1 0 011.414 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414l4.293 4.293zm-3.586 0a1 1 0 010 1.414l-5.999 5.999a1 1 0 01-1.414-1.414l5.999-6a1 1 0 011.414 0z"
+});
+
+function SvgIconRead(props) {
   return React__default.createElement("svg", _extends$v({
     viewBox: "0 0 24 24"
   }, props), _ref$v);
@@ -1942,23 +1946,6 @@ function _extends$w() { _extends$w = Object.assign || function (target) { for (v
 var _ref$w =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-read_svg__fill",
-  fill: "#2EBA9F",
-  fillRule: "evenodd",
-  d: "M2.207 11.793l5 5a1 1 0 01-1.414 1.414l-5-5a1 1 0 011.414-1.414zm19.586-6a1 1 0 011.414 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414l4.293 4.293zm-3.586 0a1 1 0 010 1.414l-5.999 5.999a1 1 0 01-1.414-1.414l5.999-6a1 1 0 011.414 0z"
-});
-
-function SvgIconRead(props) {
-  return React__default.createElement("svg", _extends$w({
-    viewBox: "0 0 24 24"
-  }, props), _ref$w);
-}
-
-function _extends$x() { _extends$x = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$x.apply(this, arguments); }
-
-var _ref$x =
-/*#__PURE__*/
-React__default.createElement("path", {
   className: "icon-refresh_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -1966,15 +1953,15 @@ React__default.createElement("path", {
 });
 
 function SvgIconRefresh(props) {
-  return React__default.createElement("svg", _extends$x({
+  return React__default.createElement("svg", _extends$w({
     width: 20,
     height: 20
-  }, props), _ref$x);
+  }, props), _ref$w);
 }
 
-function _extends$y() { _extends$y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$y.apply(this, arguments); }
+function _extends$x() { _extends$x = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$x.apply(this, arguments); }
 
-var _ref$y =
+var _ref$x =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-send_svg__fill",
@@ -1984,14 +1971,14 @@ React__default.createElement("path", {
 });
 
 function SvgIconSend(props) {
-  return React__default.createElement("svg", _extends$y({
+  return React__default.createElement("svg", _extends$x({
     viewBox: "0 0 22 22"
-  }, props), _ref$y);
+  }, props), _ref$x);
 }
 
-function _extends$z() { _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$z.apply(this, arguments); }
+function _extends$y() { _extends$y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$y.apply(this, arguments); }
 
-var _ref$z =
+var _ref$y =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-sent_svg__fill",
@@ -2001,6 +1988,23 @@ React__default.createElement("path", {
 });
 
 function SvgIconSent(props) {
+  return React__default.createElement("svg", _extends$y({
+    viewBox: "0 0 24 24"
+  }, props), _ref$y);
+}
+
+function _extends$z() { _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$z.apply(this, arguments); }
+
+var _ref$z =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-shevron_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M8.293 17.293a1 1 0 001.414 1.414l6-6a1 1 0 000-1.414l-6-6a1 1 0 00-1.414 1.414L13.586 12l-5.293 5.293z"
+});
+
+function SvgIconShevron(props) {
   return React__default.createElement("svg", _extends$z({
     viewBox: "0 0 24 24"
   }, props), _ref$z);
@@ -2011,13 +2015,13 @@ function _extends$A() { _extends$A = Object.assign || function (target) { for (v
 var _ref$A =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-shevron-right_svg__fill",
+  className: "icon-shevron-down_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M8.293 17.293a1 1 0 001.414 1.414l6-6a1 1 0 000-1.414l-6-6a1 1 0 00-1.414 1.414L13.586 12l-5.293 5.293z"
+  d: "M6.045 8.205a1.125 1.125 0 10-1.59 1.59l6.75 6.75c.439.44 1.151.44 1.59 0l6.75-6.75a1.125 1.125 0 10-1.59-1.59L12 14.159 6.045 8.205z"
 });
 
-function SvgIconShevronRight(props) {
+function SvgIconShevronDown(props) {
   return React__default.createElement("svg", _extends$A({
     viewBox: "0 0 24 24"
   }, props), _ref$A);
@@ -2169,9 +2173,6 @@ function changeTypeToIconComponent(type) {
     case Type.LEAVE:
       return React__default.createElement(SvgIconLeave, null);
 
-    case Type.NEW_MESSAGE:
-      return React__default.createElement(SvgIconNewMessage, null);
-
     case Type.MEMBERS:
       return React__default.createElement(SvgIconMembers, null);
 
@@ -2199,8 +2200,11 @@ function changeTypeToIconComponent(type) {
     case Type.SENT:
       return React__default.createElement(SvgIconSent, null);
 
-    case Type.SHEVRON_RIGHT:
-      return React__default.createElement(SvgIconShevronRight, null);
+    case Type.SHEVRON:
+      return React__default.createElement(SvgIconShevron, null);
+
+    case Type.SHEVRON_DOWN:
+      return React__default.createElement(SvgIconShevronDown, null);
 
     case Type.SPINNER:
       return React__default.createElement(SvgIconSpinnerSmall, null);
@@ -2643,6 +2647,10 @@ function AddChannel(_ref) {
       _useState2 = _slicedToArray(_useState, 2),
       showModal = _useState2[0],
       setshowModal = _useState2[1];
+
+  if (!sdk || !sdk.createApplicationUserListQuery) {
+    return null;
+  }
 
   return React__default.createElement(React__default.Fragment, null, React__default.createElement(IconButton, {
     height: "32px",
@@ -3574,6 +3582,7 @@ var MessageStatusType = {
   FAILED: 'FAILED'
 };
 
+var MessageStatusTypes = MessageStatusType;
 function MessageStatus(_ref) {
   var message = _ref.message,
       status = _ref.status,
@@ -3927,7 +3936,7 @@ function ThumbnailMessage(_ref) {
   var _ref$message = _ref.message,
       message = _ref$message === void 0 ? {} : _ref$message,
       isByMe = _ref.isByMe,
-      _onClick = _ref.onClick,
+      onClick = _ref.onClick,
       showRemove = _ref.showRemove,
       status = _ref.status;
   var type = message.type,
@@ -3941,6 +3950,7 @@ function ThumbnailMessage(_ref) {
       imgLoaded = _useState2[0],
       setImgLoaded = _useState2[1];
 
+  var isMoreActive = status === MessageStatusTypes.SENT || status === MessageStatusTypes.DELIVERED || status === MessageStatusTypes.READ;
   return React__default.createElement("div", {
     className: ['sendbird-thumbnail', !isByMe ? 'sendbird-thumbnail--incoming' : '', !imgLoaded ? 'sendbird-thumbnail--loading' : ''].join(' ')
   }, !isByMe && React__default.createElement(React__default.Fragment, null, React__default.createElement(Avatar, {
@@ -3981,12 +3991,12 @@ function ThumbnailMessage(_ref) {
       }, "Delete"));
     }
   }), React__default.createElement("div", {
-    onClick: function onClick() {
-      return _onClick(true);
-    },
-    onKeyDown: function onKeyDown() {
-      return _onClick(true);
-    },
+    onClick: isMoreActive ? function () {
+      return onClick(true);
+    } : function () {},
+    onKeyDown: isMoreActive ? function () {
+      return onClick(true);
+    } : function () {},
     tabIndex: 0,
     role: "button",
     className: "sendbird-thumbnail__wrap"
@@ -4948,7 +4958,7 @@ function Notification(_ref) {
     }, "".concat(count, " "), LabelStringSet.CHANNEL__MESSAGE_LIST__NOTIFICATION__NEW_MESSAGE, " ".concat(timeArray.join(' '))), React__default.createElement(Icon, {
       width: "24px",
       height: "24px",
-      type: IconTypes.NEW_MESSAGE,
+      type: IconTypes.SHEVRON_DOWN,
       fillColor: IconColors.CONTENT
     }))
   );
@@ -5766,6 +5776,8 @@ var ChannelProfile = function ChannelProfile(props) {
   return React__default.createElement("div", {
     className: "sendbird-channel-profile"
   }, React__default.createElement("div", {
+    className: "sendbird-channel-profile--inner"
+  }, React__default.createElement("div", {
     className: "sendbird-channel-profile__avatar"
   }, React__default.createElement(Avatar, {
     src: avatar
@@ -5789,7 +5801,7 @@ var ChannelProfile = function ChannelProfile(props) {
     onSubmit: onChannelInfoChange,
     avatar: avatar,
     title: title
-  }));
+  })));
 };
 
 ChannelProfile.propTypes = {
@@ -6027,7 +6039,7 @@ function ChannelSettings(props) {
     type: LabelTypography.SUBTITLE_1,
     color: LabelColors.ONBACKGROUND_1
   }, "".concat(LabelStringSet.CHANNEL_SETTING__MEMBERS__TITLE, " (").concat(channel.members.length, ")")), React__default.createElement(Icon, {
-    type: IconTypes.SHEVRON_RIGHT,
+    type: IconTypes.SHEVRON,
     className: ['sendbird-channel-settings__panel-icon-right', 'sendbird-channel-settings__panel-icon--chevron', showAccordion ? 'sendbird-channel-settings__panel-icon--open' : ''].join(' '),
     height: "24px",
     width: "24px"
@@ -6321,7 +6333,7 @@ exports.App = App;
 exports.Channel = Conversation;
 exports.ChannelList = ChannelList$1;
 exports.ChannelSettings = ChannelSettings$1;
-exports.SendbirdProvider = Sendbird;
-exports.sendbirdSelectors = selectors;
-exports.withSendbird = withSendbirdContext;
+exports.SendBirdProvider = Sendbird;
+exports.sendBirdSelectors = selectors;
+exports.withSendBird = withSendbirdContext;
 //# sourceMappingURL=index.js.map

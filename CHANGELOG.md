@@ -1,5 +1,5 @@
 # Changelog
 
-## 0.0.0-beta.1(MAR 31, 2020)
+## beta.3(APR 1, 2020)
 
-- Testing release
+- Branding fix - sendbird b -> B
