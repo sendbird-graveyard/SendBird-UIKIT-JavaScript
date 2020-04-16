@@ -72,12 +72,14 @@
     position: absolute;
     top: 12px;
     right: 12px;
-    display: none; }
+    display: inline-block; }
+    .sendbird-channel-preview .sendbird-channel-preview__action .sendbird-iconbutton {
+      display: none; }
   .sendbird-theme--light .sendbird-channel-preview:hover {
     background-color: #F0F0F0; }
   .sendbird-theme--dark .sendbird-channel-preview:hover {
     background-color: #2C2C2C; }
-  .sendbird-channel-preview:hover .sendbird-channel-preview__action {
+  .sendbird-channel-preview:hover .sendbird-channel-preview__action .sendbird-iconbutton {
     display: inline-block; }
   .sendbird-channel-preview:hover .sendbird-channel-preview__content__upper__last-message-at {
     display: none; }
@@ -310,6 +312,12 @@
     background-color: #D9D9D9; }
   .sendbird-theme--dark .sendbird-iconbutton:active {
     background-color: #393939; }
+  .sendbird-iconbutton.sendbird-icon--pressed {
+    display: block !important; }
+    .sendbird-theme--light .sendbird-iconbutton.sendbird-icon--pressed {
+      background-color: #E2DFFF; }
+    .sendbird-theme--dark .sendbird-iconbutton.sendbird-icon--pressed {
+      background-color: #000000; }
 
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap");
 .sendbird-channel-header {
@@ -397,7 +405,20 @@
     max-width: 320px;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; }
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+            flex-direction: row;
+    -webkit-box-align: center;
+            align-items: center; }
+    .sendbird-create-channel--user-row .sendbird-create-channel--user-row--label .sendbird-create-channel--user-row--label__user-id {
+      height: 14px;
+      margin-left: 8px;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis; }
   .sendbird-create-channel--user-row .sendbird-create-channel--user-row--avatar {
     position: absolute;
     left: 0;
