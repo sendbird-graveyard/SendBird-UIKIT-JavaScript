@@ -1,6 +1,6 @@
 {
   "name": "sendbird-uikit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React based UI kit for sendbird",
   "main": "dist/index.js",
   "style": "dist/styles.css",
@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com:sendbird/SendBird-UIKIT-JavaScript.git"
+    "url": "https://github.com/sendbird/SendBird-UIKIT-JavaScript"
   },
   "author": "SendBird <support@sendbird.com>",
   "license": "SEE LICENSE IN LICENSE.md",
