@@ -1,6 +1,6 @@
 {
   "name": "sendbird-uikit",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "React based UI kit for sendbird",
   "main": "dist/index.js",
   "style": "dist/styles.css",
@@ -30,8 +30,8 @@
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "sendbird": "^3.0.117",
-    "moment": "^2.24.0"
+    "sendbird": "^3.0.122",
+    "moment": "2.25.3"
   },
   "bugs": {
     "url": "https://github.com/sendbird/uikit-js/issues"
@@ -89,9 +89,9 @@
     "IE 11"
   ],
   "dependencies": {
-    "moment": "^2.24.0",
+    "moment": "2.25.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "sendbird": "^3.0.117"
+    "sendbird": "^3.0.122"
   }
 }

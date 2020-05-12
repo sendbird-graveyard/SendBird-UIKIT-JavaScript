@@ -1,7 +1,7 @@
-import React, { useReducer, useEffect, useState, Component, useRef } from 'react';
+import React, { useState, useReducer, useEffect, Component, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Sb from 'sendbird';
-import moment from 'moment';
+import Moment from 'moment';
 import { createPortal } from 'react-dom';
 
 function _classCallCheck(instance, Constructor) {
@@ -214,6 +214,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
+var APP_VERSION_STRING = '1.0.2';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -245,14 +246,17 @@ var handleConnection = function handleConnection(_ref2, dispatchers) {
       nickname = _ref2.nickname,
       profileUrl = _ref2.profileUrl,
       accessToken = _ref2.accessToken,
-      sdk = _ref2.sdk;
+      sdk = _ref2.sdk,
+      logger = _ref2.logger;
   var sdkDispatcher = dispatchers.sdkDispatcher,
       userDispatcher = dispatchers.userDispatcher;
   disconnectSdk({
     sdkDispatcher: sdkDispatcher,
     userDispatcher: userDispatcher,
     sdk: sdk,
+    logger: logger,
     onDisconnect: function onDisconnect() {
+      logger.info('Setup connection');
       sdkDispatcher({
         type: SET_SDK_LOADING,
         payload: true
@@ -261,7 +265,12 @@ var handleConnection = function handleConnection(_ref2, dispatchers) {
       if (userId && appId) {
         var newSdk = new Sb({
           appId: appId
-        });
+        }); // to check if code is released version from rollup and *not from storybook*
+        // see rollup config file
+
+        {
+          newSdk.addExtension('sb_uikit', APP_VERSION_STRING);
+        }
 
         var connectCbSucess = function connectCbSucess(user) {
           sdkDispatcher({
@@ -284,7 +293,8 @@ var handleConnection = function handleConnection(_ref2, dispatchers) {
           });
         };
 
-        var connectCbError = function connectCbError() {
+        var connectCbError = function connectCbError(e) {
+          logger.error('Connection failed', "".concat(e));
           sdkDispatcher({
             type: RESET_SDK
           });
@@ -313,6 +323,7 @@ var handleConnection = function handleConnection(_ref2, dispatchers) {
         sdkDispatcher({
           type: SDK_ERROR
         });
+        logger.warning('Connection failed', 'UserId or appId missing');
       }
     }
   });
@@ -384,6 +395,88 @@ function reducer$1(state, action) {
   }
 }
 
+var LOG_LEVELS = {
+  DEBUG: 'debug',
+  WARNING: 'warning',
+  ERROR: 'error',
+  INFO: 'info',
+  ALL: 'all'
+};
+
+var colorLog = function colorLog(level) {
+  switch (level) {
+    case LOG_LEVELS.WARNING:
+      return 'color: Orange';
+
+    case LOG_LEVELS.ERROR:
+      return 'color: Red';
+
+    default:
+      return 'color: Gray';
+  }
+};
+
+var printLog = function printLog(_ref) {
+  var level = _ref.level,
+      title = _ref.title,
+      _ref$description = _ref.description,
+      description = _ref$description === void 0 ? '' : _ref$description;
+  // eslint-disable-next-line no-console
+  console.log("%c SendbirdUIKit | ".concat(level, " | ").concat(new Date().toISOString(), " | ").concat(title, " ").concat(description && '|'), colorLog(level), description);
+};
+var getDefaultLogger = function getDefaultLogger() {
+  return {
+    info: function info() {},
+    error: function error() {},
+    warning: function warning() {}
+  };
+};
+var LoggerFactory = function LoggerFactory(lvl, customInterface) {
+  var logInterface = customInterface || printLog;
+  var lvlArray = Array.isArray(lvl) ? lvl : [lvl];
+
+  var applyLog = function applyLog(lgLvl) {
+    return function (title, description) {
+      return logInterface({
+        level: lgLvl,
+        title: title,
+        description: description
+      });
+    };
+  };
+
+  var logger = lvlArray.reduce(function (accumulator, currentLvl) {
+    if (currentLvl === LOG_LEVELS.DEBUG || currentLvl === LOG_LEVELS.ALL) {
+      return _objectSpread2({}, accumulator, {
+        info: applyLog(LOG_LEVELS.INFO),
+        error: applyLog(LOG_LEVELS.ERROR),
+        warning: applyLog(LOG_LEVELS.WARNING)
+      });
+    }
+
+    if (currentLvl === LOG_LEVELS.INFO) {
+      return _objectSpread2({}, accumulator, {
+        info: applyLog(LOG_LEVELS.INFO)
+      });
+    }
+
+    if (currentLvl === LOG_LEVELS.ERROR) {
+      return _objectSpread2({}, accumulator, {
+        error: applyLog(LOG_LEVELS.ERROR)
+      });
+    }
+
+    if (currentLvl === LOG_LEVELS.WARNING) {
+      return _objectSpread2({}, accumulator, {
+        warning: applyLog(LOG_LEVELS.WARNING)
+      });
+    }
+
+    return _objectSpread2({}, accumulator);
+  }, getDefaultLogger());
+  return logger;
+};
+
 function Sendbird(props) {
   var userId = props.userId,
       appId = props.appId,
@@ -392,7 +485,16 @@ function Sendbird(props) {
       theme = props.theme,
       nickname = props.nickname,
       profileUrl = props.profileUrl,
-      userListQuery = props.userListQuery;
+      userListQuery = props.userListQuery,
+      _props$config = props.config,
+      config = _props$config === void 0 ? {} : _props$config;
+  var _config$logLevel = config.logLevel,
+      logLevel = _config$logLevel === void 0 ? '' : _config$logLevel;
+
+  var _useState = useState(LoggerFactory(logLevel)),
+      _useState2 = _slicedToArray(_useState, 2),
+      logger = _useState2[0],
+      setLogger = _useState2[1];
 
   var _useReducer = useReducer(reducer, sdkInitialState),
       _useReducer2 = _slicedToArray(_useReducer, 2),
@@ -405,7 +507,8 @@ function Sendbird(props) {
       userDispatcher = _useReducer4[1];
 
   useEffect(function () {
-    // dispatch action
+    logger.info('App Init'); // dispatch action
+
     handleConnection({
       userId: userId,
       appId: appId,
@@ -413,15 +516,21 @@ function Sendbird(props) {
       sdkStore: sdkStore,
       nickname: nickname,
       profileUrl: profileUrl,
-      sdk: sdkStore.sdk
+      sdk: sdkStore.sdk,
+      logger: logger
     }, {
       sdkDispatcher: sdkDispatcher,
       userDispatcher: userDispatcher
     });
-  }, [userId, appId, accessToken]); // to create DOM elements for appending modal & context menu
+  }, [userId, appId, accessToken]);
+  useEffect(function () {
+    setLogger(LoggerFactory(logLevel));
+  }, [logLevel]); // to create DOM elements for appending modal & context menu
   // might fail on server side render
 
   useEffect(function () {
+    logger.info('Creating helper divs');
+
     var appentElemWithId = function appentElemWithId(id) {
       var elem = document.createElement('div');
       elem.setAttribute('id', id);
@@ -433,13 +542,19 @@ function Sendbird(props) {
     var menuRoot = 'sendbird-dropdown-portal';
     appentElemWithId(modalRoot);
     appentElemWithId(menuRoot);
+    logger.info('Finshed creating helper divs');
   }, []); // add-remove theme from body
 
   useEffect(function () {
+    logger.info('Setup theme', "Theme: ".concat(theme));
+
     try {
       var body = document.querySelector('body');
-      body.classList.add("sendbird-theme--".concat(theme || 'light')); // eslint-disable-next-line no-empty
-    } catch (_unused) {}
+      body.classList.add("sendbird-theme--".concat(theme || 'light'));
+      logger.info('Finish setup theme'); // eslint-disable-next-line no-empty
+    } catch (e) {
+      logger.warning('Setup theme failed', "".concat(e));
+    }
 
     return function () {
       try {
@@ -449,7 +564,7 @@ function Sendbird(props) {
 
         _body.classList.remove('sendbird-theme--dark'); // eslint-disable-next-line no-empty
 
-      } catch (_unused2) {}
+      } catch (_unused) {}
     };
   }, [theme]);
   return React.createElement(SendbirdSdkContext.Provider, {
@@ -481,7 +596,8 @@ function Sendbird(props) {
         appId: appId,
         accessToken: accessToken,
         theme: theme,
-        userListQuery: userListQuery
+        userListQuery: userListQuery,
+        logger: logger
       }
     }
   }, children);
@@ -494,14 +610,19 @@ Sendbird.propTypes = {
   theme: PropTypes.string,
   nickname: PropTypes.string,
   profileUrl: PropTypes.string,
-  userListQuery: PropTypes.func
+  userListQuery: PropTypes.func,
+  config: PropTypes.shape({
+    // None Error Warning Info 'All/Debug'
+    logLevel: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
+  })
 };
 Sendbird.defaultProps = {
   accessToken: '',
   theme: 'light',
   nickname: '',
   profileUrl: '',
-  userListQuery: null
+  userListQuery: null,
+  config: {}
 };
 
 var RESET_CHANNEL_LIST = 'RESET_CHANNEL_LIST';
@@ -1176,12 +1297,12 @@ var getLastMessageCreatedAt = function getLastMessageCreatedAt(channel) {
     return '';
   }
 
-  var moment$1 = moment(channel.lastMessage.createdAt);
+  var moment = Moment(channel.lastMessage.createdAt);
 
-  switch (moment$1.calendar().split(' ')[0]) {
+  switch (moment.calendar().split(' ')[0]) {
     case 'Today':
       {
-        return moment$1.format('LT');
+        return moment.format('LT');
       }
 
     case 'Yesterday':
@@ -1190,7 +1311,7 @@ var getLastMessageCreatedAt = function getLastMessageCreatedAt(channel) {
       }
 
     default:
-      return moment$1.format('ll').split(',')[0];
+      return moment.format('ll').split(',')[0];
   }
 };
 var getTotalMembers = function getTotalMembers(channel) {
@@ -1395,6 +1516,7 @@ var Type = {
   PHOTO: 'PHOTO',
   PLAY: 'PLAY',
   PLUS: 'PLUS',
+  REACTIONS_ADD: 'REACTIONS_ADD',
   READ: 'READ',
   REFRESH: 'REFRESH',
   SEND: 'SEND',
@@ -1965,6 +2087,23 @@ function _extends$w() { _extends$w = Object.assign || function (target) { for (v
 var _ref$w =
 /*#__PURE__*/
 React.createElement("path", {
+  className: "icon-reactions-add_svg__fill",
+  fillOpacity: 0.88,
+  fillRule: "evenodd",
+  d: "M11.033 1.107a9.98 9.98 0 012.669.362.734.734 0 01-.393 1.413A8.466 8.466 0 002.567 11.04 8.466 8.466 0 1019.2 8.8a.736.736 0 01.514-.902.735.735 0 01.901.514c.233.85.352 1.731.352 2.628 0 5.486-4.448 9.933-9.934 9.933-5.486 0-9.933-4.447-9.933-9.933s4.447-9.933 9.933-9.933zm3.68 11.96c.5 0 .854.49.696.965-.644 1.933-2.385 3.261-4.376 3.261-1.99 0-3.732-1.328-4.375-3.261a.733.733 0 01.597-.959l.098-.006h7.36zm-1.195 1.466h-4.97l.101.131a3.115 3.115 0 002.012 1.14l.198.018.174.005c.868 0 1.672-.38 2.254-1.012l.13-.15.101-.132zM7.353 7.547c.374 0 .683.28.728.641l.006.092v1.84a.734.734 0 01-1.461.092l-.006-.092V8.28c0-.405.328-.733.733-.733zm7.36 0c.374 0 .683.28.728.641l.006.092v1.84a.734.734 0 01-1.461.092l-.006-.092V8.28c0-.405.328-.733.733-.733zM18.398 0c.405 0 .733.328.733.733v2.218h2.209a.734.734 0 010 1.467h-2.21v2.209a.732.732 0 11-1.466 0V4.418h-2.217a.734.734 0 110-1.466l2.216-.001.001-2.218c0-.405.328-.733.733-.733z"
+});
+
+function SvgIconReactionsAdd(props) {
+  return React.createElement("svg", _extends$w({
+    viewBox: "0 0 22 22"
+  }, props), _ref$w);
+}
+
+function _extends$x() { _extends$x = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$x.apply(this, arguments); }
+
+var _ref$x =
+/*#__PURE__*/
+React.createElement("path", {
   className: "icon-read_svg__fill",
   fill: "#2EBA9F",
   fillRule: "evenodd",
@@ -1972,14 +2111,14 @@ React.createElement("path", {
 });
 
 function SvgIconRead(props) {
-  return React.createElement("svg", _extends$w({
+  return React.createElement("svg", _extends$x({
     viewBox: "0 0 24 24"
-  }, props), _ref$w);
+  }, props), _ref$x);
 }
 
-function _extends$x() { _extends$x = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$x.apply(this, arguments); }
+function _extends$y() { _extends$y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$y.apply(this, arguments); }
 
-var _ref$x =
+var _ref$y =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-refresh_svg__fill",
@@ -1989,15 +2128,15 @@ React.createElement("path", {
 });
 
 function SvgIconRefresh(props) {
-  return React.createElement("svg", _extends$x({
+  return React.createElement("svg", _extends$y({
     width: 20,
     height: 20
-  }, props), _ref$x);
+  }, props), _ref$y);
 }
 
-function _extends$y() { _extends$y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$y.apply(this, arguments); }
+function _extends$z() { _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$z.apply(this, arguments); }
 
-var _ref$y =
+var _ref$z =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-send_svg__fill",
@@ -2007,14 +2146,14 @@ React.createElement("path", {
 });
 
 function SvgIconSend(props) {
-  return React.createElement("svg", _extends$y({
+  return React.createElement("svg", _extends$z({
     viewBox: "0 0 22 22"
-  }, props), _ref$y);
+  }, props), _ref$z);
 }
 
-function _extends$z() { _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$z.apply(this, arguments); }
+function _extends$A() { _extends$A = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$A.apply(this, arguments); }
 
-var _ref$z =
+var _ref$A =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-sent_svg__fill",
@@ -2024,23 +2163,6 @@ React.createElement("path", {
 });
 
 function SvgIconSent(props) {
-  return React.createElement("svg", _extends$z({
-    viewBox: "0 0 24 24"
-  }, props), _ref$z);
-}
-
-function _extends$A() { _extends$A = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$A.apply(this, arguments); }
-
-var _ref$A =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-shevron_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M8.293 17.293a1 1 0 001.414 1.414l6-6a1 1 0 000-1.414l-6-6a1 1 0 00-1.414 1.414L13.586 12l-5.293 5.293z"
-});
-
-function SvgIconShevron(props) {
   return React.createElement("svg", _extends$A({
     viewBox: "0 0 24 24"
   }, props), _ref$A);
@@ -2051,13 +2173,13 @@ function _extends$B() { _extends$B = Object.assign || function (target) { for (v
 var _ref$B =
 /*#__PURE__*/
 React.createElement("path", {
-  className: "icon-shevron-down_svg__fill",
+  className: "icon-shevron_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M6.045 8.205a1.125 1.125 0 10-1.59 1.59l6.75 6.75c.439.44 1.151.44 1.59 0l6.75-6.75a1.125 1.125 0 10-1.59-1.59L12 14.159 6.045 8.205z"
+  d: "M8.293 17.293a1 1 0 001.414 1.414l6-6a1 1 0 000-1.414l-6-6a1 1 0 00-1.414 1.414L13.586 12l-5.293 5.293z"
 });
 
-function SvgIconShevronDown(props) {
+function SvgIconShevron(props) {
   return React.createElement("svg", _extends$B({
     viewBox: "0 0 24 24"
   }, props), _ref$B);
@@ -2068,13 +2190,13 @@ function _extends$C() { _extends$C = Object.assign || function (target) { for (v
 var _ref$C =
 /*#__PURE__*/
 React.createElement("path", {
-  className: "icon-spinner-small_svg__fill",
+  className: "icon-shevron-down_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M12 22.5c5.799 0 10.5-4.701 10.5-10.5S17.799 1.5 12 1.5 1.5 6.201 1.5 12a1.432 1.432 0 002.864 0A7.636 7.636 0 1112 19.636a1.432 1.432 0 000 2.864z"
+  d: "M6.045 8.205a1.125 1.125 0 10-1.59 1.59l6.75 6.75c.439.44 1.151.44 1.59 0l6.75-6.75a1.125 1.125 0 10-1.59-1.59L12 14.159 6.045 8.205z"
 });
 
-function SvgIconSpinnerSmall(props) {
+function SvgIconShevronDown(props) {
   return React.createElement("svg", _extends$C({
     viewBox: "0 0 24 24"
   }, props), _ref$C);
@@ -2085,6 +2207,23 @@ function _extends$D() { _extends$D = Object.assign || function (target) { for (v
 var _ref$D =
 /*#__PURE__*/
 React.createElement("path", {
+  className: "icon-spinner-small_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M12 22.5c5.799 0 10.5-4.701 10.5-10.5S17.799 1.5 12 1.5 1.5 6.201 1.5 12a1.432 1.432 0 002.864 0A7.636 7.636 0 1112 19.636a1.432 1.432 0 000 2.864z"
+});
+
+function SvgIconSpinnerSmall(props) {
+  return React.createElement("svg", _extends$D({
+    viewBox: "0 0 24 24"
+  }, props), _ref$D);
+}
+
+function _extends$E() { _extends$E = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$E.apply(this, arguments); }
+
+var _ref$E =
+/*#__PURE__*/
+React.createElement("path", {
   className: "icon-user_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -2092,9 +2231,9 @@ React.createElement("path", {
 });
 
 function SvgIconUser(props) {
-  return React.createElement("svg", _extends$D({
+  return React.createElement("svg", _extends$E({
     viewBox: "0 0 24 24"
-  }, props), _ref$D);
+  }, props), _ref$E);
 }
 
 var Colors$1 = {
@@ -2229,6 +2368,9 @@ function changeTypeToIconComponent(type) {
 
     case Type.PLUS:
       return React.createElement(SvgIconPlus, null);
+
+    case Type.REACTIONS_ADD:
+      return React.createElement(SvgIconReactionsAdd, null);
 
     case Type.READ:
       return React.createElement(SvgIconRead, null);
@@ -2745,34 +2887,6 @@ AddChannel.defaultProps = {
   userListQuery: null
 };
 
-var MenuItem = function MenuItem(_ref) {
-  var children = _ref.children,
-      onClick = _ref.onClick;
-  return React.createElement("li", {
-    tabIndex: 0,
-    className: "sendbird-dropdown__menu-item",
-    onClick: onClick,
-    onKeyPress: function onKeyPress(e) {
-      if (e.keyCode === 13) {
-        onClick(e);
-      }
-    },
-    role: "menuitem"
-  }, React.createElement(Label, {
-    type: LabelTypography.SUBTITLE_2,
-    color: LabelColors.ONBACKGROUND_1,
-    className: "sendbird-dropdown__menu-item__text"
-  }, children));
-};
-MenuItem.propTypes = {
-  onClick: PropTypes.func.isRequired,
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired
-};
-var MenuRoot = function MenuRoot() {
-  return React.createElement("div", {
-    id: "sendbird-dropdown-portal"
-  });
-};
 var MenuItems =
 /*#__PURE__*/
 function (_Component) {
@@ -2786,21 +2900,21 @@ function (_Component) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(MenuItems).call(this, props));
 
     _defineProperty(_assertThisInitialized(_this), "showParent", function () {
-      var _this$props$parentRef = _this.props.parentRef,
-          parentRef = _this$props$parentRef === void 0 ? {} : _this$props$parentRef;
-      var current = parentRef.current;
+      var _this$props$parentCon = _this.props.parentContainRef,
+          parentContainRef = _this$props$parentCon === void 0 ? {} : _this$props$parentCon;
+      var current = parentContainRef.current;
 
-      if (parentRef && current) {
+      if (parentContainRef && current) {
         current.classList.add('sendbird-icon--pressed');
       }
     });
 
     _defineProperty(_assertThisInitialized(_this), "hideParent", function () {
-      var _this$props$parentRef2 = _this.props.parentRef,
-          parentRef = _this$props$parentRef2 === void 0 ? {} : _this$props$parentRef2;
-      var current = parentRef.current;
+      var _this$props$parentCon2 = _this.props.parentContainRef,
+          parentContainRef = _this$props$parentCon2 === void 0 ? {} : _this$props$parentCon2;
+      var current = parentContainRef.current;
 
-      if (parentRef && current) {
+      if (parentContainRef && current) {
         current.classList.remove('sendbird-icon--pressed');
       }
     });
@@ -2924,10 +3038,181 @@ MenuItems.propTypes = {
   parentRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({
     current: PropTypes.instanceOf(Element)
   })]).isRequired,
+  parentContainRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({
+    current: PropTypes.instanceOf(Element)
+  })]).isRequired,
   openLeft: PropTypes.bool
 };
 MenuItems.defaultProps = {
   openLeft: false
+};
+
+var ReactionItems =
+/*#__PURE__*/
+function (_Component) {
+  _inherits(ReactionItems, _Component);
+
+  function ReactionItems(props) {
+    var _this;
+
+    _classCallCheck(this, ReactionItems);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(ReactionItems).call(this, props));
+
+    _defineProperty(_assertThisInitialized(_this), "showParent", function () {
+      var _this$props$parentCon = _this.props.parentContainRef,
+          parentContainRef = _this$props$parentCon === void 0 ? {} : _this$props$parentCon;
+      var current = parentContainRef.current;
+
+      if (parentContainRef && current) {
+        current.classList.add('sendbird-reactions--pressed');
+      }
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "hideParent", function () {
+      var _this$props$parentCon2 = _this.props.parentContainRef,
+          parentContainRef = _this$props$parentCon2 === void 0 ? {} : _this$props$parentCon2;
+      var current = parentContainRef.current;
+
+      if (parentContainRef && current) {
+        current.classList.remove('sendbird-reactions--pressed');
+      }
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "setupEvents", function () {
+      var closeDropdown = _this.props.closeDropdown;
+
+      var _assertThisInitialize = _assertThisInitialized(_this),
+          reactionRef = _assertThisInitialize.reactionRef;
+
+      var handleClickOutside = function handleClickOutside(event) {
+        if (reactionRef.current && !reactionRef.current.contains(event.target)) {
+          closeDropdown();
+        }
+      };
+
+      _this.setState({
+        handleClickOutside: handleClickOutside
+      });
+
+      document.addEventListener('mousedown', handleClickOutside);
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "cleanUpEvents", function () {
+      var handleClickOutside = _this.state.handleClickOutside;
+      document.removeEventListener('mousedown', handleClickOutside);
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "getBarPosition", function () {
+      var parentRef = _this.props.parentRef;
+      var parentRect = parentRef.current.getBoundingClientRect();
+      var x = parentRect.x || parentRect.left;
+      var y = parentRect.y || parentRect.top;
+      var reactionStyle = {
+        top: y,
+        left: x
+      };
+      if (!_this.reactionRef.current) return reactionStyle;
+
+      var rect = _this.reactionRef.current.getBoundingClientRect();
+
+      var childRect = _this.reactionRef.current.children[0].getBoundingClientRect();
+
+      if (reactionStyle.top < rect.height) {
+        reactionStyle.top += parentRect.height;
+      } else {
+        reactionStyle.top -= rect.height;
+      }
+
+      reactionStyle.left -= rect.width / 2 - childRect.width / 2;
+      return _this.setState({
+        reactionStyle: reactionStyle
+      });
+    });
+
+    _this.reactionRef = React.createRef();
+    _this.state = {
+      reactionStyle: {},
+      handleClickOutside: function handleClickOutside() {}
+    };
+    return _this;
+  }
+
+  _createClass(ReactionItems, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.setupEvents();
+      this.getBarPosition();
+      this.showParent();
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      this.cleanUpEvents();
+      this.hideParent();
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var reactionStyle = this.state.reactionStyle;
+      var children = this.props.children;
+      return createPortal(React.createElement(React.Fragment, null, React.createElement("div", {
+        className: "sendbird-dropdown__menu-backdrop"
+      }), React.createElement("ul", {
+        className: "sendbird-dropdown__reaction-bar",
+        ref: this.reactionRef,
+        style: {
+          display: 'inline-block',
+          position: 'fixed',
+          left: "".concat(Math.round(reactionStyle.left), "px"),
+          top: "".concat(Math.round(reactionStyle.top), "px")
+        }
+      }, children)), document.getElementById('sendbird-dropdown-portal'));
+    }
+  }]);
+
+  return ReactionItems;
+}(Component);
+ReactionItems.propTypes = {
+  closeDropdown: PropTypes.func.isRequired,
+  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
+  parentRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({
+    current: PropTypes.instanceOf(Element)
+  })]).isRequired,
+  parentContainRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({
+    current: PropTypes.instanceOf(Element)
+  })]).isRequired
+};
+
+var MenuItems$1 = MenuItems;
+var ReactionItems$1 = ReactionItems;
+var MenuItem = function MenuItem(_ref) {
+  var children = _ref.children,
+      onClick = _ref.onClick;
+  return React.createElement("li", {
+    tabIndex: 0,
+    className: "sendbird-dropdown__menu-item",
+    onClick: onClick,
+    onKeyPress: function onKeyPress(e) {
+      if (e.keyCode === 13) {
+        onClick(e);
+      }
+    },
+    role: "menuitem"
+  }, React.createElement(Label, {
+    type: LabelTypography.SUBTITLE_2,
+    color: LabelColors.ONBACKGROUND_1,
+    className: "sendbird-dropdown__menu-item__text"
+  }, children));
+};
+MenuItem.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired
+};
+var MenuRoot = function MenuRoot() {
+  return React.createElement("div", {
+    id: "sendbird-dropdown-portal"
+  });
 };
 function ContextMenu(_ref2) {
   var menuTrigger = _ref2.menuTrigger,
@@ -3005,8 +3290,9 @@ function ChannelPreviewAction(_ref) {
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
+      return React.createElement(MenuItems$1, {
         parentRef: parentRef,
+        parentContainRef: parentRef,
         closeDropdown: closeDropdown
       }, React.createElement(MenuItem, {
         onClick: function onClick() {
@@ -3124,10 +3410,12 @@ ChannelsPlaceholder.propTypes = {
 var createEventHandler = function createEventHandler(_ref) {
   var sdk = _ref.sdk,
       sdkChannelHandlerId = _ref.sdkChannelHandlerId,
-      channelListDispatcher = _ref.channelListDispatcher;
+      channelListDispatcher = _ref.channelListDispatcher,
+      logger = _ref.logger;
   var ChannelHandler = new sdk.ChannelHandler();
 
   ChannelHandler.onChannelChanged = function (channel) {
+    logger.info('ChannelList: onChannelChanged', channel);
     channelListDispatcher({
       type: ON_CHANNEL_CHANGED,
       payload: channel
@@ -3135,6 +3423,7 @@ var createEventHandler = function createEventHandler(_ref) {
   };
 
   ChannelHandler.onChannelDeleted = function (channelUrl) {
+    logger.info('ChannelList: onChannelDeleted', channelUrl);
     channelListDispatcher({
       type: ON_CHANNEL_DELETED,
       payload: channelUrl
@@ -3142,6 +3431,8 @@ var createEventHandler = function createEventHandler(_ref) {
   };
 
   ChannelHandler.onUserJoined = function (channel) {
+    logger.info('ChannelList: onUserJoined', channel);
+
     if (channel.lastMessage) {
       channelListDispatcher({
         type: ON_USER_JOINED,
@@ -3151,6 +3442,7 @@ var createEventHandler = function createEventHandler(_ref) {
   };
 
   ChannelHandler.onUserLeft = function (channel) {
+    logger.info('ChannelList: onUserLeft', channel);
     channelListDispatcher({
       type: ON_USER_LEFT,
       payload: channel
@@ -3158,6 +3450,7 @@ var createEventHandler = function createEventHandler(_ref) {
   };
 
   ChannelHandler.onReadStatus = function (channel) {
+    logger.info('ChannelList: onReadStatus', channel);
     channelListDispatcher({
       type: ON_READ_RECEIPT_UPDATED,
       payload: channel
@@ -3165,6 +3458,8 @@ var createEventHandler = function createEventHandler(_ref) {
   };
 
   ChannelHandler.onDeliveryReceiptUpdated = function (channel) {
+    logger.info('ChannelList: onDeliveryReceiptUpdated', channel);
+
     if (channel.lastMessage) {
       channelListDispatcher({
         type: ON_DELIVERY_RECEIPT_UPDATED,
@@ -3175,6 +3470,7 @@ var createEventHandler = function createEventHandler(_ref) {
 
   ChannelHandler.onMessageUpdated = function (channel, message) {
     if (channel.lastMessage.isEqual(message)) {
+      logger.info('ChannelList: onMessageUpdated', channel);
       channelListDispatcher({
         type: ON_LAST_MESSAGE_UPDATED,
         payload: channel
@@ -3182,6 +3478,7 @@ var createEventHandler = function createEventHandler(_ref) {
     }
   };
 
+  logger.info('ChannelList: Added channelHandler');
   sdk.addChannelHandler(sdkChannelHandlerId, ChannelHandler);
 };
 /**
@@ -3196,11 +3493,13 @@ function setupChannelList(_ref2) {
       sdkChannelHandlerId = _ref2.sdkChannelHandlerId,
       channelListDispatcher = _ref2.channelListDispatcher,
       setChannelSource = _ref2.setChannelSource,
-      onChannelSelect = _ref2.onChannelSelect;
+      onChannelSelect = _ref2.onChannelSelect,
+      logger = _ref2.logger;
   createEventHandler({
     sdk: sdk,
     channelListDispatcher: channelListDispatcher,
-    sdkChannelHandlerId: sdkChannelHandlerId
+    sdkChannelHandlerId: sdkChannelHandlerId,
+    logger: logger
   });
   var channelListQuery = sdk.GroupChannel.createMyGroupChannelListQuery();
   channelListQuery.includeEmpty = false;
@@ -3212,6 +3511,7 @@ function setupChannelList(_ref2) {
   channelListDispatcher({
     type: INIT_CHANNELS_START
   });
+  logger.info('ChannelList - fetching channels');
 
   if (channelListQuery.hasNext) {
     channelListQuery.next(function (response, error) {
@@ -3224,7 +3524,10 @@ function setupChannelList(_ref2) {
         err = response;
       }
 
+      logger.info('ChannelList - fetched channels', channelList);
+
       if (err) {
+        logger.error('ChannelList - couldnt fetch channels', err);
         channelListDispatcher({
           type: INIT_CHANNELS_FAILURE
         });
@@ -3232,6 +3535,7 @@ function setupChannelList(_ref2) {
       } // select first channel
 
 
+      logger.info('ChannelList - highlight channel', channelList[0]);
       onChannelSelect(channelList[0]);
       channelListDispatcher({
         type: INIT_CHANNELS_SUCCESS,
@@ -3239,11 +3543,14 @@ function setupChannelList(_ref2) {
       });
 
       if (channelList && typeof channelList.forEach === 'function') {
+        logger.info('ChannelList - mark all channels as delivered');
         channelList.forEach(function (c) {
           return c.markAsDelivered();
         });
       }
     });
+  } else {
+    logger.warning('ChannelList - there are no more channels');
   }
 }
 
@@ -3258,6 +3565,7 @@ function ChannelList(props) {
       _props$config = props.config,
       userId = _props$config.userId,
       userListQuery = _props$config.userListQuery,
+      logger = _props$config.logger,
       renderChannelPreview = props.renderChannelPreview,
       onChannelSelect = props.onChannelSelect;
   var _sdkStore$sdk = sdkStore.sdk,
@@ -3288,15 +3596,18 @@ function ChannelList(props) {
     setSdkChannelHandlerId(uuidv4);
 
     if (sdkIntialized) {
+      logger.info('ChannelList: Setup channelHandlers');
       setupChannelList({
         sdk: sdk,
         sdkChannelHandlerId: sdkChannelHandlerId,
         channelListDispatcher: channelListDispatcher,
         setChannelSource: setChannelSource,
-        onChannelSelect: onChannelSelect
+        onChannelSelect: onChannelSelect,
+        logger: logger
       });
     } else {
-      // remove previous channelHandlers
+      logger.info('ChannelList: Removing channelHandlers'); // remove previous channelHandlers
+
       if (sdk && sdk.removeChannelHandler) {
         sdk.removeChannelHandler(sdkChannelHandlerId);
       } // remove channelSource
@@ -3310,6 +3621,8 @@ function ChannelList(props) {
     }
 
     return function () {
+      logger.info('ChannelList: Removing channelHandlers');
+
       if (sdk && sdk.removeChannelHandler) {
         sdk.removeChannelHandler(sdkChannelHandlerId);
       }
@@ -3347,6 +3660,7 @@ function ChannelList(props) {
       var fetchMore = e.target.clientHeight + e.target.scrollTop === e.target.scrollHeight;
 
       if (fetchMore && channelSource.hasNext) {
+        logger.info('ChannelList: Fetching more channels');
         channelListDispatcher({
           type: FETCH_CHANNELS_START
         });
@@ -3361,6 +3675,7 @@ function ChannelList(props) {
           }
 
           if (err) {
+            logger.info('ChannelList: Fetching channels failed', err);
             channelListDispatcher({
               type: FETCH_CHANNELS_FAILURE,
               payload: channelList
@@ -3368,12 +3683,14 @@ function ChannelList(props) {
             return;
           }
 
+          logger.info('ChannelList: Fetching channels successful', channelList);
           channelListDispatcher({
             type: FETCH_CHANNELS_SUCCESS,
             payload: channelList
           });
 
           if (channelList && typeof channelList.forEach === 'function') {
+            logger.info('ChannelList: Marking all channels as read');
             channelList.forEach(function (c) {
               return c.markAsDelivered();
             });
@@ -3385,19 +3702,29 @@ function ChannelList(props) {
     type: PlaceHolderTypes.WRONG
   }), React.createElement("div", null, allChannels && allChannels.map(function (channel, idx) {
     var _onLeaveChannel = function onLeaveChannel(c, cb) {
+      logger.info('ChannelList: Leaving channel', c);
       c.leave().then(function (res) {
-        cb(res, null);
+        logger.info('ChannelList: Leaving channel success', res);
+
+        if (cb && typeof cb === 'function') {
+          cb(res, null);
+        }
+
         channelListDispatcher({
           type: LEAVE_CHANNEL_SUCCESS,
           payload: channel.url
         });
       }).catch(function (err) {
-        cb(null, err);
+        logger.error('ChannelList: Leaving channel failed', err);
+
+        if (cb && typeof cb === 'function') {
+          cb(null, err);
+        }
       });
     };
 
     var onClick = function onClick() {
-      onChannelSelect(channel);
+      logger.info('ChannelList: Clicked on channel:', channel);
       channelListDispatcher({
         type: SET_CURRENT_CHANNEL,
         payload: channel.url
@@ -3444,7 +3771,12 @@ ChannelList.propTypes = {
   }).isRequired,
   config: PropTypes.shape({
     userId: PropTypes.string.isRequired,
-    userListQuery: PropTypes.func
+    userListQuery: PropTypes.func,
+    logger: PropTypes.shape({
+      info: PropTypes.func,
+      error: PropTypes.func,
+      warning: PropTypes.func
+    })
   }).isRequired,
   renderChannelPreview: PropTypes.element,
   onChannelSelect: PropTypes.func
@@ -3504,12 +3836,22 @@ function reducer$3(state, action) {
       });
 
     case GET_PREV_MESSAGES_SUCESS:
-      return _objectSpread2({}, state, {
-        loading: false,
-        initialized: true,
-        hasMore: action.payload.hasMore,
-        allMessages: [].concat(_toConsumableArray(action.payload.messages), _toConsumableArray(state.allMessages))
-      });
+      {
+        var recivedMessages = action.payload.messages || []; // remove duplicate messages
+
+        var filteredAllMessages = state.allMessages.filter(function (msg) {
+          return recivedMessages.find(function (_ref) {
+            var messageId = _ref.messageId;
+            return !compareIds(messageId, msg.messageId);
+          });
+        });
+        return _objectSpread2({}, state, {
+          loading: false,
+          initialized: true,
+          hasMore: action.payload.hasMore,
+          allMessages: [].concat(_toConsumableArray(recivedMessages), _toConsumableArray(filteredAllMessages))
+        });
+      }
 
     case SEND_MESSAGEGE_START:
       return _objectSpread2({}, state, {
@@ -3567,7 +3909,7 @@ function reducer$3(state, action) {
 
         return _objectSpread2({}, state, {
           unreadCount: unreadCount + 1,
-          unreadSince: unreadCount === 0 ? moment().format('LT MMM DD') : unreadSince,
+          unreadSince: unreadCount === 0 ? Moment().format('LT MMM DD') : unreadSince,
           allMessages: [].concat(_toConsumableArray(state.allMessages), [message])
         });
       }
@@ -3600,15 +3942,18 @@ function reducer$3(state, action) {
 var eventHandler = (function (_ref) {
   var messagesDispatcher = _ref.messagesDispatcher,
       sdk = _ref.sdk,
-      uniqueId = _ref.uniqueId;
+      uniqueId = _ref.uniqueId,
+      logger = _ref.logger;
 
   if (!sdk || !sdk.ChannelHandler) {
     return;
   }
 
   var ChannelHandler = new sdk.ChannelHandler();
+  logger.info('Channel: Setup event handler');
 
   ChannelHandler.onMessageReceived = function (channel, message) {
+    logger.info('Channel: onMessageReceived', message);
     messagesDispatcher({
       type: ON_MESSAGE_RECEIVED,
       payload: {
@@ -3619,6 +3964,7 @@ var eventHandler = (function (_ref) {
   };
 
   ChannelHandler.onMessageUpdated = function (_, message) {
+    logger.info('Channel: onMessageUpdated', message);
     messagesDispatcher({
       type: ON_MESSAGE_UPDATED,
       payload: message
@@ -3626,6 +3972,7 @@ var eventHandler = (function (_ref) {
   };
 
   ChannelHandler.onMessageDeleted = function (_, messageId) {
+    logger.info('Channel: onMessageDeleted', messageId);
     messagesDispatcher({
       type: ON_MESSAGE_DELETED,
       payload: messageId
@@ -3636,14 +3983,47 @@ var eventHandler = (function (_ref) {
   sdk.addChannelHandler(uniqueId, ChannelHandler);
 });
 
-var getMessageCreatedAt = function getMessageCreatedAt(message) {
-  return moment(message.createdAt).format('LT');
+var ReactionButton = React.forwardRef(function (props, ref) {
+  var children = props.children,
+      width = props.width,
+      height = props.height,
+      _onClick = props.onClick,
+      selected = props.selected,
+      className = props.className;
+  var injectingClassName = Array.isArray(className) ? className : [className];
+  return React.createElement("div", {
+    ref: ref,
+    className: "sendbird-reaction-button".concat(selected ? '--selected' : '', " ").concat(injectingClassName.join(' ')),
+    style: {
+      width: typeof width === 'string' ? "".concat(width.slice(0, -2) - 2, "px") : "".concat(width - 2, "px"),
+      height: typeof height === 'string' ? "".concat(height.slice(0, -2) - 2, "px") : "".concat(height - 2, "px")
+    },
+    onClick: function onClick(e) {
+      return _onClick(e);
+    },
+    role: "button",
+    onKeyDown: function onKeyDown(e) {
+      return _onClick(e);
+    },
+    tabIndex: 0
+  }, React.createElement("div", {
+    className: "sendbird-reaction-button__inner"
+  }, children));
+});
+ReactionButton.propTypes = {
+  children: PropTypes.element.isRequired,
+  onClick: PropTypes.func,
+  selected: PropTypes.bool,
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
 };
-var getSenderName = function getSenderName(message) {
-  return message.sender && (message.sender.friendName || message.sender.nickname || message.sender.userId);
-};
-var getSenderProfileUrl = function getSenderProfileUrl(message) {
-  return message.sender && message.sender.profileUrl;
+ReactionButton.defaultProps = {
+  selected: false,
+  width: '36px',
+  height: '36px',
+  onClick: function onClick() {},
+  className: ''
 };
 
 var MessageStatusType = {
@@ -3652,6 +4032,16 @@ var MessageStatusType = {
   DELIVERED: 'DELIVERED',
   READ: 'READ',
   FAILED: 'FAILED'
+};
+
+var getMessageCreatedAt = function getMessageCreatedAt(message) {
+  return Moment(message.createdAt).format('LT');
+};
+var getSenderName = function getSenderName(message) {
+  return message.sender && (message.sender.friendName || message.sender.nickname || message.sender.userId);
+};
+var getSenderProfileUrl = function getSenderProfileUrl(message) {
+  return message.sender && message.sender.profileUrl;
 };
 
 var MessageStatusTypes = MessageStatusType;
@@ -3787,21 +4177,84 @@ var copyToClipboard = function copyToClipboard(text) {
 
   return false;
 };
+var getMessageCreatedAt$1 = function getMessageCreatedAt(message) {
+  return Moment(message.createdAt).format('LT');
+};
+var getSenderName$1 = function getSenderName(message) {
+  return message.sender && (message.sender.friendName || message.sender.nickname || message.sender.userId);
+};
+var getSenderProfileUrl$1 = function getSenderProfileUrl(message) {
+  return message.sender && message.sender.profileUrl;
+};
+
+var noop$1 = function noop() {};
+
+var SPACE_BETWEEN_MORE = 4;
+var MORE_WIDTH = 32;
+function Message(props) {
+  var isByMe = props.isByMe,
+      message = props.message,
+      className = props.className,
+      showEdit = props.showEdit,
+      showRemove = props.showRemove,
+      status = props.status,
+      useReaction = props.useReaction;
+  var injectingClassName = Array.isArray(className) ? className : [className];
+  injectingClassName.push("sendbird-message".concat(isByMe ? '--outgoing' : '--incoming'));
+  if (!message) return null;
+  return React.createElement("div", {
+    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-message']).join(' ')
+  }, isByMe ? React.createElement(OutgoingUserMessage, {
+    message: message,
+    showEdit: showEdit,
+    showRemove: showRemove,
+    status: status,
+    useReaction: useReaction
+  }) : React.createElement(IncomingUserMessage, {
+    message: message,
+    useReaction: useReaction
+  }));
+}
+Message.propTypes = {
+  isByMe: PropTypes.bool,
+  message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])).isRequired,
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  showEdit: PropTypes.func,
+  status: PropTypes.string,
+  showRemove: PropTypes.func,
+  useReaction: PropTypes.bool
+};
+Message.defaultProps = {
+  isByMe: false,
+  className: '',
+  showEdit: noop$1,
+  showRemove: noop$1,
+  status: '',
+  useReaction: false
+};
 
 function OutgoingUserMessage(_ref) {
   var message = _ref.message,
       showEdit = _ref.showEdit,
       showRemove = _ref.showRemove,
-      status = _ref.status;
+      status = _ref.status,
+      useReaction = _ref.useReaction;
   // TODO: when message.requestState is succeeded, consider if it's SENT or DELIVERED
-  var parentRef = useRef(null);
+  var parentRefReactions = useRef(null);
+  var parentRefMenus = useRef(null);
+  var parentContainRef = useRef(null);
   return React.createElement("div", {
-    className: "sendbird-user-message--outgoing"
+    className: "sendbird-user-message--outgoing",
+    style: {
+      paddingLeft: "".concat(SPACE_BETWEEN_MORE + useReaction ? MORE_WIDTH * 2 : MORE_WIDTH, "px")
+    }
+  }, React.createElement("div", {
+    className: "sendbird-user-message__more",
+    ref: parentContainRef
   }, React.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React.createElement(IconButton, {
-        ref: parentRef,
-        className: "sendbird-user-message__more",
+        ref: parentRefMenus,
         width: "32px",
         height: "32px",
         onClick: toggleDropdown
@@ -3813,8 +4266,9 @@ function OutgoingUserMessage(_ref) {
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
-        parentRef: parentRef,
+      return React.createElement(MenuItems$1, {
+        parentRef: parentRefMenus,
+        parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
         openLeft: true
       }, React.createElement(MenuItem, {
@@ -3834,7 +4288,128 @@ function OutgoingUserMessage(_ref) {
         }
       }, "Delete"));
     }
-  }), React.createElement("div", {
+  }), useReaction && React.createElement(ContextMenu, {
+    menuTrigger: function menuTrigger(toggleDropdown) {
+      return React.createElement(IconButton, {
+        ref: parentRefReactions,
+        width: "32px",
+        height: "32px",
+        onClick: toggleDropdown
+      }, React.createElement(Icon, {
+        width: "24px",
+        height: "24px",
+        type: IconTypes.REACTIONS_ADD,
+        fillColor: IconColors.PRIMARY
+      }));
+    },
+    menuItems: function menuItems(closeDropdown) {
+      return React.createElement(ReactionItems$1, {
+        parentRef: parentRefReactions,
+        closeDropdown: closeDropdown,
+        parentContainRef: parentContainRef
+      }, React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })));
+    }
+  })), React.createElement("div", {
     className: "sendbird-user-message__tooltip"
   }, React.createElement(Label, {
     className: "sendbird-user-message__tooltip__text",
@@ -3849,20 +4424,26 @@ function OutgoingUserMessage(_ref) {
 }
 
 function IncomingUserMessage(_ref2) {
-  var message = _ref2.message;
-  var parentRef = useRef(null);
+  var message = _ref2.message,
+      useReaction = _ref2.useReaction;
+  var parentRefReactions = useRef(null);
+  var parentRefMenus = useRef(null);
+  var parentContainRef = useRef(null);
   return React.createElement("div", {
-    className: "sendbird-user-message--incoming"
+    className: "sendbird-user-message--incoming",
+    style: {
+      paddingRight: "".concat(SPACE_BETWEEN_MORE + useReaction ? MORE_WIDTH * 2 : MORE_WIDTH, "px")
+    }
   }, React.createElement(Avatar, {
     className: "sendbird-user-message__avatar",
-    src: getSenderProfileUrl(message),
+    src: getSenderProfileUrl$1(message),
     width: "28px",
     height: "28px"
   }), React.createElement(Label, {
     className: "sendbird-user-message__sender-name",
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
-  }, getSenderName(message)), React.createElement("div", {
+  }, getSenderName$1(message)), React.createElement("div", {
     className: "sendbird-user-message__tooltip"
   }, React.createElement(Label, {
     className: "sendbird-user-message__tooltip__text",
@@ -3872,11 +4453,134 @@ function IncomingUserMessage(_ref2) {
     className: "sendbird-user-message__sent-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
-  }, getMessageCreatedAt(message)), React.createElement(ContextMenu, {
+  }, getMessageCreatedAt$1(message)), React.createElement("div", {
+    className: "sendbird-user-message__more",
+    ref: parentContainRef
+  }, useReaction && React.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React.createElement(IconButton, {
-        ref: parentRef,
-        className: "sendbird-user-message__more",
+        ref: parentRefReactions,
+        width: "32px",
+        height: "32px",
+        onClick: toggleDropdown
+      }, React.createElement(Icon, {
+        width: "24px",
+        height: "24px",
+        type: IconTypes.REACTIONS_ADD,
+        fillColor: IconColors.PRIMARY
+      }));
+    },
+    menuItems: function menuItems(closeDropdown) {
+      return React.createElement(ReactionItems$1, {
+        parentRef: parentRefReactions,
+        closeDropdown: closeDropdown,
+        parentContainRef: parentContainRef
+      }, React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })), React.createElement(ReactionButton, {
+        width: "36px",
+        height: "36px",
+        onClick: function onClick() {
+          closeDropdown();
+        }
+      }, React.createElement(Icon, {
+        width: "28px",
+        height: "28px",
+        type: IconTypes.DUMMY
+      })));
+    }
+  }), React.createElement(ContextMenu, {
+    menuTrigger: function menuTrigger(toggleDropdown) {
+      return React.createElement(IconButton, {
+        ref: parentRefMenus,
         width: "32px",
         height: "32px",
         onClick: toggleDropdown
@@ -3888,8 +4592,9 @@ function IncomingUserMessage(_ref2) {
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
-        parentRef: parentRef,
+      return React.createElement(MenuItems$1, {
+        parentRef: parentRefMenus,
+        parentContainRef: parentContainRef,
         closeDropdown: closeDropdown
       }, React.createElement(MenuItem, {
         onClick: function onClick() {
@@ -3898,65 +4603,29 @@ function IncomingUserMessage(_ref2) {
         }
       }, "Copy"));
     }
-  }));
+  })));
 }
 
 IncomingUserMessage.propTypes = {
-  message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object]))
+  message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])),
+  useReaction: PropTypes.bool
 };
 IncomingUserMessage.defaultProps = {
-  message: {}
+  message: {},
+  useReaction: false
 };
 OutgoingUserMessage.propTypes = {
   message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])),
   showEdit: PropTypes.func,
   showRemove: PropTypes.func,
-  status: PropTypes.string.isRequired
+  status: PropTypes.string.isRequired,
+  useReaction: PropTypes.bool
 };
 OutgoingUserMessage.defaultProps = {
   message: {},
   showEdit: function showEdit() {},
-  showRemove: function showRemove() {}
-};
-
-var noop$1 = function noop() {};
-
-function Message(props) {
-  var isByMe = props.isByMe,
-      message = props.message,
-      className = props.className,
-      showEdit = props.showEdit,
-      showRemove = props.showRemove,
-      status = props.status;
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.push("sendbird-message".concat(isByMe ? '--outgoing' : '--incoming'));
-  if (!message) return null;
-  return React.createElement("div", {
-    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-message']).join(' ')
-  }, isByMe ? React.createElement(OutgoingUserMessage, {
-    message: message,
-    showEdit: showEdit,
-    showRemove: showRemove,
-    status: status
-  }) : React.createElement(IncomingUserMessage, {
-    message: message
-  }) // file messages should be here
-  );
-}
-Message.propTypes = {
-  isByMe: PropTypes.bool,
-  message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])).isRequired,
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-  showEdit: PropTypes.func,
-  status: PropTypes.string,
-  showRemove: PropTypes.func
-};
-Message.defaultProps = {
-  isByMe: false,
-  className: '',
-  showEdit: noop$1,
-  showRemove: noop$1,
-  status: ''
+  showRemove: function showRemove() {},
+  useReaction: false
 };
 
 function AdminMessage(_ref) {
@@ -4051,8 +4720,9 @@ function ThumbnailMessage(_ref) {
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
+      return React.createElement(MenuItems$1, {
         parentRef: parentRef,
+        parentContainRef: parentRef,
         closeDropdown: closeDropdown,
         openLeft: true
       }, React.createElement(MenuItem, {
@@ -4233,7 +4903,7 @@ function OutgoingFileMessage(_ref) {
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
+      return React.createElement(MenuItems$1, {
         parentRef: parentRef,
         closeDropdown: closeDropdown,
         openLeft: true
@@ -4717,7 +5387,8 @@ function MessageHoc(_ref) {
       hasSeperator = _ref.hasSeperator,
       deleteMessage = _ref.deleteMessage,
       updateMessage = _ref.updateMessage,
-      status = _ref.status;
+      status = _ref.status,
+      useReaction = _ref.useReaction;
   var _message$sender = message.sender,
       sender = _message$sender === void 0 ? {} : _message$sender;
 
@@ -4757,7 +5428,7 @@ function MessageHoc(_ref) {
   }, hasSeperator && React.createElement(DateSeparator, null, React.createElement(Label, {
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
-  }, moment(message.createdAt).format('LL'))), (message.isFileMessage && message.isFileMessage() || message.messageType === 'file') && React.createElement(React.Fragment, null, isImage(message.type) || isVideo(message.type) ? React.createElement(ThumbnailMessage, {
+  }, Moment(message.createdAt).format('LL'))), (message.isFileMessage && message.isFileMessage() || message.messageType === 'file') && React.createElement(React.Fragment, null, isImage(message.type) || isVideo(message.type) ? React.createElement(ThumbnailMessage, {
     message: message,
     isByMe: isByMe,
     showRemove: setShowRemove,
@@ -4775,7 +5446,8 @@ function MessageHoc(_ref) {
     isByMe: isByMe,
     showEdit: setShowEdit,
     showRemove: setShowRemove,
-    status: status
+    status: status,
+    useReaction: useReaction
   }), showRemove && React.createElement(RemoveMessage, {
     onCloseModal: function onCloseModal() {
       return setShowRemove(false);
@@ -4819,7 +5491,9 @@ MessageHoc.propTypes = {
   hasSeperator: PropTypes.bool,
   deleteMessage: PropTypes.func.isRequired,
   updateMessage: PropTypes.func.isRequired,
-  status: PropTypes.string
+  status: PropTypes.string,
+  useReaction: PropTypes.bool.isRequired // emojiList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+
 };
 MessageHoc.defaultProps = {
   userId: '',
@@ -4987,7 +5661,7 @@ function (_Component) {
         var prevCreatedAt = prev && prev.createdAt;
         var currentCreatedAt = m.createdAt; // https://stackoverflow.com/a/41855608
 
-        var hasSeperator = !(prevCreatedAt && moment(currentCreatedAt).isSame(moment(prevCreatedAt), 'day'));
+        var hasSeperator = !(prevCreatedAt && Moment(currentCreatedAt).isSame(Moment(prevCreatedAt), 'day'));
 
         if (renderChatItem) {
           return React.createElement("div", {
@@ -5008,7 +5682,9 @@ function (_Component) {
           userId: userId,
           hasSeperator: hasSeperator,
           deleteMessage: deleteMessage,
-          updateMessage: updateMessage
+          updateMessage: updateMessage,
+          useReaction: false // it will be changed to true for Reactions releasing
+
         });
       }))));
     }
@@ -5100,7 +5776,8 @@ var generateTypingIndicatorString = function generateTypingIndicatorString(membe
 
 function TypingIndicator(_ref) {
   var channelUrl = _ref.channelUrl,
-      sb = _ref.sb;
+      sb = _ref.sb,
+      logger = _ref.logger;
 
   var _useState = useState(uuidv4()),
       _useState2 = _slicedToArray(_useState, 2),
@@ -5119,6 +5796,7 @@ function TypingIndicator(_ref) {
       var handler = new sb.ChannelHandler(); // there is a possible warning in here - setState called after unmount
 
       handler.onTypingStatusUpdated = function (groupChannel) {
+        logger.info('Channel > Typing Indicator: onTypingStatusUpdated', groupChannel);
         var members = groupChannel.getTypingMembers();
 
         if (groupChannel.url === channelUrl) {
@@ -5148,11 +5826,14 @@ TypingIndicator.propTypes = {
     ChannelHandler: PropTypes.func,
     removeChannelHandler: PropTypes.func,
     addChannelHandler: PropTypes.func
+  }).isRequired,
+  logger: PropTypes.shape({
+    info: PropTypes.func
   }).isRequired
 };
 
 var prettyDate = function prettyDate(date) {
-  return moment(date, 'x').fromNow();
+  return Moment(date, 'x').fromNow();
 };
 var getChannelAvatarSource$1 = function getChannelAvatarSource(channel, currentUserId) {
   if (channel && channel.coverUrl) {
@@ -5311,7 +5992,9 @@ var ConversationPanel = function ConversationPanel(props) {
       _props$stores = props.stores,
       sdkStore = _props$stores.sdkStore,
       userStore = _props$stores.userStore,
-      userId = props.config.userId,
+      _props$config = props.config,
+      userId = _props$config.userId,
+      logger = _props$config.logger,
       reconnect = props.dispatchers.reconnect,
       renderChatItem = props.renderChatItem,
       onChatHeaderActionClick = props.onChatHeaderActionClick;
@@ -5373,15 +6056,18 @@ var ConversationPanel = function ConversationPanel(props) {
       unreadSince = messagesStore.unreadSince; // to create message-datasource
 
   useEffect(function () {
+    logger.info('Channel: Setup started');
     messagesDispatcher({
       type: RESET_MESSAGES
     });
 
     if (!sdkInit) {
+      logger.warning('Channel: SDK not ready');
       setMessageSource(null);
     }
 
     if (channelUrl && sdkInit) {
+      logger.info('Channel: Set current channel', channelUrl);
       messagesDispatcher({
         type: SET_CURRENT_CHANNEL$1,
         payload: channelUrl
@@ -5389,6 +6075,7 @@ var ConversationPanel = function ConversationPanel(props) {
       // to do - move to cleanup fn
 
       if (sdk && sdk.removeChannelHandler) {
+        logger.info('Channel: Remove previous event handler');
         sdk.removeChannelHandler(channelHandlerId);
       }
 
@@ -5397,7 +6084,10 @@ var ConversationPanel = function ConversationPanel(props) {
       }
 
       sdk.GroupChannel.getChannel(channelUrl, function (groupChannel) {
+        logger.info('Channel: Fetched channel', groupChannel);
+
         if (!groupChannel) {
+          logger.warning('Channel: Invalid channel');
           setInvalidChannel(true);
           return;
         }
@@ -5429,7 +6119,8 @@ var ConversationPanel = function ConversationPanel(props) {
 
         var newHandlerId = uuidv4();
         sdk.addChannelHandler(newHandlerId, handler);
-        setChannelHandlerId(newHandlerId); // this order is important - this mark as read should update the event handler up above
+        setChannelHandlerId(newHandlerId);
+        logger.info('Channel: Mark as read', groupChannel); // this order is important - this mark as read should update the event handler up above
 
         groupChannel.markAsRead(); // There should only be one single instance per channel view.
 
@@ -5437,6 +6128,7 @@ var ConversationPanel = function ConversationPanel(props) {
         prevMessageListQuery.limit = 30;
         prevMessageListQuery.reverse = false;
         setMessageSource(prevMessageListQuery);
+        logger.info('Channel: Fetching messages', groupChannel);
         messagesDispatcher({
           type: GET_PREV_MESSAGES_START
         }); // Retrieving previous messages.
@@ -5452,10 +6144,11 @@ var ConversationPanel = function ConversationPanel(props) {
           }
 
           if (error) {
-            // maybe - add error state
+            logger.error('Channel: Fetching messages failed', error);
             return;
           }
 
+          logger.info('Channel: Fetching messages success', messages);
           messagesDispatcher({
             type: GET_PREV_MESSAGES_SUCESS,
             payload: {
@@ -5473,6 +6166,7 @@ var ConversationPanel = function ConversationPanel(props) {
 
     return function () {
       if (sdk && sdk.removeChannelHandler) {
+        logger.info('Channel: Removing channel handler', channelHandlerId);
         sdk.removeChannelHandler(channelHandlerId);
       }
     };
@@ -5484,12 +6178,14 @@ var ConversationPanel = function ConversationPanel(props) {
     if (channelUrl && sdk) {
       eventHandler({
         messagesDispatcher: messagesDispatcher,
-        sdk: sdk
+        sdk: sdk,
+        logger: logger
       });
     }
 
     return function () {
       if (sdk && sdk.removeChannelHandler) {
+        logger.info('Channel: Removing message reciver handler', messageReciverId);
         sdk.removeChannelHandler(messageReciverId);
       }
     };
@@ -5514,6 +6210,7 @@ var ConversationPanel = function ConversationPanel(props) {
     }, React.createElement(PlaceHolder, {
       type: PlaceHolderTypes.WRONG,
       retryToConnect: function retryToConnect() {
+        logger.info('Channel: reconnecting');
         reconnect();
       }
     }));
@@ -5579,16 +6276,20 @@ var ConversationPanel = function ConversationPanel(props) {
     currentGroupChannel: currentGroupChannel,
     renderChatItem: renderChatItem,
     deleteMessage: function deleteMessage(message, cb) {
+      logger.info('Channel: Deleting message', message);
       currentGroupChannel.deleteMessage(message, function (err) {
         if (cb) {
           cb(err);
         }
 
         if (!err) {
+          logger.info('Channel: Deleting message success!', message);
           messagesDispatcher({
             type: ON_MESSAGE_DELETED,
             payload: message.messageId
           });
+        } else {
+          logger.warning('Channel: Deleting message failed!', err);
         }
       });
     },
@@ -5596,6 +6297,7 @@ var ConversationPanel = function ConversationPanel(props) {
       var params = new sdk.UserMessageParams();
       params.message = text;
       currentGroupChannel.updateUserMessage(messageId, params, function (r, e) {
+        logger.info('Channel: Updating message!', params);
         var swapParams = sdk.getErrorFirstCallback();
         var message = r;
         var err = e;
@@ -5610,10 +6312,13 @@ var ConversationPanel = function ConversationPanel(props) {
         }
 
         if (!err) {
+          logger.info('Channel: Updating message success!', message);
           messagesDispatcher({
             type: ON_MESSAGE_UPDATED,
             payload: message
           });
+        } else {
+          logger.warning('Channel: Updating message failed!', err);
         }
       });
     }
@@ -5629,6 +6334,7 @@ var ConversationPanel = function ConversationPanel(props) {
       var text = messageInputRef.current.value;
       var params = new sdk.UserMessageParams();
       params.message = text;
+      logger.info('Channel: Sending message start!', params);
       var pendingMsg = currentGroupChannel.sendUserMessage(params, function (res, err) {
         var swapParams = sdk.getErrorFirstCallback();
         var message = res;
@@ -5640,6 +6346,7 @@ var ConversationPanel = function ConversationPanel(props) {
         }
 
         if (error) {
+          logger.error('Channel: Sending message failed!', params);
           messagesDispatcher({
             type: SEND_MESSAGEGE_FAILURE,
             payload: params
@@ -5647,6 +6354,7 @@ var ConversationPanel = function ConversationPanel(props) {
           return;
         }
 
+        logger.info('Channel: Sending message success!', message);
         messagesDispatcher({
           type: SEND_MESSAGEGE_SUCESS,
           payload: message
@@ -5663,6 +6371,7 @@ var ConversationPanel = function ConversationPanel(props) {
     onFileUpload: function onFileUpload(file) {
       var params = new sdk.FileMessageParams();
       params.file = file;
+      logger.info('Channel: Uploading file message start!', params);
       var pendingMsg = currentGroupChannel.sendFileMessage(params, function (response, err) {
         var swapParams = sdk.getErrorFirstCallback();
         var message = response;
@@ -5674,6 +6383,7 @@ var ConversationPanel = function ConversationPanel(props) {
         }
 
         if (error) {
+          logger.error('Channel: Sending message failed!', message);
           messagesDispatcher({
             type: SEND_MESSAGEGE_FAILURE,
             payload: params
@@ -5681,6 +6391,7 @@ var ConversationPanel = function ConversationPanel(props) {
           return;
         }
 
+        logger.info('Channel: Sending message success!', message);
         messagesDispatcher({
           type: SEND_MESSAGEGE_SUCESS,
           payload: message
@@ -5702,7 +6413,8 @@ var ConversationPanel = function ConversationPanel(props) {
     className: "sendbird-conversation__typing-indicator"
   }, React.createElement(TypingIndicator, {
     channelUrl: channelUrl,
-    sb: sdk
+    sb: sdk,
+    logger: logger
   }))));
 };
 ConversationPanel.propTypes = {
@@ -5729,7 +6441,12 @@ ConversationPanel.propTypes = {
     reconnect: PropTypes.func
   }).isRequired,
   config: PropTypes.shape({
-    userId: PropTypes.string.isRequired
+    userId: PropTypes.string.isRequired,
+    logger: PropTypes.shape({
+      info: PropTypes.func,
+      error: PropTypes.func,
+      warning: PropTypes.func
+    })
   }).isRequired,
   renderChatItem: PropTypes.element,
   onChatHeaderActionClick: PropTypes.func
@@ -5837,7 +6554,10 @@ var EditDetails = function EditDetails(props) {
     type: Type$1.PRIMARY
   }, React.createElement("form", {
     className: "channel-profile-form",
-    ref: formRef
+    ref: formRef,
+    onSubmit: function onSubmit(e) {
+      e.preventDefault();
+    }
   }, React.createElement("div", {
     className: "channel-profile-form__img-section"
   }, React.createElement(InputLabel, null, LabelStringSet.MODAL__CHANNEL_INFORMATION__CHANNEL_IMAGE), React.createElement("div", {
@@ -6045,7 +6765,8 @@ function ChannelSettings(props) {
   var sdkStore = props.stores.sdkStore,
       _props$config = props.config,
       userListQuery = _props$config.userListQuery,
-      userId = _props$config.userId;
+      userId = _props$config.userId,
+      logger = _props$config.logger;
   var sdk = sdkStore.sdk,
       initialized = sdkStore.initialized; // hack to kepp track of channel updates by triggering useEffect
 
@@ -6075,17 +6796,23 @@ function ChannelSettings(props) {
       setShowLeaveChannelModal = _useState10[1];
 
   useEffect(function () {
+    logger.info('ChannelSettings: Setting up');
+
     if (!channelUrl || !initialized || !sdk) {
+      logger.warning('ChannelSettings: Setting up failed', 'No channelUrl or sdk uninitialized');
       setInvalidChannel(false);
     } else {
       if (!sdk || !sdk.GroupChannel) {
+        logger.warning('ChannelSettings: No GroupChannel');
         return;
       }
 
       sdk.GroupChannel.getChannel(channelUrl, function (groupChannel) {
         if (!groupChannel) {
+          logger.warning('ChannelSettings: Channel not found');
           setInvalidChannel(true);
         } else {
+          logger.info('ChannelSettings: Fetched group channel', groupChannel);
           setInvalidChannel(false);
           setChannel(groupChannel);
         }
@@ -6107,6 +6834,7 @@ function ChannelSettings(props) {
       height: "24px",
       width: "24px",
       onClick: function onClick() {
+        logger.info('ChannelSettings: Click close');
         onCloseClick();
       }
     })), React.createElement("div", null, React.createElement(PlaceHolder, {
@@ -6127,6 +6855,7 @@ function ChannelSettings(props) {
     height: "24px",
     width: "24px",
     onClick: function onClick() {
+      logger.info('ChannelSettings: Click close');
       onCloseClick();
     }
   })), React.createElement("div", {
@@ -6135,7 +6864,9 @@ function ChannelSettings(props) {
     avatar: getChannelAvatarSource(channel, userId),
     title: channel.name,
     onChannelInfoChange: function onChannelInfoChange(currentImg, currentTitle) {
+      logger.info('ChannelSettings: Channel information being updated');
       channel.updateChannel(currentTitle, currentImg, channel.data, function (response) {
+        logger.info('ChannelSettings: Channel information updated', response);
         onChannelModified(response);
         setChannelUpdateId(uuidv4());
       });
@@ -6171,9 +6902,11 @@ function ChannelSettings(props) {
     swapParams: sdk && sdk.getErrorFirstCallback && sdk.getErrorFirstCallback(),
     members: channel.members,
     onInviteMemebers: function onInviteMemebers(selectedMemebers) {
+      logger.info('ChannelSettings: Inviting new users');
       channel.inviteWithUserIds(selectedMemebers).then(function (res) {
         onChannelModified(res);
         setChannelUpdateId(uuidv4());
+        logger.info('ChannelSettings: Inviting new users success!', res);
       });
     }
   }), React.createElement("div", {
@@ -6199,7 +6932,9 @@ function ChannelSettings(props) {
       return setShowLeaveChannelModal(false);
     },
     onLeaveChannel: function onLeaveChannel() {
+      logger.info('ChannelSettings: Leaving channel', channel);
       channel.leave().then(function () {
+        logger.info('ChannelSettings: Leaving channel successful!', channel);
         onCloseClick();
       });
     }
@@ -6225,7 +6960,12 @@ ChannelSettings.propTypes = {
   }).isRequired,
   config: PropTypes.shape({
     userId: PropTypes.string,
-    userListQuery: PropTypes.func
+    userListQuery: PropTypes.func,
+    logger: PropTypes.shape({
+      info: PropTypes.func,
+      error: PropTypes.func,
+      warning: PropTypes.func
+    })
   }).isRequired
 };
 ChannelSettings.defaultProps = {
@@ -6241,7 +6981,9 @@ function App(props) {
       theme = props.theme,
       userListQuery = props.userListQuery,
       nickname = props.nickname,
-      profileUrl = props.profileUrl;
+      profileUrl = props.profileUrl,
+      _props$config = props.config,
+      config = _props$config === void 0 ? {} : _props$config;
 
   var _useState = useState(null),
       _useState2 = _slicedToArray(_useState, 2),
@@ -6260,7 +7002,8 @@ function App(props) {
     theme: theme,
     nickname: nickname,
     profileUrl: profileUrl,
-    userListQuery: userListQuery
+    userListQuery: userListQuery,
+    config: config
   }, React.createElement("div", {
     className: "sendbird-app__wrap"
   }, React.createElement("div", {
@@ -6269,6 +7012,8 @@ function App(props) {
     onChannelSelect: function onChannelSelect(channel) {
       if (channel && channel.url) {
         setCurrentChannelUrl(channel.url);
+      } else {
+        setCurrentChannelUrl('');
       }
     }
   })), React.createElement("div", {
@@ -6294,14 +7039,19 @@ App.propTypes = {
   theme: PropTypes.string,
   userListQuery: PropTypes.func,
   nickname: PropTypes.string,
-  profileUrl: PropTypes.string
+  profileUrl: PropTypes.string,
+  config: PropTypes.shape({
+    // None Error Warning Info 'All/Debug'
+    logLevel: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
+  })
 };
 App.defaultProps = {
   accessToken: '',
   theme: 'light',
   nickname: '',
   profileUrl: '',
-  userListQuery: null
+  userListQuery: null,
+  config: {}
 };
 
 // SendBird disconnect. Invalidates currentUser
