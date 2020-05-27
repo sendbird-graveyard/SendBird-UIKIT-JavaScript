@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.3(May 27, 2020)
+
+- Bug fixes:
+  * Option to delete messages that failed because of image moderation
+  * Stability fix for resending failed messages
+  * Minor visual fixes
+
 ## 1.0.2(May 12, 2020)
 
 - Features:

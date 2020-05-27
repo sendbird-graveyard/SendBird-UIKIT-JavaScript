@@ -192,7 +192,8 @@ var withSendbirdContext = function withSendbirdContext(OriginalComponent, mapSto
       if (mapStoreToProps && typeof mapStoreToProps !== 'function') {
         // eslint-disable-next-line no-console
         console.warn('Second parameter to withSendbirdContext must be a pure function');
-      }
+      } // todo - memoize
+
 
       var mergedProps = mapStoreToProps && typeof mapStoreToProps === 'function' ? _objectSpread2({}, mapStoreToProps(context), {}, props) : _objectSpread2({}, context, {}, props); // eslint-disable-next-line react/jsx-props-no-spreading
 
@@ -214,7 +215,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.0.2';
+var APP_VERSION_STRING = '1.0.3';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -811,6 +812,70 @@ function reducer$2(state, action) {
   }
 }
 
+/*
+  ImageRenderer displays image with url or source
+  it checks if the source exist with img tag first
+  if it exists onLoad is called, if not onError is called
+  and those properties switch img tag to real purposing element
+*/
+
+function ImageRenderer(_ref) {
+  var alt = _ref.alt,
+      url = _ref.url,
+      width = _ref.width,
+      height = _ref.height,
+      className = _ref.className,
+      defaultComponent = _ref.defaultComponent,
+      circle = _ref.circle;
+  var injectingClassName = Array.isArray(className) ? className : [className];
+  injectingClassName.unshift('sendbird-image-renderer');
+
+  var _useState = useState(null),
+      _useState2 = _slicedToArray(_useState, 2),
+      realElement = _useState2[0],
+      setRealElement = _useState2[1];
+
+  useEffect(function () {
+    setRealElement(null);
+  }, [url]);
+  return realElement || React.createElement("img", {
+    className: "sendbird-image-renderer--hidden-placeholder",
+    src: url,
+    alt: alt,
+    onError: function onError() {
+      setRealElement(typeof defaultComponent === 'function' ? defaultComponent() : defaultComponent);
+    },
+    onLoad: function onLoad() {
+      setRealElement(React.createElement("div", {
+        className: injectingClassName.join(' '),
+        style: {
+          height: height,
+          width: width,
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          backgroundImage: "url(".concat(url, ")"),
+          borderRadius: circle ? '50%' : null
+        }
+      }));
+    }
+  });
+}
+ImageRenderer.propTypes = {
+  alt: PropTypes.string,
+  url: PropTypes.string.isRequired,
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  className: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.string), PropTypes.string]),
+  defaultComponent: PropTypes.oneOfType([PropTypes.element, PropTypes.func]).isRequired,
+  circle: PropTypes.bool
+};
+ImageRenderer.defaultProps = {
+  alt: '',
+  className: '',
+  circle: false
+};
+
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 var _ref =
@@ -871,63 +936,27 @@ var uuidv4 = function uuidv4() {
   });
 };
 
-var Img = function Img(_ref) {
-  var src = _ref.src,
-      height = _ref.height,
-      width = _ref.width,
-      alt = _ref.alt;
-
-  var _useState = useState(null),
-      _useState2 = _slicedToArray(_useState, 2),
-      realElement = _useState2[0],
-      setRealElement = _useState2[1]; // rerender element on src change
-
-
-  useEffect(function () {
-    setRealElement(null);
-  }, [src]);
-  return realElement || React.createElement("img", {
-    src: src,
-    alt: alt,
-    onError: function onError() {
-      setRealElement(document.querySelector('.sendbird-theme--dark') ? React.createElement(SvgIconAvatarDark, {
-        className: "sendbird-avatar-img",
-        style: {
-          height: height,
-          width: width
-        }
-      }) : React.createElement(SvgIconAvatarLight, {
-        className: "sendbird-avatar-img",
-        style: {
-          height: height,
-          width: width
-        }
-      }));
-    },
-    onLoad: function onLoad() {
-      setRealElement(React.createElement("div", {
-        className: "sendbird-avatar-img",
-        style: {
-          height: height,
-          width: width,
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center',
-          backgroundSize: 'cover',
-          backgroundImage: "url(".concat(src, ")")
-        }
-      }));
-    }
-  });
+var defaultComponent = function defaultComponent(_ref) {
+  var width = _ref.width,
+      height = _ref.height;
+  return function () {
+    return document.querySelector('.sendbird-theme--dark') ? React.createElement(SvgIconAvatarDark, {
+      className: "sendbird-avatar-img",
+      style: {
+        height: height,
+        width: width
+      }
+    }) : React.createElement(SvgIconAvatarLight, {
+      className: "sendbird-avatar-img",
+      style: {
+        height: height,
+        width: width
+      }
+    });
+  };
 };
-Img.propTypes = {
-  src: PropTypes.string,
-  height: PropTypes.string.isRequired,
-  width: PropTypes.string.isRequired,
-  alt: PropTypes.string.isRequired
-};
-Img.defaultProps = {
-  src: null
-};
+
+var imageRendererClassName = 'sendbird-avatar-img';
 var AvatarInner = function AvatarInner(_ref2) {
   var src = _ref2.src,
       height = _ref2.height,
@@ -935,81 +964,127 @@ var AvatarInner = function AvatarInner(_ref2) {
       alt = _ref2.alt;
 
   if (typeof src === 'string') {
-    return React.createElement(Img, {
-      src: src,
+    return React.createElement(ImageRenderer, {
+      className: imageRendererClassName,
+      url: src,
       height: height,
       width: width,
-      alt: alt
+      alt: alt,
+      defaultComponent: defaultComponent({
+        height: height,
+        width: width
+      })
     });
   }
 
   if (src && src.length) {
     if (src.length === 1) {
-      return React.createElement(Img, {
-        src: src[0],
+      return React.createElement(ImageRenderer, {
+        className: imageRendererClassName,
+        url: src[0],
         height: height,
         width: width,
-        alt: alt
+        alt: alt,
+        defaultComponent: defaultComponent({
+          height: height,
+          width: width
+        })
       });
     }
 
     if (src.length === 2) {
       return React.createElement("div", {
         className: "sendbird-avatar--inner__two-child"
-      }, React.createElement(Img, {
-        src: src[0],
+      }, React.createElement(ImageRenderer, {
+        className: imageRendererClassName,
+        url: src[0],
         height: height,
         width: width,
-        alt: alt
-      }), React.createElement(Img, {
-        src: src[1],
+        alt: alt,
+        defaultComponent: defaultComponent({
+          height: height,
+          width: width
+        })
+      }), React.createElement(ImageRenderer, {
+        className: imageRendererClassName,
+        url: src[1],
         height: height,
         width: width,
-        alt: alt
+        alt: alt,
+        defaultComponent: defaultComponent({
+          height: height,
+          width: width
+        })
       }));
     }
 
     if (src.length === 3) {
       return React.createElement(React.Fragment, null, React.createElement("div", {
         className: "sendbird-avatar--inner__three-child--upper"
-      }, React.createElement(Img, {
-        src: src[0],
+      }, React.createElement(ImageRenderer, {
+        className: imageRendererClassName,
+        url: src[0],
         height: height,
         width: width,
-        alt: alt
+        alt: alt,
+        defaultComponent: defaultComponent({
+          height: height,
+          width: width
+        })
       })), React.createElement("div", {
         className: "sendbird-avatar--inner__three-child--lower"
-      }, React.createElement(Img, {
-        src: src[1],
+      }, React.createElement(ImageRenderer, {
+        className: imageRendererClassName,
+        url: src[1],
         height: height,
         width: width,
-        alt: alt
-      }), React.createElement(Img, {
-        src: src[2],
+        alt: alt,
+        defaultComponent: defaultComponent({
+          height: height,
+          width: width
+        })
+      }), React.createElement(ImageRenderer, {
+        className: imageRendererClassName,
+        url: src[2],
         height: height,
         width: width,
-        alt: alt
+        alt: alt,
+        defaultComponent: defaultComponent({
+          height: height,
+          width: width
+        })
       })));
     }
 
     return React.createElement("div", {
       className: "sendbird-avatar--inner__four-child"
     }, src.slice(0, 4).map(function (i) {
-      return React.createElement(Img, {
-        src: i,
+      return React.createElement(ImageRenderer, {
+        className: imageRendererClassName,
+        url: i,
         height: height,
         width: width,
         alt: alt,
-        key: uuidv4()
+        key: uuidv4(),
+        defaultComponent: defaultComponent({
+          height: height,
+          width: width
+        })
       });
     }));
   } // default img
 
 
-  return React.createElement(Img, {
+  return React.createElement(ImageRenderer, {
+    className: imageRendererClassName,
+    url: "",
     height: height,
     width: width,
-    alt: alt
+    alt: alt,
+    defaultComponent: defaultComponent({
+      height: height,
+      width: width
+    })
   });
 };
 AvatarInner.propTypes = {
@@ -1503,6 +1578,8 @@ var Type = {
   EDIT: 'EDIT',
   ERROR: 'ERROR',
   ERROR_FILLED: 'ERROR_FILLED',
+  EMOJI_FAILED: 'EMOJI_FAILED',
+  EMOJI_REACTIONS_ADD: 'EMOJI_REACTIONS_ADD',
   DELIVERED: 'DELIVERED',
   DOCUMENT: 'DOCUMENT',
   DOWNLOAD: 'DOWNLOAD',
@@ -1832,6 +1909,50 @@ function _extends$j() { _extends$j = Object.assign || function (target) { for (v
 
 var _ref$j =
 /*#__PURE__*/
+React.createElement("g", {
+  className: "emoji-fail_svg__fill",
+  fill: "none",
+  fillRule: "evenodd"
+}, React.createElement("rect", {
+  width: 26.526,
+  height: 26.526,
+  x: 0.737,
+  y: 0.737,
+  fill: "#FFF",
+  rx: 4
+}), React.createElement("path", {
+  fill: "#000",
+  fillOpacity: 0.12,
+  d: "M14 23.456a9.457 9.457 0 11.001-18.913A9.457 9.457 0 0114 23.456zm0-1.72a7.736 7.736 0 100-15.473 7.737 7.737 0 000 15.474zm.714-6.005a.86.86 0 11-1.72 0v-.867a.86.86 0 01.588-.816 5.248 5.248 0 001.084-.544c.592-.395.907-.815.907-1.22a1.72 1.72 0 00-3.341-.574.86.86 0 11-1.622-.57 3.438 3.438 0 016.682 1.145c0 1.1-.651 1.969-1.672 2.65a6.81 6.81 0 01-.906.508v.288zm-1.72 2.425a.86.86 0 011.72 0v.142a.86.86 0 11-1.72 0V18.156z"
+}));
+
+function SvgEmojiFail(props) {
+  return React.createElement("svg", _extends$j({
+    viewBox: "0 0 28 28"
+  }, props), _ref$j);
+}
+
+function _extends$k() { _extends$k = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$k.apply(this, arguments); }
+
+var _ref$k =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-emoji-reactions-add_svg__fill",
+  fillOpacity: 0.38,
+  fillRule: "evenodd",
+  d: "M10.03 1.006c.828 0 1.643.112 2.426.33a.666.666 0 11-.357 1.284 7.741 7.741 0 00-2.069-.28 7.697 7.697 0 107.697 7.696c0-.696-.092-1.379-.272-2.037a.667.667 0 011.287-.352c.21.773.319 1.574.319 2.39a9.03 9.03 0 01-9.03 9.03 9.03 9.03 0 11-.001-18.06zm3.346 10.873c.455 0 .776.445.632.877-.585 1.757-2.168 2.965-3.978 2.965s-3.392-1.208-3.978-2.965a.667.667 0 01.538-.87l.095-.007h6.69zm-1.087 1.333H7.771l.092.12c.46.563 1.103.938 1.813 1.033l.196.018.158.005c.784 0 1.512-.341 2.04-.91l.128-.147.091-.12zM6.685 6.86c.34 0 .62.254.661.583l.006.083V9.2a.667.667 0 01-1.329.084L6.018 9.2V7.527c0-.368.299-.666.667-.666zm6.69 0c.34 0 .621.254.662.583l.005.083V9.2a.667.667 0 01-1.328.084L12.71 9.2V7.527c0-.368.299-.666.667-.666zM16.726 0c.368 0 .667.298.667.667l-.001 2.016H19.4a.667.667 0 010 1.334l-2.01-.001.002 2.008a.667.667 0 01-1.334 0V4.016h-2.016a.666.666 0 110-1.333h2.016V.667c0-.369.299-.667.667-.667z"
+});
+
+function SvgIconEmojiReactionsAdd(props) {
+  return React.createElement("svg", _extends$k({
+    viewBox: "0 0 20 20"
+  }, props), _ref$k);
+}
+
+function _extends$l() { _extends$l = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$l.apply(this, arguments); }
+
+var _ref$l =
+/*#__PURE__*/
 React.createElement("path", {
   className: "icon-delivered_svg__fill",
   fillOpacity: 0.38,
@@ -1840,14 +1961,14 @@ React.createElement("path", {
 });
 
 function SvgIconDelivered(props) {
-  return React.createElement("svg", _extends$j({
+  return React.createElement("svg", _extends$l({
     viewBox: "0 0 24 24"
-  }, props), _ref$j);
+  }, props), _ref$l);
 }
 
-function _extends$k() { _extends$k = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$k.apply(this, arguments); }
+function _extends$m() { _extends$m = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$m.apply(this, arguments); }
 
-var _ref$k =
+var _ref$m =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-document_svg__fill",
@@ -1857,14 +1978,14 @@ React.createElement("path", {
 });
 
 function SvgIconDocument(props) {
-  return React.createElement("svg", _extends$k({
+  return React.createElement("svg", _extends$m({
     viewBox: "0 0 24 24"
-  }, props), _ref$k);
+  }, props), _ref$m);
 }
 
-function _extends$l() { _extends$l = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$l.apply(this, arguments); }
+function _extends$n() { _extends$n = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$n.apply(this, arguments); }
 
-var _ref$l =
+var _ref$n =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-download_svg__fill",
@@ -1874,14 +1995,14 @@ React.createElement("path", {
 });
 
 function SvgIconDownload(props) {
-  return React.createElement("svg", _extends$l({
+  return React.createElement("svg", _extends$n({
     viewBox: "0 0 24 24"
-  }, props), _ref$l);
+  }, props), _ref$n);
 }
 
-function _extends$m() { _extends$m = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$m.apply(this, arguments); }
+function _extends$o() { _extends$o = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$o.apply(this, arguments); }
 
-var _ref$m =
+var _ref$o =
 /*#__PURE__*/
 React.createElement("g", {
   fill: "none",
@@ -1897,14 +2018,14 @@ React.createElement("g", {
 }));
 
 function SvgIconFileAudio(props) {
-  return React.createElement("svg", _extends$m({
+  return React.createElement("svg", _extends$o({
     viewBox: "0 0 28 28"
-  }, props), _ref$m);
+  }, props), _ref$o);
 }
 
-function _extends$n() { _extends$n = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$n.apply(this, arguments); }
+function _extends$p() { _extends$p = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$p.apply(this, arguments); }
 
-var _ref$n =
+var _ref$p =
 /*#__PURE__*/
 React.createElement("g", {
   fill: "none",
@@ -1923,14 +2044,14 @@ React.createElement("g", {
 }));
 
 function SvgIconFileDocument(props) {
-  return React.createElement("svg", _extends$n({
+  return React.createElement("svg", _extends$p({
     viewBox: "0 0 28 28"
-  }, props), _ref$n);
+  }, props), _ref$p);
 }
 
-function _extends$o() { _extends$o = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$o.apply(this, arguments); }
+function _extends$q() { _extends$q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$q.apply(this, arguments); }
 
-var _ref$o =
+var _ref$q =
 /*#__PURE__*/
 React.createElement("g", {
   fill: "none",
@@ -1949,14 +2070,14 @@ React.createElement("g", {
 }));
 
 function SvgIconGif(props) {
-  return React.createElement("svg", _extends$o({
+  return React.createElement("svg", _extends$q({
     viewBox: "0 0 56 56"
-  }, props), _ref$o);
+  }, props), _ref$q);
 }
 
-function _extends$p() { _extends$p = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$p.apply(this, arguments); }
+function _extends$r() { _extends$r = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$r.apply(this, arguments); }
 
-var _ref$p =
+var _ref$r =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-info_svg__fill",
@@ -1966,40 +2087,6 @@ React.createElement("path", {
 });
 
 function SvgIconInfo(props) {
-  return React.createElement("svg", _extends$p({
-    viewBox: "0 0 24 24"
-  }, props), _ref$p);
-}
-
-function _extends$q() { _extends$q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$q.apply(this, arguments); }
-
-var _ref$q =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-leave_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M12 2a1 1 0 01.117 1.993L12 4H4a1 1 0 00-.993.883L3 5v14a1 1 0 00.883.993L4 20h8a1 1 0 01.117 1.993L12 22H4a3 3 0 01-2.995-2.824L1 19V5a3 3 0 012.824-2.995L4 2h8zm6.613 5.21l.094.083 4 4a1 1 0 01.083 1.32l-.083.094-4 4a1 1 0 01-1.497-1.32l.083-.094 1.792-1.793H7.5a1 1 0 01-.117-1.993L7.5 11.5h12.585l-2.792-2.793a1 1 0 01-.083-1.32l.083-.094a1 1 0 011.32-.083z"
-});
-
-function SvgIconLeave(props) {
-  return React.createElement("svg", _extends$q({
-    viewBox: "0 0 24 24"
-  }, props), _ref$q);
-}
-
-function _extends$r() { _extends$r = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$r.apply(this, arguments); }
-
-var _ref$r =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-members_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M13 14a5 5 0 014.995 4.783L18 19v2a1 1 0 01-1.993.117L16 21v-2a3 3 0 00-2.824-2.995L13 16H5a3 3 0 00-2.995 2.824L2 19v2a1 1 0 01-1.993.117L0 21v-2a5 5 0 014.783-4.995L5 14h8zm7.25.162a5 5 0 013.745 4.611L24 19v2a1 1 0 01-1.993.117L22 21v-2a3 3 0 00-2.25-2.902 1 1 0 11.5-1.936zM9 2a5 5 0 110 10A5 5 0 019 2zm7.248.161a5 5 0 010 9.688 1 1 0 01-.496-1.938 3 3 0 000-5.812 1 1 0 11.496-1.938zM9 4a3 3 0 100 6 3 3 0 000-6z"
-});
-
-function SvgIconMembers(props) {
   return React.createElement("svg", _extends$r({
     viewBox: "0 0 24 24"
   }, props), _ref$r);
@@ -2010,13 +2097,13 @@ function _extends$s() { _extends$s = Object.assign || function (target) { for (v
 var _ref$s =
 /*#__PURE__*/
 React.createElement("path", {
-  className: "icon-notifications_svg__fill",
+  className: "icon-leave_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M13.73 20a1 1 0 01.865 1.502 3 3 0 01-5.19 0 1 1 0 01.752-1.496L10.27 20h3.46zM12 1a8 8 0 017.996 7.75L20 9v5a2 2 0 001.85 1.995l.283.012c1.111.12 1.154 1.73.128 1.965l-.128.021L22 18H2l-.133-.007c-1.156-.124-1.156-1.862 0-1.986l.282-.012a2 2 0 001.845-1.838L4 14V9a8 8 0 018-8zm0 2a6 6 0 00-5.996 5.775L6 9v5c0 .586-.126 1.142-.352 1.643l-.103.212-.082.145h13.073l-.08-.145a3.973 3.973 0 01-.43-1.402l-.021-.253L18 14V9a6 6 0 00-6-6z"
+  d: "M12 2a1 1 0 01.117 1.993L12 4H4a1 1 0 00-.993.883L3 5v14a1 1 0 00.883.993L4 20h8a1 1 0 01.117 1.993L12 22H4a3 3 0 01-2.995-2.824L1 19V5a3 3 0 012.824-2.995L4 2h8zm6.613 5.21l.094.083 4 4a1 1 0 01.083 1.32l-.083.094-4 4a1 1 0 01-1.497-1.32l.083-.094 1.792-1.793H7.5a1 1 0 01-.117-1.993L7.5 11.5h12.585l-2.792-2.793a1 1 0 01-.083-1.32l.083-.094a1 1 0 011.32-.083z"
 });
 
-function SvgIconNotifications(props) {
+function SvgIconLeave(props) {
   return React.createElement("svg", _extends$s({
     viewBox: "0 0 24 24"
   }, props), _ref$s);
@@ -2027,13 +2114,13 @@ function _extends$t() { _extends$t = Object.assign || function (target) { for (v
 var _ref$t =
 /*#__PURE__*/
 React.createElement("path", {
-  className: "icon-photo_svg__fill",
+  className: "icon-members_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M19 2a3 3 0 013 3v14a3 3 0 01-3 3H4.941v-.002l-.117-.003A3 3 0 012 19V5a3 3 0 013-3zm-3 9.415L7.414 20H19a1 1 0 00.993-.883L20 19v-3.585l-4-4zM19 4H5a1 1 0 00-1 1v14a1 1 0 00.65.937L15.292 9.293a1 1 0 011.32-.083l.094.083L20 12.585V5a1 1 0 00-.883-.993L19 4zM8.5 6a2.5 2.5 0 110 5 2.5 2.5 0 010-5zm0 2a.5.5 0 100 1 .5.5 0 000-1z"
+  d: "M13 14a5 5 0 014.995 4.783L18 19v2a1 1 0 01-1.993.117L16 21v-2a3 3 0 00-2.824-2.995L13 16H5a3 3 0 00-2.995 2.824L2 19v2a1 1 0 01-1.993.117L0 21v-2a5 5 0 014.783-4.995L5 14h8zm7.25.162a5 5 0 013.745 4.611L24 19v2a1 1 0 01-1.993.117L22 21v-2a3 3 0 00-2.25-2.902 1 1 0 11.5-1.936zM9 2a5 5 0 110 10A5 5 0 019 2zm7.248.161a5 5 0 010 9.688 1 1 0 01-.496-1.938 3 3 0 000-5.812 1 1 0 11.496-1.938zM9 4a3 3 0 100 6 3 3 0 000-6z"
 });
 
-function SvgIconPhoto(props) {
+function SvgIconMembers(props) {
   return React.createElement("svg", _extends$t({
     viewBox: "0 0 24 24"
   }, props), _ref$t);
@@ -2042,6 +2129,40 @@ function SvgIconPhoto(props) {
 function _extends$u() { _extends$u = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$u.apply(this, arguments); }
 
 var _ref$u =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-notifications_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M13.73 20a1 1 0 01.865 1.502 3 3 0 01-5.19 0 1 1 0 01.752-1.496L10.27 20h3.46zM12 1a8 8 0 017.996 7.75L20 9v5a2 2 0 001.85 1.995l.283.012c1.111.12 1.154 1.73.128 1.965l-.128.021L22 18H2l-.133-.007c-1.156-.124-1.156-1.862 0-1.986l.282-.012a2 2 0 001.845-1.838L4 14V9a8 8 0 018-8zm0 2a6 6 0 00-5.996 5.775L6 9v5c0 .586-.126 1.142-.352 1.643l-.103.212-.082.145h13.073l-.08-.145a3.973 3.973 0 01-.43-1.402l-.021-.253L18 14V9a6 6 0 00-6-6z"
+});
+
+function SvgIconNotifications(props) {
+  return React.createElement("svg", _extends$u({
+    viewBox: "0 0 24 24"
+  }, props), _ref$u);
+}
+
+function _extends$v() { _extends$v = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$v.apply(this, arguments); }
+
+var _ref$v =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-photo_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M19 2a3 3 0 013 3v14a3 3 0 01-3 3H4.941v-.002l-.117-.003A3 3 0 012 19V5a3 3 0 013-3zm-3 9.415L7.414 20H19a1 1 0 00.993-.883L20 19v-3.585l-4-4zM19 4H5a1 1 0 00-1 1v14a1 1 0 00.65.937L15.292 9.293a1 1 0 011.32-.083l.094.083L20 12.585V5a1 1 0 00-.883-.993L19 4zM8.5 6a2.5 2.5 0 110 5 2.5 2.5 0 010-5zm0 2a.5.5 0 100 1 .5.5 0 000-1z"
+});
+
+function SvgIconPhoto(props) {
+  return React.createElement("svg", _extends$v({
+    viewBox: "0 0 24 24"
+  }, props), _ref$v);
+}
+
+function _extends$w() { _extends$w = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$w.apply(this, arguments); }
+
+var _ref$w =
 /*#__PURE__*/
 React.createElement("g", {
   fill: "none",
@@ -2060,14 +2181,14 @@ React.createElement("g", {
 }));
 
 function SvgIconPlay(props) {
-  return React.createElement("svg", _extends$u({
+  return React.createElement("svg", _extends$w({
     viewBox: "0 0 56 56"
-  }, props), _ref$u);
+  }, props), _ref$w);
 }
 
-function _extends$v() { _extends$v = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$v.apply(this, arguments); }
+function _extends$x() { _extends$x = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$x.apply(this, arguments); }
 
-var _ref$v =
+var _ref$x =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-plus_svg__fill",
@@ -2077,40 +2198,6 @@ React.createElement("path", {
 });
 
 function SvgIconPlus(props) {
-  return React.createElement("svg", _extends$v({
-    viewBox: "0 0 24 24"
-  }, props), _ref$v);
-}
-
-function _extends$w() { _extends$w = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$w.apply(this, arguments); }
-
-var _ref$w =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-reactions-add_svg__fill",
-  fillOpacity: 0.88,
-  fillRule: "evenodd",
-  d: "M11.033 1.107a9.98 9.98 0 012.669.362.734.734 0 01-.393 1.413A8.466 8.466 0 002.567 11.04 8.466 8.466 0 1019.2 8.8a.736.736 0 01.514-.902.735.735 0 01.901.514c.233.85.352 1.731.352 2.628 0 5.486-4.448 9.933-9.934 9.933-5.486 0-9.933-4.447-9.933-9.933s4.447-9.933 9.933-9.933zm3.68 11.96c.5 0 .854.49.696.965-.644 1.933-2.385 3.261-4.376 3.261-1.99 0-3.732-1.328-4.375-3.261a.733.733 0 01.597-.959l.098-.006h7.36zm-1.195 1.466h-4.97l.101.131a3.115 3.115 0 002.012 1.14l.198.018.174.005c.868 0 1.672-.38 2.254-1.012l.13-.15.101-.132zM7.353 7.547c.374 0 .683.28.728.641l.006.092v1.84a.734.734 0 01-1.461.092l-.006-.092V8.28c0-.405.328-.733.733-.733zm7.36 0c.374 0 .683.28.728.641l.006.092v1.84a.734.734 0 01-1.461.092l-.006-.092V8.28c0-.405.328-.733.733-.733zM18.398 0c.405 0 .733.328.733.733v2.218h2.209a.734.734 0 010 1.467h-2.21v2.209a.732.732 0 11-1.466 0V4.418h-2.217a.734.734 0 110-1.466l2.216-.001.001-2.218c0-.405.328-.733.733-.733z"
-});
-
-function SvgIconReactionsAdd(props) {
-  return React.createElement("svg", _extends$w({
-    viewBox: "0 0 22 22"
-  }, props), _ref$w);
-}
-
-function _extends$x() { _extends$x = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$x.apply(this, arguments); }
-
-var _ref$x =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-read_svg__fill",
-  fill: "#2EBA9F",
-  fillRule: "evenodd",
-  d: "M2.207 11.793l5 5a1 1 0 01-1.414 1.414l-5-5a1 1 0 011.414-1.414zm19.586-6a1 1 0 011.414 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414l4.293 4.293zm-3.586 0a1 1 0 010 1.414l-5.999 5.999a1 1 0 01-1.414-1.414l5.999-6a1 1 0 011.414 0z"
-});
-
-function SvgIconRead(props) {
   return React.createElement("svg", _extends$x({
     viewBox: "0 0 24 24"
   }, props), _ref$x);
@@ -2121,6 +2208,40 @@ function _extends$y() { _extends$y = Object.assign || function (target) { for (v
 var _ref$y =
 /*#__PURE__*/
 React.createElement("path", {
+  className: "icon-reactions-add_svg__fill",
+  fillOpacity: 0.88,
+  fillRule: "evenodd",
+  d: "M11.033 1.107a9.98 9.98 0 012.669.362.734.734 0 01-.393 1.413A8.466 8.466 0 002.567 11.04 8.466 8.466 0 1019.2 8.8a.736.736 0 01.514-.902.735.735 0 01.901.514c.233.85.352 1.731.352 2.628 0 5.486-4.448 9.933-9.934 9.933-5.486 0-9.933-4.447-9.933-9.933s4.447-9.933 9.933-9.933zm3.68 11.96c.5 0 .854.49.696.965-.644 1.933-2.385 3.261-4.376 3.261-1.99 0-3.732-1.328-4.375-3.261a.733.733 0 01.597-.959l.098-.006h7.36zm-1.195 1.466h-4.97l.101.131a3.115 3.115 0 002.012 1.14l.198.018.174.005c.868 0 1.672-.38 2.254-1.012l.13-.15.101-.132zM7.353 7.547c.374 0 .683.28.728.641l.006.092v1.84a.734.734 0 01-1.461.092l-.006-.092V8.28c0-.405.328-.733.733-.733zm7.36 0c.374 0 .683.28.728.641l.006.092v1.84a.734.734 0 01-1.461.092l-.006-.092V8.28c0-.405.328-.733.733-.733zM18.398 0c.405 0 .733.328.733.733v2.218h2.209a.734.734 0 010 1.467h-2.21v2.209a.732.732 0 11-1.466 0V4.418h-2.217a.734.734 0 110-1.466l2.216-.001.001-2.218c0-.405.328-.733.733-.733z"
+});
+
+function SvgIconReactionsAdd(props) {
+  return React.createElement("svg", _extends$y({
+    viewBox: "0 0 22 22"
+  }, props), _ref$y);
+}
+
+function _extends$z() { _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$z.apply(this, arguments); }
+
+var _ref$z =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-read_svg__fill",
+  fill: "#2EBA9F",
+  fillRule: "evenodd",
+  d: "M2.207 11.793l5 5a1 1 0 01-1.414 1.414l-5-5a1 1 0 011.414-1.414zm19.586-6a1 1 0 011.414 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414l4.293 4.293zm-3.586 0a1 1 0 010 1.414l-5.999 5.999a1 1 0 01-1.414-1.414l5.999-6a1 1 0 011.414 0z"
+});
+
+function SvgIconRead(props) {
+  return React.createElement("svg", _extends$z({
+    viewBox: "0 0 24 24"
+  }, props), _ref$z);
+}
+
+function _extends$A() { _extends$A = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$A.apply(this, arguments); }
+
+var _ref$A =
+/*#__PURE__*/
+React.createElement("path", {
   className: "icon-refresh_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -2128,15 +2249,15 @@ React.createElement("path", {
 });
 
 function SvgIconRefresh(props) {
-  return React.createElement("svg", _extends$y({
+  return React.createElement("svg", _extends$A({
     width: 20,
     height: 20
-  }, props), _ref$y);
+  }, props), _ref$A);
 }
 
-function _extends$z() { _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$z.apply(this, arguments); }
+function _extends$B() { _extends$B = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$B.apply(this, arguments); }
 
-var _ref$z =
+var _ref$B =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-send_svg__fill",
@@ -2146,14 +2267,14 @@ React.createElement("path", {
 });
 
 function SvgIconSend(props) {
-  return React.createElement("svg", _extends$z({
+  return React.createElement("svg", _extends$B({
     viewBox: "0 0 22 22"
-  }, props), _ref$z);
+  }, props), _ref$B);
 }
 
-function _extends$A() { _extends$A = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$A.apply(this, arguments); }
+function _extends$C() { _extends$C = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$C.apply(this, arguments); }
 
-var _ref$A =
+var _ref$C =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-sent_svg__fill",
@@ -2163,40 +2284,6 @@ React.createElement("path", {
 });
 
 function SvgIconSent(props) {
-  return React.createElement("svg", _extends$A({
-    viewBox: "0 0 24 24"
-  }, props), _ref$A);
-}
-
-function _extends$B() { _extends$B = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$B.apply(this, arguments); }
-
-var _ref$B =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-shevron_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M8.293 17.293a1 1 0 001.414 1.414l6-6a1 1 0 000-1.414l-6-6a1 1 0 00-1.414 1.414L13.586 12l-5.293 5.293z"
-});
-
-function SvgIconShevron(props) {
-  return React.createElement("svg", _extends$B({
-    viewBox: "0 0 24 24"
-  }, props), _ref$B);
-}
-
-function _extends$C() { _extends$C = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$C.apply(this, arguments); }
-
-var _ref$C =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-shevron-down_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M6.045 8.205a1.125 1.125 0 10-1.59 1.59l6.75 6.75c.439.44 1.151.44 1.59 0l6.75-6.75a1.125 1.125 0 10-1.59-1.59L12 14.159 6.045 8.205z"
-});
-
-function SvgIconShevronDown(props) {
   return React.createElement("svg", _extends$C({
     viewBox: "0 0 24 24"
   }, props), _ref$C);
@@ -2207,13 +2294,13 @@ function _extends$D() { _extends$D = Object.assign || function (target) { for (v
 var _ref$D =
 /*#__PURE__*/
 React.createElement("path", {
-  className: "icon-spinner-small_svg__fill",
+  className: "icon-shevron_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M12 22.5c5.799 0 10.5-4.701 10.5-10.5S17.799 1.5 12 1.5 1.5 6.201 1.5 12a1.432 1.432 0 002.864 0A7.636 7.636 0 1112 19.636a1.432 1.432 0 000 2.864z"
+  d: "M8.293 17.293a1 1 0 001.414 1.414l6-6a1 1 0 000-1.414l-6-6a1 1 0 00-1.414 1.414L13.586 12l-5.293 5.293z"
 });
 
-function SvgIconSpinnerSmall(props) {
+function SvgIconShevron(props) {
   return React.createElement("svg", _extends$D({
     viewBox: "0 0 24 24"
   }, props), _ref$D);
@@ -2224,6 +2311,40 @@ function _extends$E() { _extends$E = Object.assign || function (target) { for (v
 var _ref$E =
 /*#__PURE__*/
 React.createElement("path", {
+  className: "icon-shevron-down_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M6.045 8.205a1.125 1.125 0 10-1.59 1.59l6.75 6.75c.439.44 1.151.44 1.59 0l6.75-6.75a1.125 1.125 0 10-1.59-1.59L12 14.159 6.045 8.205z"
+});
+
+function SvgIconShevronDown(props) {
+  return React.createElement("svg", _extends$E({
+    viewBox: "0 0 24 24"
+  }, props), _ref$E);
+}
+
+function _extends$F() { _extends$F = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$F.apply(this, arguments); }
+
+var _ref$F =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-spinner-small_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M12 22.5c5.799 0 10.5-4.701 10.5-10.5S17.799 1.5 12 1.5 1.5 6.201 1.5 12a1.432 1.432 0 002.864 0A7.636 7.636 0 1112 19.636a1.432 1.432 0 000 2.864z"
+});
+
+function SvgIconSpinnerSmall(props) {
+  return React.createElement("svg", _extends$F({
+    viewBox: "0 0 24 24"
+  }, props), _ref$F);
+}
+
+function _extends$G() { _extends$G = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$G.apply(this, arguments); }
+
+var _ref$G =
+/*#__PURE__*/
+React.createElement("path", {
   className: "icon-user_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -2231,9 +2352,9 @@ React.createElement("path", {
 });
 
 function SvgIconUser(props) {
-  return React.createElement("svg", _extends$E({
+  return React.createElement("svg", _extends$G({
     viewBox: "0 0 24 24"
-  }, props), _ref$E);
+  }, props), _ref$G);
 }
 
 var Colors$1 = {
@@ -2330,6 +2451,12 @@ function changeTypeToIconComponent(type) {
     case Type.ERROR_FILLED:
       return React.createElement(SvgIconErrorFilled, null);
 
+    case Type.EMOJI_FAILED:
+      return React.createElement(SvgEmojiFail, null);
+
+    case Type.EMOJI_REACTIONS_ADD:
+      return React.createElement(SvgIconEmojiReactionsAdd, null);
+
     case Type.DELIVERED:
       return React.createElement(SvgIconDelivered, null);
 
@@ -2424,7 +2551,7 @@ function Icon(_ref) {
   }, children || changeTypeToIconComponent(type));
 }
 Icon.propTypes = {
-  type: PropTypes.oneOfType([PropTypes.oneOf(Object.keys(Type)), PropTypes.string]),
+  type: PropTypes.oneOfType([PropTypes.oneOf(Object.keys(Type)), PropTypes.string]).isRequired,
   width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onClick: PropTypes.func,
@@ -2433,7 +2560,6 @@ Icon.propTypes = {
   fillColor: PropTypes.oneOf(Object.keys(Colors$1))
 };
 Icon.defaultProps = {
-  type: '',
   onClick: function onClick() {},
   width: 26,
   height: 26,
@@ -3224,6 +3350,7 @@ function ContextMenu(_ref2) {
       setShowMenu = _useState2[1];
 
   return React.createElement("div", {
+    className: "sendbird-context-menu",
     style: {
       display: 'inline'
     }
@@ -3793,9 +3920,11 @@ var GET_PREV_MESSAGES_SUCESS = 'GET_PREV_MESSAGES_SUCESS';
 var SEND_MESSAGEGE_START = 'SEND_MESSAGEGE_START';
 var SEND_MESSAGEGE_SUCESS = 'SEND_MESSAGEGE_SUCESS';
 var SEND_MESSAGEGE_FAILURE = 'SEND_MESSAGEGE_FAILURE';
+var RESEND_MESSAGEGE_START = 'RESEND_MESSAGEGE_START';
 var ON_MESSAGE_RECEIVED = 'ON_MESSAGE_RECEIVED';
 var ON_MESSAGE_UPDATED = 'ON_MESSAGE_UPDATED';
 var ON_MESSAGE_DELETED = 'ON_MESSAGE_DELETED';
+var ON_MESSAGE_DELETED_BY_REQ_ID = 'ON_MESSAGE_DELETED_BY_REQ_ID';
 var SET_CURRENT_CHANNEL$1 = 'SET_CURRENT_CHANNEL';
 var MARK_AS_READ = 'MARK_AS_READ';
 
@@ -3806,7 +3935,208 @@ var messagesInitialState = {
   currentChannel: null,
   hasMore: false,
   unreadCount: 0,
-  unreadSince: null
+  unreadSince: null,
+  emojiContainer: {
+    // mock data
+    hash: 'dlfjalksdfklasjfklsahfioherfojasdlkfjjasjdlfhukashjfilejflk;jasl',
+    emojiCategories: [{
+      key: '001',
+      name: 'first',
+      emojis: [{
+        key: '001-001',
+        name: 'first-first',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '001-002',
+        name: 'first-second',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '001-003',
+        name: 'first-third',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '001-004',
+        name: 'first-fourth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '001-005',
+        name: 'first-fifth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '001-006',
+        name: 'first-sixth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }]
+    }, {
+      key: '002',
+      name: 'second',
+      emojis: [{
+        key: '002-001',
+        name: 'second-first',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '002-002',
+        name: 'second-second',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '002-003',
+        name: 'second-third',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '002-004',
+        name: 'second-fourth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '002-005',
+        name: 'second-fifth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '002-006',
+        name: 'second-sixth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }]
+    }, {
+      key: '003',
+      name: 'third',
+      emojis: [{
+        key: '003-001',
+        name: 'third-first',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '003-002',
+        name: 'third-second',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '003-003',
+        name: 'third-third',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '003-004',
+        name: 'third-fourth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '003-005',
+        name: 'third-fifth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '003-006',
+        name: 'third-sixth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }]
+    }, {
+      key: '004',
+      name: 'fourth',
+      emojis: [{
+        key: '004-001',
+        name: 'fourth-first',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '004-002',
+        name: 'fourth-second',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '004-003',
+        name: 'fourth-third',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '004-004',
+        name: 'fourth-fourth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '004-005',
+        name: 'fourth-fifth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '004-006',
+        name: 'fourth-sixth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }]
+    }, {
+      key: '005',
+      name: 'fifth',
+      emojis: [{
+        key: '005-001',
+        name: 'fifth-first',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '005-002',
+        name: 'fifth-second',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '005-003',
+        name: 'fifth-third',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '005-004',
+        name: 'fifth-fourth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '005-005',
+        name: 'fifth-fifth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '005-006',
+        name: 'fifth-sixth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }]
+    }, {
+      key: '006',
+      name: 'sixth',
+      emojis: [{
+        key: '006-001',
+        name: 'sixth-first',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '006-002',
+        name: 'sixth-second',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '006-003',
+        name: 'sixth-third',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '006-004',
+        name: 'sixth-fourth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '006-005',
+        name: 'sixth-fifth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '006-006',
+        name: 'sixth-sixth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }]
+    }, {
+      key: '007',
+      name: 'seventh',
+      emojis: [{
+        key: '007-001',
+        name: 'seventh-first',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '007-002',
+        name: 'seventh-second',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '007-003',
+        name: 'seventh-third',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '007-004',
+        name: 'seventh-fourth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '007-005',
+        name: 'seventh-fifth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }, {
+        key: '007-006',
+        name: 'seventh-sixth',
+        url: 'https://static.sendbird.com/sample/profiles/profile_12_512px.png'
+      }]
+    }]
+  }
 };
 
 var isEmpty = function isEmpty(val) {
@@ -3866,13 +4196,15 @@ function reducer$3(state, action) {
       });
 
     case SEND_MESSAGEGE_FAILURE:
-      return _objectSpread2({}, state, {
-        allMessages: state.allMessages.map(function (m) {
-          return compareIds(m.reqId, action.payload.reqId) ? _objectSpread2({}, action.payload, {
-            failed: true
-          }) : m;
-        })
-      });
+      {
+        // eslint-disable-next-line no-param-reassign
+        action.payload.failed = true;
+        return _objectSpread2({}, state, {
+          allMessages: state.allMessages.map(function (m) {
+            return compareIds(m.reqId, action.payload.reqId) ? action.payload : m;
+          })
+        });
+      }
 
     case SET_CURRENT_CHANNEL$1:
       {
@@ -3921,6 +4253,13 @@ function reducer$3(state, action) {
         })
       });
 
+    case RESEND_MESSAGEGE_START:
+      return _objectSpread2({}, state, {
+        allMessages: state.allMessages.map(function (m) {
+          return compareIds(m.reqId, action.payload.reqId) ? action.payload : m;
+        })
+      });
+
     case MARK_AS_READ:
       return _objectSpread2({}, state, {
         unreadCount: 0,
@@ -3931,6 +4270,13 @@ function reducer$3(state, action) {
       return _objectSpread2({}, state, {
         allMessages: state.allMessages.filter(function (m) {
           return !compareIds(m.messageId, action.payload);
+        })
+      });
+
+    case ON_MESSAGE_DELETED_BY_REQ_ID:
+      return _objectSpread2({}, state, {
+        allMessages: state.allMessages.filter(function (m) {
+          return !compareIds(m.reqId, action.payload);
         })
       });
 
@@ -4049,8 +4395,10 @@ function MessageStatus(_ref) {
   var message = _ref.message,
       status = _ref.status,
       className = _ref.className,
-      onClickEvents = _ref.onClickEvents;
+      onDelete = _ref.onDelete,
+      onResend = _ref.onResend;
   var injectingClassName = Array.isArray(className) ? className : [className];
+  var canResend = message && typeof message.isResendable === 'function' && message.isResendable();
 
   var label = function label() {
     switch (status) {
@@ -4077,18 +4425,18 @@ function MessageStatus(_ref) {
             className: "sendbird-message-status__text",
             type: LabelTypography.CAPTION_3,
             color: LabelColors.ERROR
-          }, LabelStringSet.MESSAGE_STATUS__SENDING_FAILED, React.createElement("span", {
+          }, LabelStringSet.MESSAGE_STATUS__SENDING_FAILED, canResend && React.createElement(React.Fragment, null, React.createElement("span", {
             className: "sendbird-message-status__text__try-again",
             role: "button",
             tabIndex: 0,
-            onClick: onClickEvents[0],
-            onKeyPress: onClickEvents[0]
-          }, LabelStringSet.MESSAGE_STATUS__TRY_AGAIN), LabelStringSet.MESSAGE_STATUS__OR, React.createElement("span", {
+            onClick: onResend,
+            onKeyPress: onResend
+          }, LabelStringSet.MESSAGE_STATUS__TRY_AGAIN), LabelStringSet.MESSAGE_STATUS__OR), React.createElement("span", {
             className: "sendbird-message-status__text__delete",
             role: "button",
             tabIndex: 0,
-            onClick: onClickEvents[1],
-            onKeyPress: onClickEvents[1]
+            onClick: onDelete,
+            onKeyPress: onDelete
           }, LabelStringSet.MESSAGE_STATUS__DELETE));
         }
 
@@ -4143,13 +4491,151 @@ MessageStatus.propTypes = {
   message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])),
   status: PropTypes.string,
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-  onClickEvents: PropTypes.arrayOf(PropTypes.func)
+  onDelete: PropTypes.func,
+  onResend: PropTypes.func
 };
 MessageStatus.defaultProps = {
   message: null,
   status: '',
   className: '',
-  onClickEvents: [function () {}, function () {}]
+  onDelete: function onDelete() {},
+  onResend: function onResend() {}
+};
+
+var ReactionBadge = React.forwardRef(function (props, ref) {
+  var className = props.className,
+      children = props.children,
+      count = props.count,
+      selected = props.selected,
+      isAdd = props.isAdd,
+      onClick = props.onClick;
+  var injectingClassName = Array.isArray(className) ? className : [className];
+
+  if (selected && !isAdd) {
+    injectingClassName.unshift('sendbird-reaction-badge--selected');
+  } else if (isAdd) {
+    injectingClassName.push('sendbird-reaction-badge--is-add');
+  } else {
+    injectingClassName.unshift('sendbird-reaction-badge');
+  }
+
+  return React.createElement("div", {
+    ref: ref,
+    tabIndex: 0,
+    role: "button",
+    className: injectingClassName.join(' '),
+    onClick: onClick,
+    onKeyDown: onClick
+  }, React.createElement("div", {
+    className: "sendbird-reaction-badge__inner"
+  }, children, React.createElement(Label, {
+    className: children && count ? 'sendbird-reaction-badge__inner__count' : '',
+    type: LabelTypography.CAPTION_3,
+    color: LabelColors.ONBACKGROUND_1
+  }, count)));
+});
+ReactionBadge.propTypes = {
+  children: PropTypes.element.isRequired,
+  count: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  selected: PropTypes.bool,
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  isAdd: PropTypes.bool,
+  onClick: PropTypes.func
+};
+ReactionBadge.defaultProps = {
+  className: '',
+  count: '',
+  selected: false,
+  isAdd: false,
+  onClick: function onClick() {}
+};
+
+function EmojiReactions(_ref) {
+  var className = _ref.className,
+      userId = _ref.userId,
+      messageReactions = _ref.messageReactions,
+      emojiAllMap = _ref.emojiAllMap,
+      emojiAllList = _ref.emojiAllList;
+  var injectingClassName = Array.isArray(className) ? className : [className];
+  injectingClassName.unshift('sendbird-emoji-reactions');
+  var imageWidth = '20px';
+  var imageHeight = '20px';
+  var emojiReactionAddRef = useRef(null);
+  return React.createElement("div", {
+    className: injectingClassName.join(' ')
+  }, React.createElement("div", {
+    className: "sendbird-emoji-reactions--inner"
+  }, messageReactions && messageReactions.map(function (reaction) {
+    var _reaction$userIds = reaction.userIds,
+        userIds = _reaction$userIds === void 0 ? [] : _reaction$userIds;
+    var reactedUserCount = userIds.length;
+    var reactedByMe = userIds.indexOf(userId) > 0;
+    var emojiUrl = emojiAllMap.get(reaction.key) || '';
+    return React.createElement(ReactionBadge, {
+      key: reaction.key,
+      className: "sendbird-emoji-reactions__emoji-reaction",
+      count: reactedUserCount,
+      selected: reactedByMe
+    }, React.createElement(ImageRenderer, {
+      circle: true,
+      url: emojiUrl,
+      width: imageWidth,
+      height: imageHeight,
+      defaultComponent: React.createElement(Icon, {
+        width: imageWidth,
+        height: imageHeight,
+        type: IconTypes.EMOJI_FAILED
+      })
+    }));
+  }), messageReactions.length < emojiAllList.length && React.createElement(ContextMenu, {
+    menuTrigger: function menuTrigger(toggleDropdown) {
+      return React.createElement(ReactionBadge, {
+        isAdd: true,
+        onClick: toggleDropdown,
+        className: "sendbird-emoji-reactions__emoji-reaction-add",
+        ref: emojiReactionAddRef
+      }, React.createElement(Icon, {
+        width: imageWidth,
+        height: imageHeight,
+        type: IconTypes.EMOJI_REACTIONS_ADD
+      }));
+    },
+    menuItems: function menuItems(closeDropdown) {
+      return React.createElement(ReactionItems$1, {
+        parentRef: emojiReactionAddRef,
+        parentContainRef: emojiReactionAddRef,
+        closeDropdown: closeDropdown
+      }, emojiAllList.map(function (emoji) {
+        return React.createElement(ReactionButton, {
+          key: emoji.key,
+          width: "36px",
+          height: "36px",
+          onClick: function onClick() {
+            closeDropdown();
+          }
+        }, React.createElement(ImageRenderer, {
+          url: emoji.url,
+          width: "28px",
+          height: "28px",
+          defaultComponent: React.createElement(Icon, {
+            width: "28px",
+            height: "28px",
+            type: IconTypes.DUMMY
+          })
+        }));
+      }));
+    }
+  })));
+}
+EmojiReactions.propTypes = {
+  userId: PropTypes.string.isRequired,
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  messageReactions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
+  emojiAllMap: PropTypes.instanceOf(Map).isRequired
+};
+EmojiReactions.defaultProps = {
+  className: ''
 };
 
 var copyToClipboard = function copyToClipboard(text) {
@@ -4193,52 +4679,108 @@ var SPACE_BETWEEN_MORE = 4;
 var MORE_WIDTH = 32;
 function Message(props) {
   var isByMe = props.isByMe,
+      userId = props.userId,
       message = props.message,
       className = props.className,
+      resendMessage = props.resendMessage,
       showEdit = props.showEdit,
       showRemove = props.showRemove,
       status = props.status,
-      useReaction = props.useReaction;
+      useReaction = props.useReaction,
+      emojiContainer = props.emojiContainer;
+  if (!message) return null;
   var injectingClassName = Array.isArray(className) ? className : [className];
   injectingClassName.push("sendbird-message".concat(isByMe ? '--outgoing' : '--incoming'));
-  if (!message) return null;
+  var _emojiContainer$emoji = emojiContainer.emojiCategories,
+      emojiCategories = _emojiContainer$emoji === void 0 ? [] : _emojiContainer$emoji;
+
+  var _useState = useState([]),
+      _useState2 = _slicedToArray(_useState, 2),
+      emojiAllList = _useState2[0],
+      setEmojiAllList = _useState2[1];
+
+  var _useState3 = useState(new Map()),
+      _useState4 = _slicedToArray(_useState3, 2),
+      emojiAllMap = _useState4[0],
+      setEmojiAllMap = _useState4[1];
+
+  useEffect(function () {
+    if (useReaction) {
+      var emojiList = [];
+      var emojiMap = new Map();
+
+      for (var i = 0; i < emojiCategories.length; i += 1) {
+        var emojis = emojiCategories[i].emojis;
+
+        for (var j = 0; j < emojis.length; j += 1) {
+          emojiList.push({
+            key: emojis[j].key,
+            url: emojis[j].url
+          });
+          emojiMap.set(emojis[j].key, emojis[j].url);
+        }
+      }
+
+      setEmojiAllList(emojiList);
+      setEmojiAllMap(emojiMap);
+    }
+  }, [emojiContainer]);
   return React.createElement("div", {
     className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-message']).join(' ')
   }, isByMe ? React.createElement(OutgoingUserMessage, {
+    userId: userId,
     message: message,
+    resendMessage: resendMessage,
     showEdit: showEdit,
     showRemove: showRemove,
     status: status,
-    useReaction: useReaction
+    useReaction: useReaction,
+    emojiAllMap: emojiAllMap,
+    emojiAllList: emojiAllList
   }) : React.createElement(IncomingUserMessage, {
+    userId: userId,
     message: message,
-    useReaction: useReaction
+    useReaction: useReaction,
+    emojiAllMap: emojiAllMap,
+    emojiAllList: emojiAllList
   }));
 }
 Message.propTypes = {
   isByMe: PropTypes.bool,
+  userId: PropTypes.string.isRequired,
   message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])).isRequired,
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   showEdit: PropTypes.func,
   status: PropTypes.string,
   showRemove: PropTypes.func,
-  useReaction: PropTypes.bool
+  resendMessage: PropTypes.func,
+  useReaction: PropTypes.bool.isRequired,
+  emojiContainer: PropTypes.shape({
+    emojiCategories: PropTypes.arrayOf(PropTypes.shape({
+      emojis: PropTypes.arrayOf(PropTypes.shape({}))
+    }))
+  })
 };
 Message.defaultProps = {
   isByMe: false,
+  resendMessage: noop$1,
   className: '',
   showEdit: noop$1,
   showRemove: noop$1,
   status: '',
-  useReaction: false
+  emojiContainer: {}
 };
 
 function OutgoingUserMessage(_ref) {
-  var message = _ref.message,
+  var userId = _ref.userId,
+      message = _ref.message,
       showEdit = _ref.showEdit,
       showRemove = _ref.showRemove,
       status = _ref.status,
-      useReaction = _ref.useReaction;
+      resendMessage = _ref.resendMessage,
+      useReaction = _ref.useReaction,
+      emojiAllMap = _ref.emojiAllMap,
+      emojiAllList = _ref.emojiAllList;
   // TODO: when message.requestState is succeeded, consider if it's SENT or DELIVERED
   var parentRefReactions = useRef(null);
   var parentRefMenus = useRef(null);
@@ -4246,7 +4788,7 @@ function OutgoingUserMessage(_ref) {
   return React.createElement("div", {
     className: "sendbird-user-message--outgoing",
     style: {
-      paddingLeft: "".concat(SPACE_BETWEEN_MORE + useReaction ? MORE_WIDTH * 2 : MORE_WIDTH, "px")
+      paddingLeft: "".concat(SPACE_BETWEEN_MORE + (useReaction ? MORE_WIDTH * 2 : MORE_WIDTH), "px")
     }
   }, React.createElement("div", {
     className: "sendbird-user-message__more",
@@ -4254,6 +4796,7 @@ function OutgoingUserMessage(_ref) {
   }, React.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React.createElement(IconButton, {
+        className: "sendbird-user-message__more__menu",
         ref: parentRefMenus,
         width: "32px",
         height: "32px",
@@ -4267,8 +4810,10 @@ function OutgoingUserMessage(_ref) {
     },
     menuItems: function menuItems(closeDropdown) {
       return React.createElement(MenuItems$1, {
-        parentRef: parentRefMenus,
-        parentContainRef: parentContainRef,
+        parentRef: parentRefMenus // for catching location(x, y) of MenuItems
+        ,
+        parentContainRef: parentContainRef // for toggling more options(menus & reactions)
+        ,
         closeDropdown: closeDropdown,
         openLeft: true
       }, React.createElement(MenuItem, {
@@ -4288,9 +4833,10 @@ function OutgoingUserMessage(_ref) {
         }
       }, "Delete"));
     }
-  }), useReaction && React.createElement(ContextMenu, {
+  }), useReaction && emojiAllList.length > 0 && React.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React.createElement(IconButton, {
+        className: "sendbird-user-message__more__add-reaction",
         ref: parentRefReactions,
         width: "32px",
         height: "32px",
@@ -4304,135 +4850,73 @@ function OutgoingUserMessage(_ref) {
     },
     menuItems: function menuItems(closeDropdown) {
       return React.createElement(ReactionItems$1, {
-        parentRef: parentRefReactions,
         closeDropdown: closeDropdown,
+        parentRef: parentRefReactions,
         parentContainRef: parentContainRef
-      }, React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })));
+      }, emojiAllList.map(function (emoji) {
+        return React.createElement(ReactionButton, {
+          key: emoji.key,
+          width: "36px",
+          height: "36px",
+          onClick: function onClick() {
+            closeDropdown();
+          }
+        }, React.createElement(ImageRenderer, {
+          url: emoji.url,
+          width: "28px",
+          height: "28px",
+          defaultComponent: React.createElement(Icon, {
+            width: "28px",
+            height: "28px",
+            type: IconTypes.DUMMY
+          })
+        }));
+      }));
     }
   })), React.createElement("div", {
-    className: "sendbird-user-message__tooltip"
+    className: "sendbird-user-message__text-balloon"
+  }, React.createElement("div", {
+    className: "sendbird-user-message__text-balloon__inner"
+  }, React.createElement("div", {
+    className: "sendbird-user-message__text-balloon__inner__text-place"
   }, React.createElement(Label, {
-    className: "sendbird-user-message__tooltip__text",
+    className: "sendbird-user-message__text-balloon__inner__text-place__text",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, message.message)), React.createElement("div", {
+  }, message.message)), message.reactions && message.reactions.length > 0 && React.createElement(EmojiReactions, {
+    className: "sendbird-user-message__text-balloon__inner__emoji-reactions",
+    userId: userId,
+    messageReactions: message.reactions,
+    emojiAllList: emojiAllList,
+    emojiAllMap: emojiAllMap
+  }))), React.createElement("div", {
     className: "sendbird-user-message__status"
   }, React.createElement(MessageStatus, {
     message: message,
-    status: status
+    status: status,
+    onDelete: function onDelete() {
+      showRemove(true);
+    },
+    onResend: function onResend() {
+      return resendMessage(message);
+    }
   })));
 }
 
 function IncomingUserMessage(_ref2) {
-  var message = _ref2.message,
-      useReaction = _ref2.useReaction;
+  var userId = _ref2.userId,
+      message = _ref2.message,
+      useReaction = _ref2.useReaction,
+      emojiAllList = _ref2.emojiAllList,
+      emojiAllMap = _ref2.emojiAllMap;
   var parentRefReactions = useRef(null);
   var parentRefMenus = useRef(null);
   var parentContainRef = useRef(null);
+  var showReactionAddButton = useReaction && emojiAllList && emojiAllList.length > 0;
   return React.createElement("div", {
     className: "sendbird-user-message--incoming",
     style: {
-      paddingRight: "".concat(SPACE_BETWEEN_MORE + useReaction ? MORE_WIDTH * 2 : MORE_WIDTH, "px")
+      paddingRight: "".concat(SPACE_BETWEEN_MORE + (showReactionAddButton ? MORE_WIDTH * 2 : MORE_WIDTH), "px")
     }
   }, React.createElement(Avatar, {
     className: "sendbird-user-message__avatar",
@@ -4444,19 +4928,29 @@ function IncomingUserMessage(_ref2) {
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
   }, getSenderName$1(message)), React.createElement("div", {
-    className: "sendbird-user-message__tooltip"
+    className: "sendbird-user-message__text-balloon"
+  }, React.createElement("div", {
+    className: "sendbird-user-message__text-balloon__inner"
+  }, React.createElement("div", {
+    className: "sendbird-user-message__text-balloon__inner__text-place"
   }, React.createElement(Label, {
-    className: "sendbird-user-message__tooltip__text",
+    className: "sendbird-user-message__text-balloon__inner__text-place__text",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, message.message)), React.createElement(Label, {
+  }, message.message)), message.reactions && message.reactions.length > 0 && React.createElement(EmojiReactions, {
+    className: "sendbird-user-message__text-balloon__inner__emoji-reactions",
+    userId: userId,
+    messageReactions: message.reactions,
+    emojiAllList: emojiAllList,
+    emojiAllMap: emojiAllMap
+  }))), React.createElement(Label, {
     className: "sendbird-user-message__sent-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
   }, getMessageCreatedAt$1(message)), React.createElement("div", {
     className: "sendbird-user-message__more",
     ref: parentContainRef
-  }, useReaction && React.createElement(ContextMenu, {
+  }, showReactionAddButton && React.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React.createElement(IconButton, {
         ref: parentRefReactions,
@@ -4475,107 +4969,25 @@ function IncomingUserMessage(_ref2) {
         parentRef: parentRefReactions,
         closeDropdown: closeDropdown,
         parentContainRef: parentContainRef
-      }, React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })), React.createElement(ReactionButton, {
-        width: "36px",
-        height: "36px",
-        onClick: function onClick() {
-          closeDropdown();
-        }
-      }, React.createElement(Icon, {
-        width: "28px",
-        height: "28px",
-        type: IconTypes.DUMMY
-      })));
+      }, emojiAllList.map(function (emoji) {
+        return React.createElement(ReactionButton, {
+          key: emoji.key,
+          width: "36px",
+          height: "36px",
+          onClick: function onClick() {
+            closeDropdown();
+          }
+        }, React.createElement(ImageRenderer, {
+          url: emoji.url,
+          width: "28px",
+          height: "28px",
+          defaultComponent: React.createElement(Icon, {
+            width: "28px",
+            height: "28px",
+            type: IconTypes.DUMMY
+          })
+        }));
+      }));
     }
   }), React.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
@@ -4607,25 +5019,31 @@ function IncomingUserMessage(_ref2) {
 }
 
 IncomingUserMessage.propTypes = {
+  userId: PropTypes.string.isRequired,
   message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])),
-  useReaction: PropTypes.bool
+  useReaction: PropTypes.bool.isRequired,
+  emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
+  emojiAllMap: PropTypes.instanceOf(Map).isRequired
 };
 IncomingUserMessage.defaultProps = {
-  message: {},
-  useReaction: false
+  message: {}
 };
 OutgoingUserMessage.propTypes = {
+  userId: PropTypes.string.isRequired,
   message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])),
   showEdit: PropTypes.func,
   showRemove: PropTypes.func,
+  resendMessage: PropTypes.func,
   status: PropTypes.string.isRequired,
-  useReaction: PropTypes.bool
+  useReaction: PropTypes.bool.isRequired,
+  emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
+  emojiAllMap: PropTypes.instanceOf(Map).isRequired
 };
 OutgoingUserMessage.defaultProps = {
   message: {},
-  showEdit: function showEdit() {},
-  showRemove: function showRemove() {},
-  useReaction: false
+  resendMessage: noop$1,
+  showEdit: noop$1,
+  showRemove: noop$1
 };
 
 function AdminMessage(_ref) {
@@ -4679,7 +5097,8 @@ function ThumbnailMessage(_ref) {
       isByMe = _ref.isByMe,
       onClick = _ref.onClick,
       showRemove = _ref.showRemove,
-      status = _ref.status;
+      status = _ref.status,
+      resendMessage = _ref.resendMessage;
   var type = message.type,
       url = message.url,
       _message$name = message.name,
@@ -4770,7 +5189,13 @@ function ThumbnailMessage(_ref) {
     className: "sendbird-thumbnail__status"
   }, React.createElement(MessageStatus, {
     message: message,
-    status: status
+    status: status,
+    onDelete: function onDelete() {
+      showRemove(true);
+    },
+    onResend: function onResend() {
+      return resendMessage(message);
+    }
   }))));
 }
 ThumbnailMessage.propTypes = {
@@ -4779,6 +5204,7 @@ ThumbnailMessage.propTypes = {
     url: PropTypes.string,
     name: PropTypes.string
   }).isRequired,
+  resendMessage: PropTypes.func,
   status: PropTypes.string,
   isByMe: PropTypes.bool,
   onClick: PropTypes.func,
@@ -4786,6 +5212,7 @@ ThumbnailMessage.propTypes = {
 };
 ThumbnailMessage.defaultProps = {
   isByMe: false,
+  resendMessage: noop$2,
   onClick: noop$2,
   showRemove: noop$2,
   status: ''
@@ -4878,7 +5305,8 @@ function checkFileType(fileUrl) {
 function OutgoingFileMessage(_ref) {
   var message = _ref.message,
       status = _ref.status,
-      showRemove = _ref.showRemove;
+      showRemove = _ref.showRemove,
+      resendMessage = _ref.resendMessage;
   var url = message.url;
 
   var openFileUrl = function openFileUrl() {
@@ -4931,7 +5359,13 @@ function OutgoingFileMessage(_ref) {
     className: "sendbird-file-message__status"
   }, React.createElement(MessageStatus, {
     message: message,
-    status: status
+    status: status,
+    onDelete: function onDelete() {
+      showRemove(true);
+    },
+    onResend: function onResend() {
+      return resendMessage(message);
+    }
   })));
 }
 function IncomingFileMessage(_ref2) {
@@ -4974,11 +5408,13 @@ function IncomingFileMessage(_ref2) {
 OutgoingFileMessage.propTypes = {
   message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])),
   status: PropTypes.string,
-  showRemove: PropTypes.func
+  showRemove: PropTypes.func,
+  resendMessage: PropTypes.func
 };
 OutgoingFileMessage.defaultProps = {
   status: '',
-  showRemove: function showRemove() {},
+  showRemove: noop$3,
+  resendMessage: noop$3,
   message: {}
 };
 IncomingFileMessage.propTypes = {
@@ -4992,13 +5428,15 @@ var MessageSwitch = function MessageSwitch(_ref3) {
   var message = _ref3.message,
       isByMe = _ref3.isByMe,
       showRemove = _ref3.showRemove,
-      status = _ref3.status;
+      status = _ref3.status,
+      resendMessage = _ref3.resendMessage;
   return React.createElement("div", {
     className: "sendbird-file-message".concat(isByMe ? '--outgoing' : '--incoming')
   }, isByMe ? React.createElement(OutgoingFileMessage, {
     message: message,
     showRemove: showRemove,
-    status: status
+    status: status,
+    resendMessage: resendMessage
   }) : React.createElement(IncomingFileMessage, {
     message: message
   }));
@@ -5008,12 +5446,14 @@ MessageSwitch.propTypes = {
   message: PropTypes.shape({}),
   isByMe: PropTypes.bool,
   showRemove: PropTypes.func,
+  resendMessage: PropTypes.func,
   status: PropTypes.string.isRequired
 };
 MessageSwitch.defaultProps = {
   message: {},
   isByMe: false,
-  showRemove: noop$3
+  showRemove: noop$3,
+  resendMessage: noop$3
 };
 
 function DateSeparator(_ref) {
@@ -5388,7 +5828,9 @@ function MessageHoc(_ref) {
       deleteMessage = _ref.deleteMessage,
       updateMessage = _ref.updateMessage,
       status = _ref.status,
-      useReaction = _ref.useReaction;
+      resendMessage = _ref.resendMessage,
+      useReaction = _ref.useReaction,
+      emojiContainer = _ref.emojiContainer;
   var _message$sender = message.sender,
       sender = _message$sender === void 0 ? {} : _message$sender;
 
@@ -5432,22 +5874,28 @@ function MessageHoc(_ref) {
     message: message,
     isByMe: isByMe,
     showRemove: setShowRemove,
+    resendMessage: resendMessage,
     onClick: setShowFileViewer,
     status: status
   }) : React.createElement(MessageSwitch, {
     message: message,
     isByMe: isByMe,
     showRemove: setShowRemove,
-    status: status
+    resendMessage: resendMessage,
+    status: status,
+    emojiContainer: emojiContainer
   })), message.isAdminMessage && message.isAdminMessage() && React.createElement(AdminMessage, {
     message: message
   }), (message.isUserMessage && message.isUserMessage() || message.messageType === 'user') && React.createElement(Message, {
     message: message,
     isByMe: isByMe,
+    userId: userId,
     showEdit: setShowEdit,
     showRemove: setShowRemove,
+    resendMessage: resendMessage,
     status: status,
-    useReaction: useReaction
+    useReaction: useReaction,
+    emojiContainer: emojiContainer
   }), showRemove && React.createElement(RemoveMessage, {
     onCloseModal: function onCloseModal() {
       return setShowRemove(false);
@@ -5491,9 +5939,10 @@ MessageHoc.propTypes = {
   hasSeperator: PropTypes.bool,
   deleteMessage: PropTypes.func.isRequired,
   updateMessage: PropTypes.func.isRequired,
+  resendMessage: PropTypes.func.isRequired,
   status: PropTypes.string,
-  useReaction: PropTypes.bool.isRequired // emojiList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-
+  useReaction: PropTypes.bool.isRequired,
+  emojiContainer: PropTypes.shape({}).isRequired
 };
 MessageHoc.defaultProps = {
   userId: '',
@@ -5645,7 +6094,10 @@ function (_Component) {
           updateMessage = _this$props2.updateMessage,
           readStatus = _this$props2.readStatus,
           currentGroupChannel = _this$props2.currentGroupChannel,
-          renderChatItem = _this$props2.renderChatItem;
+          resendMessage = _this$props2.resendMessage,
+          renderChatItem = _this$props2.renderChatItem,
+          useReaction = _this$props2.useReaction,
+          emojiContainer = _this$props2.emojiContainer;
       return React.createElement("div", {
         className: "sendbird-conversation__messages"
       }, React.createElement("div", {
@@ -5665,26 +6117,27 @@ function (_Component) {
 
         if (renderChatItem) {
           return React.createElement("div", {
-            key: m.messageId,
+            key: m.messageId || m.reqId,
             className: "sendbird-msg--scroll-ref"
           }, renderChatItem({
             message: m,
             onDeleteMessage: deleteMessage,
-            onUpdateMessage: updateMessage
+            onUpdateMessage: updateMessage,
+            onResendMessage: resendMessage
           }));
         }
 
         return React.createElement(MessageHoc // show status for pending/failed messages
         , {
           status: readStatus[m.messageId] || getParsedStatus(m, currentGroupChannel),
-          key: m.messageId,
+          key: m.messageId || m.reqId,
           message: m,
           userId: userId,
           hasSeperator: hasSeperator,
           deleteMessage: deleteMessage,
           updateMessage: updateMessage,
-          useReaction: false // it will be changed to true for Reactions releasing
-
+          useReaction: useReaction,
+          emojiContainer: emojiContainer
         });
       }))));
     }
@@ -5709,13 +6162,16 @@ ConversationScroll.propTypes = {
     createdAt: PropTypes.number
   })).isRequired,
   deleteMessage: PropTypes.func.isRequired,
+  resendMessage: PropTypes.func.isRequired,
   updateMessage: PropTypes.func.isRequired,
   readStatus: PropTypes.shape({}).isRequired,
   currentGroupChannel: PropTypes.shape({
     markAsRead: PropTypes.func
   }).isRequired,
   renderChatItem: PropTypes.element,
-  swapParams: PropTypes.bool
+  swapParams: PropTypes.bool,
+  useReaction: PropTypes.bool,
+  emojiContainer: PropTypes.instanceOf(Map)
 };
 ConversationScroll.defaultProps = {
   hasMore: false,
@@ -5723,7 +6179,9 @@ ConversationScroll.defaultProps = {
   userId: '',
   renderChatItem: null,
   messageSource: null,
-  swapParams: false
+  swapParams: false,
+  useReaction: true,
+  emojiContainer: {}
 };
 
 function Notification(_ref) {
@@ -6046,14 +6504,16 @@ var ConversationPanel = function ConversationPanel(props) {
   var _useState13 = useState(uuidv4()),
       _useState14 = _slicedToArray(_useState13, 2),
       hash = _useState14[0],
-      setHash = _useState14[1];
+      setHash = _useState14[1]; // const {useReaction} = sdk; after sdk is ready
+
 
   var allMessages = messagesStore.allMessages,
       loading = messagesStore.loading,
       hasMore = messagesStore.hasMore,
       initialized = messagesStore.initialized,
       unreadCount = messagesStore.unreadCount,
-      unreadSince = messagesStore.unreadSince; // to create message-datasource
+      unreadSince = messagesStore.unreadSince,
+      emojiContainer = messagesStore.emojiContainer; // to create message-datasource
 
   useEffect(function () {
     logger.info('Channel: Setup started');
@@ -6275,9 +6735,33 @@ var ConversationPanel = function ConversationPanel(props) {
     readStatus: readStatus,
     currentGroupChannel: currentGroupChannel,
     renderChatItem: renderChatItem,
+    useReaction: false // after sdk is ready : change to useReaction
+    // set false for hiding reactions feature in opening product
+    ,
+    emojiContainer: emojiContainer,
     deleteMessage: function deleteMessage(message, cb) {
       logger.info('Channel: Deleting message', message);
+      var requestState = message.requestState;
+      logger.info('Channel: Deleting message requestState:', requestState); // Message is only on local
+
+      if (requestState === 'failed') {
+        logger.info('Channel: Deleted message from local:', message);
+        messagesDispatcher({
+          type: ON_MESSAGE_DELETED_BY_REQ_ID,
+          payload: message.reqId
+        });
+
+        if (cb) {
+          cb();
+        }
+
+        return;
+      } // Message is on server
+
+
       currentGroupChannel.deleteMessage(message, function (err) {
+        logger.info('Channel: Deleting message from remote:', requestState);
+
         if (cb) {
           cb(err);
         }
@@ -6321,6 +6805,82 @@ var ConversationPanel = function ConversationPanel(props) {
           logger.warning('Channel: Updating message failed!', err);
         }
       });
+    },
+    resendMessage: function resendMessage(failedMessage) {
+      logger.info('Channel: Resending message has started', failedMessage);
+      var messageType = failedMessage.messageType,
+          file = failedMessage.file;
+
+      if (failedMessage && typeof failedMessage.isResendable === 'function' && failedMessage.isResendable()) {
+        // eslint-disable-next-line no-param-reassign
+        failedMessage.requestState = 'pending';
+        messagesDispatcher({
+          type: RESEND_MESSAGEGE_START,
+          payload: failedMessage
+        }); // userMessage
+
+        if (messageType === 'user') {
+          currentGroupChannel.resendUserMessage(failedMessage).then(function (message) {
+            logger.info('Channel: Resending message success!', {
+              message: message
+            });
+            messagesDispatcher({
+              type: SEND_MESSAGEGE_SUCESS,
+              payload: message
+            });
+          }).catch(function (e) {
+            logger.warning('Channel: Resending message failed!', {
+              e: e
+            }); // eslint-disable-next-line no-param-reassign
+
+            failedMessage.requestState = 'failed';
+            messagesDispatcher({
+              type: SEND_MESSAGEGE_FAILURE,
+              payload: failedMessage
+            });
+          }); // eslint-disable-next-line no-param-reassign
+
+          failedMessage.requestState = 'pending';
+          messagesDispatcher({
+            type: RESEND_MESSAGEGE_START,
+            payload: failedMessage
+          });
+          return;
+        }
+
+        if (messageType === 'file') {
+          currentGroupChannel.resendFileMessage(failedMessage, file).then(function (message) {
+            logger.info('Channel: Resending file message success!', {
+              message: message
+            });
+            messagesDispatcher({
+              type: SEND_MESSAGEGE_SUCESS,
+              payload: message
+            });
+          }).catch(function (e) {
+            logger.warning('Channel: Resending file message failed!', {
+              e: e
+            }); // eslint-disable-next-line no-param-reassign
+
+            failedMessage.requestState = 'failed';
+            messagesDispatcher({
+              type: SEND_MESSAGEGE_FAILURE,
+              payload: failedMessage
+            });
+          }); // eslint-disable-next-line no-param-reassign
+
+          failedMessage.requestState = 'pending';
+          messagesDispatcher({
+            type: RESEND_MESSAGEGE_START,
+            payload: failedMessage
+          });
+        }
+      } else {
+        // to alert user on console
+        // eslint-disable-next-line no-console
+        console.error('Message is not resendable');
+        logger.warning('Message is not resendable', failedMessage);
+      }
     }
   }), React.createElement("div", {
     className: "sendbird-conversation__footer"
@@ -6334,7 +6894,7 @@ var ConversationPanel = function ConversationPanel(props) {
       var text = messageInputRef.current.value;
       var params = new sdk.UserMessageParams();
       params.message = text;
-      logger.info('Channel: Sending message start!', params);
+      logger.info('Channel: Sending message has started', params);
       var pendingMsg = currentGroupChannel.sendUserMessage(params, function (res, err) {
         var swapParams = sdk.getErrorFirstCallback();
         var message = res;
@@ -6343,13 +6903,17 @@ var ConversationPanel = function ConversationPanel(props) {
         if (swapParams) {
           message = err;
           error = res;
-        }
+        } // sending params instead of pending message
+        // to make sure that we can resend the message once it fails
+
 
         if (error) {
-          logger.error('Channel: Sending message failed!', params);
+          logger.warning('Channel: Sending message failed!', {
+            message: message
+          });
           messagesDispatcher({
             type: SEND_MESSAGEGE_FAILURE,
-            payload: params
+            payload: message
           });
           return;
         }
@@ -6383,10 +6947,14 @@ var ConversationPanel = function ConversationPanel(props) {
         }
 
         if (error) {
-          logger.error('Channel: Sending message failed!', message);
+          // sending params instead of pending message
+          // to make sure that we can resend the message once it fails
+          logger.error('Channel: Sending file message failed!', message);
+          message.url = URL.createObjectURL(file);
+          message.file = file;
           messagesDispatcher({
             type: SEND_MESSAGEGE_FAILURE,
-            payload: params
+            payload: message
           });
           return;
         }
