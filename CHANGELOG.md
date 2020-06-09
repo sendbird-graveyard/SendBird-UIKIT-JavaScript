@@ -1,5 +1,34 @@
 # Changelog
 
+## 1.0.4(June 9, 2020)
+
+- Features:
+  * Implement frozen channel:
+    * Disable edit/send message
+    * Real time status change
+  * Allow configuring params before operations through props:
+    * ChannelList.onBeforeCreateChannel
+    * ChannelSettings.onBeforeUpdateChannel
+    * Channel.onBeforeSendUserMessage
+    * Channel.onBeforeSendFileMessage
+    * Channel.onBeforeUpdateUserMessage
+  * Expose internal methods through sendBirdSelectors:
+    * sendBirdSelectors.getSdk
+    * sendBirdSelectors.getSendUserMessage
+    * sendBirdSelectors.getSendFileMessage
+    * sendBirdSelectors.getUpdateUserMessage
+    * sendBirdSelectors.getDeleteMessage
+    * sendBirdSelectors.getResendUserMessage
+    * sendBirdSelectors.getResendFileMessage
+    * sendBirdSelectors.getCreateChannel
+    * sendBirdSelectors.getLeaveChannel
+
+- Bug fixes:
+  * Various stability fixes
+
+- Dependency updates:
+  * SDK version - 3.0.123
+
 ## 1.0.3(May 27, 2020)
 
 - Bug fixes:
