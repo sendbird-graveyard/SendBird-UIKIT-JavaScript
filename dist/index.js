@@ -222,7 +222,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.0.4';
+var APP_VERSION_STRING = '1.0.5';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -7142,11 +7142,10 @@ var ConversationPanel = function ConversationPanel(props) {
   var _useState15 = React.useState(uuidv4()),
       _useState16 = _slicedToArray(_useState15, 2),
       hash = _useState16[0],
-      setHash = _useState16[1];
+      setHash = _useState16[1]; // const { appInfo = {} } = sdk;
 
-  var _sdk$appInfo = sdk.appInfo,
-      appInfo = _sdk$appInfo === void 0 ? {} : _sdk$appInfo;
-  var useReaction = appInfo.isUsingReaction || false;
+
+  var useReaction = false;
   var allMessages = messagesStore.allMessages,
       loading = messagesStore.loading,
       hasMore = messagesStore.hasMore,
