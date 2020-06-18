@@ -403,6 +403,106 @@ function reducer$1(state, action) {
   }
 }
 
+/* eslint-disable no-bitwise */
+
+/* eslint-disable eqeqeq */
+
+/* eslint-disable no-mixed-operators */
+// https://stackoverflow.com/a/2117523
+// used mainly for dom key generation
+var uuidv4 = function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0;
+    var v = c === 'x' ? r : r & 0x3 | 0x8;
+    return v.toString(16);
+  });
+};
+
+function useConnectionStatus(sdk, logger) {
+  var _useState = React.useState(true),
+      _useState2 = _slicedToArray(_useState, 2),
+      isOnline = _useState2[0],
+      setIsOnline = _useState2[1];
+
+  React.useEffect(function () {
+    var uniqueHandlerId = uuidv4();
+    logger.warning('sdk changed', uniqueHandlerId);
+    var handler;
+
+    if (sdk && sdk.ConnectionHandler) {
+      handler = new sdk.ConnectionHandler();
+
+      handler.onReconnectStarted = function () {
+        setIsOnline(false);
+        logger.warning('onReconnectStarted', {
+          isOnline: isOnline
+        });
+      };
+
+      handler.onReconnectSucceeded = function () {
+        setIsOnline(true);
+        logger.warning('onReconnectSucceeded', {
+          isOnline: isOnline
+        });
+      };
+
+      handler.onReconnectFailed = function () {
+        sdk.reconnect();
+        logger.warning('onReconnectFailed');
+      };
+
+      logger.info('Added ConnectionHandler', uniqueHandlerId);
+      sdk.addConnectionHandler(uniqueHandlerId, handler);
+    }
+
+    return function () {
+      try {
+        sdk.removeConnectionHandler(uniqueHandlerId);
+        logger.info('Removed ConnectionHandler', uniqueHandlerId);
+      } catch (_unused) {//
+      }
+    };
+  }, [sdk]);
+  React.useEffect(function () {
+    var tryReconnect = function tryReconnect() {
+      try {
+        logger.warning('Try reconnecting SDK');
+
+        if (sdk.getConnectionState() !== 'OPEN') {
+          // connection is not broken yet
+          sdk.reconnect();
+        }
+      } catch (_unused2) {//
+      }
+    }; // addEventListener version
+
+
+    window.addEventListener('online', tryReconnect);
+    return function () {
+      window.removeEventListener('online', tryReconnect);
+    };
+  }, [sdk]); // add offline-class to body
+
+  React.useEffect(function () {
+    var body = document.querySelector('body');
+
+    if (!isOnline) {
+      try {
+        body.classList.add('sendbird__offline');
+        logger.info('Added class sendbird__offline to body');
+      } catch (e) {//
+      }
+    } else {
+      try {
+        body.classList.remove('sendbird__offline');
+        logger.info('Removed class sendbird__offline from body');
+      } catch (e) {//
+      }
+    }
+  }, [isOnline]);
+  return isOnline;
+}
+
 var LOG_LEVELS = {
   DEBUG: 'debug',
   WARNING: 'warning',
@@ -621,6 +721,7 @@ function Sendbird(props) {
       } catch (_unused) {}
     };
   }, [theme]);
+  var isOnline = useConnectionStatus(sdkStore.sdk, logger);
   return React__default.createElement(SendbirdSdkContext.Provider, {
     value: {
       stores: {
@@ -638,6 +739,7 @@ function Sendbird(props) {
             sdkStore: sdkStore,
             nickname: nickname,
             profileUrl: profileUrl,
+            logger: logger,
             sdk: sdkStore.sdk
           }, {
             sdkDispatcher: sdkDispatcher,
@@ -646,6 +748,7 @@ function Sendbird(props) {
         }
       },
       config: {
+        isOnline: isOnline,
         userId: userId,
         appId: appId,
         accessToken: accessToken,
@@ -981,21 +1084,6 @@ function SvgIconAvatarDark(props) {
   }, props), _ref$1, _ref2$1);
 }
 
-/* eslint-disable no-bitwise */
-
-/* eslint-disable eqeqeq */
-
-/* eslint-disable no-mixed-operators */
-// https://stackoverflow.com/a/2117523
-// used mainly for dom key generation
-var uuidv4 = function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0;
-    var v = c === 'x' ? r : r & 0x3 | 0x8;
-    return v.toString(16);
-  });
-};
-
 var defaultComponent = function defaultComponent(_ref) {
   var width = _ref.width,
       height = _ref.height;
@@ -1280,6 +1368,7 @@ function changeColorToClassName(color) {
 var getStringSet = function getStringSet(lang) {
   var stringSet = {
     en: {
+      TRYING_TO_CONNECT: 'Trying to connect…',
       CHANNEL_LIST__TITLE: 'Channels',
       CHANNEL__MESSAGE_INPUT__PLACE_HOLDER: 'Enter message',
       CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__DISABLED: 'Chat is unavailable in this channel',
@@ -1324,7 +1413,10 @@ var getStringSet = function getStringSet(lang) {
       NO_NAME: '(No name)',
       NO_MEMBERS: '(No members)',
       TOOLTIP__AND_YOU: ', and you',
-      TOOLTIP__YOU: 'you'
+      TOOLTIP__YOU: 'you',
+      TOOLTIP__UNKOWN_USER: '(no name)',
+      UNKNOWN__UNKNOWN_MESSAGE_TYPE: '(Unknown message type)',
+      UNKNOWN__CANNOT_READ_MESSAGE: 'Cannot read this message.'
     }
   };
   return stringSet && stringSet[lang] ? stringSet[lang] : {};
@@ -1556,6 +1648,7 @@ ChannelPreview.defaultProps = {
   currentUser: {}
 };
 
+var CLASS_NAME$1 = 'sendbird-iconbutton';
 var IconButton = React__default.forwardRef(function (props, ref) {
   var children = props.children,
       className = props.className,
@@ -1564,10 +1657,18 @@ var IconButton = React__default.forwardRef(function (props, ref) {
       type = props.type,
       height = props.height,
       width = props.width,
-      onClick = props.onClick;
+      _onClick = props.onClick;
+
+  var _useState = React.useState(''),
+      _useState2 = _slicedToArray(_useState, 2),
+      pressed = _useState2[0],
+      setPressed = _useState2[1];
+
+  var injectingClassName = Array.isArray(className) ? className : [className];
+  injectingClassName.unshift(CLASS_NAME$1);
   return (// eslint-disable-next-line react/button-has-type
     React__default.createElement("button", {
-      className: "sendbird-iconbutton ".concat(className),
+      className: "".concat(injectingClassName.join(' '), " ").concat(pressed),
       disabled: disabled,
       ref: ref,
       type: type,
@@ -1575,7 +1676,18 @@ var IconButton = React__default.forwardRef(function (props, ref) {
         height: height,
         width: width
       },
-      onClick: onClick
+      onClick: function onClick(e) {
+        if (disabled) {
+          return;
+        }
+
+        setPressed('sendbird-iconbutton--pressed');
+
+        _onClick(e);
+      },
+      onBlur: function onBlur() {
+        setPressed('');
+      }
     }, React__default.createElement("span", {
       className: "sendbird-iconbutton__inner"
     }, children))
@@ -1584,7 +1696,7 @@ var IconButton = React__default.forwardRef(function (props, ref) {
 IconButton.propTypes = {
   height: PropTypes.string,
   width: PropTypes.string,
-  className: PropTypes.string,
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element), PropTypes.any]).isRequired,
   type: PropTypes.string,
   disabled: PropTypes.bool,
@@ -1647,12 +1759,14 @@ var Type = {
   CHAT: 'CHAT',
   CREATE: 'CREATE',
   DELETE: 'DELETE',
+  DISCONNECTED: 'DISCONNECTED',
   DUMMY: 'DUMMY',
   EDIT: 'EDIT',
   ERROR: 'ERROR',
   ERROR_FILLED: 'ERROR_FILLED',
   EMOJI_FAILED: 'EMOJI_FAILED',
   EMOJI_REACTIONS_ADD: 'EMOJI_REACTIONS_ADD',
+  EMOJI_REACTIONS_ADD_GRAY: 'EMOJI_REACTIONS_ADD_GRAY',
   DELIVERED: 'DELIVERED',
   DOCUMENT: 'DOCUMENT',
   DOWNLOAD: 'DOWNLOAD',
@@ -1666,7 +1780,6 @@ var Type = {
   PHOTO: 'PHOTO',
   PLAY: 'PLAY',
   PLUS: 'PLUS',
-  REACTIONS_ADD: 'REACTIONS_ADD',
   READ: 'READ',
   REFRESH: 'REFRESH',
   SEND: 'SEND',
@@ -2009,6 +2122,23 @@ function _extends$k() { _extends$k = Object.assign || function (target) { for (v
 var _ref$k =
 /*#__PURE__*/
 React__default.createElement("path", {
+  className: "icon-reactions-add_svg__fill",
+  fillOpacity: 0.88,
+  fillRule: "evenodd",
+  d: "M11.033 1.107a9.98 9.98 0 012.669.362.734.734 0 01-.393 1.413A8.466 8.466 0 002.567 11.04 8.466 8.466 0 1019.2 8.8a.736.736 0 01.514-.902.735.735 0 01.901.514c.233.85.352 1.731.352 2.628 0 5.486-4.448 9.933-9.934 9.933-5.486 0-9.933-4.447-9.933-9.933s4.447-9.933 9.933-9.933zm3.68 11.96c.5 0 .854.49.696.965-.644 1.933-2.385 3.261-4.376 3.261-1.99 0-3.732-1.328-4.375-3.261a.733.733 0 01.597-.959l.098-.006h7.36zm-1.195 1.466h-4.97l.101.131a3.115 3.115 0 002.012 1.14l.198.018.174.005c.868 0 1.672-.38 2.254-1.012l.13-.15.101-.132zM7.353 7.547c.374 0 .683.28.728.641l.006.092v1.84a.734.734 0 01-1.461.092l-.006-.092V8.28c0-.405.328-.733.733-.733zm7.36 0c.374 0 .683.28.728.641l.006.092v1.84a.734.734 0 01-1.461.092l-.006-.092V8.28c0-.405.328-.733.733-.733zM18.398 0c.405 0 .733.328.733.733v2.218h2.209a.734.734 0 010 1.467h-2.21v2.209a.732.732 0 11-1.466 0V4.418h-2.217a.734.734 0 110-1.466l2.216-.001.001-2.218c0-.405.328-.733.733-.733z"
+});
+
+function SvgIconReactionsAdd(props) {
+  return React__default.createElement("svg", _extends$k({
+    viewBox: "0 0 22 22"
+  }, props), _ref$k);
+}
+
+function _extends$l() { _extends$l = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$l.apply(this, arguments); }
+
+var _ref$l =
+/*#__PURE__*/
+React__default.createElement("path", {
   className: "icon-emoji-reactions-add_svg__fill",
   fillOpacity: 0.38,
   fillRule: "evenodd",
@@ -2016,14 +2146,14 @@ React__default.createElement("path", {
 });
 
 function SvgIconEmojiReactionsAdd(props) {
-  return React__default.createElement("svg", _extends$k({
+  return React__default.createElement("svg", _extends$l({
     viewBox: "0 0 20 20"
-  }, props), _ref$k);
+  }, props), _ref$l);
 }
 
-function _extends$l() { _extends$l = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$l.apply(this, arguments); }
+function _extends$m() { _extends$m = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$m.apply(this, arguments); }
 
-var _ref$l =
+var _ref$m =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-delivered_svg__fill",
@@ -2033,23 +2163,6 @@ React__default.createElement("path", {
 });
 
 function SvgIconDelivered(props) {
-  return React__default.createElement("svg", _extends$l({
-    viewBox: "0 0 24 24"
-  }, props), _ref$l);
-}
-
-function _extends$m() { _extends$m = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$m.apply(this, arguments); }
-
-var _ref$m =
-/*#__PURE__*/
-React__default.createElement("path", {
-  className: "icon-document_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M14 1a1.01 1.01 0 01.25.031l.03.009c.03.009.061.02.091.031l.027.012a.914.914 0 01.195.112c.04.03.078.062.114.098l-.093-.082.011.009.082.073 6 6a1.006 1.006 0 01.21.309l.012.027c.012.03.022.06.031.091l.008.03A.921.921 0 0121 8l-.008-.126.001.01L21 8v12a3 3 0 01-3 3H6a3 3 0 01-3-3V4a3 3 0 013-3h8zm-1 2H6a1 1 0 00-1 1v16a1 1 0 001 1h12a1 1 0 001-1V9h-5a1 1 0 01-.993-.883L13 8V3zm4.585 4L15 4.415V7h2.585z"
-});
-
-function SvgIconDocument(props) {
   return React__default.createElement("svg", _extends$m({
     viewBox: "0 0 24 24"
   }, props), _ref$m);
@@ -2060,13 +2173,12 @@ function _extends$n() { _extends$n = Object.assign || function (target) { for (v
 var _ref$n =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-download_svg__fill",
-  fill: "#7B53EF",
+  className: "icon-disconnected_svg__fill",
   fillRule: "evenodd",
-  d: "M21 16a1 1 0 01.993.883L22 17v3a3 3 0 01-2.824 2.995L19 23H5a3 3 0 01-2.995-2.824L2 20v-3a1 1 0 011.993-.117L4 17v3a1 1 0 00.883.993L5 21h14a1 1 0 00.993-.883L20 20v-3a1 1 0 011-1zM12 1a1 1 0 01.993.883L13 2v11.585l2.293-2.292a1 1 0 011.32-.083l.094.083a1 1 0 01.083 1.32l-.083.094-4 4a1.006 1.006 0 01-.09.08l.09-.08a1.008 1.008 0 01-.674.292L12 17h-.032l-.054-.004L12 17a1.008 1.008 0 01-.613-.21 1.037 1.037 0 01-.094-.083l-4-4a1 1 0 011.32-1.497l.094.083L11 13.585V2a1 1 0 011-1z"
+  d: "M3.55 2.276l.093.081L10.9 9.615a.895.895 0 01.148.147l10.594 10.595a.91.91 0 01-1.193 1.367l-.093-.081-5.015-5.015a.913.913 0 01-.705-.15 4.545 4.545 0 00-5.265 0 .91.91 0 01-1.053-1.483 6.358 6.358 0 014.24-1.151l-2.529-2.53c-1.4.316-2.706.96-3.81 1.883a.91.91 0 01-1.167-1.394 10.854 10.854 0 013.504-1.962L6.445 7.728a13.518 13.518 0 00-3.461 2.226.909.909 0 01-1.204-1.362 15.38 15.38 0 013.299-2.229l-2.722-2.72A.91.91 0 013.55 2.276zm13.14 8.052c.812.397 1.572.894 2.262 1.479a.908.908 0 11-1.177 1.386 9.015 9.015 0 00-1.883-1.23.91.91 0 01.798-1.635zm5.53-1.737a.91.91 0 01-1.203 1.363A13.642 13.642 0 0010.9 6.588a.91.91 0 01-.146-1.813A15.457 15.457 0 0122.22 8.591z"
 });
 
-function SvgIconDownload(props) {
+function SvgIconDisconnected(props) {
   return React__default.createElement("svg", _extends$n({
     viewBox: "0 0 24 24"
   }, props), _ref$n);
@@ -2075,6 +2187,40 @@ function SvgIconDownload(props) {
 function _extends$o() { _extends$o = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$o.apply(this, arguments); }
 
 var _ref$o =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-document_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M14 1a1.01 1.01 0 01.25.031l.03.009c.03.009.061.02.091.031l.027.012a.914.914 0 01.195.112c.04.03.078.062.114.098l-.093-.082.011.009.082.073 6 6a1.006 1.006 0 01.21.309l.012.027c.012.03.022.06.031.091l.008.03A.921.921 0 0121 8l-.008-.126.001.01L21 8v12a3 3 0 01-3 3H6a3 3 0 01-3-3V4a3 3 0 013-3h8zm-1 2H6a1 1 0 00-1 1v16a1 1 0 001 1h12a1 1 0 001-1V9h-5a1 1 0 01-.993-.883L13 8V3zm4.585 4L15 4.415V7h2.585z"
+});
+
+function SvgIconDocument(props) {
+  return React__default.createElement("svg", _extends$o({
+    viewBox: "0 0 24 24"
+  }, props), _ref$o);
+}
+
+function _extends$p() { _extends$p = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$p.apply(this, arguments); }
+
+var _ref$p =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-download_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M21 16a1 1 0 01.993.883L22 17v3a3 3 0 01-2.824 2.995L19 23H5a3 3 0 01-2.995-2.824L2 20v-3a1 1 0 011.993-.117L4 17v3a1 1 0 00.883.993L5 21h14a1 1 0 00.993-.883L20 20v-3a1 1 0 011-1zM12 1a1 1 0 01.993.883L13 2v11.585l2.293-2.292a1 1 0 011.32-.083l.094.083a1 1 0 01.083 1.32l-.083.094-4 4a1.006 1.006 0 01-.09.08l.09-.08a1.008 1.008 0 01-.674.292L12 17h-.032l-.054-.004L12 17a1.008 1.008 0 01-.613-.21 1.037 1.037 0 01-.094-.083l-4-4a1 1 0 011.32-1.497l.094.083L11 13.585V2a1 1 0 011-1z"
+});
+
+function SvgIconDownload(props) {
+  return React__default.createElement("svg", _extends$p({
+    viewBox: "0 0 24 24"
+  }, props), _ref$p);
+}
+
+function _extends$q() { _extends$q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$q.apply(this, arguments); }
+
+var _ref$q =
 /*#__PURE__*/
 React__default.createElement("g", {
   fill: "none",
@@ -2090,14 +2236,14 @@ React__default.createElement("g", {
 }));
 
 function SvgIconFileAudio(props) {
-  return React__default.createElement("svg", _extends$o({
+  return React__default.createElement("svg", _extends$q({
     viewBox: "0 0 28 28"
-  }, props), _ref$o);
+  }, props), _ref$q);
 }
 
-function _extends$p() { _extends$p = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$p.apply(this, arguments); }
+function _extends$r() { _extends$r = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$r.apply(this, arguments); }
 
-var _ref$p =
+var _ref$r =
 /*#__PURE__*/
 React__default.createElement("g", {
   fill: "none",
@@ -2116,14 +2262,14 @@ React__default.createElement("g", {
 }));
 
 function SvgIconFileDocument(props) {
-  return React__default.createElement("svg", _extends$p({
+  return React__default.createElement("svg", _extends$r({
     viewBox: "0 0 28 28"
-  }, props), _ref$p);
+  }, props), _ref$r);
 }
 
-function _extends$q() { _extends$q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$q.apply(this, arguments); }
+function _extends$s() { _extends$s = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$s.apply(this, arguments); }
 
-var _ref$q =
+var _ref$s =
 /*#__PURE__*/
 React__default.createElement("g", {
   fill: "none",
@@ -2142,14 +2288,14 @@ React__default.createElement("g", {
 }));
 
 function SvgIconGif(props) {
-  return React__default.createElement("svg", _extends$q({
+  return React__default.createElement("svg", _extends$s({
     viewBox: "0 0 56 56"
-  }, props), _ref$q);
+  }, props), _ref$s);
 }
 
-function _extends$r() { _extends$r = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$r.apply(this, arguments); }
+function _extends$t() { _extends$t = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$t.apply(this, arguments); }
 
-var _ref$r =
+var _ref$t =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-info_svg__fill",
@@ -2159,40 +2305,6 @@ React__default.createElement("path", {
 });
 
 function SvgIconInfo(props) {
-  return React__default.createElement("svg", _extends$r({
-    viewBox: "0 0 24 24"
-  }, props), _ref$r);
-}
-
-function _extends$s() { _extends$s = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$s.apply(this, arguments); }
-
-var _ref$s =
-/*#__PURE__*/
-React__default.createElement("path", {
-  className: "icon-leave_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M12 2a1 1 0 01.117 1.993L12 4H4a1 1 0 00-.993.883L3 5v14a1 1 0 00.883.993L4 20h8a1 1 0 01.117 1.993L12 22H4a3 3 0 01-2.995-2.824L1 19V5a3 3 0 012.824-2.995L4 2h8zm6.613 5.21l.094.083 4 4a1 1 0 01.083 1.32l-.083.094-4 4a1 1 0 01-1.497-1.32l.083-.094 1.792-1.793H7.5a1 1 0 01-.117-1.993L7.5 11.5h12.585l-2.792-2.793a1 1 0 01-.083-1.32l.083-.094a1 1 0 011.32-.083z"
-});
-
-function SvgIconLeave(props) {
-  return React__default.createElement("svg", _extends$s({
-    viewBox: "0 0 24 24"
-  }, props), _ref$s);
-}
-
-function _extends$t() { _extends$t = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$t.apply(this, arguments); }
-
-var _ref$t =
-/*#__PURE__*/
-React__default.createElement("path", {
-  className: "icon-members_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M13 14a5 5 0 014.995 4.783L18 19v2a1 1 0 01-1.993.117L16 21v-2a3 3 0 00-2.824-2.995L13 16H5a3 3 0 00-2.995 2.824L2 19v2a1 1 0 01-1.993.117L0 21v-2a5 5 0 014.783-4.995L5 14h8zm7.25.162a5 5 0 013.745 4.611L24 19v2a1 1 0 01-1.993.117L22 21v-2a3 3 0 00-2.25-2.902 1 1 0 11.5-1.936zM9 2a5 5 0 110 10A5 5 0 019 2zm7.248.161a5 5 0 010 9.688 1 1 0 01-.496-1.938 3 3 0 000-5.812 1 1 0 11.496-1.938zM9 4a3 3 0 100 6 3 3 0 000-6z"
-});
-
-function SvgIconMembers(props) {
   return React__default.createElement("svg", _extends$t({
     viewBox: "0 0 24 24"
   }, props), _ref$t);
@@ -2203,13 +2315,13 @@ function _extends$u() { _extends$u = Object.assign || function (target) { for (v
 var _ref$u =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-notifications_svg__fill",
+  className: "icon-leave_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M13.73 20a1 1 0 01.865 1.502 3 3 0 01-5.19 0 1 1 0 01.752-1.496L10.27 20h3.46zM12 1a8 8 0 017.996 7.75L20 9v5a2 2 0 001.85 1.995l.283.012c1.111.12 1.154 1.73.128 1.965l-.128.021L22 18H2l-.133-.007c-1.156-.124-1.156-1.862 0-1.986l.282-.012a2 2 0 001.845-1.838L4 14V9a8 8 0 018-8zm0 2a6 6 0 00-5.996 5.775L6 9v5c0 .586-.126 1.142-.352 1.643l-.103.212-.082.145h13.073l-.08-.145a3.973 3.973 0 01-.43-1.402l-.021-.253L18 14V9a6 6 0 00-6-6z"
+  d: "M12 2a1 1 0 01.117 1.993L12 4H4a1 1 0 00-.993.883L3 5v14a1 1 0 00.883.993L4 20h8a1 1 0 01.117 1.993L12 22H4a3 3 0 01-2.995-2.824L1 19V5a3 3 0 012.824-2.995L4 2h8zm6.613 5.21l.094.083 4 4a1 1 0 01.083 1.32l-.083.094-4 4a1 1 0 01-1.497-1.32l.083-.094 1.792-1.793H7.5a1 1 0 01-.117-1.993L7.5 11.5h12.585l-2.792-2.793a1 1 0 01-.083-1.32l.083-.094a1 1 0 011.32-.083z"
 });
 
-function SvgIconNotifications(props) {
+function SvgIconLeave(props) {
   return React__default.createElement("svg", _extends$u({
     viewBox: "0 0 24 24"
   }, props), _ref$u);
@@ -2220,13 +2332,13 @@ function _extends$v() { _extends$v = Object.assign || function (target) { for (v
 var _ref$v =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-photo_svg__fill",
+  className: "icon-members_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M19 2a3 3 0 013 3v14a3 3 0 01-3 3H4.941v-.002l-.117-.003A3 3 0 012 19V5a3 3 0 013-3zm-3 9.415L7.414 20H19a1 1 0 00.993-.883L20 19v-3.585l-4-4zM19 4H5a1 1 0 00-1 1v14a1 1 0 00.65.937L15.292 9.293a1 1 0 011.32-.083l.094.083L20 12.585V5a1 1 0 00-.883-.993L19 4zM8.5 6a2.5 2.5 0 110 5 2.5 2.5 0 010-5zm0 2a.5.5 0 100 1 .5.5 0 000-1z"
+  d: "M13 14a5 5 0 014.995 4.783L18 19v2a1 1 0 01-1.993.117L16 21v-2a3 3 0 00-2.824-2.995L13 16H5a3 3 0 00-2.995 2.824L2 19v2a1 1 0 01-1.993.117L0 21v-2a5 5 0 014.783-4.995L5 14h8zm7.25.162a5 5 0 013.745 4.611L24 19v2a1 1 0 01-1.993.117L22 21v-2a3 3 0 00-2.25-2.902 1 1 0 11.5-1.936zM9 2a5 5 0 110 10A5 5 0 019 2zm7.248.161a5 5 0 010 9.688 1 1 0 01-.496-1.938 3 3 0 000-5.812 1 1 0 11.496-1.938zM9 4a3 3 0 100 6 3 3 0 000-6z"
 });
 
-function SvgIconPhoto(props) {
+function SvgIconMembers(props) {
   return React__default.createElement("svg", _extends$v({
     viewBox: "0 0 24 24"
   }, props), _ref$v);
@@ -2235,6 +2347,40 @@ function SvgIconPhoto(props) {
 function _extends$w() { _extends$w = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$w.apply(this, arguments); }
 
 var _ref$w =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-notifications_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M13.73 20a1 1 0 01.865 1.502 3 3 0 01-5.19 0 1 1 0 01.752-1.496L10.27 20h3.46zM12 1a8 8 0 017.996 7.75L20 9v5a2 2 0 001.85 1.995l.283.012c1.111.12 1.154 1.73.128 1.965l-.128.021L22 18H2l-.133-.007c-1.156-.124-1.156-1.862 0-1.986l.282-.012a2 2 0 001.845-1.838L4 14V9a8 8 0 018-8zm0 2a6 6 0 00-5.996 5.775L6 9v5c0 .586-.126 1.142-.352 1.643l-.103.212-.082.145h13.073l-.08-.145a3.973 3.973 0 01-.43-1.402l-.021-.253L18 14V9a6 6 0 00-6-6z"
+});
+
+function SvgIconNotifications(props) {
+  return React__default.createElement("svg", _extends$w({
+    viewBox: "0 0 24 24"
+  }, props), _ref$w);
+}
+
+function _extends$x() { _extends$x = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$x.apply(this, arguments); }
+
+var _ref$x =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-photo_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M19 2a3 3 0 013 3v14a3 3 0 01-3 3H4.941v-.002l-.117-.003A3 3 0 012 19V5a3 3 0 013-3zm-3 9.415L7.414 20H19a1 1 0 00.993-.883L20 19v-3.585l-4-4zM19 4H5a1 1 0 00-1 1v14a1 1 0 00.65.937L15.292 9.293a1 1 0 011.32-.083l.094.083L20 12.585V5a1 1 0 00-.883-.993L19 4zM8.5 6a2.5 2.5 0 110 5 2.5 2.5 0 010-5zm0 2a.5.5 0 100 1 .5.5 0 000-1z"
+});
+
+function SvgIconPhoto(props) {
+  return React__default.createElement("svg", _extends$x({
+    viewBox: "0 0 24 24"
+  }, props), _ref$x);
+}
+
+function _extends$y() { _extends$y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$y.apply(this, arguments); }
+
+var _ref$y =
 /*#__PURE__*/
 React__default.createElement("g", {
   fill: "none",
@@ -2253,14 +2399,14 @@ React__default.createElement("g", {
 }));
 
 function SvgIconPlay(props) {
-  return React__default.createElement("svg", _extends$w({
+  return React__default.createElement("svg", _extends$y({
     viewBox: "0 0 56 56"
-  }, props), _ref$w);
+  }, props), _ref$y);
 }
 
-function _extends$x() { _extends$x = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$x.apply(this, arguments); }
+function _extends$z() { _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$z.apply(this, arguments); }
 
-var _ref$x =
+var _ref$z =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-plus_svg__fill",
@@ -2270,40 +2416,6 @@ React__default.createElement("path", {
 });
 
 function SvgIconPlus(props) {
-  return React__default.createElement("svg", _extends$x({
-    viewBox: "0 0 24 24"
-  }, props), _ref$x);
-}
-
-function _extends$y() { _extends$y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$y.apply(this, arguments); }
-
-var _ref$y =
-/*#__PURE__*/
-React__default.createElement("path", {
-  className: "icon-reactions-add_svg__fill",
-  fillOpacity: 0.88,
-  fillRule: "evenodd",
-  d: "M11.033 1.107a9.98 9.98 0 012.669.362.734.734 0 01-.393 1.413A8.466 8.466 0 002.567 11.04 8.466 8.466 0 1019.2 8.8a.736.736 0 01.514-.902.735.735 0 01.901.514c.233.85.352 1.731.352 2.628 0 5.486-4.448 9.933-9.934 9.933-5.486 0-9.933-4.447-9.933-9.933s4.447-9.933 9.933-9.933zm3.68 11.96c.5 0 .854.49.696.965-.644 1.933-2.385 3.261-4.376 3.261-1.99 0-3.732-1.328-4.375-3.261a.733.733 0 01.597-.959l.098-.006h7.36zm-1.195 1.466h-4.97l.101.131a3.115 3.115 0 002.012 1.14l.198.018.174.005c.868 0 1.672-.38 2.254-1.012l.13-.15.101-.132zM7.353 7.547c.374 0 .683.28.728.641l.006.092v1.84a.734.734 0 01-1.461.092l-.006-.092V8.28c0-.405.328-.733.733-.733zm7.36 0c.374 0 .683.28.728.641l.006.092v1.84a.734.734 0 01-1.461.092l-.006-.092V8.28c0-.405.328-.733.733-.733zM18.398 0c.405 0 .733.328.733.733v2.218h2.209a.734.734 0 010 1.467h-2.21v2.209a.732.732 0 11-1.466 0V4.418h-2.217a.734.734 0 110-1.466l2.216-.001.001-2.218c0-.405.328-.733.733-.733z"
-});
-
-function SvgIconReactionsAdd(props) {
-  return React__default.createElement("svg", _extends$y({
-    viewBox: "0 0 22 22"
-  }, props), _ref$y);
-}
-
-function _extends$z() { _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$z.apply(this, arguments); }
-
-var _ref$z =
-/*#__PURE__*/
-React__default.createElement("path", {
-  className: "icon-read_svg__fill",
-  fill: "#2EBA9F",
-  fillRule: "evenodd",
-  d: "M2.207 11.793l5 5a1 1 0 01-1.414 1.414l-5-5a1 1 0 011.414-1.414zm19.586-6a1 1 0 011.414 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414l4.293 4.293zm-3.586 0a1 1 0 010 1.414l-5.999 5.999a1 1 0 01-1.414-1.414l5.999-6a1 1 0 011.414 0z"
-});
-
-function SvgIconRead(props) {
   return React__default.createElement("svg", _extends$z({
     viewBox: "0 0 24 24"
   }, props), _ref$z);
@@ -2314,6 +2426,23 @@ function _extends$A() { _extends$A = Object.assign || function (target) { for (v
 var _ref$A =
 /*#__PURE__*/
 React__default.createElement("path", {
+  className: "icon-read_svg__fill",
+  fill: "#2EBA9F",
+  fillRule: "evenodd",
+  d: "M2.207 11.793l5 5a1 1 0 01-1.414 1.414l-5-5a1 1 0 011.414-1.414zm19.586-6a1 1 0 011.414 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414l4.293 4.293zm-3.586 0a1 1 0 010 1.414l-5.999 5.999a1 1 0 01-1.414-1.414l5.999-6a1 1 0 011.414 0z"
+});
+
+function SvgIconRead(props) {
+  return React__default.createElement("svg", _extends$A({
+    viewBox: "0 0 24 24"
+  }, props), _ref$A);
+}
+
+function _extends$B() { _extends$B = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$B.apply(this, arguments); }
+
+var _ref$B =
+/*#__PURE__*/
+React__default.createElement("path", {
   className: "icon-refresh_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -2321,15 +2450,15 @@ React__default.createElement("path", {
 });
 
 function SvgIconRefresh(props) {
-  return React__default.createElement("svg", _extends$A({
+  return React__default.createElement("svg", _extends$B({
     width: 20,
     height: 20
-  }, props), _ref$A);
+  }, props), _ref$B);
 }
 
-function _extends$B() { _extends$B = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$B.apply(this, arguments); }
+function _extends$C() { _extends$C = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$C.apply(this, arguments); }
 
-var _ref$B =
+var _ref$C =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-send_svg__fill",
@@ -2339,14 +2468,14 @@ React__default.createElement("path", {
 });
 
 function SvgIconSend(props) {
-  return React__default.createElement("svg", _extends$B({
+  return React__default.createElement("svg", _extends$C({
     viewBox: "0 0 22 22"
-  }, props), _ref$B);
+  }, props), _ref$C);
 }
 
-function _extends$C() { _extends$C = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$C.apply(this, arguments); }
+function _extends$D() { _extends$D = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$D.apply(this, arguments); }
 
-var _ref$C =
+var _ref$D =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-sent_svg__fill",
@@ -2356,23 +2485,6 @@ React__default.createElement("path", {
 });
 
 function SvgIconSent(props) {
-  return React__default.createElement("svg", _extends$C({
-    viewBox: "0 0 24 24"
-  }, props), _ref$C);
-}
-
-function _extends$D() { _extends$D = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$D.apply(this, arguments); }
-
-var _ref$D =
-/*#__PURE__*/
-React__default.createElement("path", {
-  className: "icon-shevron_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M8.293 17.293a1 1 0 001.414 1.414l6-6a1 1 0 000-1.414l-6-6a1 1 0 00-1.414 1.414L13.586 12l-5.293 5.293z"
-});
-
-function SvgIconShevron(props) {
   return React__default.createElement("svg", _extends$D({
     viewBox: "0 0 24 24"
   }, props), _ref$D);
@@ -2383,13 +2495,13 @@ function _extends$E() { _extends$E = Object.assign || function (target) { for (v
 var _ref$E =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-shevron-down_svg__fill",
+  className: "icon-shevron_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M6.045 8.205a1.125 1.125 0 10-1.59 1.59l6.75 6.75c.439.44 1.151.44 1.59 0l6.75-6.75a1.125 1.125 0 10-1.59-1.59L12 14.159 6.045 8.205z"
+  d: "M8.293 17.293a1 1 0 001.414 1.414l6-6a1 1 0 000-1.414l-6-6a1 1 0 00-1.414 1.414L13.586 12l-5.293 5.293z"
 });
 
-function SvgIconShevronDown(props) {
+function SvgIconShevron(props) {
   return React__default.createElement("svg", _extends$E({
     viewBox: "0 0 24 24"
   }, props), _ref$E);
@@ -2400,13 +2512,13 @@ function _extends$F() { _extends$F = Object.assign || function (target) { for (v
 var _ref$F =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-spinner-small_svg__fill",
+  className: "icon-shevron-down_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M12 22.5c5.799 0 10.5-4.701 10.5-10.5S17.799 1.5 12 1.5 1.5 6.201 1.5 12a1.432 1.432 0 002.864 0A7.636 7.636 0 1112 19.636a1.432 1.432 0 000 2.864z"
+  d: "M6.045 8.205a1.125 1.125 0 10-1.59 1.59l6.75 6.75c.439.44 1.151.44 1.59 0l6.75-6.75a1.125 1.125 0 10-1.59-1.59L12 14.159 6.045 8.205z"
 });
 
-function SvgIconSpinnerSmall(props) {
+function SvgIconShevronDown(props) {
   return React__default.createElement("svg", _extends$F({
     viewBox: "0 0 24 24"
   }, props), _ref$F);
@@ -2417,6 +2529,23 @@ function _extends$G() { _extends$G = Object.assign || function (target) { for (v
 var _ref$G =
 /*#__PURE__*/
 React__default.createElement("path", {
+  className: "icon-spinner-small_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M12 22.5c5.799 0 10.5-4.701 10.5-10.5S17.799 1.5 12 1.5 1.5 6.201 1.5 12a1.432 1.432 0 002.864 0A7.636 7.636 0 1112 19.636a1.432 1.432 0 000 2.864z"
+});
+
+function SvgIconSpinnerSmall(props) {
+  return React__default.createElement("svg", _extends$G({
+    viewBox: "0 0 24 24"
+  }, props), _ref$G);
+}
+
+function _extends$H() { _extends$H = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$H.apply(this, arguments); }
+
+var _ref$H =
+/*#__PURE__*/
+React__default.createElement("path", {
   className: "icon-user_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -2424,9 +2553,9 @@ React__default.createElement("path", {
 });
 
 function SvgIconUser(props) {
-  return React__default.createElement("svg", _extends$G({
+  return React__default.createElement("svg", _extends$H({
     viewBox: "0 0 24 24"
-  }, props), _ref$G);
+  }, props), _ref$H);
 }
 
 var Colors$1 = {
@@ -2515,6 +2644,9 @@ function changeTypeToIconComponent(type) {
     case Type.DELETE:
       return React__default.createElement(SvgIconDelete, null);
 
+    case Type.DISCONNECTED:
+      return React__default.createElement(SvgIconDisconnected, null);
+
     case Type.DUMMY:
       return React__default.createElement(SvgIconDummy, null);
 
@@ -2531,6 +2663,9 @@ function changeTypeToIconComponent(type) {
       return React__default.createElement(SvgEmojiFail, null);
 
     case Type.EMOJI_REACTIONS_ADD:
+      return React__default.createElement(SvgIconReactionsAdd, null);
+
+    case Type.EMOJI_REACTIONS_ADD_GRAY:
       return React__default.createElement(SvgIconEmojiReactionsAdd, null);
 
     case Type.DELIVERED:
@@ -2571,9 +2706,6 @@ function changeTypeToIconComponent(type) {
 
     case Type.PLUS:
       return React__default.createElement(SvgIconPlus, null);
-
-    case Type.REACTIONS_ADD:
-      return React__default.createElement(SvgIconReactionsAdd, null);
 
     case Type.READ:
       return React__default.createElement(SvgIconRead, null);
@@ -2700,13 +2832,15 @@ function Button(_ref) {
   var type = _ref.type,
       size = _ref.size,
       children = _ref.children,
+      disabled = _ref.disabled,
       onClick = _ref.onClick,
       className = _ref.className;
-  var injectingClassNames = ['sendbird-button', changeTypeToClassName(type), changeSizeToClassName(size)].concat(_toConsumableArray(Array.isArray(className) ? className : [className])).join(' ');
+  var injectingClassNames = ['sendbird-button', disabled ? 'sendbird-button__disabled' : '', changeTypeToClassName(type), changeSizeToClassName(size)].concat(_toConsumableArray(Array.isArray(className) ? className : [className])).join(' ');
   return React__default.createElement("button", {
     type: "button",
     className: injectingClassNames,
-    onClick: onClick
+    onClick: onClick,
+    disabled: disabled
   }, React__default.createElement(Label, {
     className: "sendbird-button__text",
     type: LabelTypography.BUTTON_1,
@@ -2715,6 +2849,7 @@ function Button(_ref) {
 }
 Button.propTypes = {
   children: PropTypes.oneOfType([PropTypes.string, PropTypes.element, PropTypes.arrayOf(PropTypes.element)]),
+  disabled: PropTypes.bool,
   type: PropTypes.oneOf(Object.keys(Type$1)),
   size: PropTypes.oneOf(Object.keys(Size)),
   onClick: PropTypes.func,
@@ -2723,6 +2858,7 @@ Button.propTypes = {
 Button.defaultProps = {
   children: 'Button',
   type: Type$1.PRIMARY,
+  disabled: false,
   size: Size.BIG,
   onClick: function onClick() {},
   className: ''
@@ -3053,6 +3189,7 @@ var createChannel = function createChannel(sdk, selectedUsers, onBeforeCreateCha
 
 function AddChannel(_ref) {
   var sdk = _ref.sdk,
+      disabled = _ref.disabled,
       channelListDispatcher = _ref.channelListDispatcher,
       onBeforeCreateChannel = _ref.onBeforeCreateChannel,
       userId = _ref.userId,
@@ -3072,7 +3209,8 @@ function AddChannel(_ref) {
     width: "32px",
     onClick: function onClick() {
       setshowModal(true);
-    }
+    },
+    disabled: disabled
   }, React__default.createElement(Icon, {
     type: IconTypes.CREATE,
     fillColor: IconColors.PRIMARY,
@@ -3105,12 +3243,14 @@ AddChannel.propTypes = {
     getErrorFirstCallback: PropTypes.func,
     createApplicationUserListQuery: PropTypes.func
   }).isRequired,
+  disabled: PropTypes.bool,
   channelListDispatcher: PropTypes.func.isRequired,
   onBeforeCreateChannel: PropTypes.func,
   userId: PropTypes.string.isRequired,
   userListQuery: PropTypes.func
 };
 AddChannel.defaultProps = {
+  disabled: false,
   onBeforeCreateChannel: null,
   userListQuery: null
 };
@@ -3275,19 +3415,22 @@ MenuItems.defaultProps = {
   openLeft: false
 };
 
+var componentClassName = 'sendbird-sort-by-row';
 function SortByRow(_ref) {
   var className = _ref.className,
       maxItemCount = _ref.maxItemCount,
       itemWidth = _ref.itemWidth,
       itemHeight = _ref.itemHeight,
       children = _ref.children;
+  var injectingClassName = Array.isArray(className) ? className : [className];
+  injectingClassName.unshift(componentClassName);
 
   if (children.length > maxItemCount) {
     var result = [];
 
     for (var i = 0; i < children.length; i += maxItemCount) {
       result.push(React__default.createElement("div", {
-        className: className,
+        className: injectingClassName.join(' '),
         style: {
           width: itemWidth * maxItemCount,
           height: itemHeight
@@ -3300,7 +3443,7 @@ function SortByRow(_ref) {
   }
 
   return React__default.createElement("div", {
-    className: className,
+    className: injectingClassName.join(' '),
     style: {
       width: itemWidth * children.length,
       height: itemHeight
@@ -3318,17 +3461,17 @@ SortByRow.defaultProps = {
   className: ''
 };
 
-var ReactionItems =
+var EmojiListItems =
 /*#__PURE__*/
 function (_Component) {
-  _inherits(ReactionItems, _Component);
+  _inherits(EmojiListItems, _Component);
 
-  function ReactionItems(props) {
+  function EmojiListItems(props) {
     var _this;
 
-    _classCallCheck(this, ReactionItems);
+    _classCallCheck(this, EmojiListItems);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(ReactionItems).call(this, props));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(EmojiListItems).call(this, props));
 
     _defineProperty(_assertThisInitialized(_this), "showParent", function () {
       var _this$props$parentCon = _this.props.parentContainRef,
@@ -3426,7 +3569,7 @@ function (_Component) {
     return _this;
   }
 
-  _createClass(ReactionItems, [{
+  _createClass(EmojiListItems, [{
     key: "componentDidMount",
     value: function componentDidMount() {
       this.setupEvents();
@@ -3464,9 +3607,9 @@ function (_Component) {
     }
   }]);
 
-  return ReactionItems;
+  return EmojiListItems;
 }(React.Component);
-ReactionItems.propTypes = {
+EmojiListItems.propTypes = {
   closeDropdown: PropTypes.func.isRequired,
   children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
   parentRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({
@@ -3480,18 +3623,20 @@ ReactionItems.propTypes = {
     y: PropTypes.number
   })
 };
-ReactionItems.defaultProps = {
+EmojiListItems.defaultProps = {
   spaceFromTrigger: {}
 };
 
 var MenuItems$1 = MenuItems;
-var ReactionItems$1 = ReactionItems;
+var EmojiListItems$1 = EmojiListItems;
 var MenuItem = function MenuItem(_ref) {
   var children = _ref.children,
-      onClick = _ref.onClick;
+      onClick = _ref.onClick,
+      className = _ref.className;
+  var injectingClassName = Array.isArray(className) ? className : [className];
   return React__default.createElement("li", {
     tabIndex: 0,
-    className: "sendbird-dropdown__menu-item",
+    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-dropdown__menu-item']).join(' '),
     onClick: onClick,
     onKeyPress: function onKeyPress(e) {
       if (e.keyCode === 13) {
@@ -3507,7 +3652,11 @@ var MenuItem = function MenuItem(_ref) {
 };
 MenuItem.propTypes = {
   onClick: PropTypes.func.isRequired,
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired
+};
+MenuItem.defaultProps = {
+  className: ''
 };
 var MenuRoot = function MenuRoot() {
   return React__default.createElement("div", {
@@ -3556,7 +3705,8 @@ LeaveChannel.propTypes = {
 };
 
 function ChannelPreviewAction(_ref) {
-  var onLeaveChannel = _ref.onLeaveChannel;
+  var disabled = _ref.disabled,
+      onLeaveChannel = _ref.onLeaveChannel;
   var parentRef = React.useRef(null);
 
   var _useState = React.useState(false),
@@ -3597,6 +3747,10 @@ function ChannelPreviewAction(_ref) {
         closeDropdown: closeDropdown
       }, React__default.createElement(MenuItem, {
         onClick: function onClick() {
+          if (disabled) {
+            return;
+          }
+
           setShowModal(true);
           closeDropdown();
         }
@@ -3610,7 +3764,11 @@ function ChannelPreviewAction(_ref) {
   }));
 }
 ChannelPreviewAction.propTypes = {
+  disabled: PropTypes.bool,
   onLeaveChannel: PropTypes.func.isRequired
+};
+ChannelPreviewAction.defaultProps = {
+  disabled: false
 };
 
 function Loader(_ref) {
@@ -3901,6 +4059,7 @@ function ChannelList(props) {
       userStore = _props$stores$userSto === void 0 ? {} : _props$stores$userSto,
       _props$config = props.config,
       userId = _props$config.userId,
+      isOnline = _props$config.isOnline,
       userListQuery = _props$config.userListQuery,
       logger = _props$config.logger,
       pubSub = _props$config.pubSub,
@@ -3994,6 +4153,7 @@ function ChannelList(props) {
   }, React__default.createElement(ChannelHeader, {
     title: "Channels",
     iconButton: React__default.createElement(AddChannel, {
+      disabled: !isOnline,
       userListQuery: userListQuery,
       sdk: sdk,
       channelListDispatcher: channelListDispatcher,
@@ -4070,6 +4230,10 @@ function ChannelList(props) {
     };
 
     var onClick = function onClick() {
+      if (!isOnline) {
+        return;
+      }
+
       logger.info('ChannelList: Clicked on channel:', channel);
       channelListDispatcher({
         type: SET_CURRENT_CHANNEL,
@@ -4093,6 +4257,7 @@ function ChannelList(props) {
       isActive: channel.url === currentChannel // todo - potential performance hit refactor
       ,
       ChannelAction: React__default.createElement(ChannelPreviewAction, {
+        disabled: !isOnline,
         onLeaveChannel: function onLeaveChannel() {
           return _onLeaveChannel(channel);
         }
@@ -4118,6 +4283,7 @@ ChannelList.propTypes = {
   config: PropTypes.shape({
     userId: PropTypes.string.isRequired,
     userListQuery: PropTypes.func,
+    isOnline: PropTypes.bool,
     logger: PropTypes.shape({
       info: PropTypes.func,
       error: PropTypes.func,
@@ -4139,7 +4305,16 @@ ChannelList.defaultProps = {
 };
 var ChannelList$1 = withSendbirdContext(ChannelList);
 
+var MessageStatusType = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  DELIVERED: 'DELIVERED',
+  READ: 'READ',
+  FAILED: 'FAILED'
+};
+
 var RESET_MESSAGES = 'RESET_MESSAGES';
+var CLEAR_SENT_MESSAGES = 'CLEAR_SENT_MESSAGES';
 var GET_PREV_MESSAGES_START = 'GET_PREV_MESSAGES_START';
 var GET_PREV_MESSAGES_SUCESS = 'GET_PREV_MESSAGES_SUCESS';
 var SEND_MESSAGEGE_START = 'SEND_MESSAGEGE_START';
@@ -4154,6 +4329,163 @@ var SET_CURRENT_CHANNEL$1 = 'SET_CURRENT_CHANNEL';
 var MARK_AS_READ = 'MARK_AS_READ';
 var ON_REACTION_UPDATED = 'ON_REACTION_UPDATED';
 
+var pubSubHandleRemover$1 = function pubSubHandleRemover(subscriber) {
+  subscriber.forEach(function (s) {
+    try {
+      s.remove();
+    } catch (_unused) {//
+    }
+  });
+};
+var pubSubHandler$1 = function pubSubHandler(channelUrl, pubSub, dispatcher) {
+  var subscriber = new Map();
+  if (!pubSub || !pubSub.subscribe) return subscriber;
+  subscriber.set(SEND_USER_MESSAGE, pubSub.subscribe(SEND_USER_MESSAGE, function (msg) {
+    var channel = msg.channel,
+        message = msg.message;
+
+    if (channel && channelUrl === channel.url) {
+      dispatcher({
+        type: SEND_MESSAGEGE_SUCESS,
+        payload: message
+      });
+    }
+  }));
+  subscriber.set(SEND_MESSAGE_START, pubSub.subscribe(SEND_MESSAGE_START, function (msg) {
+    var channel = msg.channel,
+        message = msg.message;
+
+    if (channel && channelUrl === channel.url) {
+      dispatcher({
+        type: SEND_MESSAGEGE_START,
+        payload: message
+      });
+    }
+  }));
+  subscriber.set(SEND_FILE_MESSAGE, pubSub.subscribe(SEND_FILE_MESSAGE, function (msg) {
+    var channel = msg.channel,
+        message = msg.message;
+
+    if (channel && channelUrl === channel.url) {
+      dispatcher({
+        type: SEND_MESSAGEGE_SUCESS,
+        payload: message
+      });
+    }
+  }));
+  subscriber.set(UPDATE_USER_MESSAGE, pubSub.subscribe(UPDATE_USER_MESSAGE, function (msg) {
+    var channel = msg.channel,
+        message = msg.message;
+
+    if (channel && channelUrl === channel.url) {
+      dispatcher({
+        type: ON_MESSAGE_UPDATED,
+        payload: message
+      });
+    }
+  }));
+  subscriber.set(DELETE_MESSAGE, pubSub.subscribe(DELETE_MESSAGE, function (msg) {
+    var channel = msg.channel,
+        messageId = msg.messageId;
+
+    if (channel && channelUrl === channel.url) {
+      dispatcher({
+        type: ON_MESSAGE_DELETED,
+        payload: messageId
+      });
+    }
+  }));
+  return subscriber;
+};
+var scrollIntoLast = function scrollIntoLast(selector) {
+  var intialTry = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var MAX_TRIES = 10;
+  var currentTry = intialTry;
+
+  if (currentTry > MAX_TRIES) {
+    return;
+  }
+
+  try {
+    var nodes = document.querySelectorAll(selector);
+    var last = nodes[nodes.length - 1];
+    last.scrollIntoView(false);
+    /** alignToTop: false */
+  } catch (error) {
+    setTimeout(function () {
+      scrollIntoLast(selector, currentTry + 1);
+    }, 500 * currentTry);
+  }
+};
+var getParsedStatus = function getParsedStatus(message, currentGroupChannel) {
+  if (message.requestState === 'failed') {
+    return MessageStatusType.FAILED;
+  }
+
+  if (message.requestState === 'pending') {
+    return MessageStatusType.PENDING;
+  }
+
+  if (message.requestState === 'succeeded') {
+    if (!currentGroupChannel) {
+      return MessageStatusType.SENT;
+    }
+
+    var unreadCount = currentGroupChannel.getReadReceipt(message);
+
+    if (unreadCount === 0) {
+      return MessageStatusType.READ;
+    }
+
+    var isDelivered = currentGroupChannel.getDeliveryReceipt(message) === 0;
+
+    if (isDelivered) {
+      return MessageStatusType.DELIVERED;
+    }
+
+    return MessageStatusType.SENT;
+  }
+
+  return null;
+};
+var isOperator = function isOperator() {
+  var groupChannel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var myRole = groupChannel.myRole;
+  return myRole === 'operator';
+};
+var isDisabledBecauseFrozen = function isDisabledBecauseFrozen() {
+  var groupChannel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var isFrozen = groupChannel.isFrozen;
+  return isFrozen && !isOperator(groupChannel);
+};
+var getEmojiCategoriesFromEmojiContainer = function getEmojiCategoriesFromEmojiContainer() {
+  var emojiContainer = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  return emojiContainer.emojiCategories ? emojiContainer.emojiCategories : [];
+};
+var getAllEmojisFromEmojiContainer = function getAllEmojisFromEmojiContainer() {
+  var emojiContainer = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var _emojiContainer$emoji = emojiContainer.emojiCategories,
+      emojiCategories = _emojiContainer$emoji === void 0 ? [] : _emojiContainer$emoji;
+  var allEmojis = [];
+
+  for (var categoryIndex = 0; categoryIndex < emojiCategories.length; categoryIndex += 1) {
+    var emojis = emojiCategories[categoryIndex].emojis;
+
+    for (var emojiIndex = 0; emojiIndex < emojis.length; emojiIndex += 1) {
+      allEmojis.push(emojis[emojiIndex]);
+    }
+  }
+
+  return allEmojis;
+};
+var getEmojisFromEmojiContainer = function getEmojisFromEmojiContainer() {
+  var emojiContainer = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var emojiCategoryId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+  return emojiContainer.emojiCategories ? emojiContainer.emojiCategories.filter(function (emojiCategory) {
+    return emojiCategory.id === emojiCategoryId;
+  })[0].emojis : [];
+};
+
 var messagesInitialState = {
   initialized: false,
   loading: false,
@@ -4161,8 +4493,7 @@ var messagesInitialState = {
   currentChannel: null,
   hasMore: false,
   unreadCount: 0,
-  unreadSince: null,
-  emojiContainer: {}
+  unreadSince: null
 };
 
 var isEmpty = function isEmpty(val) {
@@ -4191,14 +4522,21 @@ function reducer$3(state, action) {
         loading: true
       });
 
+    case CLEAR_SENT_MESSAGES:
+      return _objectSpread2({}, state, {
+        allMessages: _toConsumableArray(state.allMessages.filter(function (m) {
+          return m.sendingStatus !== 'succeeded';
+        }))
+      });
+
     case GET_PREV_MESSAGES_SUCESS:
       {
         var recivedMessages = action.payload.messages || []; // remove duplicate messages
 
         var filteredAllMessages = state.allMessages.filter(function (msg) {
-          return recivedMessages.find(function (_ref) {
+          return !recivedMessages.find(function (_ref) {
             var messageId = _ref.messageId;
-            return !compareIds(messageId, msg.messageId);
+            return compareIds(messageId, msg.messageId);
           });
         });
         return _objectSpread2({}, state, {
@@ -4275,13 +4613,7 @@ function reducer$3(state, action) {
     case ON_MESSAGE_UPDATED:
       return _objectSpread2({}, state, {
         allMessages: state.allMessages.map(function (m) {
-          if (compareIds(m.messageId, action.payload.messageId)) {
-            // eslint-disable-next-line no-param-reassign
-            action.payload.reactions = m.reactions;
-            return action.payload;
-          }
-
-          return m;
+          return compareIds(m.messageId, action.payload.messageId) ? action.payload : m;
         })
       });
 
@@ -4317,7 +4649,10 @@ function reducer$3(state, action) {
         return _objectSpread2({}, state, {
           allMessages: state.allMessages.map(function (m) {
             if (compareIds(m.messageId, action.payload.messageId)) {
-              m.applyReactionEvent(action.payload);
+              if (m.applyReactionEvent && typeof m.applyReactionEvent === 'function') {
+                m.applyReactionEvent(action.payload);
+              }
+
               return m;
             }
 
@@ -4424,14 +4759,6 @@ ReactionButton.defaultProps = {
   height: '36px',
   onClick: function onClick() {},
   className: ''
-};
-
-var MessageStatusType = {
-  PENDING: 'PENDING',
-  SENT: 'SENT',
-  DELIVERED: 'DELIVERED',
-  READ: 'READ',
-  FAILED: 'FAILED'
 };
 
 var getMessageCreatedAt = function getMessageCreatedAt(message) {
@@ -4582,7 +4909,9 @@ var ReactionBadge = React__default.forwardRef(function (props, ref) {
     onKeyDown: onClick
   }, React__default.createElement("div", {
     className: "sendbird-reaction-badge__inner"
-  }, children, React__default.createElement(Label, {
+  }, React__default.createElement("div", {
+    className: "sendbird-reaction-badge__inner__icon"
+  }, children), React__default.createElement(Label, {
     className: children && count ? 'sendbird-reaction-badge__inner__count' : '',
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_1
@@ -4604,16 +4933,16 @@ ReactionBadge.defaultProps = {
   onClick: function onClick() {}
 };
 
-var CLASS_NAME$1 = 'sendbird-tooltip';
+var CLASS_NAME$2 = 'sendbird-tooltip';
 function Tooltip(_ref) {
   var className = _ref.className,
       children = _ref.children;
   var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.unshift(CLASS_NAME$1);
+  injectingClassName.unshift(CLASS_NAME$2);
   return React__default.createElement("div", {
     className: injectingClassName.join(' ')
   }, React__default.createElement(Label, {
-    className: "".concat(CLASS_NAME$1, "__text")
+    className: "".concat(CLASS_NAME$2, "__text")
   }, children));
 }
 Tooltip.propTypes = {
@@ -4625,13 +4954,13 @@ Tooltip.defaultProps = {
   children: ''
 };
 
-var CLASS_NAME$2 = 'sendbird-tooltip-wrapper';
+var CLASS_NAME$3 = 'sendbird-tooltip-wrapper';
 var SPACE_FROM_TRIGGER = 8;
 function TooltipWrapper(_ref) {
   var className = _ref.className,
       children = _ref.children,
       hoverTooltip = _ref.hoverTooltip;
-  var injectingClassName = Array.isArray(className) ? [CLASS_NAME$2].concat(_toConsumableArray(className)) : [CLASS_NAME$2, className];
+  var injectingClassName = Array.isArray(className) ? [CLASS_NAME$3].concat(_toConsumableArray(className)) : [CLASS_NAME$3, className];
 
   var _useState = React.useState(false),
       _useState2 = _slicedToArray(_useState, 2),
@@ -4654,17 +4983,17 @@ function TooltipWrapper(_ref) {
       setShowHoverTooltip(false);
     }
   }, React__default.createElement("div", {
-    className: "".concat(CLASS_NAME$2, "__children"),
+    className: "".concat(CLASS_NAME$3, "__children"),
     ref: childrenRef
   }, children), showHoverTooltip && React__default.createElement("div", {
-    className: "".concat(CLASS_NAME$2, "__hover-tooltip"),
+    className: "".concat(CLASS_NAME$3, "__hover-tooltip"),
     style: {
       bottom: "calc(100% + ".concat(SPACE_FROM_TRIGGER, "px)")
     }
   }, React__default.createElement("div", {
-    className: "".concat(CLASS_NAME$2, "__hover-tooltip__inner")
+    className: "".concat(CLASS_NAME$3, "__hover-tooltip__inner")
   }, React__default.createElement("div", {
-    className: "".concat(CLASS_NAME$2, "__hover-tooltip__inner__tooltip-container"),
+    className: "".concat(CLASS_NAME$3, "__hover-tooltip__inner__tooltip-container"),
     style: {
       left: childrenRef.current && "calc(".concat(childrenRef.current.offsetWidth / 2, "px - 50%)")
     }
@@ -4685,6 +5014,7 @@ function EmojiReactions(_ref) {
       message = _ref.message,
       emojiAllMap = _ref.emojiAllMap,
       emojiAllList = _ref.emojiAllList,
+      membersMap = _ref.membersMap,
       toggleReaction = _ref.toggleReaction;
   var injectingClassName = Array.isArray(className) ? className : [className];
   injectingClassName.unshift('sendbird-emoji-reactions');
@@ -4704,14 +5034,16 @@ function EmojiReactions(_ref) {
     var emojiUrl = emojiAllMap.get(reaction.key) || '';
     var reactedUserCount = userIds.length;
     var reactedByMe = !(userIds.indexOf(userId) < 0);
-    var userIdsExcludingMe = userIds.filter(function (currentUserId) {
+    var nicknames = userIds.filter(function (currentUserId) {
       return currentUserId !== userId;
+    }).map(function (currentUserId) {
+      return membersMap.get(currentUserId) || LabelStringSet.TOOLTIP__UNKOWN_USER;
     });
-    var stringSetForMe = userIdsExcludingMe.length > 0 ? LabelStringSet.TOOLTIP__AND_YOU : LabelStringSet.TOOLTIP__YOU;
+    var stringSetForMe = nicknames.length > 0 ? LabelStringSet.TOOLTIP__AND_YOU : LabelStringSet.TOOLTIP__YOU;
     return React__default.createElement(TooltipWrapper, {
       className: "sendbird-emoji-reactions__emoji-reaction",
       key: reaction.key,
-      hoverTooltip: userIds.length > 0 && React__default.createElement(Tooltip, null, React__default.createElement(React__default.Fragment, null, "".concat(userIdsExcludingMe.join(', ')).concat(reactedByMe ? stringSetForMe : '')))
+      hoverTooltip: userIds.length > 0 && React__default.createElement(Tooltip, null, React__default.createElement(React__default.Fragment, null, "".concat(nicknames.join(', ')).concat(reactedByMe ? stringSetForMe : '')))
     }, React__default.createElement(ReactionBadge, {
       count: reactedUserCount,
       selected: reactedByMe,
@@ -4739,11 +5071,11 @@ function EmojiReactions(_ref) {
       }, React__default.createElement(Icon, {
         width: imageWidth,
         height: imageHeight,
-        type: IconTypes.EMOJI_REACTIONS_ADD
+        type: IconTypes.EMOJI_REACTIONS_ADD_GRAY
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(ReactionItems$1, {
+      return React__default.createElement(EmojiListItems$1, {
         parentRef: emojiReactionAddRef,
         parentContainRef: emojiReactionAddRef,
         closeDropdown: closeDropdown,
@@ -4771,7 +5103,7 @@ function EmojiReactions(_ref) {
           defaultComponent: React__default.createElement(Icon, {
             width: "28px",
             height: "28px",
-            type: IconTypes.DUMMY
+            type: IconTypes.EMOJI_FAILED
           })
         }));
       }));
@@ -4786,10 +5118,12 @@ EmojiReactions.propTypes = {
   }).isRequired,
   emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
   emojiAllMap: PropTypes.instanceOf(Map).isRequired,
+  membersMap: PropTypes.instanceOf(Map),
   toggleReaction: PropTypes.func
 };
 EmojiReactions.defaultProps = {
   className: '',
+  membersMap: new Map(),
   userId: '',
   toggleReaction: function toggleReaction() {}
 };
@@ -4839,12 +5173,14 @@ function Message(props) {
       message = props.message,
       className = props.className,
       resendMessage = props.resendMessage,
+      disabled = props.disabled,
       showEdit = props.showEdit,
       showRemove = props.showRemove,
       status = props.status,
       useReaction = props.useReaction,
       emojiAllList = props.emojiAllList,
       emojiAllMap = props.emojiAllMap,
+      membersMap = props.membersMap,
       toggleReaction = props.toggleReaction;
   if (!message) return null;
   var injectingClassName = Array.isArray(className) ? className : [className];
@@ -4855,12 +5191,14 @@ function Message(props) {
     userId: userId,
     message: message,
     resendMessage: resendMessage,
+    disabled: disabled,
     showEdit: showEdit,
     showRemove: showRemove,
     status: status,
     useReaction: useReaction,
     emojiAllMap: emojiAllMap,
     emojiAllList: emojiAllList,
+    membersMap: membersMap,
     toggleReaction: toggleReaction
   }) : React__default.createElement(IncomingUserMessage, {
     userId: userId,
@@ -4868,11 +5206,13 @@ function Message(props) {
     useReaction: useReaction,
     emojiAllMap: emojiAllMap,
     emojiAllList: emojiAllList,
+    membersMap: membersMap,
     toggleReaction: toggleReaction
   }));
 }
 Message.propTypes = {
   isByMe: PropTypes.bool,
+  disabled: PropTypes.bool,
   userId: PropTypes.string,
   message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])).isRequired,
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
@@ -4883,10 +5223,12 @@ Message.propTypes = {
   useReaction: PropTypes.bool.isRequired,
   emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   emojiAllMap: PropTypes.instanceOf(Map),
+  membersMap: PropTypes.instanceOf(Map),
   toggleReaction: PropTypes.func
 };
 Message.defaultProps = {
   isByMe: false,
+  disabled: false,
   userId: '',
   resendMessage: noop$1,
   className: '',
@@ -4895,6 +5237,7 @@ Message.defaultProps = {
   status: '',
   emojiAllList: [],
   emojiAllMap: new Map(),
+  membersMap: new Map(),
   toggleReaction: noop$1
 };
 
@@ -4902,12 +5245,14 @@ function OutgoingUserMessage(_ref) {
   var userId = _ref.userId,
       message = _ref.message,
       showEdit = _ref.showEdit,
+      disabled = _ref.disabled,
       showRemove = _ref.showRemove,
       status = _ref.status,
       resendMessage = _ref.resendMessage,
       useReaction = _ref.useReaction,
       emojiAllMap = _ref.emojiAllMap,
       emojiAllList = _ref.emojiAllList,
+      membersMap = _ref.membersMap,
       toggleReaction = _ref.toggleReaction;
   // TODO: when message.requestState is succeeded, consider if it's SENT or DELIVERED
   var parentRefReactions = React.useRef(null);
@@ -4945,17 +5290,26 @@ function OutgoingUserMessage(_ref) {
         closeDropdown: closeDropdown,
         openLeft: true
       }, React__default.createElement(MenuItem, {
+        className: "sendbird-user-message--copy",
         onClick: function onClick() {
           copyToClipboard(message.message);
           closeDropdown();
         }
       }, "Copy"), React__default.createElement(MenuItem, {
         onClick: function onClick() {
+          if (disabled) {
+            return;
+          }
+
           showEdit(true);
           closeDropdown();
         }
       }, "Edit"), React__default.createElement(MenuItem, {
         onClick: function onClick() {
+          if (disabled) {
+            return;
+          }
+
           showRemove(true);
           closeDropdown();
         }
@@ -4972,12 +5326,12 @@ function OutgoingUserMessage(_ref) {
       }, React__default.createElement(Icon, {
         width: "24px",
         height: "24px",
-        type: IconTypes.REACTIONS_ADD,
+        type: IconTypes.EMOJI_REACTIONS_ADD,
         fillColor: IconColors.CONTENT_INVERSE
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(ReactionItems$1, {
+      return React__default.createElement(EmojiListItems$1, {
         closeDropdown: closeDropdown,
         parentRef: parentRefReactions,
         parentContainRef: parentContainRef,
@@ -5005,7 +5359,7 @@ function OutgoingUserMessage(_ref) {
           defaultComponent: React__default.createElement(Icon, {
             width: "28px",
             height: "28px",
-            type: IconTypes.DUMMY
+            type: IconTypes.EMOJI_FAILED
           })
         }));
       }));
@@ -5026,6 +5380,7 @@ function OutgoingUserMessage(_ref) {
     message: message,
     emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
+    membersMap: membersMap,
     toggleReaction: toggleReaction
   }))), React__default.createElement("div", {
     className: "sendbird-user-message__status"
@@ -5047,6 +5402,7 @@ function IncomingUserMessage(_ref2) {
       useReaction = _ref2.useReaction,
       emojiAllList = _ref2.emojiAllList,
       emojiAllMap = _ref2.emojiAllMap,
+      membersMap = _ref2.membersMap,
       toggleReaction = _ref2.toggleReaction;
   var parentRefReactions = React.useRef(null);
   var parentRefMenus = React.useRef(null);
@@ -5082,6 +5438,7 @@ function IncomingUserMessage(_ref2) {
     message: message,
     emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
+    membersMap: membersMap,
     toggleReaction: toggleReaction
   }))), React__default.createElement(Label, {
     className: "sendbird-user-message__sent-at",
@@ -5100,12 +5457,12 @@ function IncomingUserMessage(_ref2) {
       }, React__default.createElement(Icon, {
         width: "24px",
         height: "24px",
-        type: IconTypes.REACTIONS_ADD,
+        type: IconTypes.EMOJI_REACTIONS_ADD,
         fillColor: IconColors.CONTENT_INVERSE
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(ReactionItems$1, {
+      return React__default.createElement(EmojiListItems$1, {
         parentRef: parentRefReactions,
         closeDropdown: closeDropdown,
         parentContainRef: parentContainRef,
@@ -5133,7 +5490,7 @@ function IncomingUserMessage(_ref2) {
           defaultComponent: React__default.createElement(Icon, {
             width: "28px",
             height: "28px",
-            type: IconTypes.DUMMY
+            type: IconTypes.EMOJI_FAILED
           })
         }));
       }));
@@ -5158,6 +5515,7 @@ function IncomingUserMessage(_ref2) {
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown
       }, React__default.createElement(MenuItem, {
+        className: "sendbird-user-message--copy",
         onClick: function onClick() {
           copyToClipboard(message.message);
           closeDropdown();
@@ -5173,12 +5531,14 @@ IncomingUserMessage.propTypes = {
   useReaction: PropTypes.bool.isRequired,
   emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   emojiAllMap: PropTypes.instanceOf(Map),
+  membersMap: PropTypes.instanceOf(Map),
   toggleReaction: PropTypes.func
 };
 IncomingUserMessage.defaultProps = {
   message: {},
   emojiAllList: [],
   emojiAllMap: new Map(),
+  membersMap: new Map(),
   toggleReaction: noop$1
 };
 OutgoingUserMessage.propTypes = {
@@ -5186,11 +5546,13 @@ OutgoingUserMessage.propTypes = {
   message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])),
   showEdit: PropTypes.func,
   showRemove: PropTypes.func,
+  disabled: PropTypes.bool,
   resendMessage: PropTypes.func,
   status: PropTypes.string.isRequired,
   useReaction: PropTypes.bool.isRequired,
   emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   emojiAllMap: PropTypes.instanceOf(Map),
+  membersMap: PropTypes.instanceOf(Map),
   toggleReaction: PropTypes.func
 };
 OutgoingUserMessage.defaultProps = {
@@ -5198,8 +5560,10 @@ OutgoingUserMessage.defaultProps = {
   resendMessage: noop$1,
   showEdit: noop$1,
   showRemove: noop$1,
+  disabled: false,
   emojiAllList: [],
   emojiAllMap: new Map(),
+  membersMap: new Map(),
   toggleReaction: noop$1
 };
 
@@ -5258,6 +5622,7 @@ function ThumbnailMessage(_ref) {
   var _ref$message = _ref.message,
       message = _ref$message === void 0 ? {} : _ref$message,
       userId = _ref.userId,
+      disabled = _ref.disabled,
       isByMe = _ref.isByMe,
       onClick = _ref.onClick,
       showRemove = _ref.showRemove,
@@ -5266,24 +5631,17 @@ function ThumbnailMessage(_ref) {
       useReaction = _ref.useReaction,
       emojiAllList = _ref.emojiAllList,
       emojiAllMap = _ref.emojiAllMap,
+      membersMap = _ref.membersMap,
       toggleReaction = _ref.toggleReaction;
   var type = message.type,
-      url = message.url,
-      _message$name = message.name,
-      name = _message$name === void 0 ? '' : _message$name;
+      url = message.url;
   var parentContainRef = React.useRef(null);
   var menuRef = React.useRef(null);
   var reactionAddRef = React.useRef(null);
-
-  var _useState = React.useState(false),
-      _useState2 = _slicedToArray(_useState, 2),
-      imgLoaded = _useState2[0],
-      setImgLoaded = _useState2[1];
-
   var isMoreActive = status === MessageStatusTypes.SENT || status === MessageStatusTypes.DELIVERED || status === MessageStatusTypes.READ;
   var showReactionAddButton = useReaction && emojiAllList && emojiAllList.length > 0;
   return React__default.createElement("div", {
-    className: ['sendbird-thumbnail', !isByMe ? 'sendbird-thumbnail--incoming' : '', !imgLoaded ? 'sendbird-thumbnail--loading' : ''].join(' ')
+    className: ['sendbird-thumbnail', !isByMe ? 'sendbird-thumbnail--incoming' : ''].join(' ')
   }, !isByMe && React__default.createElement(React__default.Fragment, null, React__default.createElement(Avatar, {
     className: "sendbird-thumbnail__avatar",
     src: getSenderProfileUrl(message),
@@ -5323,6 +5681,10 @@ function ThumbnailMessage(_ref) {
         openLeft: true
       }, React__default.createElement(MenuItem, {
         onClick: function onClick() {
+          if (disabled) {
+            return;
+          }
+
           showRemove(true);
           closeDropdown();
         }
@@ -5338,12 +5700,12 @@ function ThumbnailMessage(_ref) {
       }, React__default.createElement(Icon, {
         width: "24px",
         height: "24px",
-        type: IconTypes.REACTIONS_ADD,
+        type: IconTypes.EMOJI_REACTIONS_ADD,
         color: IconColors.CONTENT_INVERSE
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(ReactionItems$1, {
+      return React__default.createElement(EmojiListItems$1, {
         parentRef: reactionAddRef,
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
@@ -5371,7 +5733,7 @@ function ThumbnailMessage(_ref) {
           defaultComponent: React__default.createElement(Icon, {
             width: "28px",
             height: "28px",
-            type: IconTypes.DUMMY
+            type: IconTypes.EMOJI_FAILED
           })
         }));
       }));
@@ -5389,10 +5751,7 @@ function ThumbnailMessage(_ref) {
     tabIndex: 0,
     role: "button"
   }, isVideo(type) && React__default.createElement(React__default.Fragment, null, React__default.createElement("video", {
-    className: "sendbird-thumbnail__video",
-    onLoadedData: function onLoadedData() {
-      return setImgLoaded(true);
-    }
+    className: "sendbird-thumbnail__video"
   }, React__default.createElement("source", {
     src: url,
     type: type
@@ -5401,13 +5760,16 @@ function ThumbnailMessage(_ref) {
     width: "56px",
     height: "56px",
     type: IconTypes.PLAY
-  })), isImage(type) && React__default.createElement("img", {
-    onLoad: function onLoad() {
-      return setImgLoaded(true);
-    },
-    src: url,
-    alt: name,
-    className: "sendbird-thumbnail__img"
+  })), isImage(type) && React__default.createElement("div", {
+    className: "sendbird-thumbnail__img",
+    style: {
+      backgroundImage: "url(".concat(url, ")"),
+      height: '280px',
+      width: '404px',
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center'
+    }
   }), unSupported(type) && React__default.createElement("div", {
     className: "sendbird-thumbnail__other"
   }, "Unknown type"), React__default.createElement("div", {
@@ -5418,6 +5780,7 @@ function ThumbnailMessage(_ref) {
     message: message,
     emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
+    membersMap: membersMap,
     toggleReaction: toggleReaction
   })), isByMe ? React__default.createElement("div", {
     className: "sendbird-thumbnail__status"
@@ -5450,12 +5813,12 @@ function ThumbnailMessage(_ref) {
       }, React__default.createElement(Icon, {
         width: "24px",
         height: "24px",
-        type: IconTypes.REACTIONS_ADD,
+        type: IconTypes.EMOJI_REACTIONS_ADD,
         color: IconColors.CONTENT_INVERSE
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(ReactionItems$1, {
+      return React__default.createElement(EmojiListItems$1, {
         parentRef: reactionAddRef,
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
@@ -5483,7 +5846,7 @@ function ThumbnailMessage(_ref) {
           defaultComponent: React__default.createElement(Icon, {
             width: "28px",
             height: "28px",
-            type: IconTypes.DUMMY
+            type: IconTypes.EMOJI_FAILED
           })
         }));
       }));
@@ -5493,22 +5856,24 @@ function ThumbnailMessage(_ref) {
 ThumbnailMessage.propTypes = {
   message: PropTypes.shape({
     type: PropTypes.string,
-    url: PropTypes.string,
-    name: PropTypes.string
+    url: PropTypes.string
   }).isRequired,
   userId: PropTypes.string,
   resendMessage: PropTypes.func,
   status: PropTypes.string,
   isByMe: PropTypes.bool,
+  disabled: PropTypes.bool,
   onClick: PropTypes.func,
   showRemove: PropTypes.func,
   useReaction: PropTypes.bool.isRequired,
   emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   emojiAllMap: PropTypes.instanceOf(Map),
+  membersMap: PropTypes.instanceOf(Map),
   toggleReaction: PropTypes.func
 };
 ThumbnailMessage.defaultProps = {
   isByMe: false,
+  disabled: false,
   resendMessage: noop$2,
   onClick: noop$2,
   showRemove: noop$2,
@@ -5516,6 +5881,7 @@ ThumbnailMessage.defaultProps = {
   userId: '',
   emojiAllList: [],
   emojiAllMap: new Map(),
+  membersMap: new Map(),
   toggleReaction: noop$2
 };
 
@@ -5559,6 +5925,7 @@ function changeColorToClassName$2(color) {
 function TextButton(_ref) {
   var color = _ref.color,
       children = _ref.children,
+      disabled = _ref.disabled,
       className = _ref.className,
       onClick = _ref.onClick,
       notUnderline = _ref.notUnderline;
@@ -5566,7 +5933,7 @@ function TextButton(_ref) {
   return React__default.createElement("div", {
     role: "button",
     tabIndex: 0,
-    className: [].concat(_toConsumableArray(injectingClassName), [changeColorToClassName$2(color), notUnderline ? 'sendbird-textbutton--not-underline' : 'sendbird-textbutton']).join(' '),
+    className: [].concat(_toConsumableArray(injectingClassName), [changeColorToClassName$2(color), notUnderline ? 'sendbird-textbutton--not-underline' : 'sendbird-textbutton', disabled ? 'sendbird-textbutton--disabled' : '']).join(' '),
     onClick: onClick,
     onKeyPress: onClick
   }, children);
@@ -5576,13 +5943,15 @@ TextButton.propTypes = {
   children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   onClick: PropTypes.func,
-  notUnderline: PropTypes.bool
+  notUnderline: PropTypes.bool,
+  disabled: PropTypes.bool
 };
 TextButton.defaultProps = {
   color: Colors$2.ONBACKGROUND_1,
   className: '',
   onClick: function onClick() {},
-  notUnderline: false
+  notUnderline: false,
+  disabled: false
 };
 
 var MAX_TRUNCATE_LENGTH = 40;
@@ -5610,10 +5979,12 @@ function OutgoingFileMessage(_ref) {
       userId = _ref.userId,
       status = _ref.status,
       showRemove = _ref.showRemove,
+      disabled = _ref.disabled,
       resendMessage = _ref.resendMessage,
       useReaction = _ref.useReaction,
       emojiAllList = _ref.emojiAllList,
       emojiAllMap = _ref.emojiAllMap,
+      membersMap = _ref.membersMap,
       toggleReaction = _ref.toggleReaction;
   var url = message.url;
 
@@ -5654,6 +6025,10 @@ function OutgoingFileMessage(_ref) {
         openLeft: true
       }, React__default.createElement(MenuItem, {
         onClick: function onClick() {
+          if (disabled) {
+            return;
+          }
+
           showRemove(true);
           closeDropdown();
         }
@@ -5669,12 +6044,12 @@ function OutgoingFileMessage(_ref) {
       }, React__default.createElement(Icon, {
         width: "24px",
         height: "24px",
-        type: IconTypes.REACTIONS_ADD,
+        type: IconTypes.EMOJI_REACTIONS_ADD,
         fillColor: IconColors.CONTENT_INVERSE
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(ReactionItems$1, {
+      return React__default.createElement(EmojiListItems$1, {
         closeDropdown: closeDropdown,
         parentRef: reactionAddButtonRef,
         parentContainRef: parentContainRef,
@@ -5702,7 +6077,7 @@ function OutgoingFileMessage(_ref) {
           defaultComponent: React__default.createElement(Icon, {
             width: "28px",
             height: "28px",
-            type: IconTypes.REACTIONS_ADD,
+            type: IconTypes.EMOJI_FAILED,
             fillColor: IconColors.CONTENT_INVERSE
           })
         }));
@@ -5729,6 +6104,7 @@ function OutgoingFileMessage(_ref) {
     message: message,
     emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
+    membersMap: membersMap,
     toggleReaction: toggleReaction
   })), React__default.createElement("div", {
     className: "sendbird-file-message__status"
@@ -5749,6 +6125,7 @@ function IncomingFileMessage(_ref2) {
       useReaction = _ref2.useReaction,
       emojiAllList = _ref2.emojiAllList,
       emojiAllMap = _ref2.emojiAllMap,
+      membersMap = _ref2.membersMap,
       toggleReaction = _ref2.toggleReaction;
 
   var openFileUrl = function openFileUrl() {
@@ -5793,13 +6170,15 @@ function IncomingFileMessage(_ref2) {
     message: message,
     emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
+    membersMap: membersMap,
     toggleReaction: toggleReaction
   })), React__default.createElement(Label, {
     className: "sendbird-file-message__sent-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
   }, getMessageCreatedAt(message)), showReactionAddButton && React__default.createElement("div", {
-    className: "sendbird-file-message__more"
+    className: "sendbird-file-message__more",
+    ref: parentContainRef
   }, React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React__default.createElement(IconButton, {
@@ -5810,12 +6189,12 @@ function IncomingFileMessage(_ref2) {
       }, React__default.createElement(Icon, {
         width: "24px",
         height: "24px",
-        type: IconTypes.REACTIONS_ADD,
+        type: IconTypes.EMOJI_REACTIONS_ADD,
         fillColor: IconColors.CONTENT_INVERSE
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(ReactionItems$1, {
+      return React__default.createElement(EmojiListItems$1, {
         closeDropdown: closeDropdown,
         parentRef: reactionAddButtonRef,
         parentContainRef: parentContainRef,
@@ -5843,7 +6222,7 @@ function IncomingFileMessage(_ref2) {
           defaultComponent: React__default.createElement(Icon, {
             width: "28px",
             height: "28px",
-            type: IconTypes.REACTIONS_ADD,
+            type: IconTypes.EMOJI_FAILED,
             fillColor: IconColors.CONTENT_INVERSE
           })
         }));
@@ -5858,8 +6237,10 @@ OutgoingFileMessage.propTypes = {
   showRemove: PropTypes.func,
   resendMessage: PropTypes.func,
   useReaction: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool,
   emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   emojiAllMap: PropTypes.instanceOf(Map),
+  membersMap: PropTypes.instanceOf(Map),
   toggleReaction: PropTypes.func
 };
 OutgoingFileMessage.defaultProps = {
@@ -5868,8 +6249,10 @@ OutgoingFileMessage.defaultProps = {
   resendMessage: noop$3,
   message: {},
   userId: '',
+  disabled: false,
   emojiAllList: [],
   emojiAllMap: new Map(),
+  membersMap: new Map(),
   toggleReaction: noop$3
 };
 IncomingFileMessage.propTypes = {
@@ -5878,6 +6261,7 @@ IncomingFileMessage.propTypes = {
   useReaction: PropTypes.bool.isRequired,
   emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   emojiAllMap: PropTypes.instanceOf(Map),
+  membersMap: PropTypes.instanceOf(Map),
   toggleReaction: PropTypes.func
 };
 IncomingFileMessage.defaultProps = {
@@ -5885,12 +6269,14 @@ IncomingFileMessage.defaultProps = {
   userId: '',
   emojiAllList: [],
   emojiAllMap: new Map(),
+  membersMap: new Map(),
   toggleReaction: noop$3
 };
 
 var MessageSwitch = function MessageSwitch(_ref3) {
   var message = _ref3.message,
       userId = _ref3.userId,
+      disabled = _ref3.disabled,
       isByMe = _ref3.isByMe,
       showRemove = _ref3.showRemove,
       status = _ref3.status,
@@ -5898,18 +6284,21 @@ var MessageSwitch = function MessageSwitch(_ref3) {
       useReaction = _ref3.useReaction,
       emojiAllList = _ref3.emojiAllList,
       emojiAllMap = _ref3.emojiAllMap,
+      membersMap = _ref3.membersMap,
       toggleReaction = _ref3.toggleReaction;
   return React__default.createElement("div", {
     className: "sendbird-file-message".concat(isByMe ? '--outgoing' : '--incoming')
   }, isByMe ? React__default.createElement(OutgoingFileMessage, {
     message: message,
     userId: userId,
+    disabled: disabled,
     showRemove: showRemove,
     status: status,
     resendMessage: resendMessage,
     useReaction: useReaction,
     emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
+    membersMap: membersMap,
     toggleReaction: toggleReaction
   }) : React__default.createElement(IncomingFileMessage, {
     userId: userId,
@@ -5917,6 +6306,7 @@ var MessageSwitch = function MessageSwitch(_ref3) {
     useReaction: useReaction,
     emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
+    membersMap: membersMap,
     toggleReaction: toggleReaction
   }));
 };
@@ -5925,22 +6315,26 @@ MessageSwitch.propTypes = {
   message: PropTypes.shape({}),
   userId: PropTypes.string,
   isByMe: PropTypes.bool,
+  disabled: PropTypes.bool,
   showRemove: PropTypes.func,
   resendMessage: PropTypes.func,
   status: PropTypes.string.isRequired,
   useReaction: PropTypes.bool.isRequired,
   emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   emojiAllMap: PropTypes.instanceOf(Map),
+  membersMap: PropTypes.instanceOf(Map),
   toggleReaction: PropTypes.func
 };
 MessageSwitch.defaultProps = {
   message: {},
   isByMe: false,
+  disabled: false,
   showRemove: noop$3,
   resendMessage: noop$3,
   userId: '',
   emojiAllList: [],
   emojiAllMap: new Map(),
+  membersMap: new Map(),
   toggleReaction: noop$3
 };
 
@@ -6309,9 +6703,164 @@ RemoveMessage.propTypes = {
   onDeleteMessage: PropTypes.func.isRequired
 };
 
+var getMessageCreatedAt$3 = function getMessageCreatedAt(message) {
+  return Moment(message.createdAt).format('LT');
+};
+
+var CLASS_NAME$4 = 'sendbird-unknown-message';
+function UnknownMessage(_ref) {
+  var message = _ref.message,
+      isByMe = _ref.isByMe,
+      status = _ref.status,
+      className = _ref.className,
+      showRemove = _ref.showRemove;
+  var injectingClassName = Array.isArray(className) ? className : [className];
+  injectingClassName.unshift(CLASS_NAME$4);
+  injectingClassName.push("".concat(CLASS_NAME$4).concat(isByMe ? '--outgoing' : '--incoming'));
+  return React__default.createElement("div", {
+    className: injectingClassName.join(' ')
+  }, isByMe ? React__default.createElement(OutgoingUnknownMessage, {
+    message: message,
+    status: status,
+    showRemove: showRemove
+  }) : React__default.createElement(IncomingUnknownMessage, {
+    message: message
+  }));
+}
+UnknownMessage.propTypes = {
+  message: PropTypes.shape({}).isRequired,
+  isByMe: PropTypes.bool,
+  status: PropTypes.string,
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  showRemove: PropTypes.func
+};
+UnknownMessage.defaultProps = {
+  isByMe: false,
+  status: '',
+  className: '',
+  showRemove: function showRemove() {}
+};
+
+function OutgoingUnknownMessage(_ref2) {
+  var message = _ref2.message,
+      status = _ref2.status,
+      showRemove = _ref2.showRemove;
+  var className = 'sendbird-outgoing-unknown-message';
+  var parentContainRef = React.useRef(null);
+  var menuRef = React.useRef(null);
+  return React__default.createElement("div", {
+    className: className
+  }, React__default.createElement("div", {
+    className: "".concat(className, "__more"),
+    ref: parentContainRef
+  }, React__default.createElement(ContextMenu, {
+    menuTrigger: function menuTrigger(toggleDropdown) {
+      return React__default.createElement(IconButton, {
+        className: "".concat(className, "__more__menu"),
+        ref: menuRef,
+        width: "32px",
+        height: "32px",
+        onClick: toggleDropdown
+      }, React__default.createElement(Icon, {
+        width: "24px",
+        height: "24px",
+        type: IconTypes.MORE,
+        fillColor: IconColors.CONTENT_INVERSE
+      }));
+    },
+    menuItems: function menuItems(closeDropdown) {
+      return React__default.createElement(MenuItems$1, {
+        parentRef: menuRef // for catching location(x, y) of MenuItems
+        ,
+        parentContainRef: parentContainRef // for toggling more options(menus & reactions)
+        ,
+        closeDropdown: closeDropdown,
+        openLeft: true
+      }, React__default.createElement(MenuItem, {
+        onClick: function onClick() {
+          showRemove(true);
+          closeDropdown();
+        }
+      }, "Delete"));
+    }
+  })), React__default.createElement("div", {
+    className: "".concat(className, "__body")
+  }, React__default.createElement("div", {
+    className: "".concat(className, "__body__text-balloon")
+  }, React__default.createElement(Label, {
+    className: "".concat(className, "__body__text-balloon__header"),
+    type: LabelTypography.BODY_1,
+    color: LabelColors.ONBACKGROUND_1
+  }, LabelStringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React__default.createElement(Label, {
+    className: "".concat(className, "__body__text-balloon__description"),
+    type: LabelTypography.BODY_1,
+    color: LabelColors.ONBACKGROUND_2
+  }, LabelStringSet.UNKNOWN__CANNOT_READ_MESSAGE)), React__default.createElement("div", {
+    className: "".concat(className, "__body__message-status")
+  }, React__default.createElement(MessageStatus, {
+    message: message,
+    status: status
+  }))));
+}
+
+function IncomingUnknownMessage(_ref3) {
+  var message = _ref3.message;
+  var className = 'sendbird-incoming-unknown-message';
+  var sender = message.sender;
+  return React__default.createElement("div", {
+    className: className
+  }, React__default.createElement("div", {
+    className: "".concat(className, "__left")
+  }, React__default.createElement(Avatar, {
+    className: "".concat(className, "__left__sender-profile-image"),
+    src: sender.profileUrl || '',
+    width: "26px",
+    height: "26px",
+    alt: "sender-profile-image"
+  })), React__default.createElement("div", {
+    className: "".concat(className, "__body")
+  }, React__default.createElement(Label, {
+    className: "".concat(className, "__body__sender-name"),
+    type: LabelTypography.CAPTION_2,
+    color: LabelColors.ONBACKGROUND_2
+  }, sender.nickname || LabelStringSet.NO_NAME), React__default.createElement("div", {
+    className: "".concat(className, "__body__text-balloon")
+  }, React__default.createElement(Label, {
+    className: "".concat(className, "__body__text-balloon__header"),
+    type: LabelTypography.BODY_1,
+    color: LabelColors.ONBACKGROUND_1
+  }, LabelStringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React__default.createElement(Label, {
+    className: "".concat(className, "__body__text-balloon__description"),
+    type: LabelTypography.BODY_1,
+    color: LabelColors.ONBACKGROUND_2
+  }, LabelStringSet.UNKNOWN__CANNOT_READ_MESSAGE)), React__default.createElement(Label, {
+    className: "".concat(className, "__body__sent-at"),
+    type: LabelTypography.CAPTION_3,
+    color: LabelColors.ONBACKGROUND_2
+  }, getMessageCreatedAt$3(message))));
+}
+
+OutgoingUnknownMessage.propTypes = {
+  message: PropTypes.shape({}).isRequired,
+  status: PropTypes.string.isRequired,
+  showRemove: PropTypes.func
+};
+OutgoingUnknownMessage.defaultProps = {
+  showRemove: function showRemove() {}
+};
+IncomingUnknownMessage.propTypes = {
+  message: PropTypes.shape({
+    sender: PropTypes.shape({
+      nickname: PropTypes.string,
+      profileUrl: PropTypes.string
+    })
+  }).isRequired
+};
+
 function MessageHoc(_ref) {
   var message = _ref.message,
       userId = _ref.userId,
+      disabled = _ref.disabled,
       editDisabled = _ref.editDisabled,
       hasSeperator = _ref.hasSeperator,
       deleteMessage = _ref.deleteMessage,
@@ -6319,7 +6868,9 @@ function MessageHoc(_ref) {
       status = _ref.status,
       resendMessage = _ref.resendMessage,
       useReaction = _ref.useReaction,
-      emojiContainer = _ref.emojiContainer,
+      emojiAllList = _ref.emojiAllList,
+      emojiAllMap = _ref.emojiAllMap,
+      membersMap = _ref.membersMap,
       toggleReaction = _ref.toggleReaction;
   var _message$sender = message.sender,
       sender = _message$sender === void 0 ? {} : _message$sender;
@@ -6341,40 +6892,6 @@ function MessageHoc(_ref) {
 
   var editMessageInputRef = React.useRef(null);
   var isByMe = userId === sender.userId || message.requestState === 'pending' || message.requestState === 'failed';
-  var _emojiContainer$emoji = emojiContainer.emojiCategories,
-      emojiCategories = _emojiContainer$emoji === void 0 ? [] : _emojiContainer$emoji;
-
-  var _useState7 = React.useState([]),
-      _useState8 = _slicedToArray(_useState7, 2),
-      emojiAllList = _useState8[0],
-      setEmojiAllList = _useState8[1];
-
-  var _useState9 = React.useState(new Map()),
-      _useState10 = _slicedToArray(_useState9, 2),
-      emojiAllMap = _useState10[0],
-      setEmojiAllMap = _useState10[1];
-
-  React.useEffect(function () {
-    if (useReaction) {
-      var emojiList = [];
-      var emojiMap = new Map();
-
-      for (var i = 0; i < emojiCategories.length; i += 1) {
-        var emojis = emojiCategories[i].emojis;
-
-        for (var j = 0; j < emojis.length; j += 1) {
-          emojiList.push({
-            key: emojis[j].key,
-            url: emojis[j].url
-          });
-          emojiMap.set(emojis[j].key, emojis[j].url);
-        }
-      }
-
-      setEmojiAllList(emojiList);
-      setEmojiAllMap(emojiMap);
-    }
-  }, [emojiContainer]);
 
   if (showEdit) {
     return React__default.createElement(MessageInput, {
@@ -6396,6 +6913,7 @@ function MessageHoc(_ref) {
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
   }, Moment(message.createdAt).format('LL'))), (message.isFileMessage && message.isFileMessage() || message.messageType === 'file') && React__default.createElement(React__default.Fragment, null, isImage(message.type) || isVideo(message.type) ? React__default.createElement(ThumbnailMessage, {
+    disabled: disabled,
     message: message,
     userId: userId,
     isByMe: isByMe,
@@ -6406,10 +6924,12 @@ function MessageHoc(_ref) {
     useReaction: useReaction,
     emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
+    membersMap: membersMap,
     toggleReaction: toggleReaction
   }) : React__default.createElement(MessageSwitch, {
     message: message,
     userId: userId,
+    disabled: disabled,
     isByMe: isByMe,
     showRemove: setShowRemove,
     resendMessage: resendMessage,
@@ -6417,11 +6937,13 @@ function MessageHoc(_ref) {
     useReaction: useReaction,
     emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
+    membersMap: membersMap,
     toggleReaction: toggleReaction
   })), message.isAdminMessage && message.isAdminMessage() && React__default.createElement(AdminMessage, {
     message: message
   }), (message.isUserMessage && message.isUserMessage() || message.messageType === 'user') && React__default.createElement(Message, {
     message: message,
+    disabled: disabled,
     isByMe: isByMe,
     userId: userId,
     showEdit: setShowEdit,
@@ -6431,6 +6953,7 @@ function MessageHoc(_ref) {
     useReaction: useReaction,
     emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
+    membersMap: membersMap,
     toggleReaction: toggleReaction
   }), showRemove && React__default.createElement(RemoveMessage, {
     onCloseModal: function onCloseModal() {
@@ -6452,6 +6975,11 @@ function MessageHoc(_ref) {
       });
     },
     isByMe: isByMe
+  }), !(message.isFileMessage && message.isFileMessage() || message.messageType === 'file') && !(message.isAdminMessage && message.isAdminMessage()) && !(message.isUserMessage && message.isUserMessage() || message.messageType === 'user') && !showFileViewer && React__default.createElement(UnknownMessage, {
+    message: message,
+    status: status,
+    isByMe: isByMe,
+    showRemove: setShowRemove
   }));
 }
 MessageHoc.propTypes = {
@@ -6473,15 +7001,16 @@ MessageHoc.propTypes = {
     })
   }),
   hasSeperator: PropTypes.bool,
+  disabled: PropTypes.bool,
   editDisabled: PropTypes.bool,
   deleteMessage: PropTypes.func.isRequired,
   updateMessage: PropTypes.func.isRequired,
   resendMessage: PropTypes.func.isRequired,
   status: PropTypes.string,
   useReaction: PropTypes.bool.isRequired,
-  emojiContainer: PropTypes.shape({
-    emojiCategories: PropTypes.oneOfType([PropTypes.shape({}), PropTypes.arrayOf(PropTypes.shape({}))])
-  }).isRequired,
+  emojiAllList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  emojiAllMap: PropTypes.instanceOf(Map).isRequired,
+  membersMap: PropTypes.instanceOf(Map).isRequired,
   toggleReaction: PropTypes.func
 };
 MessageHoc.defaultProps = {
@@ -6489,138 +7018,9 @@ MessageHoc.defaultProps = {
   editDisabled: false,
   message: {},
   hasSeperator: false,
+  disabled: false,
   status: '',
   toggleReaction: function toggleReaction() {}
-};
-
-var pubSubHandleRemover$1 = function pubSubHandleRemover(subscriber) {
-  subscriber.forEach(function (s) {
-    try {
-      s.remove();
-    } catch (_unused) {//
-    }
-  });
-};
-var pubSubHandler$1 = function pubSubHandler(channelUrl, pubSub, dispatcher) {
-  var subscriber = new Map();
-  if (!pubSub || !pubSub.subscribe) return subscriber;
-  subscriber.set(SEND_USER_MESSAGE, pubSub.subscribe(SEND_USER_MESSAGE, function (msg) {
-    var channel = msg.channel,
-        message = msg.message;
-
-    if (channel && channelUrl === channel.url) {
-      dispatcher({
-        type: SEND_MESSAGEGE_SUCESS,
-        payload: message
-      });
-    }
-  }));
-  subscriber.set(SEND_MESSAGE_START, pubSub.subscribe(SEND_MESSAGE_START, function (msg) {
-    var channel = msg.channel,
-        message = msg.message;
-
-    if (channel && channelUrl === channel.url) {
-      dispatcher({
-        type: SEND_MESSAGEGE_START,
-        payload: message
-      });
-    }
-  }));
-  subscriber.set(SEND_FILE_MESSAGE, pubSub.subscribe(SEND_FILE_MESSAGE, function (msg) {
-    var channel = msg.channel,
-        message = msg.message;
-
-    if (channel && channelUrl === channel.url) {
-      dispatcher({
-        type: SEND_MESSAGEGE_SUCESS,
-        payload: message
-      });
-    }
-  }));
-  subscriber.set(UPDATE_USER_MESSAGE, pubSub.subscribe(UPDATE_USER_MESSAGE, function (msg) {
-    var channel = msg.channel,
-        message = msg.message;
-
-    if (channel && channelUrl === channel.url) {
-      dispatcher({
-        type: ON_MESSAGE_UPDATED,
-        payload: message
-      });
-    }
-  }));
-  subscriber.set(DELETE_MESSAGE, pubSub.subscribe(DELETE_MESSAGE, function (msg) {
-    var channel = msg.channel,
-        messageId = msg.messageId;
-
-    if (channel && channelUrl === channel.url) {
-      dispatcher({
-        type: ON_MESSAGE_DELETED,
-        payload: messageId
-      });
-    }
-  }));
-  return subscriber;
-};
-var scrollIntoLast = function scrollIntoLast(selector) {
-  var intialTry = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-  var MAX_TRIES = 10;
-  var currentTry = intialTry;
-
-  if (currentTry > MAX_TRIES) {
-    return;
-  }
-
-  try {
-    var nodes = document.querySelectorAll(selector);
-    var last = nodes[nodes.length - 1];
-    last.scrollIntoView(false);
-    /** alignToTop: false */
-  } catch (error) {
-    setTimeout(function () {
-      scrollIntoLast(selector, currentTry + 1);
-    }, 500 * currentTry);
-  }
-};
-var getParsedStatus = function getParsedStatus(message, currentGroupChannel) {
-  if (message.requestState === 'failed') {
-    return MessageStatusType.FAILED;
-  }
-
-  if (message.requestState === 'pending') {
-    return MessageStatusType.PENDING;
-  }
-
-  if (message.requestState === 'succeeded') {
-    if (!currentGroupChannel) {
-      return MessageStatusType.SENT;
-    }
-
-    var unreadCount = currentGroupChannel.getReadReceipt(message);
-
-    if (unreadCount === 0) {
-      return MessageStatusType.READ;
-    }
-
-    var isDelivered = currentGroupChannel.getDeliveryReceipt(message) === 0;
-
-    if (isDelivered) {
-      return MessageStatusType.DELIVERED;
-    }
-
-    return MessageStatusType.SENT;
-  }
-
-  return null;
-};
-var isOperator = function isOperator() {
-  var groupChannel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  var myRole = groupChannel.myRole;
-  return myRole === 'operator';
-};
-var isDisabledBecauseFrozen = function isDisabledBecauseFrozen() {
-  var groupChannel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  var isFrozen = groupChannel.isFrozen;
-  return isFrozen && !isOperator(groupChannel);
 };
 
 var ConversationScroll =
@@ -6711,6 +7111,7 @@ function (_Component) {
           editDisabled = _this$props2.editDisabled,
           allMessages = _this$props2.allMessages,
           userId = _this$props2.userId,
+          disabled = _this$props2.disabled,
           deleteMessage = _this$props2.deleteMessage,
           updateMessage = _this$props2.updateMessage,
           readStatus = _this$props2.readStatus,
@@ -6719,6 +7120,9 @@ function (_Component) {
           renderChatItem = _this$props2.renderChatItem,
           useReaction = _this$props2.useReaction,
           emojiContainer = _this$props2.emojiContainer,
+          emojiAllMap = _this$props2.emojiAllMap,
+          emojiAllList = _this$props2.emojiAllList,
+          membersMap = _this$props2.membersMap,
           toggleReaction = _this$props2.toggleReaction;
       return React__default.createElement("div", {
         className: "sendbird-conversation__messages"
@@ -6745,7 +7149,8 @@ function (_Component) {
             message: m,
             onDeleteMessage: deleteMessage,
             onUpdateMessage: updateMessage,
-            onResendMessage: resendMessage
+            onResendMessage: resendMessage,
+            emojiContainer: emojiContainer
           }));
         }
 
@@ -6755,13 +7160,16 @@ function (_Component) {
           key: m.messageId || m.reqId,
           message: m,
           userId: userId,
+          disabled: disabled,
           editDisabled: editDisabled,
           hasSeperator: hasSeperator,
           deleteMessage: deleteMessage,
           updateMessage: updateMessage,
           useReaction: useReaction,
           resendMessage: resendMessage,
-          emojiContainer: emojiContainer,
+          emojiAllList: emojiAllList,
+          emojiAllMap: emojiAllMap,
+          membersMap: membersMap,
           toggleReaction: toggleReaction
         });
       }))));
@@ -6783,6 +7191,7 @@ ConversationScroll.propTypes = {
   }),
   initialized: PropTypes.bool,
   editDisabled: PropTypes.bool,
+  disabled: PropTypes.bool,
   userId: PropTypes.string,
   allMessages: PropTypes.arrayOf(PropTypes.shape({
     createdAt: PropTypes.number
@@ -6792,17 +7201,22 @@ ConversationScroll.propTypes = {
   updateMessage: PropTypes.func.isRequired,
   readStatus: PropTypes.shape({}).isRequired,
   currentGroupChannel: PropTypes.shape({
-    markAsRead: PropTypes.func
+    markAsRead: PropTypes.func,
+    members: PropTypes.arrayOf(PropTypes.shape({}))
   }).isRequired,
   renderChatItem: PropTypes.element,
   swapParams: PropTypes.bool,
   useReaction: PropTypes.bool,
   emojiContainer: PropTypes.shape({}),
+  emojiAllMap: PropTypes.instanceOf(Map),
+  emojiAllList: PropTypes.arrayOf(PropTypes.shape({})),
+  membersMap: PropTypes.instanceOf(Map),
   toggleReaction: PropTypes.func
 };
 ConversationScroll.defaultProps = {
   hasMore: false,
   editDisabled: false,
+  disabled: false,
   initialized: false,
   userId: '',
   renderChatItem: null,
@@ -6810,6 +7224,9 @@ ConversationScroll.defaultProps = {
   swapParams: false,
   useReaction: true,
   emojiContainer: {},
+  emojiAllMap: new Map(),
+  emojiAllList: [],
+  membersMap: new Map(),
   toggleReaction: function toggleReaction() {}
 };
 
@@ -6919,6 +7336,20 @@ TypingIndicator.propTypes = {
   }).isRequired
 };
 
+function ConnectionStatus() {
+  return React__default.createElement("div", {
+    className: "sendbird-conversation__connection-status"
+  }, React__default.createElement(Label, {
+    type: LabelTypography.BODY_2,
+    color: LabelColors.ONBACKGROUND_2
+  }, LabelStringSet.TRYING_TO_CONNECT), React__default.createElement(Icon, {
+    type: IconTypes.DISCONNECTED,
+    fillColor: IconColors.SENT,
+    height: "14px",
+    width: "14px"
+  }));
+}
+
 var prettyDate = function prettyDate(date) {
   return Moment(date, 'x').fromNow();
 };
@@ -7009,16 +7440,19 @@ function ChatHeader(props) {
       isMuted = props.isMuted,
       onActionClick = props.onActionClick;
   var userId = currentUser.userId;
+  var memoizedAvatar = React.useMemo(function () {
+    return React__default.createElement(Avatar, {
+      className: "sendbird-chat-header__avatar",
+      src: getChannelAvatarSource$1(currentGroupChannel, userId),
+      width: "32px",
+      height: "32px"
+    });
+  }, [currentGroupChannel]);
   return React__default.createElement("div", {
     className: "sendbird-chat-header"
   }, React__default.createElement("div", {
     className: "sendbird-chat-header__left"
-  }, React__default.createElement(Avatar, {
-    className: "sendbird-chat-header__avatar",
-    src: getChannelAvatarSource$1(currentGroupChannel, userId),
-    width: "32px",
-    height: "32px"
-  }), React__default.createElement(Label, {
+  }, memoizedAvatar, React__default.createElement(Label, {
     className: "sendbird-chat-header__title",
     type: LabelTypography.H_2,
     color: LabelColors.ONBACKGROUND_1
@@ -7083,6 +7517,7 @@ var ConversationPanel = function ConversationPanel(props) {
       userId = _props$config.userId,
       logger = _props$config.logger,
       pubSub = _props$config.pubSub,
+      isOnline = _props$config.isOnline,
       reconnect = props.dispatchers.reconnect,
       renderChatItem = props.renderChatItem,
       onChatHeaderActionClick = props.onChatHeaderActionClick,
@@ -7151,7 +7586,16 @@ var ConversationPanel = function ConversationPanel(props) {
       hasMore = messagesStore.hasMore,
       initialized = messagesStore.initialized,
       unreadCount = messagesStore.unreadCount,
-      unreadSince = messagesStore.unreadSince; // to create message-datasource
+      unreadSince = messagesStore.unreadSince;
+  var emojiAllMap = React.useMemo(function () {
+    return  new Map();
+  }, [emojiContainer]);
+  var emojiAllList = React.useMemo(function () {
+    return  [];
+  }, [emojiContainer]);
+  var nicknamesMap = React.useMemo(function () {
+    return  new Map();
+  }, [currentGroupChannel.members]); // to create message-datasource
 
   React.useEffect(function () {
     logger.info('Channel: Setup started');
@@ -7343,7 +7787,64 @@ var ConversationPanel = function ConversationPanel(props) {
       }, {});
       setReadStatus(allReadStatus);
     }
-  }, [allMessages]);
+  }, [allMessages]); // handling connection breaks
+
+  React.useEffect(function () {
+    var wasOffline = !isOnline;
+    return function () {
+      var prevMessageListQuery = null; // state changed from offline to online
+
+      if (wasOffline) {
+        logger.info('Refreshing conversation state');
+
+        if (!currentGroupChannel || !currentGroupChannel.createPreviousMessageListQuery) {
+          return;
+        }
+
+        prevMessageListQuery = currentGroupChannel.createPreviousMessageListQuery();
+        prevMessageListQuery.limit = 30;
+        prevMessageListQuery.reverse = false;
+        prevMessageListQuery.includeReaction = true;
+        setMessageSource(prevMessageListQuery); // Retrieving previous messages.
+
+        prevMessageListQuery.load(function (response, err) {
+          if (prevMessageListQuery.deprecatedRun) {
+            logger.warning('Donot run prevMessageListQuery, because channel has been switched', prevMessageListQuery);
+            return;
+          }
+
+          var swapParams = sdk.getErrorFirstCallback();
+          var messages = response;
+          var error = err;
+
+          if (swapParams) {
+            messages = error;
+            error = response;
+          }
+
+          if (error) {
+            logger.error('Channel: Fetching messages failed', error);
+            return;
+          }
+
+          logger.info('Channel: Fetching messages success', messages);
+          messagesDispatcher({
+            type: CLEAR_SENT_MESSAGES
+          });
+          messagesDispatcher({
+            type: GET_PREV_MESSAGES_SUCESS,
+            payload: {
+              messages: messages,
+              hasMore: prevMessageListQuery.hasMore
+            }
+          });
+          setTimeout(function () {
+            return scrollIntoLast('.sendbird-msg--scroll-ref');
+          });
+        });
+      }
+    };
+  }, [isOnline]);
 
   if (sdkError) {
     return React__default.createElement("div", {
@@ -7408,6 +7909,7 @@ var ConversationPanel = function ConversationPanel(props) {
     swapParams: sdk && sdk.getErrorFirstCallback && sdk.getErrorFirstCallback(),
     scrollRef: scrollRef,
     hasMore: hasMore,
+    disabled: !isOnline,
     messagesDispatcher: messagesDispatcher,
     messageSource: messageSource,
     initialized: initialized,
@@ -7419,6 +7921,9 @@ var ConversationPanel = function ConversationPanel(props) {
     renderChatItem: renderChatItem,
     useReaction: useReaction,
     emojiContainer: emojiContainer,
+    emojiAllList: emojiAllList,
+    emojiAllMap: emojiAllMap,
+    membersMap: nicknamesMap,
     deleteMessage: function deleteMessage(message, cb) {
       logger.info('Channel: Deleting message', message);
       var requestState = message.requestState;
@@ -7594,7 +8099,7 @@ var ConversationPanel = function ConversationPanel(props) {
   }, React__default.createElement(MessageInput, {
     placeholder: isDisabledBecauseFrozen(currentGroupChannel) && LabelStringSet.CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__DISABLED,
     ref: messageInputRef,
-    disabled: !initialized || isDisabledBecauseFrozen(currentGroupChannel),
+    disabled: !initialized || isDisabledBecauseFrozen(currentGroupChannel) || !isOnline,
     onStartTyping: function onStartTyping() {
       currentGroupChannel.startTyping();
     },
@@ -7714,7 +8219,11 @@ var ConversationPanel = function ConversationPanel(props) {
     channelUrl: channelUrl,
     sb: sdk,
     logger: logger
-  }))));
+  })), !isOnline && React__default.createElement(ConnectionStatus, {
+    sdkInit: sdkInit,
+    sb: sdk,
+    logger: logger
+  })));
 };
 ConversationPanel.propTypes = {
   channelUrl: PropTypes.string,
@@ -7743,6 +8252,7 @@ ConversationPanel.propTypes = {
   }).isRequired,
   config: PropTypes.shape({
     userId: PropTypes.string.isRequired,
+    isOnline: PropTypes.bool.isRequired,
     logger: PropTypes.shape({
       info: PropTypes.func,
       error: PropTypes.func,
@@ -7769,6 +8279,9 @@ ConversationPanel.defaultProps = {
   renderChatItem: null,
   onChatHeaderActionClick: noop$5
 };
+var getEmojiCategoriesFromEmojiContainer$1 = getEmojiCategoriesFromEmojiContainer,
+    getAllEmojisFromEmojiContainer$1 = getAllEmojisFromEmojiContainer,
+    getEmojisFromEmojiContainer$1 = getEmojisFromEmojiContainer;
 var Conversation = withSendbirdContext(ConversationPanel);
 
 var InputLabel = function InputLabel(_ref) {
@@ -7920,6 +8433,7 @@ EditDetails.propTypes = {
 
 var ChannelProfile = function ChannelProfile(props) {
   var avatar = props.avatar,
+      disabled = props.disabled,
       title = props.title,
       onChannelInfoChange = props.onChannelInfoChange;
 
@@ -7941,14 +8455,19 @@ var ChannelProfile = function ChannelProfile(props) {
     color: LabelColors.ONBACKGROUND_1,
     className: "sendbird-channel-profile__title"
   }, title), React__default.createElement(TextButton, {
+    disabled: disabled,
     className: "sendbird-channel-profile__edit",
     onClick: function onClick() {
-      return setShowModal(true);
+      if (disabled) {
+        return;
+      }
+
+      setShowModal(true);
     },
     notUnderline: true
   }, React__default.createElement(Label, {
     type: LabelTypography.BUTTON_1,
-    color: LabelColors.PRIMARY
+    color: disabled ? LabelColors.ONBACKGROUND_2 : LabelColors.PRIMARY
   }, LabelStringSet.CHANNEL_SETTING__PROFILE__EDIT)), showModal && React__default.createElement(EditDetails, {
     onCancel: function onCancel() {
       return setShowModal(false);
@@ -7961,12 +8480,14 @@ var ChannelProfile = function ChannelProfile(props) {
 
 ChannelProfile.propTypes = {
   avatar: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  disabled: PropTypes.bool,
   title: PropTypes.string,
   onChannelInfoChange: PropTypes.func
 };
 ChannelProfile.defaultProps = {
   avatar: '',
   title: '',
+  disabled: false,
   onChannelInfoChange: function onChannelInfoChange() {}
 };
 
@@ -7974,6 +8495,7 @@ var SHOWN_MEMBER_MAX = 10;
 
 var MemebersAccordion = function MemebersAccordion(_ref) {
   var members = _ref.members,
+      disabled = _ref.disabled,
       userQueryCreator = _ref.userQueryCreator,
       onInviteMemebers = _ref.onInviteMemebers,
       swapParams = _ref.swapParams;
@@ -8042,8 +8564,13 @@ var MemebersAccordion = function MemebersAccordion(_ref) {
     className: "sendbird-members-accordion__footer__invite-users",
     type: Type$1.SECONDARY,
     size: Size.SMALL,
+    disabled: disabled,
     onClick: function onClick() {
-      return setShowAddUserModal(true);
+      if (disabled) {
+        return;
+      }
+
+      setShowAddUserModal(true);
     }
   }, LabelStringSet.CHANNEL_SETTING__MEMBERS__INVITE_MEMBER), showAddUserModal && React__default.createElement(InviteMembers, {
     swapParams: swapParams,
@@ -8062,12 +8589,14 @@ var MemebersAccordion = function MemebersAccordion(_ref) {
 
 MemebersAccordion.propTypes = {
   swapParams: PropTypes.bool,
+  disabled: PropTypes.bool,
   members: PropTypes.arrayOf(PropTypes.shape({})),
   userQueryCreator: PropTypes.func.isRequired,
   onInviteMemebers: PropTypes.func.isRequired
 };
 MemebersAccordion.defaultProps = {
   swapParams: false,
+  disabled: false,
   members: []
 };
 
@@ -8080,7 +8609,8 @@ function ChannelSettings(props) {
       _props$config = props.config,
       userListQuery = _props$config.userListQuery,
       userId = _props$config.userId,
-      logger = _props$config.logger;
+      logger = _props$config.logger,
+      isOnline = _props$config.isOnline;
   var sdk = sdkStore.sdk,
       initialized = sdkStore.initialized; // hack to kepp track of channel updates by triggering useEffect
 
@@ -8175,6 +8705,7 @@ function ChannelSettings(props) {
   })), React__default.createElement("div", {
     className: "sendbird-channel-settings__scroll-area"
   }, React__default.createElement(ChannelProfile, {
+    disabled: !isOnline,
     avatar: getChannelAvatarSource(channel, userId),
     title: channel.name,
     onChannelInfoChange: function onChannelInfoChange(currentImg, currentTitle) {
@@ -8234,8 +8765,9 @@ function ChannelSettings(props) {
     className: ['sendbird-channel-settings__panel-icon-right', 'sendbird-channel-settings__panel-icon--chevron', showAccordion ? 'sendbird-channel-settings__panel-icon--open' : ''].join(' '),
     height: "24px",
     width: "24px"
-  })), showAccordion && React__default.createElement(MemebersAccordion // eslint-disable-next-line
-  , {
+  })), showAccordion && React__default.createElement(MemebersAccordion, {
+    disabled: !isOnline // eslint-disable-next-line
+    ,
     userQueryCreator: userListQuery && typeof userListQuery === 'function' ? userListQuery : sdk.createApplicationUserListQuery.bind(sdk),
     swapParams: sdk && sdk.getErrorFirstCallback && sdk.getErrorFirstCallback(),
     members: channel.members,
@@ -8248,14 +8780,23 @@ function ChannelSettings(props) {
       });
     }
   }), React__default.createElement("div", {
-    className: "sendbird-channel-settings__panel-item",
+    className: "sendbird-channel-settings__panel-item\n              ".concat(!isOnline ? 'sendbird-channel-settings__panel-item__disabled' : ''),
     role: "button",
     tabIndex: 0,
+    disabled: true,
     onKeyDown: function onKeyDown() {
-      return setShowLeaveChannelModal(true);
+      if (!isOnline) {
+        return;
+      }
+
+      setShowLeaveChannelModal(true);
     },
     onClick: function onClick() {
-      return setShowLeaveChannelModal(true);
+      if (!isOnline) {
+        return;
+      }
+
+      setShowLeaveChannelModal(true);
     }
   }, React__default.createElement(Icon, {
     type: IconTypes.LEAVE,
@@ -8300,6 +8841,7 @@ ChannelSettings.propTypes = {
   config: PropTypes.shape({
     userId: PropTypes.string,
     userListQuery: PropTypes.func,
+    isOnline: PropTypes.bool,
     logger: PropTypes.shape({
       info: PropTypes.func,
       error: PropTypes.func,
@@ -8748,6 +9290,9 @@ exports.Channel = Conversation;
 exports.ChannelList = ChannelList$1;
 exports.ChannelSettings = ChannelSettings$1;
 exports.SendBirdProvider = Sendbird;
+exports.getAllEmojisFromEmojiContainer = getAllEmojisFromEmojiContainer$1;
+exports.getEmojiCategoriesFromEmojiContainer = getEmojiCategoriesFromEmojiContainer$1;
+exports.getEmojisFromEmojiContainer = getEmojisFromEmojiContainer$1;
 exports.sendBirdSelectors = selectors;
 exports.withSendBird = withSendbirdContext;
 //# sourceMappingURL=index.js.map

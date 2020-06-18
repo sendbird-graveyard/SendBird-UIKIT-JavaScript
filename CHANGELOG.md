@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.6(June 18, 2020)
+
+- Bug fixes:
+  * Improve disconnect/reconnect UX
+  * Various stability fixes
+
 ## 1.0.5(June 9, 2020)
 
 - Summary:
