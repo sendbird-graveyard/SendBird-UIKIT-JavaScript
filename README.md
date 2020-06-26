@@ -4,6 +4,8 @@ Find the docs at: https://docs.sendbird.com/javascript/ui_kit_getting_started
 
 For bugs and feature requests, visit: https://community.sendbird.com/
 
+Samples: https://github.com/sendbird/SendBird-JavaScript/tree/master/uikit-samples
+
 ## Install
 
 `npm i sendbird-uikit`
