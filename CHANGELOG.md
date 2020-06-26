@@ -1,5 +1,46 @@
 # Changelog
 
+## 1.0.7(June 26, 2020)
+
+- Features:
+  * Implement query customization - users can now customize internal queries that we use inside the app
+  to customize - ChannelList, MessageList and UserList rendering
+
+    * ChannelList.queries.channelListQuery (MyGroupChannelListQuery)
+    * ChannelList.queries.applicationUserListQuery (ApplicationUserListQuery), ChannelSettings.queries.applicationUserListQuery (ApplicationUserListQuery)
+    * Channel.queries.messageListQuery (MessageListQuery)
+
+  * UI for unknown message type
+
+
+ - Example
+
+  ```
+  <ChannelList
+    queries={{
+      channelListQuery: { includeEmpty: true },
+      applicationUserListQuery: { limit: 30, userIdsFilter: ['yourId'] },
+    }}
+  />
+
+  <Channel
+    channelUrl={channelUrl}
+    queries={{
+      messageListQuery: { prevResultSize: 10, includeParentMessageText: true, includeReaction: false },
+    }}
+  />
+
+  <ChannelSetting
+    channelUrl={channelUrl}
+    queries={{
+      applicationUserListQuery: { limit: 30, userIdsFilter: ['yourId'] },
+    }}
+  />
+  ```
+
+- Bug fixes:
+  * Various stability fixes
+
 ## 1.0.6(June 18, 2020)
 
 - Bug fixes:
