@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer, Component, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useReducer, useMemo, Component, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import Sb from 'sendbird';
 import Moment from 'moment';
@@ -215,7 +215,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.0.5';
+var APP_VERSION_STRING = '1.0.7';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -615,6 +615,28 @@ var pubSubFactory = (function () {
   };
 });
 
+function useAppendDomNode() {
+  var ids = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var rootSelector = arguments.length > 1 ? arguments[1] : undefined;
+  useEffect(function () {
+    var root = document.querySelector(rootSelector);
+    ids.forEach(function (id) {
+      var elem = document.createElement('div');
+      elem.setAttribute('id', id);
+      root.appendChild(elem);
+    });
+    return function () {
+      ids.forEach(function (id) {
+        var target = document.getElementById(id);
+
+        if (target) {
+          root.removeChild(target);
+        }
+      });
+    };
+  }, []);
+}
+
 function Sendbird(props) {
   var userId = props.userId,
       appId = props.appId,
@@ -672,25 +694,8 @@ function Sendbird(props) {
 
   useEffect(function () {
     setLogger(LoggerFactory(logLevel));
-  }, [logLevel]); // to create DOM elements for appending modal & context menu
-  // might fail on server side render
-
-  useEffect(function () {
-    logger.info('Creating helper divs');
-
-    var appentElemWithId = function appentElemWithId(id) {
-      var elem = document.createElement('div');
-      elem.setAttribute('id', id);
-      var body = document.querySelector('body');
-      body.appendChild(elem);
-    };
-
-    var modalRoot = 'sendbird-modal-root';
-    var menuRoot = 'sendbird-dropdown-portal';
-    appentElemWithId(modalRoot);
-    appentElemWithId(menuRoot);
-    logger.info('Finshed creating helper divs');
-  }, []); // add-remove theme from body
+  }, [logLevel]);
+  useAppendDomNode(['sendbird-modal-root', 'sendbird-dropdown-portal', 'sendbird-emoji-list-portal'], 'body'); // add-remove theme from body
 
   useEffect(function () {
     logger.info('Setup theme', "Theme: ".concat(theme));
@@ -856,11 +861,15 @@ function reducer$2(state, action) {
     case LEAVE_CHANNEL_SUCCESS:
     case ON_CHANNEL_DELETED:
       {
+        var channelUrl = action.payload;
+        var leftCurrentChannel = state.currentChannel === channelUrl;
         var newAllChannels = state.allChannels.filter(function (_ref2) {
           var url = _ref2.url;
-          return url !== action.payload;
+          return url !== channelUrl;
         });
-        var currentChannel = newAllChannels.length > 0 ? newAllChannels[0].url : '';
+        var currentChannel = leftCurrentChannel ? function () {
+          return newAllChannels.length > 0 ? newAllChannels[0].url : '';
+        }() : state.currentChannel;
         return _objectSpread2({}, state, {
           currentChannel: currentChannel,
           allChannels: newAllChannels
@@ -869,27 +878,35 @@ function reducer$2(state, action) {
 
     case ON_USER_LEFT:
       {
-        var channel = action.payload;
-        var myMemberState = channel.myMemberState,
-            url = channel.url; // I left
+        var _action$payload = action.payload,
+            channel = _action$payload.channel,
+            isMe = _action$payload.isMe;
+        var url = channel.url;
 
-        var _newAllChannels = state.allChannels.filter(function (c) {
-          return c.url !== url;
-        });
+        if (isMe) {
+          var _leftCurrentChannel = url === state.currentChannel.url;
 
-        var _currentChannel = _newAllChannels.length > 0 ? _newAllChannels[0].url : '';
+          var _newAllChannels2 = state.allChannels.filter(function (c) {
+            return c.url !== url;
+          });
 
-        if (myMemberState === 'none') {
+          var _currentChannel = _leftCurrentChannel ? function () {
+            return _newAllChannels2.length > 0 ? _newAllChannels2[0].url : '';
+          }() : state.currentChannel;
+
           return _objectSpread2({}, state, {
             currentChannel: _currentChannel,
-            allChannels: _newAllChannels
+            allChannels: _newAllChannels2
           });
         } // other user left
 
 
+        var _newAllChannels = state.allChannels.map(function (c) {
+          return c.url === url ? channel : c;
+        });
+
         return _objectSpread2({}, state, {
-          currentChannel: _currentChannel,
-          allChannels: [action.payload].concat(_toConsumableArray(_newAllChannels))
+          allChannels: _newAllChannels
         });
       }
 
@@ -1389,7 +1406,7 @@ var getStringSet = function getStringSet(lang) {
       MODAL__INVITE_MEMBER__TITLE: 'Invite member',
       MODAL__INVITE_MEMBER__SELECTEC: 'selected',
       MODAL__CREATE_CHANNEL__TITLE: 'New channel',
-      MODAL__CREATE_CHANNEL__SELECTED: 'seledted',
+      MODAL__CREATE_CHANNEL__SELECTED: 'selected',
       MODAL__USER_LIST__TITLE: 'members',
       TYPING_INDICATOR__IS_TYPING: 'is typing...',
       TYPING_INDICATOR__AND: 'and',
@@ -1476,6 +1493,14 @@ Badge.defaultProps = {
   className: []
 };
 
+var MessageStatusType = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  DELIVERED: 'DELIVERED',
+  READ: 'READ',
+  FAILED: 'FAILED'
+};
+
 var truncate = function truncate(fullStr, strLen) {
   if (fullStr === null || fullStr === undefined) return '';
   if (fullStr.length <= strLen) return fullStr;
@@ -1485,6 +1510,9 @@ var truncate = function truncate(fullStr, strLen) {
   var frontChars = Math.ceil(charsToShow / 2);
   var backChars = Math.floor(charsToShow / 2);
   return fullStr.substr(0, frontChars) + separator + fullStr.substr(fullStr.length - backChars);
+};
+var getIsSentFromStatus = function getIsSentFromStatus(status) {
+  return status === MessageStatusType.SENT || status === MessageStatusType.DELIVERED || status === MessageStatusType.READ;
 };
 
 var getChannelAvatarSource = function getChannelAvatarSource(channel, currentUserId) {
@@ -1579,6 +1607,14 @@ function ChannelPreview(_ref) {
       tabIndex = _ref.tabIndex,
       currentUser = _ref.currentUser;
   var userId = currentUser.userId;
+  var memoizedAvatar = useMemo(function () {
+    return React.createElement(Avatar, {
+      className: "sendbird-chat-header__avatar",
+      src: getChannelAvatarSource(channel, userId),
+      width: "32px",
+      height: "32px"
+    });
+  }, [channel]);
   return React.createElement("div", {
     role: "link",
     tabIndex: tabIndex,
@@ -1587,9 +1623,7 @@ function ChannelPreview(_ref) {
     className: "\n        sendbird-channel-preview\n        ".concat(isActive ? 'sendbird-channel-preview--active' : null, "\n      ")
   }, React.createElement("div", {
     className: "sendbird-channel-preview__avatar"
-  }, React.createElement(Avatar, {
-    src: getChannelAvatarSource(channel, userId)
-  })), React.createElement("div", {
+  }, memoizedAvatar), React.createElement("div", {
     className: "sendbird-channel-preview__content"
   }, React.createElement("div", {
     className: "sendbird-channel-preview__content__upper"
@@ -2773,11 +2807,6 @@ var IconColors = Colors$1;
 
 // simple component to be used as modal root
 var MODAL_ROOT = 'sendbird-modal-root';
-var ModalRoot = (function () {
-  return React.createElement("div", {
-    id: MODAL_ROOT
-  });
-});
 
 var Type$1 = {
   PRIMARY: 'PRIMARY',
@@ -3132,6 +3161,20 @@ InviteMembers.defaultProps = {
   idsToFilter: []
 };
 
+var createDefaultUserListQuery = function createDefaultUserListQuery(_ref) {
+  var sdk = _ref.sdk,
+      _ref$userFilledApplic = _ref.userFilledApplicationUserListQuery,
+      userFilledApplicationUserListQuery = _ref$userFilledApplic === void 0 ? {} : _ref$userFilledApplic;
+  var params = sdk.createApplicationUserListQuery();
+
+  if (userFilledApplicationUserListQuery) {
+    Object.keys(userFilledApplicationUserListQuery).forEach(function (key) {
+      params[key] = userFilledApplicationUserListQuery[key];
+    });
+  }
+
+  return params;
+};
 var createChannel = function createChannel(sdk, selectedUsers, onBeforeCreateChannel) {
   return new Promise(function (resolve, reject) {
     // have custom params
@@ -3186,6 +3229,7 @@ function AddChannel(_ref) {
       channelListDispatcher = _ref.channelListDispatcher,
       onBeforeCreateChannel = _ref.onBeforeCreateChannel,
       userId = _ref.userId,
+      userFilledApplicationUserListQuery = _ref.userFilledApplicationUserListQuery,
       userListQuery = _ref.userListQuery;
 
   var _useState = useState(false),
@@ -3218,7 +3262,10 @@ function AddChannel(_ref) {
     },
     idsToFilter: [userId],
     userQueryCreator: function userQueryCreator() {
-      return userListQuery && typeof userListQuery === 'function' ? userListQuery() : sdk.createApplicationUserListQuery();
+      return userListQuery && typeof userListQuery === 'function' ? userListQuery() : createDefaultUserListQuery({
+        sdk: sdk,
+        userFilledApplicationUserListQuery: userFilledApplicationUserListQuery
+      });
     },
     onSubmit: function onSubmit(selectedUsers) {
       return createChannel(sdk, selectedUsers, onBeforeCreateChannel).then(function (channel) {
@@ -3238,12 +3285,14 @@ AddChannel.propTypes = {
   }).isRequired,
   disabled: PropTypes.bool,
   channelListDispatcher: PropTypes.func.isRequired,
+  userFilledApplicationUserListQuery: PropTypes.shape({}),
   onBeforeCreateChannel: PropTypes.func,
   userId: PropTypes.string.isRequired,
   userListQuery: PropTypes.func
 };
 AddChannel.defaultProps = {
   disabled: false,
+  userFilledApplicationUserListQuery: {},
   onBeforeCreateChannel: null,
   userListQuery: null
 };
@@ -3596,7 +3645,7 @@ function (_Component) {
         maxItemCount: 8,
         itemWidth: 44,
         itemHeight: 40
-      }, children))), document.getElementById('sendbird-dropdown-portal'));
+      }, children))), document.getElementById('sendbird-emoji-list-portal'));
     }
   }]);
 
@@ -3650,11 +3699,6 @@ MenuItem.propTypes = {
 };
 MenuItem.defaultProps = {
   className: ''
-};
-var MenuRoot = function MenuRoot() {
-  return React.createElement("div", {
-    id: "sendbird-dropdown-portal"
-  });
 };
 function ContextMenu(_ref2) {
   var menuTrigger = _ref2.menuTrigger,
@@ -3901,11 +3945,16 @@ var createEventHandler = function createEventHandler(_ref) {
     }
   };
 
-  ChannelHandler.onUserLeft = function (channel) {
+  ChannelHandler.onUserLeft = function (channel, leftUser) {
+    var currentUser = sdk.currentUser;
+    var isMe = currentUser.userId === leftUser.userId;
     logger.info('ChannelList: onUserLeft', channel);
     channelListDispatcher({
       type: ON_USER_LEFT,
-      payload: channel
+      payload: {
+        channel: channel,
+        isMe: isMe
+      }
     });
   };
 
@@ -3941,6 +3990,25 @@ var createEventHandler = function createEventHandler(_ref) {
   logger.info('ChannelList: Added channelHandler');
   sdk.addChannelHandler(sdkChannelHandlerId, ChannelHandler);
 };
+
+var createApplicationUserListQuery = function createApplicationUserListQuery(_ref2) {
+  var sdk = _ref2.sdk,
+      _ref2$userFilledChann = _ref2.userFilledChannelListQuery,
+      userFilledChannelListQuery = _ref2$userFilledChann === void 0 ? {} : _ref2$userFilledChann;
+  var channelListQuery = sdk.GroupChannel.createMyGroupChannelListQuery();
+  channelListQuery.includeEmpty = false;
+  channelListQuery.order = 'latest_last_message'; // 'chronological', 'latest_last_message', 'channel_name_alphabetical', and 'metadata_value_alphabetical'
+
+  channelListQuery.limit = 20; // The value of pagination limit could be set up to 100.
+
+  if (userFilledChannelListQuery) {
+    Object.keys(userFilledChannelListQuery).forEach(function (key) {
+      channelListQuery[key] = userFilledChannelListQuery[key];
+    });
+  }
+
+  return channelListQuery;
+};
 /**
  * Setup event listener
  * create channel source query
@@ -3948,25 +4016,28 @@ var createEventHandler = function createEventHandler(_ref) {
  */
 
 
-function setupChannelList(_ref2) {
-  var sdk = _ref2.sdk,
-      sdkChannelHandlerId = _ref2.sdkChannelHandlerId,
-      channelListDispatcher = _ref2.channelListDispatcher,
-      setChannelSource = _ref2.setChannelSource,
-      onChannelSelect = _ref2.onChannelSelect,
-      logger = _ref2.logger;
+function setupChannelList(_ref3) {
+  var sdk = _ref3.sdk,
+      sdkChannelHandlerId = _ref3.sdkChannelHandlerId,
+      channelListDispatcher = _ref3.channelListDispatcher,
+      setChannelSource = _ref3.setChannelSource,
+      onChannelSelect = _ref3.onChannelSelect,
+      userFilledChannelListQuery = _ref3.userFilledChannelListQuery,
+      logger = _ref3.logger;
   createEventHandler({
     sdk: sdk,
     channelListDispatcher: channelListDispatcher,
     sdkChannelHandlerId: sdkChannelHandlerId,
     logger: logger
   });
-  var channelListQuery = sdk.GroupChannel.createMyGroupChannelListQuery();
-  channelListQuery.includeEmpty = false;
-  channelListQuery.order = 'latest_last_message'; // 'chronological', 'latest_last_message', 'channel_name_alphabetical', and 'metadata_value_alphabetical'
-
-  channelListQuery.limit = 20; // The value of pagination limit could be set up to 100.
-
+  logger.info('ChannelList - creating query', {
+    userFilledChannelListQuery: userFilledChannelListQuery
+  });
+  var channelListQuery = createApplicationUserListQuery({
+    sdk: sdk,
+    userFilledChannelListQuery: userFilledChannelListQuery
+  });
+  logger.info('ChannelList - created query', channelListQuery);
   setChannelSource(channelListQuery);
   channelListDispatcher({
     type: INIT_CHANNELS_START
@@ -4056,11 +4127,15 @@ function ChannelList(props) {
       userListQuery = _props$config.userListQuery,
       logger = _props$config.logger,
       pubSub = _props$config.pubSub,
+      _props$queries = props.queries,
+      queries = _props$queries === void 0 ? {} : _props$queries,
       renderChannelPreview = props.renderChannelPreview,
       onBeforeCreateChannel = props.onBeforeCreateChannel,
       onChannelSelect = props.onChannelSelect;
   var _sdkStore$sdk = sdkStore.sdk,
       sdk = _sdkStore$sdk === void 0 ? {} : _sdkStore$sdk;
+  var userFilledChannelListQuery = queries.channelListQuery;
+  var userFilledApplicationUserListQuery = queries.applicationUserListQuery;
   var sdkError = sdkStore.error;
   var _userStore$user = userStore.user,
       user = _userStore$user === void 0 ? {} : _userStore$user;
@@ -4100,6 +4175,7 @@ function ChannelList(props) {
         channelListDispatcher: channelListDispatcher,
         setChannelSource: setChannelSource,
         onChannelSelect: onChannelSelect,
+        userFilledChannelListQuery: userFilledChannelListQuery,
         logger: logger
       });
     } else {
@@ -4151,6 +4227,7 @@ function ChannelList(props) {
       sdk: sdk,
       channelListDispatcher: channelListDispatcher,
       userId: userId,
+      userFilledApplicationUserListQuery: userFilledApplicationUserListQuery,
       onBeforeCreateChannel: onBeforeCreateChannel
     })
   })), React.createElement("div", {
@@ -4287,6 +4364,33 @@ ChannelList.propTypes = {
       publish: PropTypes.func
     })
   }).isRequired,
+  queries: PropTypes.shape({
+    channelListQuery: PropTypes.shape({
+      channelNameContainsFilter: PropTypes.string,
+      channelUrlsFilter: PropTypes.arrayOf(PropTypes.string),
+      customTypesFilter: PropTypes.arrayOf(PropTypes.string),
+      customTypeStartsWithFilter: PropTypes.string,
+      hiddenChannelFilter: PropTypes.string,
+      includeEmpty: PropTypes.bool,
+      limit: PropTypes.number,
+      memberStateFilter: PropTypes.string,
+      metadataOrderKeyFilter: PropTypes.string,
+      nicknameContainsFilter: PropTypes.string,
+      order: PropTypes.string,
+      publicChannelFilter: PropTypes.string,
+      superChannelFilter: PropTypes.string,
+      unreadChannelFilter: PropTypes.string,
+      userIdsExactFilter: PropTypes.arrayOf(PropTypes.string),
+      userIdsIncludeFilter: PropTypes.arrayOf(PropTypes.string),
+      userIdsIncludeFilterQueryType: PropTypes.string
+    }),
+    applicationUserListQuery: PropTypes.shape({
+      limit: PropTypes.number,
+      userIdsFilter: PropTypes.arrayOf(PropTypes.string),
+      metaDataKeyFilter: PropTypes.string,
+      metaDataValuesFilter: PropTypes.arrayOf(PropTypes.string)
+    })
+  }),
   onBeforeCreateChannel: PropTypes.func,
   renderChannelPreview: PropTypes.element,
   onChannelSelect: PropTypes.func
@@ -4294,19 +4398,13 @@ ChannelList.propTypes = {
 ChannelList.defaultProps = {
   onBeforeCreateChannel: null,
   renderChannelPreview: null,
+  queries: {},
   onChannelSelect: noop
 };
 var ChannelList$1 = withSendbirdContext(ChannelList);
 
-var MessageStatusType = {
-  PENDING: 'PENDING',
-  SENT: 'SENT',
-  DELIVERED: 'DELIVERED',
-  READ: 'READ',
-  FAILED: 'FAILED'
-};
-
 var RESET_MESSAGES = 'RESET_MESSAGES';
+var RESET_STATE = 'RESET_STATE';
 var CLEAR_SENT_MESSAGES = 'CLEAR_SENT_MESSAGES';
 var GET_PREV_MESSAGES_START = 'GET_PREV_MESSAGES_START';
 var GET_PREV_MESSAGES_SUCESS = 'GET_PREV_MESSAGES_SUCESS';
@@ -4319,8 +4417,11 @@ var ON_MESSAGE_UPDATED = 'ON_MESSAGE_UPDATED';
 var ON_MESSAGE_DELETED = 'ON_MESSAGE_DELETED';
 var ON_MESSAGE_DELETED_BY_REQ_ID = 'ON_MESSAGE_DELETED_BY_REQ_ID';
 var SET_CURRENT_CHANNEL$1 = 'SET_CURRENT_CHANNEL';
+var SET_CHANNEL_INVALID = 'SET_CHANNEL_INVALID';
 var MARK_AS_READ = 'MARK_AS_READ';
 var ON_REACTION_UPDATED = 'ON_REACTION_UPDATED';
+var SET_EMOJI_CONTAINER = 'SET_EMOJI_CONTAINER';
+var SET_READ_STATUS = 'SET_READ_STATUS';
 
 var pubSubHandleRemover$1 = function pubSubHandleRemover(subscriber) {
   subscriber.forEach(function (s) {
@@ -4483,10 +4584,16 @@ var messagesInitialState = {
   initialized: false,
   loading: false,
   allMessages: [],
-  currentChannel: null,
+  currentGroupChannel: {
+    members: []
+  },
   hasMore: false,
+  lastMessageTimeStamp: 0,
+  emojiContainer: {},
+  readStatus: {},
   unreadCount: 0,
-  unreadSince: null
+  unreadSince: null,
+  isInvalid: false
 };
 
 var isEmpty = function isEmpty(val) {
@@ -4507,8 +4614,13 @@ function compareIds (a, b) {
 
 function reducer$3(state, action) {
   switch (action.type) {
-    case RESET_MESSAGES:
+    case RESET_STATE:
       return messagesInitialState;
+
+    case RESET_MESSAGES:
+      return _objectSpread2({}, state, {
+        allMessages: []
+      });
 
     case GET_PREV_MESSAGES_START:
       return _objectSpread2({}, state, {
@@ -4536,6 +4648,7 @@ function reducer$3(state, action) {
           loading: false,
           initialized: true,
           hasMore: action.payload.hasMore,
+          lastMessageTimeStamp: action.payload.lastMessageTimeStamp,
           allMessages: [].concat(_toConsumableArray(recivedMessages), _toConsumableArray(filteredAllMessages))
         });
       }
@@ -4566,7 +4679,15 @@ function reducer$3(state, action) {
     case SET_CURRENT_CHANNEL$1:
       {
         return _objectSpread2({}, state, {
-          currentChannel: action.payload
+          currentGroupChannel: action.payload,
+          isInvalid: false
+        });
+      }
+
+    case SET_CHANNEL_INVALID:
+      {
+        return _objectSpread2({}, state, {
+          isInvalid: true
         });
       }
 
@@ -4575,11 +4696,13 @@ function reducer$3(state, action) {
         var _action$payload = action.payload,
             channel = _action$payload.channel,
             message = _action$payload.message;
-        var currentChannel = state.currentChannel,
+        var _state$currentGroupCh = state.currentGroupChannel,
+            currentGroupChannel = _state$currentGroupCh === void 0 ? {} : _state$currentGroupCh,
             unreadCount = state.unreadCount,
             unreadSince = state.unreadSince;
+        var currentGroupChannelUrl = currentGroupChannel.url;
 
-        if (!compareIds(channel.url, currentChannel)) {
+        if (!compareIds(channel.url, currentGroupChannelUrl)) {
           return state;
         } // Excluded overlapping messages
 
@@ -4637,6 +4760,20 @@ function reducer$3(state, action) {
         })
       });
 
+    case SET_EMOJI_CONTAINER:
+      {
+        return _objectSpread2({}, state, {
+          emojiContainer: action.payload
+        });
+      }
+
+    case SET_READ_STATUS:
+      {
+        return _objectSpread2({}, state, {
+          readStatus: action.payload
+        });
+      }
+
     case ON_REACTION_UPDATED:
       {
         return _objectSpread2({}, state, {
@@ -4659,57 +4796,690 @@ function reducer$3(state, action) {
   }
 }
 
-var eventHandler = (function (_ref) {
-  var messagesDispatcher = _ref.messagesDispatcher,
-      sdk = _ref.sdk,
-      uniqueId = _ref.uniqueId,
-      logger = _ref.logger;
+/**
+ * Handles ChannelEvents and send values to dispatcher using messagesDispatcher
+ * messagesDispatcher: Dispatcher
+ * sdk: sdkInstance
+ * logger: loggerInstance
+ * channelUrl: string
+ * sdkInit: bool
+ */
 
-  if (!sdk || !sdk.ChannelHandler) {
-    return;
-  }
+function useHandleChannelEvents(_ref, _ref2) {
+  var currentGroupChannel = _ref.currentGroupChannel,
+      sdkInit = _ref.sdkInit;
+  var messagesDispatcher = _ref2.messagesDispatcher,
+      sdk = _ref2.sdk,
+      logger = _ref2.logger;
+  var channelUrl = currentGroupChannel && currentGroupChannel.url;
+  useEffect(function () {
+    var messageReciverId = uuidv4();
 
-  var ChannelHandler = new sdk.ChannelHandler();
-  logger.info('Channel: Setup event handler');
+    if (channelUrl && sdk && sdk.ChannelHandler) {
+      var ChannelHandler = new sdk.ChannelHandler();
+      logger.info('Channel | useHandleChannelEvents: Setup event handler', messageReciverId);
 
-  ChannelHandler.onMessageReceived = function (channel, message) {
-    logger.info('Channel: onMessageReceived', message);
+      ChannelHandler.onMessageReceived = function (channel, message) {
+        if (compareIds(channel.url, currentGroupChannel.url)) {
+          logger.info('Channel | useHandleChannelEvents: onMessageReceived', message);
+          messagesDispatcher({
+            type: ON_MESSAGE_RECEIVED,
+            payload: {
+              channel: channel,
+              message: message
+            }
+          });
+        }
+      };
+
+      ChannelHandler.onMessageUpdated = function (_, message) {
+        logger.info('Channel | useHandleChannelEvents: onMessageUpdated', message);
+        messagesDispatcher({
+          type: ON_MESSAGE_UPDATED,
+          payload: message
+        });
+      };
+
+      ChannelHandler.onMessageDeleted = function (_, messageId) {
+        logger.info('Channel | useHandleChannelEvents: onMessageDeleted', messageId);
+        messagesDispatcher({
+          type: ON_MESSAGE_DELETED,
+          payload: messageId
+        });
+      };
+
+      ChannelHandler.onReactionUpdated = function (_, reactionEvent) {
+        logger.info('Channel | useHandleChannelEvents: onReactionUpdated', reactionEvent);
+        messagesDispatcher({
+          type: ON_REACTION_UPDATED,
+          payload: reactionEvent
+        });
+      };
+
+      ChannelHandler.onChannelChanged = function (groupChannel) {
+        if (compareIds(groupChannel.url, currentGroupChannel.url)) {
+          logger.info('Channel | useHandleChannelEvents: onChannelChanged', groupChannel);
+          messagesDispatcher({
+            type: SET_CURRENT_CHANNEL$1,
+            payload: groupChannel
+          });
+        }
+      };
+
+      ChannelHandler.onChannelFrozen = function (groupChannel) {
+        if (compareIds(groupChannel.url, currentGroupChannel.url)) {
+          logger.info('Channel | useHandleChannelEvents: onChannelFrozen', groupChannel);
+          messagesDispatcher({
+            type: SET_CURRENT_CHANNEL$1,
+            payload: groupChannel
+          });
+        }
+      };
+
+      ChannelHandler.onChannelUnFrozen = function (groupChannel) {
+        if (compareIds(groupChannel.url, currentGroupChannel.url)) {
+          logger.info('Channel | useHandleChannelEvents: onChannelUnFrozen', groupChannel);
+          messagesDispatcher({
+            type: SET_CURRENT_CHANNEL$1,
+            payload: groupChannel
+          });
+        }
+      }; // Add this channel event handler to the SendBird object.
+
+
+      sdk.addChannelHandler(messageReciverId, ChannelHandler);
+    }
+
+    return function () {
+      if (sdk && sdk.removeChannelHandler) {
+        logger.info('Channel | useHandleChannelEvents: Removing message reciver handler', messageReciverId);
+        sdk.removeChannelHandler(messageReciverId);
+      }
+    };
+  }, [channelUrl, sdkInit]);
+}
+
+function useSetChannel(_ref, _ref2) {
+  var channelUrl = _ref.channelUrl,
+      sdkInit = _ref.sdkInit;
+  var messagesDispatcher = _ref2.messagesDispatcher,
+      sdk = _ref2.sdk,
+      logger = _ref2.logger;
+  useEffect(function () {
+    if (channelUrl && sdkInit && sdk && sdk.GroupChannel) {
+      logger.info('Channel | useSetChannel fetching channel', channelUrl);
+      sdk.GroupChannel.getChannel(channelUrl).then(function (groupChannel) {
+        logger.info('Channel | useSetChannel fetched channel', groupChannel);
+        messagesDispatcher({
+          type: SET_CURRENT_CHANNEL$1,
+          payload: groupChannel
+        });
+        logger.info('Channel: Mark as read', groupChannel); // this order is important - this mark as read should update the event handler up above
+
+        groupChannel.markAsRead();
+      }).catch(function (e) {
+        logger.warning('Channel | useSetChannel fetch channel failed', {
+          channelUrl: channelUrl,
+          e: e
+        });
+        messagesDispatcher({
+          type: SET_CHANNEL_INVALID
+        });
+      });
+      sdk.getAllEmoji(function (emojiContainer_, err) {
+        if (err) {
+          logger.error('Channel: Getting emojis failed', err);
+          return;
+        }
+
+        logger.info('Channel: Getting emojis success', emojiContainer_);
+        messagesDispatcher({
+          type: SET_EMOJI_CONTAINER,
+          payload: emojiContainer_
+        });
+      });
+    }
+  }, [channelUrl, sdkInit]);
+}
+
+function useInitialMessagesFetch(_ref, _ref2) {
+  var currentGroupChannel = _ref.currentGroupChannel;
+  var sdk = _ref2.sdk,
+      logger = _ref2.logger,
+      userFilledMessageListQuery = _ref2.userFilledMessageListQuery,
+      messagesDispatcher = _ref2.messagesDispatcher;
+  var channelUrl = currentGroupChannel && currentGroupChannel.url;
+  useEffect(function () {
+    logger.info('Channel useInitialMessagesFetch: Setup started', currentGroupChannel);
     messagesDispatcher({
-      type: ON_MESSAGE_RECEIVED,
-      payload: {
-        channel: channel,
-        message: message
+      type: RESET_MESSAGES
+    });
+
+    if (sdk && sdk.MessageListParams && currentGroupChannel && currentGroupChannel.getMessagesByMessageId) {
+      var messageListParams = new sdk.MessageListParams();
+      messageListParams.prevResultSize = 30;
+      messageListParams.isInclusive = true;
+      messageListParams.includeReplies = false;
+      messageListParams.includeReactions = true;
+
+      if (userFilledMessageListQuery) {
+        Object.keys(userFilledMessageListQuery).forEach(function (key) {
+          messageListParams[key] = userFilledMessageListQuery[key];
+        });
+      }
+
+      logger.info('Channel: Fetching messages', {
+        currentGroupChannel: currentGroupChannel,
+        userFilledMessageListQuery: userFilledMessageListQuery
+      });
+      currentGroupChannel.getMessagesByTimestamp(new Date().getTime(), messageListParams).then(function (messages) {
+        var hasMore = messages && messages.length > 0;
+        var lastMessageTimeStamp = hasMore ? messages[0].createdAt : null;
+        messagesDispatcher({
+          type: GET_PREV_MESSAGES_SUCESS,
+          payload: {
+            messages: messages,
+            hasMore: hasMore,
+            lastMessageTimeStamp: lastMessageTimeStamp
+          }
+        });
+      }).catch(function (error) {
+        logger.error('Channel: Fetching messages failed', error);
+        messagesDispatcher({
+          type: GET_PREV_MESSAGES_SUCESS,
+          payload: {
+            messages: [],
+            hasMore: false,
+            lastMessageTimeStamp: 0
+          }
+        });
+      }).finally(function () {
+        currentGroupChannel.markAsRead();
+        setTimeout(function () {
+          return scrollIntoLast('.sendbird-msg--scroll-ref');
+        });
+      });
+    }
+  }, [channelUrl]);
+}
+
+function useHandleReconnect(_ref, _ref2) {
+  var isOnline = _ref.isOnline;
+  var logger = _ref2.logger,
+      sdk = _ref2.sdk,
+      currentGroupChannel = _ref2.currentGroupChannel,
+      messagesDispatcher = _ref2.messagesDispatcher,
+      userFilledMessageListQuery = _ref2.userFilledMessageListQuery;
+  useEffect(function () {
+    var wasOffline = !isOnline;
+    return function () {
+      // state changed from offline to online
+      if (wasOffline) {
+        logger.info('Refreshing conversation state');
+        var _sdk$appInfo = sdk.appInfo,
+            appInfo = _sdk$appInfo === void 0 ? {} : _sdk$appInfo;
+        var useReaction = appInfo.isUsingReaction || false;
+        var messageListParams = new sdk.MessageListParams();
+        messageListParams.prevResultSize = 30;
+        messageListParams.includeReplies = false;
+        messageListParams.includeReactions = useReaction;
+
+        if (userFilledMessageListQuery) {
+          Object.keys(userFilledMessageListQuery).forEach(function (key) {
+            messageListParams[key] = userFilledMessageListQuery[key];
+          });
+        }
+
+        logger.info('Channel: Fetching messages', {
+          currentGroupChannel: currentGroupChannel,
+          userFilledMessageListQuery: userFilledMessageListQuery
+        });
+        messagesDispatcher({
+          type: GET_PREV_MESSAGES_START
+        });
+        sdk.GroupChannel.getChannel(currentGroupChannel.url).then(function (groupChannel) {
+          var lastMessageTime = new Date().getTime();
+          groupChannel.getMessagesByTimestamp(lastMessageTime, messageListParams).then(function (messages) {
+            messagesDispatcher({
+              type: CLEAR_SENT_MESSAGES
+            });
+            var hasMore = messages && messages.length > 0;
+            var lastMessageTimeStamp = hasMore ? messages[0].createdAt : null;
+            messagesDispatcher({
+              type: GET_PREV_MESSAGES_SUCESS,
+              payload: {
+                messages: messages,
+                hasMore: hasMore,
+                lastMessageTimeStamp: lastMessageTimeStamp
+              }
+            });
+            setTimeout(function () {
+              return scrollIntoLast('.sendbird-msg--scroll-ref');
+            });
+          }).catch(function (error) {
+            logger.error('Channel: Fetching messages failed', error);
+          }).finally(function () {
+            currentGroupChannel.markAsRead();
+          });
+        });
+      }
+    };
+  }, [isOnline]);
+}
+
+function useScrollCallback(_ref, _ref2) {
+  var currentGroupChannel = _ref.currentGroupChannel,
+      lastMessageTimeStamp = _ref.lastMessageTimeStamp,
+      userFilledMessageListQuery = _ref.userFilledMessageListQuery;
+  var hasMore = _ref2.hasMore,
+      logger = _ref2.logger,
+      messagesDispatcher = _ref2.messagesDispatcher,
+      sdk = _ref2.sdk;
+  return useCallback(function (cb) {
+    if (!hasMore) {
+      return;
+    }
+
+    var messageListParams = new sdk.MessageListParams();
+    messageListParams.prevResultSize = 30;
+    messageListParams.includeReplies = false;
+    messageListParams.includeReactions = true;
+
+    if (userFilledMessageListQuery) {
+      Object.keys(userFilledMessageListQuery).forEach(function (key) {
+        messageListParams[key] = userFilledMessageListQuery[key];
+      });
+    }
+
+    logger.info('Channel: Fetching messages', {
+      currentGroupChannel: currentGroupChannel,
+      userFilledMessageListQuery: userFilledMessageListQuery
+    });
+    currentGroupChannel.getMessagesByTimestamp(lastMessageTimeStamp || new Date().getTime(), messageListParams).then(function (messages) {
+      var hasMoreMessages = messages && messages.length > 0;
+      var lastMessageTs = hasMoreMessages ? messages[0].createdAt : null;
+      messagesDispatcher({
+        type: GET_PREV_MESSAGES_SUCESS,
+        payload: {
+          messages: messages,
+          hasMore: hasMoreMessages,
+          lastMessageTimeStamp: lastMessageTs
+        }
+      });
+      cb([messages, null]);
+    }).catch(function (error) {
+      logger.error('Channel: Fetching messages failed', error);
+      messagesDispatcher({
+        type: GET_PREV_MESSAGES_SUCESS,
+        payload: {
+          messages: [],
+          hasMore: false,
+          lastMessageTimeStamp: 0
+        }
+      });
+      cb([null, error]);
+    }).finally(function () {
+      currentGroupChannel.markAsRead();
+    });
+  }, [currentGroupChannel, lastMessageTimeStamp]);
+}
+
+function useDeleteMessageCallback(_ref, _ref2) {
+  var currentGroupChannel = _ref.currentGroupChannel,
+      messagesDispatcher = _ref.messagesDispatcher;
+  var logger = _ref2.logger;
+  return useCallback(function (message, cb) {
+    logger.info('Channel | useDeleteMessageCallback: Deleting message', message);
+    var requestState = message.requestState;
+    logger.info('Channel | useDeleteMessageCallback: Deleting message requestState:', requestState); // Message is only on local
+
+    if (requestState === 'failed' || requestState === 'pending') {
+      logger.info('Channel | useDeleteMessageCallback: Deleted message from local:', message);
+      messagesDispatcher({
+        type: ON_MESSAGE_DELETED_BY_REQ_ID,
+        payload: message.reqId
+      });
+
+      if (cb) {
+        cb();
+      }
+
+      return;
+    } // Message is on server
+
+
+    currentGroupChannel.deleteMessage(message, function (err) {
+      logger.info('Channel | useDeleteMessageCallback: Deleting message from remote:', requestState);
+
+      if (cb) {
+        cb(err);
+      }
+
+      if (!err) {
+        logger.info('Channel | useDeleteMessageCallback: Deleting message success!', message);
+        messagesDispatcher({
+          type: ON_MESSAGE_DELETED,
+          payload: message.messageId
+        });
+      } else {
+        logger.warning('Channel | useDeleteMessageCallback: Deleting message failed!', err);
       }
     });
-  };
+  }, [currentGroupChannel, messagesDispatcher]);
+}
 
-  ChannelHandler.onMessageUpdated = function (_, message) {
-    logger.info('Channel: onMessageUpdated', message);
-    messagesDispatcher({
-      type: ON_MESSAGE_UPDATED,
-      payload: message
+function useUpdateMessageCallback(_ref, _ref2) {
+  var currentGroupChannel = _ref.currentGroupChannel,
+      messagesDispatcher = _ref.messagesDispatcher,
+      onBeforeUpdateUserMessage = _ref.onBeforeUpdateUserMessage;
+  var logger = _ref2.logger,
+      sdk = _ref2.sdk;
+  return useCallback(function (messageId, text, cb) {
+    var createParamsDefault = function createParamsDefault(txt) {
+      var params = new sdk.UserMessageParams();
+      params.message = txt;
+      return params;
+    };
+
+    var createCustomPrams = onBeforeUpdateUserMessage && typeof onBeforeUpdateUserMessage === 'function';
+
+    if (createCustomPrams) {
+      logger.info('Channel: creting params using onBeforeUpdateUserMessage', onBeforeUpdateUserMessage);
+    }
+
+    var params = onBeforeUpdateUserMessage ? onBeforeUpdateUserMessage(text) : createParamsDefault(text);
+    currentGroupChannel.updateUserMessage(messageId, params, function (r, e) {
+      logger.info('Channel: Updating message!', params);
+      var swapParams = sdk.getErrorFirstCallback();
+      var message = r;
+      var err = e;
+
+      if (swapParams) {
+        message = e;
+        err = r;
+      }
+
+      if (cb) {
+        cb(err, message);
+      }
+
+      if (!err) {
+        logger.info('Channel: Updating message success!', message);
+        messagesDispatcher({
+          type: ON_MESSAGE_UPDATED,
+          payload: message
+        });
+      } else {
+        logger.warning('Channel: Updating message failed!', err);
+      }
     });
-  };
+  }, [currentGroupChannel.url, messagesDispatcher, onBeforeUpdateUserMessage]);
+}
 
-  ChannelHandler.onMessageDeleted = function (_, messageId) {
-    logger.info('Channel: onMessageDeleted', messageId);
-    messagesDispatcher({
-      type: ON_MESSAGE_DELETED,
-      payload: messageId
+function useResendMessageCallback(_ref, _ref2) {
+  var currentGroupChannel = _ref.currentGroupChannel,
+      messagesDispatcher = _ref.messagesDispatcher;
+  var logger = _ref2.logger;
+  return useCallback(function (failedMessage) {
+    logger.info('Channel: Resending message has started', failedMessage);
+    var messageType = failedMessage.messageType,
+        file = failedMessage.file;
+
+    if (failedMessage && typeof failedMessage.isResendable === 'function' && failedMessage.isResendable()) {
+      // eslint-disable-next-line no-param-reassign
+      failedMessage.requestState = 'pending';
+      messagesDispatcher({
+        type: RESEND_MESSAGEGE_START,
+        payload: failedMessage
+      }); // userMessage
+
+      if (messageType === 'user') {
+        currentGroupChannel.resendUserMessage(failedMessage).then(function (message) {
+          logger.info('Channel: Resending message success!', {
+            message: message
+          });
+          messagesDispatcher({
+            type: SEND_MESSAGEGE_SUCESS,
+            payload: message
+          });
+        }).catch(function (e) {
+          logger.warning('Channel: Resending message failed!', {
+            e: e
+          }); // eslint-disable-next-line no-param-reassign
+
+          failedMessage.requestState = 'failed';
+          messagesDispatcher({
+            type: SEND_MESSAGEGE_FAILURE,
+            payload: failedMessage
+          });
+        }); // eslint-disable-next-line no-param-reassign
+
+        failedMessage.requestState = 'pending';
+        messagesDispatcher({
+          type: RESEND_MESSAGEGE_START,
+          payload: failedMessage
+        });
+        return;
+      }
+
+      if (messageType === 'file') {
+        currentGroupChannel.resendFileMessage(failedMessage, file).then(function (message) {
+          logger.info('Channel: Resending file message success!', {
+            message: message
+          });
+          messagesDispatcher({
+            type: SEND_MESSAGEGE_SUCESS,
+            payload: message
+          });
+        }).catch(function (e) {
+          logger.warning('Channel: Resending file message failed!', {
+            e: e
+          }); // eslint-disable-next-line no-param-reassign
+
+          failedMessage.requestState = 'failed';
+          messagesDispatcher({
+            type: SEND_MESSAGEGE_FAILURE,
+            payload: failedMessage
+          });
+        }); // eslint-disable-next-line no-param-reassign
+
+        failedMessage.requestState = 'pending';
+        messagesDispatcher({
+          type: RESEND_MESSAGEGE_START,
+          payload: failedMessage
+        });
+      }
+    } else {
+      // to alert user on console
+      // eslint-disable-next-line no-console
+      console.error('Message is not resendable');
+      logger.warning('Message is not resendable', failedMessage);
+    }
+  }, [currentGroupChannel, messagesDispatcher]);
+}
+
+function useSendMessageCallback(_ref, _ref2) {
+  var currentGroupChannel = _ref.currentGroupChannel,
+      onBeforeSendUserMessage = _ref.onBeforeSendUserMessage;
+  var sdk = _ref2.sdk,
+      logger = _ref2.logger,
+      messagesDispatcher = _ref2.messagesDispatcher;
+  var messageInputRef = useRef(null);
+  var sendMessage = useCallback(function () {
+    var text = messageInputRef.current.value;
+
+    var createParamsDefault = function createParamsDefault(txt) {
+      var params = new sdk.UserMessageParams();
+      params.message = txt;
+      return params;
+    };
+
+    var createCustomPrams = onBeforeSendUserMessage && typeof onBeforeSendUserMessage === 'function';
+
+    if (createCustomPrams) {
+      logger.info('Channel: creting params using onBeforeSendUserMessage', onBeforeSendUserMessage);
+    }
+
+    var params = onBeforeSendUserMessage ? onBeforeSendUserMessage(text) : createParamsDefault(text);
+    logger.info('Channel: Sending message has started', params);
+    var pendingMsg = currentGroupChannel.sendUserMessage(params, function (res, err) {
+      var swapParams = sdk.getErrorFirstCallback();
+      var message = res;
+      var error = err;
+
+      if (swapParams) {
+        message = err;
+        error = res;
+      } // sending params instead of pending message
+      // to make sure that we can resend the message once it fails
+
+
+      if (error) {
+        logger.warning('Channel: Sending message failed!', {
+          message: message
+        });
+        messagesDispatcher({
+          type: SEND_MESSAGEGE_FAILURE,
+          payload: message
+        });
+        return;
+      }
+
+      logger.info('Channel: Sending message success!', message);
+      messagesDispatcher({
+        type: SEND_MESSAGEGE_SUCESS,
+        payload: message
+      });
     });
-  };
-
-  ChannelHandler.onReactionUpdated = function (_, reactionEvent) {
-    logger.info('Channel: onReactionUpdated', reactionEvent);
     messagesDispatcher({
-      type: ON_REACTION_UPDATED,
-      payload: reactionEvent
+      type: SEND_MESSAGEGE_START,
+      payload: pendingMsg
     });
-  }; // Add this channel event handler to the SendBird object.
+    setTimeout(function () {
+      return scrollIntoLast('.sendbird-msg--scroll-ref');
+    });
+  }, [currentGroupChannel, onBeforeSendUserMessage]);
+  return [messageInputRef, sendMessage];
+}
+
+function useSendFileMessageCallback(_ref, _ref2) {
+  var currentGroupChannel = _ref.currentGroupChannel,
+      onBeforeSendFileMessage = _ref.onBeforeSendFileMessage;
+  var sdk = _ref2.sdk,
+      logger = _ref2.logger,
+      messagesDispatcher = _ref2.messagesDispatcher;
+  var sendMessage = useCallback(function (file) {
+    var createParamsDefault = function createParamsDefault(file_) {
+      var params = new sdk.FileMessageParams();
+      params.file = file_;
+      return params;
+    };
+
+    var createCustomPrams = onBeforeSendFileMessage && typeof onBeforeSendFileMessage === 'function';
+
+    if (createCustomPrams) {
+      logger.info('Channel: creting params using onBeforeSendFileMessage', onBeforeSendFileMessage);
+    }
+
+    var params = onBeforeSendFileMessage ? onBeforeSendFileMessage(file) : createParamsDefault(file);
+    logger.info('Channel: Uploading file message start!', params);
+    var pendingMsg = currentGroupChannel.sendFileMessage(params, function (response, err) {
+      var swapParams = sdk.getErrorFirstCallback();
+      var message = response;
+      var error = err;
+
+      if (swapParams) {
+        message = err;
+        error = response;
+      }
+
+      if (error) {
+        // sending params instead of pending message
+        // to make sure that we can resend the message once it fails
+        logger.error('Channel: Sending file message failed!', message);
+        message.url = URL.createObjectURL(file);
+        message.file = file;
+        messagesDispatcher({
+          type: SEND_MESSAGEGE_FAILURE,
+          payload: message
+        });
+        return;
+      }
+
+      logger.info('Channel: Sending message success!', message);
+      messagesDispatcher({
+        type: SEND_MESSAGEGE_SUCESS,
+        payload: message
+      });
+    });
+    messagesDispatcher({
+      type: SEND_MESSAGEGE_START,
+      payload: _objectSpread2({}, pendingMsg, {
+        url: URL.createObjectURL(file),
+        // pending thumbnail message seems to be failed
+        requestState: 'pending'
+      })
+    });
+    setTimeout(function () {
+      return scrollIntoLast('.sendbird-msg--scroll-ref');
+    }, 1000);
+  }, [currentGroupChannel, onBeforeSendFileMessage]);
+  return [sendMessage];
+}
+
+function useSetReadStatus(_ref, _ref2) {
+  var allMessages = _ref.allMessages,
+      currentGroupChannel = _ref.currentGroupChannel;
+  var messagesDispatcher = _ref2.messagesDispatcher,
+      sdk = _ref2.sdk,
+      logger = _ref2.logger;
+  useEffect(function () {
+    if (!sdk.ChannelHandler || !currentGroupChannel.url) {
+      return function () {};
+    } // todo: move to reducer?
 
 
-  sdk.addChannelHandler(uniqueId, ChannelHandler);
-});
+    var setReadStatus = function setReadStatus() {
+      var allReadStatus = allMessages.reduce(function (accumulator, msg) {
+        if (msg.messageId !== 0) {
+          return _objectSpread2({}, accumulator, _defineProperty({}, msg.messageId, getParsedStatus(msg, currentGroupChannel)));
+        }
+
+        return accumulator;
+      }, {});
+      messagesDispatcher({
+        type: SET_READ_STATUS,
+        payload: allReadStatus
+      });
+    };
+
+    if (allMessages.length > 0) {
+      setReadStatus();
+    }
+
+    var channelUrl = currentGroupChannel.url;
+    var handler = new sdk.ChannelHandler();
+
+    var handleMessageStatus = function handleMessageStatus(c) {
+      if (channelUrl === c.url) {
+        setReadStatus();
+      }
+    };
+
+    handler.onDeliveryReceiptUpdated = handleMessageStatus;
+    handler.onReadReceiptUpdated = handleMessageStatus; // Add this channel event handler to the SendBird object.
+
+    var handlerId = uuidv4();
+    logger.info('Channel | useSetReadStatus: Removing message reciver handler', handlerId);
+    sdk.addChannelHandler(handlerId, handler);
+    return function () {
+      if (sdk && sdk.removeChannelHandler) {
+        logger.info('Channel | useSetReadStatus: Removing message reciver handler', handlerId);
+        sdk.removeChannelHandler(handlerId);
+      }
+    };
+  }, [allMessages, currentGroupChannel]);
+}
 
 var ReactionButton = React.forwardRef(function (props, ref) {
   var children = props.children,
@@ -4754,6 +5524,82 @@ ReactionButton.defaultProps = {
   className: ''
 };
 
+function useMemoizedEmojiListItems(_ref, _ref2) {
+  var emojiContainer = _ref.emojiContainer,
+      toggleReaction = _ref.toggleReaction;
+  var useReaction = _ref2.useReaction,
+      logger = _ref2.logger,
+      userId = _ref2.userId,
+      emojiAllList = _ref2.emojiAllList;
+  return useMemo(function () {
+    return function (_ref3) {
+      var parentRef = _ref3.parentRef,
+          parentContainRef = _ref3.parentContainRef,
+          message = _ref3.message,
+          closeDropdown = _ref3.closeDropdown,
+          _ref3$spaceFromTrigge = _ref3.spaceFromTrigger,
+          spaceFromTrigger = _ref3$spaceFromTrigge === void 0 ? {} : _ref3$spaceFromTrigge;
+
+      if (!useReaction || !(parentRef || parentContainRef || message || closeDropdown)) {
+        logger.warning('Channel: Invalid Params in memoizedEmojiListItems');
+        return null;
+      }
+
+      return React.createElement(EmojiListItems$1, {
+        parentRef: parentRef,
+        parentContainRef: parentContainRef,
+        closeDropdown: closeDropdown,
+        spaceFromTrigger: spaceFromTrigger
+      }, emojiAllList.map(function (emoji) {
+        var reactedReaction = message.reactions.filter(function (reaction) {
+          return reaction.key === emoji.key;
+        })[0];
+        var isReacted = reactedReaction ? !(reactedReaction.userIds.indexOf(userId) < 0) : false;
+        return React.createElement(ReactionButton, {
+          key: emoji.key,
+          width: "36px",
+          height: "36px",
+          selected: isReacted,
+          onClick: function onClick() {
+            closeDropdown();
+            toggleReaction(message, emoji.key, isReacted);
+          }
+        }, React.createElement(ImageRenderer, {
+          url: emoji.url,
+          width: "28px",
+          height: "28px",
+          defaultComponent: React.createElement(Icon, {
+            width: "28px",
+            height: "28px",
+            type: IconTypes.EMOJI_FAILED
+          })
+        }));
+      }));
+    };
+  }, [emojiContainer]);
+}
+
+function useToggleReactionCallback(_ref, _ref2) {
+  var currentGroupChannel = _ref.currentGroupChannel;
+  var logger = _ref2.logger;
+  return useCallback(function (message, key, isReacted) {
+    if (isReacted) {
+      currentGroupChannel.deleteReaction(message, key).then(function (res) {
+        logger.info('Delete reaction success', res);
+      }).catch(function (err) {
+        logger.warning('Delete reaction failed', err);
+      });
+      return;
+    }
+
+    currentGroupChannel.addReaction(message, key).then(function (res) {
+      logger.info('Add reaction success', res);
+    }).catch(function (err) {
+      logger.warning('Add reaction failed', err);
+    });
+  }, [currentGroupChannel]);
+}
+
 var getMessageCreatedAt = function getMessageCreatedAt(message) {
   return Moment(message.createdAt).format('LT');
 };
@@ -4764,7 +5610,6 @@ var getSenderProfileUrl = function getSenderProfileUrl(message) {
   return message.sender && message.sender.profileUrl;
 };
 
-var MessageStatusTypes = MessageStatusType;
 function MessageStatus(_ref) {
   var message = _ref.message,
       status = _ref.status,
@@ -5006,11 +5851,12 @@ function EmojiReactions(_ref) {
       userId = _ref.userId,
       message = _ref.message,
       emojiAllMap = _ref.emojiAllMap,
-      emojiAllList = _ref.emojiAllList,
       membersMap = _ref.membersMap,
-      toggleReaction = _ref.toggleReaction;
+      toggleReaction = _ref.toggleReaction,
+      memoizedEmojiListItems = _ref.memoizedEmojiListItems;
   var injectingClassName = Array.isArray(className) ? className : [className];
   injectingClassName.unshift('sendbird-emoji-reactions');
+  var MemoizedEmojiListItems = memoizedEmojiListItems;
   var imageWidth = '20px';
   var imageHeight = '20px';
   var emojiReactionAddRef = useRef(null);
@@ -5054,7 +5900,7 @@ function EmojiReactions(_ref) {
         type: IconTypes.EMOJI_FAILED
       })
     })));
-  }), messageReactions.length < emojiAllList.length && React.createElement(ContextMenu, {
+  }), messageReactions.length < emojiAllMap.size && React.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React.createElement(ReactionBadge, {
         isAdd: true,
@@ -5068,38 +5914,15 @@ function EmojiReactions(_ref) {
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(EmojiListItems$1, {
+      return React.createElement(MemoizedEmojiListItems, {
+        message: message,
         parentRef: emojiReactionAddRef,
         parentContainRef: emojiReactionAddRef,
         closeDropdown: closeDropdown,
         spaceFromTrigger: {
           y: 4
         }
-      }, emojiAllList.map(function (emoji) {
-        var reactedReaction = message.reactions.filter(function (reaction) {
-          return reaction.key === emoji.key;
-        })[0];
-        var isReacted = reactedReaction ? !(reactedReaction.userIds.indexOf(userId) < 0) : false;
-        return React.createElement(ReactionButton, {
-          key: emoji.key,
-          width: "36px",
-          height: "36px",
-          selected: isReacted,
-          onClick: function onClick() {
-            closeDropdown();
-            toggleReaction(message, emoji.key, isReacted);
-          }
-        }, React.createElement(ImageRenderer, {
-          url: emoji.url,
-          width: "28px",
-          height: "28px",
-          defaultComponent: React.createElement(Icon, {
-            width: "28px",
-            height: "28px",
-            type: IconTypes.EMOJI_FAILED
-          })
-        }));
-      }));
+      });
     }
   })));
 }
@@ -5109,16 +5932,19 @@ EmojiReactions.propTypes = {
   message: PropTypes.shape({
     reactions: PropTypes.arrayOf(PropTypes.shape({}))
   }).isRequired,
-  emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)).isRequired,
   emojiAllMap: PropTypes.instanceOf(Map).isRequired,
   membersMap: PropTypes.instanceOf(Map),
-  toggleReaction: PropTypes.func
+  toggleReaction: PropTypes.func,
+  memoizedEmojiListItems: PropTypes.func
 };
 EmojiReactions.defaultProps = {
   className: '',
   membersMap: new Map(),
   userId: '',
-  toggleReaction: function toggleReaction() {}
+  toggleReaction: function toggleReaction() {},
+  memoizedEmojiListItems: function memoizedEmojiListItems() {
+    return '';
+  }
 };
 
 var copyToClipboard = function copyToClipboard(text) {
@@ -5155,6 +5981,9 @@ var getSenderName$1 = function getSenderName(message) {
 var getSenderProfileUrl$1 = function getSenderProfileUrl(message) {
   return message.sender && message.sender.profileUrl;
 };
+var getIsSentFromStatus$1 = function getIsSentFromStatus(status) {
+  return status === MessageStatusType.SENT || status === MessageStatusType.DELIVERED || status === MessageStatusType.READ;
+};
 
 var noop$1 = function noop() {};
 
@@ -5171,10 +6000,10 @@ function Message(props) {
       showRemove = props.showRemove,
       status = props.status,
       useReaction = props.useReaction,
-      emojiAllList = props.emojiAllList,
       emojiAllMap = props.emojiAllMap,
       membersMap = props.membersMap,
-      toggleReaction = props.toggleReaction;
+      toggleReaction = props.toggleReaction,
+      memoizedEmojiListItems = props.memoizedEmojiListItems;
   if (!message) return null;
   var injectingClassName = Array.isArray(className) ? className : [className];
   injectingClassName.push("sendbird-message".concat(isByMe ? '--outgoing' : '--incoming'));
@@ -5190,17 +6019,17 @@ function Message(props) {
     status: status,
     useReaction: useReaction,
     emojiAllMap: emojiAllMap,
-    emojiAllList: emojiAllList,
     membersMap: membersMap,
-    toggleReaction: toggleReaction
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems
   }) : React.createElement(IncomingUserMessage, {
     userId: userId,
     message: message,
     useReaction: useReaction,
     emojiAllMap: emojiAllMap,
-    emojiAllList: emojiAllList,
     membersMap: membersMap,
-    toggleReaction: toggleReaction
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems
   }));
 }
 Message.propTypes = {
@@ -5214,10 +6043,10 @@ Message.propTypes = {
   showRemove: PropTypes.func,
   resendMessage: PropTypes.func,
   useReaction: PropTypes.bool.isRequired,
-  emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   emojiAllMap: PropTypes.instanceOf(Map),
   membersMap: PropTypes.instanceOf(Map),
-  toggleReaction: PropTypes.func
+  toggleReaction: PropTypes.func,
+  memoizedEmojiListItems: PropTypes.func
 };
 Message.defaultProps = {
   isByMe: false,
@@ -5228,10 +6057,12 @@ Message.defaultProps = {
   showEdit: noop$1,
   showRemove: noop$1,
   status: '',
-  emojiAllList: [],
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$1
+  toggleReaction: noop$1,
+  memoizedEmojiListItems: function memoizedEmojiListItems() {
+    return '';
+  }
 };
 
 function OutgoingUserMessage(_ref) {
@@ -5244,13 +6075,15 @@ function OutgoingUserMessage(_ref) {
       resendMessage = _ref.resendMessage,
       useReaction = _ref.useReaction,
       emojiAllMap = _ref.emojiAllMap,
-      emojiAllList = _ref.emojiAllList,
       membersMap = _ref.membersMap,
-      toggleReaction = _ref.toggleReaction;
-  // TODO: when message.requestState is succeeded, consider if it's SENT or DELIVERED
+      toggleReaction = _ref.toggleReaction,
+      memoizedEmojiListItems = _ref.memoizedEmojiListItems;
+  var MemoizedEmojiListItems = memoizedEmojiListItems; // TODO: when message.requestState is succeeded, consider if it's SENT or DELIVERED
+
   var parentRefReactions = useRef(null);
   var parentRefMenus = useRef(null);
   var parentContainRef = useRef(null);
+  var isMessageSent = getIsSentFromStatus$1(status);
   return React.createElement("div", {
     className: "sendbird-user-message--outgoing",
     style: {
@@ -5282,13 +6115,13 @@ function OutgoingUserMessage(_ref) {
         ,
         closeDropdown: closeDropdown,
         openLeft: true
-      }, React.createElement(MenuItem, {
+      }, isMessageSent && React.createElement(MenuItem, {
         className: "sendbird-user-message--copy",
         onClick: function onClick() {
           copyToClipboard(message.message);
           closeDropdown();
         }
-      }, "Copy"), React.createElement(MenuItem, {
+      }, "Copy"), isMessageSent && React.createElement(MenuItem, {
         onClick: function onClick() {
           if (disabled) {
             return;
@@ -5308,7 +6141,7 @@ function OutgoingUserMessage(_ref) {
         }
       }, "Delete"));
     }
-  }), useReaction && emojiAllList.length > 0 && React.createElement(ContextMenu, {
+  }), isMessageSent && useReaction && emojiAllMap.size > 0 && React.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React.createElement(IconButton, {
         className: "sendbird-user-message__more__add-reaction",
@@ -5324,38 +6157,15 @@ function OutgoingUserMessage(_ref) {
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(EmojiListItems$1, {
-        closeDropdown: closeDropdown,
+      return React.createElement(MemoizedEmojiListItems, {
+        message: message,
         parentRef: parentRefReactions,
         parentContainRef: parentContainRef,
+        closeDropdown: closeDropdown,
         spaceFromTrigger: {
           y: 2
         }
-      }, emojiAllList.map(function (emoji) {
-        var reactedReaction = message.reactions.filter(function (reaction) {
-          return reaction.key === emoji.key;
-        })[0];
-        var isReacted = reactedReaction ? !(reactedReaction.userIds.indexOf(userId) < 0) : false;
-        return React.createElement(ReactionButton, {
-          key: emoji.key,
-          width: "36px",
-          height: "36px",
-          selected: isReacted,
-          onClick: function onClick() {
-            closeDropdown();
-            toggleReaction(message, emoji.key, isReacted);
-          }
-        }, React.createElement(ImageRenderer, {
-          url: emoji.url,
-          width: "28px",
-          height: "28px",
-          defaultComponent: React.createElement(Icon, {
-            width: "28px",
-            height: "28px",
-            type: IconTypes.EMOJI_FAILED
-          })
-        }));
-      }));
+      });
     }
   })), React.createElement("div", {
     className: "sendbird-user-message__text-balloon"
@@ -5371,10 +6181,10 @@ function OutgoingUserMessage(_ref) {
     className: "sendbird-user-message__text-balloon__inner__emoji-reactions",
     userId: userId,
     message: message,
-    emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
     membersMap: membersMap,
-    toggleReaction: toggleReaction
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems
   }))), React.createElement("div", {
     className: "sendbird-user-message__status"
   }, React.createElement(MessageStatus, {
@@ -5393,14 +6203,15 @@ function IncomingUserMessage(_ref2) {
   var userId = _ref2.userId,
       message = _ref2.message,
       useReaction = _ref2.useReaction,
-      emojiAllList = _ref2.emojiAllList,
       emojiAllMap = _ref2.emojiAllMap,
       membersMap = _ref2.membersMap,
-      toggleReaction = _ref2.toggleReaction;
+      toggleReaction = _ref2.toggleReaction,
+      memoizedEmojiListItems = _ref2.memoizedEmojiListItems;
+  var MemoizedEmojiListItems = memoizedEmojiListItems;
   var parentRefReactions = useRef(null);
   var parentRefMenus = useRef(null);
   var parentContainRef = useRef(null);
-  var showReactionAddButton = useReaction && emojiAllList && emojiAllList.length > 0;
+  var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
   return React.createElement("div", {
     className: "sendbird-user-message--incoming",
     style: {
@@ -5429,10 +6240,10 @@ function IncomingUserMessage(_ref2) {
     className: "sendbird-user-message__text-balloon__inner__emoji-reactions",
     userId: userId,
     message: message,
-    emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
     membersMap: membersMap,
-    toggleReaction: toggleReaction
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems
   }))), React.createElement(Label, {
     className: "sendbird-user-message__sent-at",
     type: LabelTypography.CAPTION_3,
@@ -5455,38 +6266,15 @@ function IncomingUserMessage(_ref2) {
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(EmojiListItems$1, {
+      return React.createElement(MemoizedEmojiListItems, {
         parentRef: parentRefReactions,
-        closeDropdown: closeDropdown,
         parentContainRef: parentContainRef,
+        closeDropdown: closeDropdown,
+        message: message,
         spaceFromTrigger: {
           y: 2
         }
-      }, emojiAllList.map(function (emoji) {
-        var reactedReaction = message.reactions.filter(function (reaction) {
-          return reaction.key === emoji.key;
-        })[0];
-        var isReacted = reactedReaction ? !(reactedReaction.userIds.indexOf(userId) < 0) : false;
-        return React.createElement(ReactionButton, {
-          key: emoji.key,
-          width: "36px",
-          height: "36px",
-          selected: isReacted,
-          onClick: function onClick() {
-            closeDropdown();
-            toggleReaction(message, emoji.key, isReacted);
-          }
-        }, React.createElement(ImageRenderer, {
-          url: emoji.url,
-          width: "28px",
-          height: "28px",
-          defaultComponent: React.createElement(Icon, {
-            width: "28px",
-            height: "28px",
-            type: IconTypes.EMOJI_FAILED
-          })
-        }));
-      }));
+      });
     }
   }), React.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
@@ -5522,17 +6310,19 @@ IncomingUserMessage.propTypes = {
   userId: PropTypes.string.isRequired,
   message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])),
   useReaction: PropTypes.bool.isRequired,
-  emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   emojiAllMap: PropTypes.instanceOf(Map),
   membersMap: PropTypes.instanceOf(Map),
-  toggleReaction: PropTypes.func
+  toggleReaction: PropTypes.func,
+  memoizedEmojiListItems: PropTypes.func
 };
 IncomingUserMessage.defaultProps = {
   message: {},
-  emojiAllList: [],
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$1
+  toggleReaction: noop$1,
+  memoizedEmojiListItems: function memoizedEmojiListItems() {
+    return '';
+  }
 };
 OutgoingUserMessage.propTypes = {
   userId: PropTypes.string.isRequired,
@@ -5543,10 +6333,10 @@ OutgoingUserMessage.propTypes = {
   resendMessage: PropTypes.func,
   status: PropTypes.string.isRequired,
   useReaction: PropTypes.bool.isRequired,
-  emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   emojiAllMap: PropTypes.instanceOf(Map),
   membersMap: PropTypes.instanceOf(Map),
-  toggleReaction: PropTypes.func
+  toggleReaction: PropTypes.func,
+  memoizedEmojiListItems: PropTypes.func
 };
 OutgoingUserMessage.defaultProps = {
   message: {},
@@ -5554,10 +6344,12 @@ OutgoingUserMessage.defaultProps = {
   showEdit: noop$1,
   showRemove: noop$1,
   disabled: false,
-  emojiAllList: [],
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$1
+  toggleReaction: noop$1,
+  memoizedEmojiListItems: function memoizedEmojiListItems() {
+    return '';
+  }
 };
 
 function AdminMessage(_ref) {
@@ -5589,6 +6381,9 @@ AdminMessage.defaultProps = {
 
 var getMessageCreatedAt$2 = function getMessageCreatedAt(message) {
   return Moment(message.createdAt).format('LT');
+};
+var getIsSentFromStatus$2 = function getIsSentFromStatus(status) {
+  return status === MessageStatusType.SENT || status === MessageStatusType.DELIVERED || status === MessageStatusType.READ;
 };
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types
@@ -5622,17 +6417,18 @@ function ThumbnailMessage(_ref) {
       status = _ref.status,
       resendMessage = _ref.resendMessage,
       useReaction = _ref.useReaction,
-      emojiAllList = _ref.emojiAllList,
       emojiAllMap = _ref.emojiAllMap,
       membersMap = _ref.membersMap,
-      toggleReaction = _ref.toggleReaction;
+      toggleReaction = _ref.toggleReaction,
+      memoizedEmojiListItems = _ref.memoizedEmojiListItems;
   var type = message.type,
       url = message.url;
   var parentContainRef = useRef(null);
   var menuRef = useRef(null);
   var reactionAddRef = useRef(null);
-  var isMoreActive = status === MessageStatusTypes.SENT || status === MessageStatusTypes.DELIVERED || status === MessageStatusTypes.READ;
-  var showReactionAddButton = useReaction && emojiAllList && emojiAllList.length > 0;
+  var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
+  var MemoizedEmojiListItems = memoizedEmojiListItems;
+  var isMessageSent = getIsSentFromStatus$2(status);
   return React.createElement("div", {
     className: ['sendbird-thumbnail', !isByMe ? 'sendbird-thumbnail--incoming' : ''].join(' ')
   }, !isByMe && React.createElement(React.Fragment, null, React.createElement(Avatar, {
@@ -5683,7 +6479,7 @@ function ThumbnailMessage(_ref) {
         }
       }, "Delete"));
     }
-  }), showReactionAddButton && React.createElement(ContextMenu, {
+  }), isMessageSent && showReactionAddButton && React.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React.createElement(IconButton, {
         ref: reactionAddRef,
@@ -5698,47 +6494,24 @@ function ThumbnailMessage(_ref) {
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(EmojiListItems$1, {
+      return React.createElement(MemoizedEmojiListItems, {
+        message: message,
         parentRef: reactionAddRef,
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
         spaceFromTrigger: {
           y: 2
         }
-      }, emojiAllList.map(function (emoji) {
-        var reactedReaction = message.reactions.filter(function (reaction) {
-          return reaction.key === emoji.key;
-        })[0];
-        var isReacted = reactedReaction ? !(reactedReaction.userIds.indexOf(userId) < 0) : false;
-        return React.createElement(ReactionButton, {
-          key: emoji.key,
-          width: "36px",
-          height: "36px",
-          selected: isReacted,
-          onClick: function onClick() {
-            closeDropdown();
-            toggleReaction(message, emoji.key, isReacted);
-          }
-        }, React.createElement(ImageRenderer, {
-          url: emoji.url,
-          width: "28px",
-          height: "28px",
-          defaultComponent: React.createElement(Icon, {
-            width: "28px",
-            height: "28px",
-            type: IconTypes.EMOJI_FAILED
-          })
-        }));
-      }));
+      });
     }
   })), React.createElement("div", {
     className: "sendbird-thumbnail__wrap"
   }, React.createElement("div", {
     className: "sendbird-thumbnail__wrap__inner",
-    onClick: isMoreActive ? function () {
+    onClick: isMessageSent ? function () {
       return onClick(true);
     } : function () {},
-    onKeyDown: isMoreActive ? function () {
+    onKeyDown: isMessageSent ? function () {
       return onClick(true);
     } : function () {},
     tabIndex: 0,
@@ -5771,10 +6544,10 @@ function ThumbnailMessage(_ref) {
     className: "sendbird-thumbnail__wrap__emoji-reactions",
     userId: userId,
     message: message,
-    emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
     membersMap: membersMap,
-    toggleReaction: toggleReaction
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems
   })), isByMe ? React.createElement("div", {
     className: "sendbird-thumbnail__status"
   }, React.createElement(MessageStatus, {
@@ -5811,38 +6584,15 @@ function ThumbnailMessage(_ref) {
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(EmojiListItems$1, {
+      return React.createElement(MemoizedEmojiListItems, {
+        message: message,
         parentRef: reactionAddRef,
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
         spaceFromTrigger: {
           y: 2
         }
-      }, emojiAllList.map(function (emoji) {
-        var reactedReaction = message.reactions.filter(function (reaction) {
-          return reaction.key === emoji.key;
-        })[0];
-        var isReacted = reactedReaction ? !(reactedReaction.userIds.indexOf(userId) < 0) : false;
-        return React.createElement(ReactionButton, {
-          key: emoji.key,
-          width: "36px",
-          height: "36px",
-          selected: isReacted,
-          onClick: function onClick() {
-            closeDropdown();
-            toggleReaction(message, emoji.key, isReacted);
-          }
-        }, React.createElement(ImageRenderer, {
-          url: emoji.url,
-          width: "28px",
-          height: "28px",
-          defaultComponent: React.createElement(Icon, {
-            width: "28px",
-            height: "28px",
-            type: IconTypes.EMOJI_FAILED
-          })
-        }));
-      }));
+      });
     }
   }))));
 }
@@ -5859,10 +6609,10 @@ ThumbnailMessage.propTypes = {
   onClick: PropTypes.func,
   showRemove: PropTypes.func,
   useReaction: PropTypes.bool.isRequired,
-  emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   emojiAllMap: PropTypes.instanceOf(Map),
   membersMap: PropTypes.instanceOf(Map),
-  toggleReaction: PropTypes.func
+  toggleReaction: PropTypes.func,
+  memoizedEmojiListItems: PropTypes.func
 };
 ThumbnailMessage.defaultProps = {
   isByMe: false,
@@ -5872,10 +6622,12 @@ ThumbnailMessage.defaultProps = {
   showRemove: noop$2,
   status: '',
   userId: '',
-  emojiAllList: [],
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$2
+  toggleReaction: noop$2,
+  memoizedEmojiListItems: function memoizedEmojiListItems() {
+    return '';
+  }
 };
 
 var Colors$2 = {
@@ -5975,10 +6727,10 @@ function OutgoingFileMessage(_ref) {
       disabled = _ref.disabled,
       resendMessage = _ref.resendMessage,
       useReaction = _ref.useReaction,
-      emojiAllList = _ref.emojiAllList,
       emojiAllMap = _ref.emojiAllMap,
       membersMap = _ref.membersMap,
-      toggleReaction = _ref.toggleReaction;
+      toggleReaction = _ref.toggleReaction,
+      memoizedEmojiListItems = _ref.memoizedEmojiListItems;
   var url = message.url;
 
   var openFileUrl = function openFileUrl() {
@@ -5988,7 +6740,9 @@ function OutgoingFileMessage(_ref) {
   var parentContainRef = useRef(null);
   var menuRef = useRef(null);
   var reactionAddButtonRef = useRef(null);
-  var showReactionAddButton = useReaction && emojiAllList && emojiAllList.length > 0;
+  var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
+  var MemoizedEmojiListItems = memoizedEmojiListItems;
+  var isMessageSent = getIsSentFromStatus(status);
   return React.createElement("div", {
     className: "sendbird-file-message__outgoing",
     style: {
@@ -6042,39 +6796,15 @@ function OutgoingFileMessage(_ref) {
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(EmojiListItems$1, {
-        closeDropdown: closeDropdown,
+      return React.createElement(MemoizedEmojiListItems, {
+        message: message,
         parentRef: reactionAddButtonRef,
         parentContainRef: parentContainRef,
+        closeDropdown: closeDropdown,
         spaceFromTrigger: {
           y: 2
         }
-      }, emojiAllList.map(function (emoji) {
-        var reactedReaction = message.reactions.filter(function (reaction) {
-          return reaction.key === emoji.key;
-        })[0];
-        var isReacted = reactedReaction ? !(reactedReaction.userIds.indexOf(userId) < 0) : false;
-        return React.createElement(ReactionButton, {
-          key: emoji.key,
-          width: "36px",
-          height: "36px",
-          selected: isReacted,
-          onClick: function onClick() {
-            closeDropdown();
-            toggleReaction(message, emoji.key, isReacted);
-          }
-        }, React.createElement(ImageRenderer, {
-          url: emoji.url,
-          width: "28px",
-          height: "28px",
-          defaultComponent: React.createElement(Icon, {
-            width: "28px",
-            height: "28px",
-            type: IconTypes.EMOJI_FAILED,
-            fillColor: IconColors.CONTENT_INVERSE
-          })
-        }));
-      }));
+      });
     }
   })), React.createElement("div", {
     className: "sendbird-file-message__tooltip"
@@ -6091,14 +6821,14 @@ function OutgoingFileMessage(_ref) {
   }, React.createElement(Label, {
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, truncate(message.url, MAX_TRUNCATE_LENGTH)))), useReaction && message.reactions && message.reactions.length > 0 && React.createElement(EmojiReactions, {
+  }, truncate(message.url, MAX_TRUNCATE_LENGTH)))), isMessageSent && useReaction && message.reactions && message.reactions.length > 0 && React.createElement(EmojiReactions, {
     className: "sendbird-file-message__tooltip__emoji-reactions",
     userId: userId,
     message: message,
-    emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
     membersMap: membersMap,
-    toggleReaction: toggleReaction
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems
   })), React.createElement("div", {
     className: "sendbird-file-message__status"
   }, React.createElement(MessageStatus, {
@@ -6116,10 +6846,10 @@ function IncomingFileMessage(_ref2) {
   var message = _ref2.message,
       userId = _ref2.userId,
       useReaction = _ref2.useReaction,
-      emojiAllList = _ref2.emojiAllList,
       emojiAllMap = _ref2.emojiAllMap,
       membersMap = _ref2.membersMap,
-      toggleReaction = _ref2.toggleReaction;
+      toggleReaction = _ref2.toggleReaction,
+      memoizedEmojiListItems = _ref2.memoizedEmojiListItems;
 
   var openFileUrl = function openFileUrl() {
     window.open(message.url);
@@ -6127,7 +6857,8 @@ function IncomingFileMessage(_ref2) {
 
   var parentContainRef = useRef(null);
   var reactionAddButtonRef = useRef(null);
-  var showReactionAddButton = useReaction && emojiAllList && emojiAllList.length > 0;
+  var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
+  var MemoizedEmojiListItems = memoizedEmojiListItems;
   return React.createElement("div", {
     className: "sendbird-file-message__incoming",
     style: {
@@ -6161,10 +6892,10 @@ function IncomingFileMessage(_ref2) {
     className: "sendbird-file-message__tooltip__emoji-reactions",
     userId: userId,
     message: message,
-    emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
     membersMap: membersMap,
-    toggleReaction: toggleReaction
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems
   })), React.createElement(Label, {
     className: "sendbird-file-message__sent-at",
     type: LabelTypography.CAPTION_3,
@@ -6187,39 +6918,15 @@ function IncomingFileMessage(_ref2) {
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(EmojiListItems$1, {
-        closeDropdown: closeDropdown,
+      return React.createElement(MemoizedEmojiListItems, {
+        message: message,
         parentRef: reactionAddButtonRef,
         parentContainRef: parentContainRef,
+        closeDropdown: closeDropdown,
         spaceFromTrigger: {
           y: 2
         }
-      }, emojiAllList.map(function (emoji) {
-        var reactedReaction = message.reactions.filter(function (reaction) {
-          return reaction.key === emoji.key;
-        })[0];
-        var isReacted = reactedReaction ? !(reactedReaction.userIds.indexOf(userId) < 0) : false;
-        return React.createElement(ReactionButton, {
-          key: emoji.key,
-          width: "36px",
-          height: "36px",
-          selected: isReacted,
-          onClick: function onClick() {
-            closeDropdown();
-            toggleReaction(message, emoji.key, isReacted);
-          }
-        }, React.createElement(ImageRenderer, {
-          url: emoji.url,
-          width: "28px",
-          height: "28px",
-          defaultComponent: React.createElement(Icon, {
-            width: "28px",
-            height: "28px",
-            type: IconTypes.EMOJI_FAILED,
-            fillColor: IconColors.CONTENT_INVERSE
-          })
-        }));
-      }));
+      });
     }
   })));
 }
@@ -6231,10 +6938,10 @@ OutgoingFileMessage.propTypes = {
   resendMessage: PropTypes.func,
   useReaction: PropTypes.bool.isRequired,
   disabled: PropTypes.bool,
-  emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   emojiAllMap: PropTypes.instanceOf(Map),
   membersMap: PropTypes.instanceOf(Map),
-  toggleReaction: PropTypes.func
+  toggleReaction: PropTypes.func,
+  memoizedEmojiListItems: PropTypes.func
 };
 OutgoingFileMessage.defaultProps = {
   status: '',
@@ -6243,27 +6950,31 @@ OutgoingFileMessage.defaultProps = {
   message: {},
   userId: '',
   disabled: false,
-  emojiAllList: [],
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$3
+  toggleReaction: noop$3,
+  memoizedEmojiListItems: function memoizedEmojiListItems() {
+    return '';
+  }
 };
 IncomingFileMessage.propTypes = {
   message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])),
   userId: PropTypes.string,
   useReaction: PropTypes.bool.isRequired,
-  emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   emojiAllMap: PropTypes.instanceOf(Map),
   membersMap: PropTypes.instanceOf(Map),
-  toggleReaction: PropTypes.func
+  toggleReaction: PropTypes.func,
+  memoizedEmojiListItems: PropTypes.func
 };
 IncomingFileMessage.defaultProps = {
   message: {},
   userId: '',
-  emojiAllList: [],
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$3
+  toggleReaction: noop$3,
+  memoizedEmojiListItems: function memoizedEmojiListItems() {
+    return '';
+  }
 };
 
 var MessageSwitch = function MessageSwitch(_ref3) {
@@ -6275,10 +6986,10 @@ var MessageSwitch = function MessageSwitch(_ref3) {
       status = _ref3.status,
       resendMessage = _ref3.resendMessage,
       useReaction = _ref3.useReaction,
-      emojiAllList = _ref3.emojiAllList,
       emojiAllMap = _ref3.emojiAllMap,
       membersMap = _ref3.membersMap,
-      toggleReaction = _ref3.toggleReaction;
+      toggleReaction = _ref3.toggleReaction,
+      memoizedEmojiListItems = _ref3.memoizedEmojiListItems;
   return React.createElement("div", {
     className: "sendbird-file-message".concat(isByMe ? '--outgoing' : '--incoming')
   }, isByMe ? React.createElement(OutgoingFileMessage, {
@@ -6289,18 +7000,18 @@ var MessageSwitch = function MessageSwitch(_ref3) {
     status: status,
     resendMessage: resendMessage,
     useReaction: useReaction,
-    emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
     membersMap: membersMap,
-    toggleReaction: toggleReaction
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems
   }) : React.createElement(IncomingFileMessage, {
     userId: userId,
     message: message,
     useReaction: useReaction,
-    emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
     membersMap: membersMap,
-    toggleReaction: toggleReaction
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems
   }));
 };
 
@@ -6313,10 +7024,10 @@ MessageSwitch.propTypes = {
   resendMessage: PropTypes.func,
   status: PropTypes.string.isRequired,
   useReaction: PropTypes.bool.isRequired,
-  emojiAllList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string)),
   emojiAllMap: PropTypes.instanceOf(Map),
   membersMap: PropTypes.instanceOf(Map),
-  toggleReaction: PropTypes.func
+  toggleReaction: PropTypes.func,
+  memoizedEmojiListItems: PropTypes.func
 };
 MessageSwitch.defaultProps = {
   message: {},
@@ -6325,10 +7036,12 @@ MessageSwitch.defaultProps = {
   showRemove: noop$3,
   resendMessage: noop$3,
   userId: '',
-  emojiAllList: [],
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$3
+  toggleReaction: noop$3,
+  memoizedEmojiListItems: function memoizedEmojiListItems() {
+    return '';
+  }
 };
 
 function DateSeparator(_ref) {
@@ -6861,10 +7574,10 @@ function MessageHoc(_ref) {
       status = _ref.status,
       resendMessage = _ref.resendMessage,
       useReaction = _ref.useReaction,
-      emojiAllList = _ref.emojiAllList,
       emojiAllMap = _ref.emojiAllMap,
       membersMap = _ref.membersMap,
-      toggleReaction = _ref.toggleReaction;
+      toggleReaction = _ref.toggleReaction,
+      memoizedEmojiListItems = _ref.memoizedEmojiListItems;
   var _message$sender = message.sender,
       sender = _message$sender === void 0 ? {} : _message$sender;
 
@@ -6915,10 +7628,10 @@ function MessageHoc(_ref) {
     onClick: setShowFileViewer,
     status: status,
     useReaction: useReaction,
-    emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
     membersMap: membersMap,
-    toggleReaction: toggleReaction
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems
   }) : React.createElement(MessageSwitch, {
     message: message,
     userId: userId,
@@ -6928,10 +7641,10 @@ function MessageHoc(_ref) {
     resendMessage: resendMessage,
     status: status,
     useReaction: useReaction,
-    emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
     membersMap: membersMap,
-    toggleReaction: toggleReaction
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems
   })), message.isAdminMessage && message.isAdminMessage() && React.createElement(AdminMessage, {
     message: message
   }), (message.isUserMessage && message.isUserMessage() || message.messageType === 'user') && React.createElement(Message, {
@@ -6944,10 +7657,10 @@ function MessageHoc(_ref) {
     resendMessage: resendMessage,
     status: status,
     useReaction: useReaction,
-    emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
     membersMap: membersMap,
-    toggleReaction: toggleReaction
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems
   }), showRemove && React.createElement(RemoveMessage, {
     onCloseModal: function onCloseModal() {
       return setShowRemove(false);
@@ -7001,10 +7714,10 @@ MessageHoc.propTypes = {
   resendMessage: PropTypes.func.isRequired,
   status: PropTypes.string,
   useReaction: PropTypes.bool.isRequired,
-  emojiAllList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   emojiAllMap: PropTypes.instanceOf(Map).isRequired,
   membersMap: PropTypes.instanceOf(Map).isRequired,
-  toggleReaction: PropTypes.func
+  toggleReaction: PropTypes.func,
+  memoizedEmojiListItems: PropTypes.func
 };
 MessageHoc.defaultProps = {
   userId: '',
@@ -7013,7 +7726,10 @@ MessageHoc.defaultProps = {
   hasSeperator: false,
   disabled: false,
   status: '',
-  toggleReaction: function toggleReaction() {}
+  toggleReaction: function toggleReaction() {},
+  memoizedEmojiListItems: function memoizedEmojiListItems() {
+    return '';
+  }
 };
 
 var ConversationScroll =
@@ -7039,9 +7755,8 @@ function (_Component) {
           scrollRef = _this$props.scrollRef,
           hasMore = _this$props.hasMore,
           messagesDispatcher = _this$props.messagesDispatcher,
-          messageSource = _this$props.messageSource,
-          currentGroupChannel = _this$props.currentGroupChannel,
-          swapParams = _this$props.swapParams;
+          onScroll = _this$props.onScroll,
+          currentGroupChannel = _this$props.currentGroupChannel;
       var element = e.target;
       var scrollTop = element.scrollTop,
           clientHeight = element.clientHeight,
@@ -7054,30 +7769,14 @@ function (_Component) {
 
         var nodes = scrollRef.current.querySelectorAll('.sendbird-msg--scroll-ref');
         var first = nodes[0];
-        messageSource.load(function (response, err) {
-          var messages = response;
-          var error = err;
+        onScroll(function (_ref) {
+          var _ref2 = _slicedToArray(_ref, 1),
+              messages = _ref2[0];
 
-          if (swapParams) {
-            messages = error;
-            error = response;
-          }
-
-          if (error) {
-            return;
-          }
-
-          messagesDispatcher({
-            type: GET_PREV_MESSAGES_SUCESS,
-            payload: {
-              messages: messages,
-              hasMore: messageSource.hasMore
-            }
-          });
-          setTimeout(function () {
+          if (messages) {
             // https://github.com/scabbiaza/react-scroll-position-on-updating-dom
             first.scrollIntoView();
-          });
+          }
         });
       }
 
@@ -7114,9 +7813,9 @@ function (_Component) {
           useReaction = _this$props2.useReaction,
           emojiContainer = _this$props2.emojiContainer,
           emojiAllMap = _this$props2.emojiAllMap,
-          emojiAllList = _this$props2.emojiAllList,
           membersMap = _this$props2.membersMap,
-          toggleReaction = _this$props2.toggleReaction;
+          toggleReaction = _this$props2.toggleReaction,
+          memoizedEmojiListItems = _this$props2.memoizedEmojiListItems;
       return React.createElement("div", {
         className: "sendbird-conversation__messages"
       }, React.createElement("div", {
@@ -7160,10 +7859,10 @@ function (_Component) {
           updateMessage: updateMessage,
           useReaction: useReaction,
           resendMessage: resendMessage,
-          emojiAllList: emojiAllList,
           emojiAllMap: emojiAllMap,
           membersMap: membersMap,
-          toggleReaction: toggleReaction
+          toggleReaction: toggleReaction,
+          memoizedEmojiListItems: memoizedEmojiListItems
         });
       }))));
     }
@@ -7178,7 +7877,7 @@ ConversationScroll.propTypes = {
   }).isRequired,
   hasMore: PropTypes.bool,
   messagesDispatcher: PropTypes.func.isRequired,
-  messageSource: PropTypes.shape({
+  onScroll: PropTypes.shape({
     load: PropTypes.func,
     hasMore: PropTypes.bool
   }),
@@ -7198,13 +7897,12 @@ ConversationScroll.propTypes = {
     members: PropTypes.arrayOf(PropTypes.shape({}))
   }).isRequired,
   renderChatItem: PropTypes.element,
-  swapParams: PropTypes.bool,
   useReaction: PropTypes.bool,
   emojiContainer: PropTypes.shape({}),
   emojiAllMap: PropTypes.instanceOf(Map),
-  emojiAllList: PropTypes.arrayOf(PropTypes.shape({})),
   membersMap: PropTypes.instanceOf(Map),
-  toggleReaction: PropTypes.func
+  toggleReaction: PropTypes.func,
+  memoizedEmojiListItems: PropTypes.func
 };
 ConversationScroll.defaultProps = {
   hasMore: false,
@@ -7213,14 +7911,15 @@ ConversationScroll.defaultProps = {
   initialized: false,
   userId: '',
   renderChatItem: null,
-  messageSource: null,
-  swapParams: false,
+  onScroll: null,
   useReaction: true,
   emojiContainer: {},
   emojiAllMap: new Map(),
-  emojiAllList: [],
   membersMap: new Map(),
-  toggleReaction: function toggleReaction() {}
+  toggleReaction: function toggleReaction() {},
+  memoizedEmojiListItems: function memoizedEmojiListItems() {
+    return '';
+  }
 };
 
 function Notification(_ref) {
@@ -7512,6 +8211,8 @@ var ConversationPanel = function ConversationPanel(props) {
       pubSub = _props$config.pubSub,
       isOnline = _props$config.isOnline,
       reconnect = props.dispatchers.reconnect,
+      _props$queries = props.queries,
+      queries = _props$queries === void 0 ? {} : _props$queries,
       renderChatItem = props.renderChatItem,
       onChatHeaderActionClick = props.onChatHeaderActionClick,
       onBeforeSendUserMessage = props.onBeforeSendUserMessage,
@@ -7521,57 +8222,15 @@ var ConversationPanel = function ConversationPanel(props) {
   var sdkError = sdkStore.error;
   var sdkInit = sdkStore.initialized;
   var user = userStore.user;
+  var userFilledMessageListQuery = queries.messageListQuery;
 
   var _useReducer = useReducer(reducer$3, messagesInitialState),
       _useReducer2 = _slicedToArray(_useReducer, 2),
       messagesStore = _useReducer2[0],
       messagesDispatcher = _useReducer2[1];
 
-  var _useState = useState(null),
-      _useState2 = _slicedToArray(_useState, 2),
-      messageSource = _useState2[0],
-      setMessageSource = _useState2[1];
-
-  var _useState3 = useState(false),
-      _useState4 = _slicedToArray(_useState3, 2),
-      invalidChannel = _useState4[0],
-      setInvalidChannel = _useState4[1];
-
-  var _useState5 = useState(uuidv4()),
-      _useState6 = _slicedToArray(_useState5, 2),
-      channelHandlerId = _useState6[0],
-      setChannelHandlerId = _useState6[1]; // map to update read status of messages
-
-
-  var _useState7 = useState({}),
-      _useState8 = _slicedToArray(_useState7, 2),
-      readStatus = _useState8[0],
-      setReadStatus = _useState8[1];
-
-  var _useState9 = useState(),
-      _useState10 = _slicedToArray(_useState9, 2),
-      messageReciverId = _useState10[0],
-      setMessageReciverId = _useState10[1];
-
-  var _useState11 = useState({}),
-      _useState12 = _slicedToArray(_useState11, 2),
-      currentGroupChannel = _useState12[0],
-      setCurrentGroupChannel = _useState12[1];
-
-  var _useState13 = useState({}),
-      _useState14 = _slicedToArray(_useState13, 2),
-      emojiContainer = _useState14[0],
-      setEmojiContainer = _useState14[1];
-
-  var messageInputRef = useRef(null);
-  var scrollRef = useRef(null); // hack to rerender header when channel info changes
-  // ChatHeader doesnt seem to recoganize changes in currentGroupChannel
-
-  var _useState15 = useState(uuidv4()),
-      _useState16 = _slicedToArray(_useState15, 2),
-      hash = _useState16[0],
-      setHash = _useState16[1]; // const { appInfo = {} } = sdk;
-
+  var scrollRef = useRef(null); // const { appInfo = {} } = sdk;
+  // const useReaction = appInfo.isUsingReaction || false;
 
   var useReaction = false;
   var allMessages = messagesStore.allMessages,
@@ -7579,7 +8238,12 @@ var ConversationPanel = function ConversationPanel(props) {
       hasMore = messagesStore.hasMore,
       initialized = messagesStore.initialized,
       unreadCount = messagesStore.unreadCount,
-      unreadSince = messagesStore.unreadSince;
+      unreadSince = messagesStore.unreadSince,
+      invalidChannel = messagesStore.invalidChannel,
+      currentGroupChannel = messagesStore.currentGroupChannel,
+      lastMessageTimeStamp = messagesStore.lastMessageTimeStamp,
+      emojiContainer = messagesStore.emojiContainer,
+      readStatus = messagesStore.readStatus;
   var emojiAllMap = useMemo(function () {
     return  new Map();
   }, [emojiContainer]);
@@ -7588,256 +8252,126 @@ var ConversationPanel = function ConversationPanel(props) {
   }, [emojiContainer]);
   var nicknamesMap = useMemo(function () {
     return  new Map();
-  }, [currentGroupChannel.members]); // to create message-datasource
+  }, [currentGroupChannel.members]);
+  var onScrollCallback = useScrollCallback({
+    currentGroupChannel: currentGroupChannel,
+    lastMessageTimeStamp: lastMessageTimeStamp,
+    userFilledMessageListQuery: userFilledMessageListQuery
+  }, {
+    hasMore: hasMore,
+    logger: logger,
+    messagesDispatcher: messagesDispatcher,
+    sdk: sdk
+  });
+  var toggleReaction = useToggleReactionCallback({
+    currentGroupChannel: currentGroupChannel
+  }, {
+    logger: logger
+  });
+  var memoizedEmojiListItems = useMemoizedEmojiListItems({
+    emojiContainer: emojiContainer,
+    toggleReaction: toggleReaction
+  }, {
+    useReaction: useReaction,
+    logger: logger,
+    userId: userId,
+    emojiAllList: emojiAllList
+  }); // to create message-datasource
 
-  useEffect(function () {
-    logger.info('Channel: Setup started');
-    messagesDispatcher({
-      type: RESET_MESSAGES
-    });
-    var prevMessageListQuery = null;
+  useSetChannel({
+    channelUrl: channelUrl,
+    sdkInit: sdkInit
+  }, {
+    messagesDispatcher: messagesDispatcher,
+    sdk: sdk,
+    logger: logger
+  }); // Hook to handle ChannelEvents and send values to useReducer using messagesDispatcher
 
-    if (!sdkInit) {
-      logger.warning('Channel: SDK not ready');
-      setMessageSource(null);
-    }
-
-    if (channelUrl && sdkInit) {
-      logger.info('Channel: Set current channel', channelUrl);
-      messagesDispatcher({
-        type: SET_CURRENT_CHANNEL$1,
-        payload: channelUrl
-      }); // remove previous handler
-      // to do - move to cleanup fn
-
-      if (sdk && sdk.removeChannelHandler) {
-        logger.info('Channel: Remove previous event handler');
-        sdk.removeChannelHandler(channelHandlerId);
-      }
-
-      if (!sdk || !sdk.GroupChannel) {
-        return;
-      }
-
-      sdk.GroupChannel.getChannel(channelUrl, function (groupChannel) {
-        logger.info('Channel: Fetched channel', groupChannel);
-
-        if (!groupChannel) {
-          logger.warning('Channel: Invalid channel');
-          setInvalidChannel(true);
-          return;
-        }
-
-        setInvalidChannel(false);
-        setCurrentGroupChannel(groupChannel); // for handling read status on the go
-
-        var handler = new sdk.ChannelHandler();
-
-        var handleMessageStatus = function handleMessageStatus(c) {
-          if (channelUrl === c.url) {
-            var allReadStatus = allMessages.reduce(function (accumulator, msg) {
-              if (msg.messageId !== 0) {
-                return _objectSpread2({}, accumulator, _defineProperty({}, msg.messageId, getParsedStatus(msg, groupChannel)));
-              }
-
-              return accumulator;
-            }, {});
-            setReadStatus(allReadStatus);
-          }
-        };
-
-        handler.onDeliveryReceiptUpdated = handleMessageStatus;
-        handler.onReadReceiptUpdated = handleMessageStatus;
-
-        handler.onChannelChanged = function () {
-          setHash(uuidv4());
-        };
-
-        handler.onChannelFrozen = function (groupChannel_) {
-          setCurrentGroupChannel(groupChannel_);
-        };
-
-        handler.onChannelUnFrozen = function (groupChannel_) {
-          setCurrentGroupChannel(groupChannel_);
-        };
-
-        var newHandlerId = uuidv4();
-        sdk.addChannelHandler(newHandlerId, handler);
-        setChannelHandlerId(newHandlerId);
-        logger.info('Channel: Mark as read', groupChannel); // this order is important - this mark as read should update the event handler up above
-
-        groupChannel.markAsRead(); // There should only be one single instance per channel view.
-
-        prevMessageListQuery = groupChannel.createPreviousMessageListQuery();
-        prevMessageListQuery.limit = 30;
-        prevMessageListQuery.reverse = false;
-        prevMessageListQuery.includeReaction = true; // should set includeReaction true in below cases
-        // https://sendbird.atlassian.net/wiki/spaces/SDK/pages/89981992/Message+reaction
-
-        setMessageSource(prevMessageListQuery);
-        logger.info('Channel: Fetching messages', groupChannel);
-        messagesDispatcher({
-          type: GET_PREV_MESSAGES_START
-        }); // Retrieving previous messages.
-
-        prevMessageListQuery.load(function (response, err) {
-          if (prevMessageListQuery.deprecatedRun) {
-            logger.warning('Donot run prevMessageListQuery, because channel has been switched', prevMessageListQuery);
-            return;
-          }
-
-          var swapParams = sdk.getErrorFirstCallback();
-          var messages = response;
-          var error = err;
-
-          if (swapParams) {
-            messages = error;
-            error = response;
-          }
-
-          if (error) {
-            logger.error('Channel: Fetching messages failed', error);
-            return;
-          }
-
-          logger.info('Channel: Fetching messages success', messages);
-          messagesDispatcher({
-            type: GET_PREV_MESSAGES_SUCESS,
-            payload: {
-              messages: messages,
-              hasMore: prevMessageListQuery.hasMore
-            }
-          });
-          setTimeout(function () {
-            return scrollIntoLast('.sendbird-msg--scroll-ref');
-          });
-        });
-      });
-    } // eslint-disable-next-line consistent-return
-
-
-    return function () {
-      if (sdk && sdk.removeChannelHandler) {
-        logger.info('Channel: Removing channel handler', channelHandlerId);
-        sdk.removeChannelHandler(channelHandlerId);
-      }
-
-      if (prevMessageListQuery) {
-        prevMessageListQuery.deprecatedRun = true;
-      }
-    };
-  }, [channelUrl, sdkInit]); // todo: cleanup internal state - this is for removing messages from other person
-
-  useEffect(function () {
-    setMessageReciverId(uuidv4());
-
-    if (channelUrl && sdk) {
-      eventHandler({
-        messagesDispatcher: messagesDispatcher,
-        sdk: sdk,
-        logger: logger
-      });
-    }
-
-    return function () {
-      if (sdk && sdk.removeChannelHandler) {
-        logger.info('Channel: Removing message reciver handler', messageReciverId);
-        sdk.removeChannelHandler(messageReciverId);
-      }
-    };
-  }, [channelUrl, sdkInit]); // handles API calls from withSendbird
+  useHandleChannelEvents({
+    currentGroupChannel: currentGroupChannel,
+    sdkInit: sdkInit
+  }, {
+    messagesDispatcher: messagesDispatcher,
+    sdk: sdk,
+    logger: logger
+  });
+  useInitialMessagesFetch({
+    currentGroupChannel: currentGroupChannel
+  }, {
+    sdk: sdk,
+    logger: logger,
+    messagesDispatcher: messagesDispatcher,
+    userFilledMessageListQuery: userFilledMessageListQuery
+  }); // handles API calls from withSendbird
 
   useEffect(function () {
     var subScriber = pubSubHandler$1(channelUrl, pubSub, messagesDispatcher);
     return function () {
       pubSubHandleRemover$1(subScriber);
     };
-  }, [channelUrl, sdkInit]);
-  useEffect(function () {
-    if (!sdk || !sdk.getAllEmoji) {
-      return;
-    }
-
-    sdk.getAllEmoji(function (emojiContainer_, err) {
-      if (err) {
-        logger.error('Channel: Getting emojis failed', err);
-        return;
-      }
-
-      logger.info('Channel: Getting emojis success', emojiContainer_);
-      setEmojiContainer(emojiContainer_);
-    });
   }, [channelUrl, sdkInit]); // to create initial read status
 
-  useEffect(function () {
-    if (allMessages.length > 0) {
-      var allReadStatus = allMessages.reduce(function (accumulator, msg) {
-        if (msg.messageId !== 0) {
-          return _objectSpread2({}, accumulator, _defineProperty({}, msg.messageId, getParsedStatus(msg, currentGroupChannel)));
-        }
+  useSetReadStatus({
+    allMessages: allMessages,
+    currentGroupChannel: currentGroupChannel
+  }, {
+    messagesDispatcher: messagesDispatcher,
+    sdk: sdk,
+    logger: logger
+  }); // handling connection breaks
 
-        return accumulator;
-      }, {});
-      setReadStatus(allReadStatus);
-    }
-  }, [allMessages]); // handling connection breaks
+  useHandleReconnect({
+    isOnline: isOnline
+  }, {
+    logger: logger,
+    sdk: sdk,
+    currentGroupChannel: currentGroupChannel,
+    messagesDispatcher: messagesDispatcher,
+    userFilledMessageListQuery: userFilledMessageListQuery
+  });
+  var deleteMessage = useDeleteMessageCallback({
+    currentGroupChannel: currentGroupChannel,
+    messagesDispatcher: messagesDispatcher
+  }, {
+    logger: logger
+  });
+  var updateMessage = useUpdateMessageCallback({
+    currentGroupChannel: currentGroupChannel,
+    messagesDispatcher: messagesDispatcher,
+    onBeforeUpdateUserMessage: onBeforeUpdateUserMessage
+  }, {
+    logger: logger,
+    sdk: sdk
+  });
+  var resendMessage = useResendMessageCallback({
+    currentGroupChannel: currentGroupChannel,
+    messagesDispatcher: messagesDispatcher
+  }, {
+    logger: logger
+  });
 
-  useEffect(function () {
-    var wasOffline = !isOnline;
-    return function () {
-      var prevMessageListQuery = null; // state changed from offline to online
+  var _useSendMessageCallba = useSendMessageCallback({
+    currentGroupChannel: currentGroupChannel,
+    onBeforeSendUserMessage: onBeforeSendUserMessage
+  }, {
+    sdk: sdk,
+    logger: logger,
+    messagesDispatcher: messagesDispatcher
+  }),
+      _useSendMessageCallba2 = _slicedToArray(_useSendMessageCallba, 2),
+      messageInputRef = _useSendMessageCallba2[0],
+      onSendMessage = _useSendMessageCallba2[1];
 
-      if (wasOffline) {
-        logger.info('Refreshing conversation state');
-
-        if (!currentGroupChannel || !currentGroupChannel.createPreviousMessageListQuery) {
-          return;
-        }
-
-        prevMessageListQuery = currentGroupChannel.createPreviousMessageListQuery();
-        prevMessageListQuery.limit = 30;
-        prevMessageListQuery.reverse = false;
-        prevMessageListQuery.includeReaction = true;
-        setMessageSource(prevMessageListQuery); // Retrieving previous messages.
-
-        prevMessageListQuery.load(function (response, err) {
-          if (prevMessageListQuery.deprecatedRun) {
-            logger.warning('Donot run prevMessageListQuery, because channel has been switched', prevMessageListQuery);
-            return;
-          }
-
-          var swapParams = sdk.getErrorFirstCallback();
-          var messages = response;
-          var error = err;
-
-          if (swapParams) {
-            messages = error;
-            error = response;
-          }
-
-          if (error) {
-            logger.error('Channel: Fetching messages failed', error);
-            return;
-          }
-
-          logger.info('Channel: Fetching messages success', messages);
-          messagesDispatcher({
-            type: CLEAR_SENT_MESSAGES
-          });
-          messagesDispatcher({
-            type: GET_PREV_MESSAGES_SUCESS,
-            payload: {
-              messages: messages,
-              hasMore: prevMessageListQuery.hasMore
-            }
-          });
-          setTimeout(function () {
-            return scrollIntoLast('.sendbird-msg--scroll-ref');
-          });
-        });
-      }
-    };
-  }, [isOnline]);
+  var _useSendFileMessageCa = useSendFileMessageCallback({
+    currentGroupChannel: currentGroupChannel,
+    onBeforeSendFileMessage: onBeforeSendFileMessage
+  }, {
+    sdk: sdk,
+    logger: logger,
+    messagesDispatcher: messagesDispatcher
+  }),
+      _useSendFileMessageCa2 = _slicedToArray(_useSendFileMessageCa, 1),
+      onSendFileMessage = _useSendFileMessageCa2[0];
 
   if (sdkError) {
     return React.createElement("div", {
@@ -7878,7 +8412,6 @@ var ConversationPanel = function ConversationPanel(props) {
   return React.createElement("div", {
     className: "sendbird-conversation"
   }, React.createElement(ChatHeader, {
-    hash: hash,
     currentGroupChannel: currentGroupChannel,
     currentUser: user,
     onActionClick: onChatHeaderActionClick,
@@ -7904,7 +8437,7 @@ var ConversationPanel = function ConversationPanel(props) {
     hasMore: hasMore,
     disabled: !isOnline,
     messagesDispatcher: messagesDispatcher,
-    messageSource: messageSource,
+    onScroll: onScrollCallback,
     initialized: initialized,
     allMessages: allMessages,
     userId: userId,
@@ -7914,179 +8447,13 @@ var ConversationPanel = function ConversationPanel(props) {
     renderChatItem: renderChatItem,
     useReaction: useReaction,
     emojiContainer: emojiContainer,
-    emojiAllList: emojiAllList,
     emojiAllMap: emojiAllMap,
     membersMap: nicknamesMap,
-    deleteMessage: function deleteMessage(message, cb) {
-      logger.info('Channel: Deleting message', message);
-      var requestState = message.requestState;
-      logger.info('Channel: Deleting message requestState:', requestState); // Message is only on local
-
-      if (requestState === 'failed') {
-        logger.info('Channel: Deleted message from local:', message);
-        messagesDispatcher({
-          type: ON_MESSAGE_DELETED_BY_REQ_ID,
-          payload: message.reqId
-        });
-
-        if (cb) {
-          cb();
-        }
-
-        return;
-      } // Message is on server
-
-
-      currentGroupChannel.deleteMessage(message, function (err) {
-        logger.info('Channel: Deleting message from remote:', requestState);
-
-        if (cb) {
-          cb(err);
-        }
-
-        if (!err) {
-          logger.info('Channel: Deleting message success!', message);
-          messagesDispatcher({
-            type: ON_MESSAGE_DELETED,
-            payload: message.messageId
-          });
-        } else {
-          logger.warning('Channel: Deleting message failed!', err);
-        }
-      });
-    },
-    updateMessage: function updateMessage(messageId, text, cb) {
-      var createParamsDefault = function createParamsDefault(txt) {
-        var params = new sdk.UserMessageParams();
-        params.message = txt;
-        return params;
-      };
-
-      var createCustomPrams = onBeforeUpdateUserMessage && typeof onBeforeUpdateUserMessage === 'function';
-
-      if (createCustomPrams) {
-        logger.info('Channel: creting params using onBeforeUpdateUserMessage', onBeforeUpdateUserMessage);
-      }
-
-      var params = onBeforeUpdateUserMessage ? onBeforeUpdateUserMessage(text) : createParamsDefault(text);
-      currentGroupChannel.updateUserMessage(messageId, params, function (r, e) {
-        logger.info('Channel: Updating message!', params);
-        var swapParams = sdk.getErrorFirstCallback();
-        var message = r;
-        var err = e;
-
-        if (swapParams) {
-          message = e;
-          err = r;
-        }
-
-        if (cb) {
-          cb(err, message);
-        }
-
-        if (!err) {
-          logger.info('Channel: Updating message success!', message);
-          messagesDispatcher({
-            type: ON_MESSAGE_UPDATED,
-            payload: message
-          });
-        } else {
-          logger.warning('Channel: Updating message failed!', err);
-        }
-      });
-    },
-    resendMessage: function resendMessage(failedMessage) {
-      logger.info('Channel: Resending message has started', failedMessage);
-      var messageType = failedMessage.messageType,
-          file = failedMessage.file;
-
-      if (failedMessage && typeof failedMessage.isResendable === 'function' && failedMessage.isResendable()) {
-        // eslint-disable-next-line no-param-reassign
-        failedMessage.requestState = 'pending';
-        messagesDispatcher({
-          type: RESEND_MESSAGEGE_START,
-          payload: failedMessage
-        }); // userMessage
-
-        if (messageType === 'user') {
-          currentGroupChannel.resendUserMessage(failedMessage).then(function (message) {
-            logger.info('Channel: Resending message success!', {
-              message: message
-            });
-            messagesDispatcher({
-              type: SEND_MESSAGEGE_SUCESS,
-              payload: message
-            });
-          }).catch(function (e) {
-            logger.warning('Channel: Resending message failed!', {
-              e: e
-            }); // eslint-disable-next-line no-param-reassign
-
-            failedMessage.requestState = 'failed';
-            messagesDispatcher({
-              type: SEND_MESSAGEGE_FAILURE,
-              payload: failedMessage
-            });
-          }); // eslint-disable-next-line no-param-reassign
-
-          failedMessage.requestState = 'pending';
-          messagesDispatcher({
-            type: RESEND_MESSAGEGE_START,
-            payload: failedMessage
-          });
-          return;
-        }
-
-        if (messageType === 'file') {
-          currentGroupChannel.resendFileMessage(failedMessage, file).then(function (message) {
-            logger.info('Channel: Resending file message success!', {
-              message: message
-            });
-            messagesDispatcher({
-              type: SEND_MESSAGEGE_SUCESS,
-              payload: message
-            });
-          }).catch(function (e) {
-            logger.warning('Channel: Resending file message failed!', {
-              e: e
-            }); // eslint-disable-next-line no-param-reassign
-
-            failedMessage.requestState = 'failed';
-            messagesDispatcher({
-              type: SEND_MESSAGEGE_FAILURE,
-              payload: failedMessage
-            });
-          }); // eslint-disable-next-line no-param-reassign
-
-          failedMessage.requestState = 'pending';
-          messagesDispatcher({
-            type: RESEND_MESSAGEGE_START,
-            payload: failedMessage
-          });
-        }
-      } else {
-        // to alert user on console
-        // eslint-disable-next-line no-console
-        console.error('Message is not resendable');
-        logger.warning('Message is not resendable', failedMessage);
-      }
-    },
-    toggleReaction: function toggleReaction(message, key, isReacted) {
-      if (isReacted) {
-        currentGroupChannel.deleteReaction(message, key).then(function (res) {
-          logger.info('Delete reaction success', res);
-        }).catch(function (err) {
-          logger.warning('Delete reaction failed', err);
-        });
-        return;
-      }
-
-      currentGroupChannel.addReaction(message, key).then(function (res) {
-        logger.info('Add reaction success', res);
-      }).catch(function (err) {
-        logger.warning('Add reaction failed', err);
-      });
-    }
+    memoizedEmojiListItems: memoizedEmojiListItems,
+    deleteMessage: deleteMessage,
+    updateMessage: updateMessage,
+    resendMessage: resendMessage,
+    toggleReaction: toggleReaction
   }), React.createElement("div", {
     className: "sendbird-conversation__footer"
   }, React.createElement(MessageInput, {
@@ -8096,116 +8463,8 @@ var ConversationPanel = function ConversationPanel(props) {
     onStartTyping: function onStartTyping() {
       currentGroupChannel.startTyping();
     },
-    onSendMessage: function onSendMessage() {
-      var text = messageInputRef.current.value;
-
-      var createParamsDefault = function createParamsDefault(txt) {
-        var params = new sdk.UserMessageParams();
-        params.message = txt;
-        return params;
-      };
-
-      var createCustomPrams = onBeforeSendUserMessage && typeof onBeforeSendUserMessage === 'function';
-
-      if (createCustomPrams) {
-        logger.info('Channel: creting params using onBeforeSendUserMessage', onBeforeSendUserMessage);
-      }
-
-      var params = onBeforeSendUserMessage ? onBeforeSendUserMessage(text) : createParamsDefault(text);
-      logger.info('Channel: Sending message has started', params);
-      var pendingMsg = currentGroupChannel.sendUserMessage(params, function (res, err) {
-        var swapParams = sdk.getErrorFirstCallback();
-        var message = res;
-        var error = err;
-
-        if (swapParams) {
-          message = err;
-          error = res;
-        } // sending params instead of pending message
-        // to make sure that we can resend the message once it fails
-
-
-        if (error) {
-          logger.warning('Channel: Sending message failed!', {
-            message: message
-          });
-          messagesDispatcher({
-            type: SEND_MESSAGEGE_FAILURE,
-            payload: message
-          });
-          return;
-        }
-
-        logger.info('Channel: Sending message success!', message);
-        messagesDispatcher({
-          type: SEND_MESSAGEGE_SUCESS,
-          payload: message
-        });
-      });
-      messagesDispatcher({
-        type: SEND_MESSAGEGE_START,
-        payload: pendingMsg
-      });
-      setTimeout(function () {
-        return scrollIntoLast('.sendbird-msg--scroll-ref');
-      });
-    },
-    onFileUpload: function onFileUpload(file) {
-      var createParamsDefault = function createParamsDefault(file_) {
-        var params = new sdk.FileMessageParams();
-        params.file = file_;
-        return params;
-      };
-
-      var createCustomPrams = onBeforeSendFileMessage && typeof onBeforeSendFileMessage === 'function';
-
-      if (createCustomPrams) {
-        logger.info('Channel: creting params using onBeforeSendFileMessage', onBeforeSendFileMessage);
-      }
-
-      var params = onBeforeSendFileMessage ? onBeforeSendFileMessage(file) : createParamsDefault(file);
-      logger.info('Channel: Uploading file message start!', params);
-      var pendingMsg = currentGroupChannel.sendFileMessage(params, function (response, err) {
-        var swapParams = sdk.getErrorFirstCallback();
-        var message = response;
-        var error = err;
-
-        if (swapParams) {
-          message = err;
-          error = response;
-        }
-
-        if (error) {
-          // sending params instead of pending message
-          // to make sure that we can resend the message once it fails
-          logger.error('Channel: Sending file message failed!', message);
-          message.url = URL.createObjectURL(file);
-          message.file = file;
-          messagesDispatcher({
-            type: SEND_MESSAGEGE_FAILURE,
-            payload: message
-          });
-          return;
-        }
-
-        logger.info('Channel: Sending message success!', message);
-        messagesDispatcher({
-          type: SEND_MESSAGEGE_SUCESS,
-          payload: message
-        });
-      });
-      messagesDispatcher({
-        type: SEND_MESSAGEGE_START,
-        payload: _objectSpread2({}, pendingMsg, {
-          url: URL.createObjectURL(file),
-          // pending thumbnail message seems to be failed
-          requestState: 'pending'
-        })
-      });
-      setTimeout(function () {
-        return scrollIntoLast('.sendbird-msg--scroll-ref');
-      }, 1000);
-    }
+    onSendMessage: onSendMessage,
+    onFileUpload: onSendFileMessage
   }), React.createElement("div", {
     className: "sendbird-conversation__typing-indicator"
   }, React.createElement(TypingIndicator, {
@@ -8256,6 +8515,18 @@ ConversationPanel.propTypes = {
       publish: PropTypes.func
     })
   }).isRequired,
+  queries: PropTypes.shape({
+    messageListQuery: PropTypes.shape({
+      includeMetaArray: PropTypes.bool,
+      includeParentMessageText: PropTypes.bool,
+      includeReaction: PropTypes.bool,
+      includeReplies: PropTypes.bool,
+      includeThreadInfo: PropTypes.bool,
+      limit: PropTypes.number,
+      reverse: PropTypes.bool,
+      senderUserIdsFilter: PropTypes.arrayOf(PropTypes.string)
+    })
+  }),
   onBeforeSendUserMessage: PropTypes.func,
   // onBeforeSendUserMessage(text)
   onBeforeSendFileMessage: PropTypes.func,
@@ -8266,6 +8537,7 @@ ConversationPanel.propTypes = {
 };
 ConversationPanel.defaultProps = {
   channelUrl: null,
+  queries: {},
   onBeforeSendUserMessage: null,
   onBeforeSendFileMessage: null,
   onBeforeUpdateUserMessage: null,
@@ -8603,7 +8875,10 @@ function ChannelSettings(props) {
       userListQuery = _props$config.userListQuery,
       userId = _props$config.userId,
       logger = _props$config.logger,
-      isOnline = _props$config.isOnline;
+      isOnline = _props$config.isOnline,
+      _props$queries = props.queries,
+      queries = _props$queries === void 0 ? {} : _props$queries;
+  var userFilledApplicationUserListQuery = queries.applicationUserListQuery;
   var sdk = sdkStore.sdk,
       initialized = sdkStore.initialized; // hack to kepp track of channel updates by triggering useEffect
 
@@ -8761,7 +9036,12 @@ function ChannelSettings(props) {
   })), showAccordion && React.createElement(MemebersAccordion, {
     disabled: !isOnline // eslint-disable-next-line
     ,
-    userQueryCreator: userListQuery && typeof userListQuery === 'function' ? userListQuery : sdk.createApplicationUserListQuery.bind(sdk),
+    userQueryCreator: function userQueryCreator() {
+      return userListQuery && typeof userListQuery === 'function' ? userListQuery() : createDefaultUserListQuery({
+        sdk: sdk,
+        userFilledApplicationUserListQuery: userFilledApplicationUserListQuery
+      });
+    },
     swapParams: sdk && sdk.getErrorFirstCallback && sdk.getErrorFirstCallback(),
     members: channel.members,
     onInviteMemebers: function onInviteMemebers(selectedMemebers) {
@@ -8818,6 +9098,14 @@ ChannelSettings.propTypes = {
   onChannelModified: PropTypes.func,
   onBeforeUpdateChannel: PropTypes.func,
   channelUrl: PropTypes.string.isRequired,
+  queries: PropTypes.shape({
+    applicationUserListQuery: PropTypes.shape({
+      limit: PropTypes.number,
+      userIdsFilter: PropTypes.arrayOf(PropTypes.string),
+      metaDataKeyFilter: PropTypes.string,
+      metaDataValuesFilter: PropTypes.arrayOf(PropTypes.string)
+    })
+  }),
   // from withSendbirdContext
   stores: PropTypes.shape({
     sdkStore: PropTypes.shape({
@@ -8844,6 +9132,7 @@ ChannelSettings.propTypes = {
 };
 ChannelSettings.defaultProps = {
   onBeforeUpdateChannel: null,
+  queries: {},
   onCloseClick: function onCloseClick() {},
   onChannelModified: function onChannelModified() {}
 };
@@ -8905,7 +9194,7 @@ function App(props) {
     onCloseClick: function onCloseClick() {
       setShowSettings(false);
     }
-  })), React.createElement(ModalRoot, null), React.createElement(MenuRoot, null));
+  })));
 }
 App.propTypes = {
   appId: PropTypes.string.isRequired,
