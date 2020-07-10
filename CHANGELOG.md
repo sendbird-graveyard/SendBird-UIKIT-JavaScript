@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.1.0(July 10, 2020)
+
+- Features:
+  * Reactions
+    * Reactions are available for users who have it enabled
+    * getEmojiCategoriesFromEmojiContainer
+    * getAllEmojisFromEmojiContainer
+    * getEmojisFromEmojiContainer
+- Bugfixes:
+  * Avatar flickering issue
+  * SDK version mismatch issue
+  * Various stability fixes
+
+- Dependency updates:
+  * SDK version - 3.0.128
+
 ## 1.0.7(June 26, 2020)
 
 - Features:
