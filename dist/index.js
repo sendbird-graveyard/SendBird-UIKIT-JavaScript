@@ -222,7 +222,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.0.7';
+var APP_VERSION_STRING = '1.1.0';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -1621,7 +1621,7 @@ function ChannelPreview(_ref) {
       width: "32px",
       height: "32px"
     });
-  }, [channel]);
+  }, [channel.members, channel.coverUrl]);
   return React__default.createElement("div", {
     role: "link",
     tabIndex: tabIndex,
@@ -1665,7 +1665,8 @@ function ChannelPreview(_ref) {
 ChannelPreview.propTypes = {
   isActive: PropTypes.bool,
   channel: PropTypes.shape({
-    members: PropTypes.arrayOf(PropTypes.shape({}))
+    members: PropTypes.arrayOf(PropTypes.shape({})),
+    coverUrl: PropTypes.string
   }),
   ChannelAction: PropTypes.element.isRequired,
   onClick: PropTypes.func,
@@ -4585,6 +4586,38 @@ var getEmojisFromEmojiContainer = function getEmojisFromEmojiContainer() {
   return emojiContainer.emojiCategories ? emojiContainer.emojiCategories.filter(function (emojiCategory) {
     return emojiCategory.id === emojiCategoryId;
   })[0].emojis : [];
+};
+var getAllEmojisMapFromEmojiContainer = function getAllEmojisMapFromEmojiContainer() {
+  var emojiContainer = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var _emojiContainer$emoji2 = emojiContainer.emojiCategories,
+      emojiCategories = _emojiContainer$emoji2 === void 0 ? [] : _emojiContainer$emoji2;
+  var allEmojisMap = new Map();
+
+  for (var categoryIndex = 0; categoryIndex < emojiCategories.length; categoryIndex += 1) {
+    var emojis = emojiCategories[categoryIndex].emojis;
+
+    for (var emojiIndex = 0; emojiIndex < emojis.length; emojiIndex += 1) {
+      var _emojis$emojiIndex = emojis[emojiIndex],
+          key = _emojis$emojiIndex.key,
+          url = _emojis$emojiIndex.url;
+      allEmojisMap.set(key, url);
+    }
+  }
+
+  return allEmojisMap;
+};
+var getNicknamesMapFromMembers = function getNicknamesMapFromMembers() {
+  var members = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var nicknamesMap = new Map();
+
+  for (var memberIndex = 0; memberIndex < members.length; memberIndex += 1) {
+    var _members$memberIndex = members[memberIndex],
+        userId = _members$memberIndex.userId,
+        nickname = _members$memberIndex.nickname;
+    nicknamesMap.set(userId, nickname);
+  }
+
+  return nicknamesMap;
 };
 
 var messagesInitialState = {
@@ -8146,7 +8179,7 @@ function ChatHeader(props) {
       width: "32px",
       height: "32px"
     });
-  }, [currentGroupChannel]);
+  }, [currentGroupChannel.members, currentGroupChannel.coverUrl]);
   return React__default.createElement("div", {
     className: "sendbird-chat-header"
   }, React__default.createElement("div", {
@@ -8185,7 +8218,10 @@ function ChatHeader(props) {
   }))));
 }
 ChatHeader.propTypes = {
-  currentGroupChannel: PropTypes.shape({}),
+  currentGroupChannel: PropTypes.shape({
+    members: PropTypes.arrayOf(PropTypes.shape({})),
+    coverUrl: PropTypes.string
+  }),
   currentUser: PropTypes.shape({
     userId: PropTypes.string
   }),
@@ -8236,10 +8272,10 @@ var ConversationPanel = function ConversationPanel(props) {
       messagesStore = _useReducer2[0],
       messagesDispatcher = _useReducer2[1];
 
-  var scrollRef = React.useRef(null); // const { appInfo = {} } = sdk;
-  // const useReaction = appInfo.isUsingReaction || false;
-
-  var useReaction = false;
+  var scrollRef = React.useRef(null);
+  var _sdk$appInfo = sdk.appInfo,
+      appInfo = _sdk$appInfo === void 0 ? {} : _sdk$appInfo;
+  var useReaction = appInfo.isUsingReaction || false;
   var allMessages = messagesStore.allMessages,
       loading = messagesStore.loading,
       hasMore = messagesStore.hasMore,
@@ -8252,13 +8288,13 @@ var ConversationPanel = function ConversationPanel(props) {
       emojiContainer = messagesStore.emojiContainer,
       readStatus = messagesStore.readStatus;
   var emojiAllMap = React.useMemo(function () {
-    return  new Map();
+    return useReaction ? getAllEmojisMapFromEmojiContainer(emojiContainer) : new Map();
   }, [emojiContainer]);
   var emojiAllList = React.useMemo(function () {
-    return  [];
+    return useReaction ? getAllEmojisFromEmojiContainer(emojiContainer) : [];
   }, [emojiContainer]);
   var nicknamesMap = React.useMemo(function () {
-    return  new Map();
+    return useReaction ? getNicknamesMapFromMembers(currentGroupChannel.members) : new Map();
   }, [currentGroupChannel.members]);
   var onScrollCallback = useScrollCallback({
     currentGroupChannel: currentGroupChannel,

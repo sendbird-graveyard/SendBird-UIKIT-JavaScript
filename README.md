@@ -10,6 +10,8 @@ Samples: https://github.com/sendbird/SendBird-JavaScript/tree/master/uikit-sampl
 
 `npm i sendbird-uikit`
 
+> Note - If you are building for IE11, import an Array.prototype.find polyfill - https://www.npmjs.com/package/array.prototype.find or https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find#Polyfill
+
 ## Available Components
 
 The components that you receive once you install the uikit
