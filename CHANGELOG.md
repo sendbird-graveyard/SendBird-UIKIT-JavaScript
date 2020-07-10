@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0(July 10, 2020)
+## 1.1.1(July 10, 2020)
 
 - Features:
   * Reactions
@@ -15,6 +15,8 @@
 
 - Dependency updates:
   * SDK version - 3.0.128
+
+## 1.1.0(July 10, 2020)(deprecated)
 
 ## 1.0.7(June 26, 2020)
 
