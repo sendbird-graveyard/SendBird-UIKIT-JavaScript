@@ -215,7 +215,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.1.0';
+var APP_VERSION_STRING = '1.1.1';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -4993,7 +4993,7 @@ function useInitialMessagesFetch(_ref, _ref2) {
       messageListParams.prevResultSize = 30;
       messageListParams.isInclusive = true;
       messageListParams.includeReplies = false;
-      messageListParams.includeReactions = true;
+      messageListParams.includeReaction = true;
 
       if (userFilledMessageListQuery) {
         Object.keys(userFilledMessageListQuery).forEach(function (key) {
@@ -5055,7 +5055,7 @@ function useHandleReconnect(_ref, _ref2) {
         var messageListParams = new sdk.MessageListParams();
         messageListParams.prevResultSize = 30;
         messageListParams.includeReplies = false;
-        messageListParams.includeReactions = useReaction;
+        messageListParams.includeReaction = useReaction;
 
         if (userFilledMessageListQuery) {
           Object.keys(userFilledMessageListQuery).forEach(function (key) {
@@ -5116,7 +5116,7 @@ function useScrollCallback(_ref, _ref2) {
     var messageListParams = new sdk.MessageListParams();
     messageListParams.prevResultSize = 30;
     messageListParams.includeReplies = false;
-    messageListParams.includeReactions = true;
+    messageListParams.includeReaction = true;
 
     if (userFilledMessageListQuery) {
       Object.keys(userFilledMessageListQuery).forEach(function (key) {
