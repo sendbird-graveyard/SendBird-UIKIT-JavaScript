@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.8(July 13, 2020)
+
+- Dependency updates:
+  * SDK version - 3.0.128
+
 ## 1.0.7(June 26, 2020)
 
 - Features:

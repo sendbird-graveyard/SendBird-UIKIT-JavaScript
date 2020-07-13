@@ -215,7 +215,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.0.7';
+var APP_VERSION_STRING = '1.0.8';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
