@@ -222,7 +222,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.0.8';
+var APP_VERSION_STRING = '1.0.9';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -7245,7 +7245,7 @@ var MessageInput = React__default.forwardRef(function (props, ref) {
   }, LabelStringSet.BUTTON__SAVE)));
 });
 MessageInput.propTypes = {
-  placeholder: PropTypes.string,
+  placeholder: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
   isEdit: PropTypes.bool,
   name: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   value: PropTypes.string,
@@ -7673,9 +7673,7 @@ function MessageHoc(_ref) {
       return setShowRemove(false);
     },
     onDeleteMessage: function onDeleteMessage() {
-      deleteMessage(message, function () {
-        setShowRemove(false);
-      });
+      deleteMessage(message);
     }
   }), showFileViewer && React__default.createElement(FileViewer, {
     onClose: function onClose() {
@@ -7884,10 +7882,7 @@ ConversationScroll.propTypes = {
   }).isRequired,
   hasMore: PropTypes.bool,
   messagesDispatcher: PropTypes.func.isRequired,
-  onScroll: PropTypes.shape({
-    load: PropTypes.func,
-    hasMore: PropTypes.bool
-  }),
+  onScroll: PropTypes.func,
   initialized: PropTypes.bool,
   editDisabled: PropTypes.bool,
   disabled: PropTypes.bool,

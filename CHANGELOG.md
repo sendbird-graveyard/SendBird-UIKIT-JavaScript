@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.9(July 14, 2020)
+
+- Bug fixes:
+  * Fix various PropType warnings
+
 ## 1.0.8(July 13, 2020)
 
 - Dependency updates:
