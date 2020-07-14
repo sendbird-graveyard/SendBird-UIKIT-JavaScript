@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.2(July 14, 2020)
+
+- Features:
+  * Implement render messsage input and render chat header
+    * Channel.renderChatHeader({channel, user})
+    * Channel.renderMessageInput({channel, user, disabled})
+  * Rename messageListQuery to messageListParams
+
+- Bugfixes:
+  * Avatar size issue in ChannelList
+  * Various PropType warnings
+  * Other stability fixes
+
+
 ## 1.1.1(July 10, 2020)
 
 - Features:
