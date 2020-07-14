@@ -222,7 +222,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.1.1';
+var APP_VERSION_STRING = '1.1.2';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -891,7 +891,7 @@ function reducer$2(state, action) {
         var url = channel.url;
 
         if (isMe) {
-          var _leftCurrentChannel = url === state.currentChannel.url;
+          var _leftCurrentChannel = url === state.currentChannel;
 
           var _newAllChannels2 = state.allChannels.filter(function (c) {
             return c.url !== url;
@@ -1618,8 +1618,8 @@ function ChannelPreview(_ref) {
     return React__default.createElement(Avatar, {
       className: "sendbird-chat-header__avatar",
       src: getChannelAvatarSource(channel, userId),
-      width: "32px",
-      height: "32px"
+      width: "56px",
+      height: "56px"
     });
   }, [channel.members, channel.coverUrl]);
   return React__default.createElement("div", {
@@ -3030,6 +3030,61 @@ Checkbox.defaultProps = {
   onChange: function onChange() {}
 };
 
+var COMPONENT_NAME = 'sendbird-user-list-item';
+function UserListItem(_ref) {
+  var user = _ref.user,
+      className = _ref.className,
+      checkBox = _ref.checkBox,
+      checked = _ref.checked,
+      _onChange = _ref.onChange;
+  var injectingClassNames = Array.isArray(className) ? className : [className];
+  var uniqueKey = user.userId;
+  return React__default.createElement("div", {
+    className: [COMPONENT_NAME].concat(_toConsumableArray(injectingClassNames)).join(' ')
+  }, React__default.createElement(Avatar, {
+    className: "".concat(COMPONENT_NAME, "__avatar"),
+    src: user.profileUrl,
+    width: "40px",
+    height: "40px"
+  }), React__default.createElement(Label, {
+    className: "".concat(COMPONENT_NAME, "__title"),
+    type: LabelTypography.SUBTITLE_1,
+    color: LabelColors.ONBACKGROUND_1
+  }, user.nickname || LabelStringSet.NO_NAME), // if there is now nickname, display userId
+  !user.nickname && React__default.createElement(Label, {
+    className: "".concat(COMPONENT_NAME, "__subtitle"),
+    type: LabelTypography.CAPTION_3,
+    color: LabelColors.ONBACKGROUND_2
+  }, user.userId), checkBox && // eslint-disable-next-line jsx-a11y/label-has-associated-control
+  React__default.createElement("label", {
+    className: "".concat(COMPONENT_NAME, "__checkbox"),
+    htmlFor: uniqueKey
+  }, React__default.createElement(Checkbox, {
+    id: uniqueKey,
+    checked: checked,
+    onChange: function onChange(event) {
+      return _onChange(event);
+    }
+  })));
+}
+UserListItem.propTypes = {
+  user: PropTypes.shape({
+    userId: PropTypes.string,
+    nickname: PropTypes.string,
+    profileUrl: PropTypes.string
+  }).isRequired,
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  checkBox: PropTypes.bool,
+  checked: PropTypes.bool,
+  onChange: PropTypes.func
+};
+UserListItem.defaultProps = {
+  className: '',
+  checkBox: false,
+  checked: false,
+  onChange: function onChange() {}
+};
+
 var filterUser = function filterUser(idsToFilter) {
   return function (currentId) {
     return idsToFilter.includes(currentId);
@@ -3115,30 +3170,10 @@ var InviteMembers = function InviteMembers(props) {
       }
     }
   }, users.map(function (user) {
-    return !filterUser(idsToFilter)(user.userId) && React__default.createElement("div", {
+    return !filterUser(idsToFilter)(user.userId) && React__default.createElement(UserListItem, {
       key: user.userId,
-      className: "sendbird-create-channel--user-row"
-    }, React__default.createElement("div", {
-      className: "sendbird-create-channel--user-row--avatar"
-    }, React__default.createElement(Avatar, {
-      height: "40px",
-      width: "40px",
-      src: user.profileUrl
-    })), React__default.createElement("div", {
-      className: "sendbird-create-channel--user-row--label"
-    }, React__default.createElement(Label, {
-      className: "sendbird-create-channel--user-row--label__nickname",
-      type: LabelTypography.SUBTITLE_1,
-      color: LabelColors.ONBACKGROUND_1
-    }, user.nickname || LabelStringSet.NO_NAME), user.nickname ? null : React__default.createElement(Label, {
-      className: "sendbird-create-channel--user-row--label__user-id",
-      type: LabelTypography.CAPTION_3,
-      color: LabelColors.ONBACKGROUND_2
-    }, user.userId)), React__default.createElement("label", {
-      htmlFor: user.userId,
-      className: "sendbird-create-channel--user-row--checkbox"
-    }, React__default.createElement(Checkbox, {
-      id: user.userId,
+      user: user,
+      checkBox: true,
       checked: selectedUsers[user.userId],
       onChange: function onChange(event) {
         var modifiedSelectedUsers = _objectSpread2({}, selectedUsers, _defineProperty({}, event.target.id, event.target.checked));
@@ -3149,7 +3184,7 @@ var InviteMembers = function InviteMembers(props) {
 
         setSelectedUsers(modifiedSelectedUsers);
       }
-    })));
+    });
   }))));
 };
 
@@ -4431,6 +4466,26 @@ var ON_REACTION_UPDATED = 'ON_REACTION_UPDATED';
 var SET_EMOJI_CONTAINER = 'SET_EMOJI_CONTAINER';
 var SET_READ_STATUS = 'SET_READ_STATUS';
 
+var scrollIntoLast = function scrollIntoLast(selector) {
+  var intialTry = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var MAX_TRIES = 10;
+  var currentTry = intialTry;
+
+  if (currentTry > MAX_TRIES) {
+    return;
+  }
+
+  try {
+    var nodes = document.querySelectorAll(selector);
+    var last = nodes[nodes.length - 1];
+    last.scrollIntoView(false);
+    /** alignToTop: false */
+  } catch (error) {
+    setTimeout(function () {
+      scrollIntoLast(selector, currentTry + 1);
+    }, 500 * currentTry);
+  }
+};
 var pubSubHandleRemover$1 = function pubSubHandleRemover(subscriber) {
   subscriber.forEach(function (s) {
     try {
@@ -4445,6 +4500,7 @@ var pubSubHandler$1 = function pubSubHandler(channelUrl, pubSub, dispatcher) {
   subscriber.set(SEND_USER_MESSAGE, pubSub.subscribe(SEND_USER_MESSAGE, function (msg) {
     var channel = msg.channel,
         message = msg.message;
+    scrollIntoLast('.sendbird-msg--scroll-ref');
 
     if (channel && channelUrl === channel.url) {
       dispatcher({
@@ -4467,6 +4523,7 @@ var pubSubHandler$1 = function pubSubHandler(channelUrl, pubSub, dispatcher) {
   subscriber.set(SEND_FILE_MESSAGE, pubSub.subscribe(SEND_FILE_MESSAGE, function (msg) {
     var channel = msg.channel,
         message = msg.message;
+    scrollIntoLast('.sendbird-msg--scroll-ref');
 
     if (channel && channelUrl === channel.url) {
       dispatcher({
@@ -4498,26 +4555,6 @@ var pubSubHandler$1 = function pubSubHandler(channelUrl, pubSub, dispatcher) {
     }
   }));
   return subscriber;
-};
-var scrollIntoLast = function scrollIntoLast(selector) {
-  var intialTry = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-  var MAX_TRIES = 10;
-  var currentTry = intialTry;
-
-  if (currentTry > MAX_TRIES) {
-    return;
-  }
-
-  try {
-    var nodes = document.querySelectorAll(selector);
-    var last = nodes[nodes.length - 1];
-    last.scrollIntoView(false);
-    /** alignToTop: false */
-  } catch (error) {
-    setTimeout(function () {
-      scrollIntoLast(selector, currentTry + 1);
-    }, 500 * currentTry);
-  }
 };
 var getParsedStatus = function getParsedStatus(message, currentGroupChannel) {
   if (message.requestState === 'failed') {
@@ -7278,7 +7315,7 @@ var MessageInput = React__default.forwardRef(function (props, ref) {
   }, LabelStringSet.BUTTON__SAVE)));
 });
 MessageInput.propTypes = {
-  placeholder: PropTypes.string,
+  placeholder: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
   isEdit: PropTypes.bool,
   name: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   value: PropTypes.string,
@@ -7706,9 +7743,7 @@ function MessageHoc(_ref) {
       return setShowRemove(false);
     },
     onDeleteMessage: function onDeleteMessage() {
-      deleteMessage(message, function () {
-        setShowRemove(false);
-      });
+      deleteMessage(message);
     }
   }), showFileViewer && React__default.createElement(FileViewer, {
     onClose: function onClose() {
@@ -7917,10 +7952,7 @@ ConversationScroll.propTypes = {
   }).isRequired,
   hasMore: PropTypes.bool,
   messagesDispatcher: PropTypes.func.isRequired,
-  onScroll: PropTypes.shape({
-    load: PropTypes.func,
-    hasMore: PropTypes.bool
-  }),
+  onScroll: PropTypes.func,
   initialized: PropTypes.bool,
   editDisabled: PropTypes.bool,
   disabled: PropTypes.bool,
@@ -8257,6 +8289,8 @@ var ConversationPanel = function ConversationPanel(props) {
       _props$queries = props.queries,
       queries = _props$queries === void 0 ? {} : _props$queries,
       renderChatItem = props.renderChatItem,
+      renderMessageInput = props.renderMessageInput,
+      renderChatHeader = props.renderChatHeader,
       onChatHeaderActionClick = props.onChatHeaderActionClick,
       onBeforeSendUserMessage = props.onBeforeSendUserMessage,
       onBeforeSendFileMessage = props.onBeforeSendFileMessage,
@@ -8265,7 +8299,13 @@ var ConversationPanel = function ConversationPanel(props) {
   var sdkError = sdkStore.error;
   var sdkInit = sdkStore.initialized;
   var user = userStore.user;
-  var userFilledMessageListQuery = queries.messageListQuery;
+
+  if (queries.messageListQuery) {
+    // eslint-disable-next-line no-console
+    console.warn('messageListQuery will be deprecared in v1.3.0, please use messageListParams instead');
+  }
+
+  var userFilledMessageListQuery = queries.messageListParams || queries.messageListQuery;
 
   var _useReducer = React.useReducer(reducer$3, messagesInitialState),
       _useReducer2 = _slicedToArray(_useReducer, 2),
@@ -8416,6 +8456,8 @@ var ConversationPanel = function ConversationPanel(props) {
       _useSendFileMessageCa2 = _slicedToArray(_useSendFileMessageCa, 1),
       onSendFileMessage = _useSendFileMessageCa2[0];
 
+  var inputDisabled = !initialized || isDisabledBecauseFrozen(currentGroupChannel) || !isOnline;
+
   if (sdkError) {
     return React__default.createElement("div", {
       className: "sendbird-conversation"
@@ -8454,7 +8496,10 @@ var ConversationPanel = function ConversationPanel(props) {
 
   return React__default.createElement("div", {
     className: "sendbird-conversation"
-  }, React__default.createElement(ChatHeader, {
+  }, renderChatHeader ? renderChatHeader({
+    channel: currentGroupChannel,
+    user: user
+  }) : React__default.createElement(ChatHeader, {
     currentGroupChannel: currentGroupChannel,
     currentUser: user,
     onActionClick: onChatHeaderActionClick,
@@ -8499,10 +8544,14 @@ var ConversationPanel = function ConversationPanel(props) {
     toggleReaction: toggleReaction
   }), React__default.createElement("div", {
     className: "sendbird-conversation__footer"
-  }, React__default.createElement(MessageInput, {
+  }, renderMessageInput ? renderMessageInput({
+    channel: currentGroupChannel,
+    user: user,
+    disabled: inputDisabled
+  }) : React__default.createElement(MessageInput, {
     placeholder: isDisabledBecauseFrozen(currentGroupChannel) && LabelStringSet.CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__DISABLED,
     ref: messageInputRef,
-    disabled: !initialized || isDisabledBecauseFrozen(currentGroupChannel) || !isOnline,
+    disabled: inputDisabled,
     onStartTyping: function onStartTyping() {
       currentGroupChannel.startTyping();
     },
@@ -8559,6 +8608,17 @@ ConversationPanel.propTypes = {
     })
   }).isRequired,
   queries: PropTypes.shape({
+    messageListParams: PropTypes.shape({
+      includeMetaArray: PropTypes.bool,
+      includeParentMessageText: PropTypes.bool,
+      includeReaction: PropTypes.bool,
+      includeReplies: PropTypes.bool,
+      includeThreadInfo: PropTypes.bool,
+      limit: PropTypes.number,
+      reverse: PropTypes.bool,
+      senderUserIdsFilter: PropTypes.arrayOf(PropTypes.string)
+    }),
+    // deprecate in v1.3
     messageListQuery: PropTypes.shape({
       includeMetaArray: PropTypes.bool,
       includeParentMessageText: PropTypes.bool,
@@ -8575,7 +8635,9 @@ ConversationPanel.propTypes = {
   onBeforeSendFileMessage: PropTypes.func,
   // onBeforeSendFileMessage(File)
   onBeforeUpdateUserMessage: PropTypes.func,
-  renderChatItem: PropTypes.element,
+  renderChatItem: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
+  renderMessageInput: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
+  renderChatHeader: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   onChatHeaderActionClick: PropTypes.func
 };
 ConversationPanel.defaultProps = {
@@ -8585,6 +8647,8 @@ ConversationPanel.defaultProps = {
   onBeforeSendFileMessage: null,
   onBeforeUpdateUserMessage: null,
   renderChatItem: null,
+  renderMessageInput: null,
+  renderChatHeader: null,
   onChatHeaderActionClick: noop$5
 };
 var getEmojiCategoriesFromEmojiContainer$1 = getEmojiCategoriesFromEmojiContainer,
@@ -8855,19 +8919,10 @@ var MemebersAccordion = function MemebersAccordion(_ref) {
   }, React__default.createElement("div", {
     className: "sendbird-more-members__popup-scroll"
   }, members.map(function (member) {
-    return React__default.createElement("div", {
-      key: member.userId,
-      className: "sendbird-more-members__popup-member"
-    }, React__default.createElement("div", {
-      className: "sendbird-more-members__popup-avatar"
-    }, React__default.createElement(Avatar, {
-      src: member.profileUrl,
-      height: "40px",
-      width: "40px"
-    })), React__default.createElement(Label, {
-      type: LabelTypography.SUBTITLE_1,
-      color: LabelColors.ONBACKGROUND_1
-    }, member.nickname || LabelStringSet.NO_NAME));
+    return React__default.createElement(UserListItem, {
+      user: member,
+      key: member.userId
+    });
   }))), React__default.createElement(Button, {
     className: "sendbird-members-accordion__footer__invite-users",
     type: Type$1.SECONDARY,
@@ -9528,6 +9583,7 @@ var getResendUserMessage = function getResendUserMessage(store) {
 
       sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
         channel.resendUserMessage(failedMessage).then(function (message) {
+          resolve(message);
           pubsub.publish(SEND_USER_MESSAGE, {
             message: message,
             channel: channel
@@ -9548,6 +9604,7 @@ var getResendFileMessage = function getResendFileMessage(store) {
 
       sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
         channel.resendFileMessage(failedMessage).then(function (message) {
+          resolve(message);
           pubsub.publish(SEND_FILE_MESSAGE, {
             message: message,
             channel: channel
