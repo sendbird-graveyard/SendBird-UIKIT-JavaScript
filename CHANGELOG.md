@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.3(July 29, 2020)
+
+- Features:
+  * Visual indicator for frozen, broadcast channels
+
+- Bugfixes:
+  * Sort Channels in ChannelList by send message
+  * Update ChannelPreview on edit message
+  * Hide channel on onChannelHidden
+  * Other stability fixes
+
 ## 1.1.2(July 14, 2020)
 
 - Features:
@@ -12,7 +23,6 @@
   * Avatar size issue in ChannelList
   * Various PropType warnings
   * Other stability fixes
-
 
 ## 1.1.1(July 10, 2020)
 

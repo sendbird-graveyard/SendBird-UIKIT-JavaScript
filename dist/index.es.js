@@ -215,7 +215,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.1.2';
+var APP_VERSION_STRING = '1.1.3';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -802,8 +802,10 @@ var ON_CHANNEL_DELETED = 'ON_CHANNEL_DELETED';
 var ON_LAST_MESSAGE_UPDATED = 'ON_LAST_MESSAGE_UPDATED';
 var ON_USER_LEFT = 'ON_USER_LEFT';
 var ON_CHANNEL_CHANGED = 'ON_CHANNEL_CHANGED';
+var ON_CHANNEL_ARCHIVED = 'ON_CHANNEL_ARCHIVED';
 var ON_READ_RECEIPT_UPDATED = 'ON_READ_RECEIPT_UPDATED';
 var ON_DELIVERY_RECEIPT_UPDATED = 'ON_DELIVERY_RECEIPT_UPDATED';
+var CHANNEL_REPLACED_TO_TOP = 'CHANNEL_REPLACED_TO_TOP';
 
 var channelListInitialState = {
   // we might not need this initialized state -> should remove
@@ -858,6 +860,7 @@ function reducer$2(state, action) {
         });
       }
 
+    case ON_CHANNEL_ARCHIVED:
     case LEAVE_CHANNEL_SUCCESS:
     case ON_CHANNEL_DELETED:
       {
@@ -978,6 +981,13 @@ function reducer$2(state, action) {
 
           return channel;
         })
+      });
+
+    case CHANNEL_REPLACED_TO_TOP:
+      return _objectSpread2({}, state, {
+        allChannels: [action.payload].concat(_toConsumableArray(state.allChannels.filter(function (channel) {
+          return channel.url !== action.payload.url;
+        })))
       });
 
     default:
@@ -1247,8 +1257,8 @@ var AvatarInner = function AvatarInner(_ref2) {
 };
 AvatarInner.propTypes = {
   src: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-  height: PropTypes.string.isRequired,
-  width: PropTypes.string.isRequired,
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   alt: PropTypes.string.isRequired
 };
 AvatarInner.defaultProps = {
@@ -1276,8 +1286,8 @@ function Avatar(_ref3) {
 }
 Avatar.propTypes = {
   src: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-  height: PropTypes.string,
-  width: PropTypes.string,
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   alt: PropTypes.string,
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
 };
@@ -1289,494 +1299,18 @@ Avatar.defaultProps = {
   className: ''
 };
 
-var Typography = {
-  H_1: 'H_1',
-  H_2: 'H_2',
-  SUBTITLE_1: 'SUBTITLE_1',
-  SUBTITLE_2: 'SUBTITLE_2',
-  BODY_1: 'BODY_1',
-  BODY_2: 'BODY_2',
-  BUTTON_1: 'BUTTON_1',
-  BUTTON_2: 'BUTTON_2',
-  CAPTION_1: 'CAPTION_1',
-  CAPTION_2: 'CAPTION_2',
-  CAPTION_3: 'CAPTION_3'
-};
-var Colors = {
-  ONBACKGROUND_1: 'ONBACKGROUND_1',
-  ONBACKGROUND_2: 'ONBACKGROUND_2',
-  ONBACKGROUND_3: 'ONBACKGROUND_3',
-  ONCONTENT_1: 'ONCONTENT_1',
-  PRIMARY: 'PRIMARY',
-  ERROR: 'ERROR'
-};
-
-function changeTypographyToClassName(type) {
-  switch (type) {
-    case Typography.H_1:
-      return 'sendbird-label--h-1';
-
-    case Typography.H_2:
-      return 'sendbird-label--h-2';
-
-    case Typography.SUBTITLE_1:
-      return 'sendbird-label--subtitle-1';
-
-    case Typography.SUBTITLE_2:
-      return 'sendbird-label--subtitle-2';
-
-    case Typography.BODY_1:
-      return 'sendbird-label--body-1';
-
-    case Typography.BODY_2:
-      return 'sendbird-label--body-2';
-
-    case Typography.BUTTON_1:
-      return 'sendbird-label--button-1';
-
-    case Typography.BUTTON_2:
-      return 'sendbird-label--button-2';
-
-    case Typography.CAPTION_1:
-      return 'sendbird-label--caption-1';
-
-    case Typography.CAPTION_2:
-      return 'sendbird-label--caption-2';
-
-    case Typography.CAPTION_3:
-      return 'sendbird-label--caption-3';
-
-    default:
-      return null;
-  }
-}
-function changeColorToClassName(color) {
-  switch (color) {
-    case Colors.ONBACKGROUND_1:
-      return 'sendbird-label--color-onbackground-1';
-
-    case Colors.ONBACKGROUND_2:
-      return 'sendbird-label--color-onbackground-2';
-
-    case Colors.ONBACKGROUND_3:
-      return 'sendbird-label--color-onbackground-3';
-
-    case Colors.ONCONTENT_1:
-      return 'sendbird-label--color-oncontent-1';
-
-    case Colors.PRIMARY:
-      return 'sendbird-label--color-primary';
-
-    case Colors.ERROR:
-      return 'sendbird-label--color-error';
-
-    default:
-      return null;
-  }
-}
-
-var getStringSet = function getStringSet(lang) {
-  var stringSet = {
-    en: {
-      TRYING_TO_CONNECT: 'Trying to connect…',
-      CHANNEL_LIST__TITLE: 'Channels',
-      CHANNEL__MESSAGE_INPUT__PLACE_HOLDER: 'Enter message',
-      CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__DISABLED: 'Chat is unavailable in this channel',
-      CHANNEL__MESSAGE_LIST__NOTIFICATION__NEW_MESSAGE: 'new message(s) since',
-      CHANNEL__MESSAGE_LIST__NOTIFICATION__ON: 'on',
-      CHANNEL_SETTING__HEADER__TITLE: 'Channel information',
-      CHANNEL_SETTING__PROFILE__EDIT: 'Edit',
-      CHANNEL_SETTING__MEMBERS__TITLE: 'Members',
-      CHANNEL_SETTING__MEMBERS__SEE_ALL_MEMBERS: 'All members',
-      CHANNEL_SETTING__MEMBERS__INVITE_MEMBER: 'Invite users',
-      CHANNEL_SETTING__LEAVE_CHANNEL__TITLE: 'Leave channel',
-      BUTTON__CANCEL: 'Cancel',
-      BUTTON__DELETE: 'Delete',
-      BUTTON__SAVE: 'Save',
-      BUTTON__CREATE: 'Create',
-      BUTTON__INVITE: 'Invite',
-      BUTTON__CLOSE: 'Close',
-      BADGE__OVER: '+',
-      MODAL__DELETE_MESSAGE__TITLE: 'Delete this message?',
-      MODAL__CHANNEL_INFORMATION__TITLE: 'Edit channel information',
-      MODAL__CHANNEL_INFORMATION__CHANNEL_IMAGE: 'Channel image',
-      MODAL__CHANNEL_INFORMATION__UPLOAD: 'Upload',
-      MODAL__CHANNEL_INFORMATION__CHANNEL_NAME: 'Channel name',
-      MODAL__CHANNEL_INFORMATION__INPUT__PLACE_HOLDER: 'Enter name',
-      MODAL__INVITE_MEMBER__TITLE: 'Invite member',
-      MODAL__INVITE_MEMBER__SELECTEC: 'selected',
-      MODAL__CREATE_CHANNEL__TITLE: 'New channel',
-      MODAL__CREATE_CHANNEL__SELECTED: 'selected',
-      MODAL__USER_LIST__TITLE: 'members',
-      TYPING_INDICATOR__IS_TYPING: 'is typing...',
-      TYPING_INDICATOR__AND: 'and',
-      TYPING_INDICATOR__ARE_TYPING: 'are typing...',
-      TYPING_INDICATOR__MULTIPLE_TYPING: 'Several people are typing...',
-      MESSAGE_STATUS__SENDING_FAILED: 'Couldn\'t send message.',
-      MESSAGE_STATUS__TRY_AGAIN: 'Try again',
-      MESSAGE_STATUS__OR: 'or',
-      MESSAGE_STATUS__DELETE: 'delete',
-      PLACE_HOLDER__NO_CHANNEL: 'No channels',
-      PLACE_HOLDER__WRONG: 'Something went wrong',
-      PLACE_HOLDER__RETRY_TO_CONNECT: 'Retry',
-      NO_TITLE: 'No title',
-      NO_NAME: '(No name)',
-      NO_MEMBERS: '(No members)',
-      TOOLTIP__AND_YOU: ', and you',
-      TOOLTIP__YOU: 'you',
-      TOOLTIP__UNKOWN_USER: '(no name)',
-      UNKNOWN__UNKNOWN_MESSAGE_TYPE: '(Unknown message type)',
-      UNKNOWN__CANNOT_READ_MESSAGE: 'Cannot read this message.'
-    }
-  };
-  return stringSet && stringSet[lang] ? stringSet[lang] : {};
-};
-
-var CLASS_NAME = 'sendbird-label';
-function Label(_ref) {
-  var type = _ref.type,
-      color = _ref.color,
-      children = _ref.children,
-      className = _ref.className;
-  var injectingClassName = Array.isArray(className) ? [CLASS_NAME].concat(_toConsumableArray(className)) : [CLASS_NAME, className];
-
-  if (type) {
-    injectingClassName.push(changeTypographyToClassName(type));
-  }
-
-  if (color) {
-    injectingClassName.push(changeColorToClassName(color));
-  }
-
-  return React.createElement("div", {
-    className: injectingClassName.join(' ')
-  }, children);
-}
-Label.propTypes = {
-  type: PropTypes.oneOf([].concat(_toConsumableArray(Object.keys(Typography)), [''])),
-  color: PropTypes.oneOf([].concat(_toConsumableArray(Object.keys(Colors)), [''])),
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.element, PropTypes.any]),
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
-};
-Label.defaultProps = {
-  type: '',
-  color: '',
-  className: [],
-  children: null
-};
-var LabelTypography = Typography;
-var LabelColors = Colors;
-var LabelStringSet = getStringSet('en');
-
-function Badge(_ref) {
-  var count = _ref.count,
-      maxLevel = _ref.maxLevel,
-      className = _ref.className;
-  var maximumNumber = parseInt('9'.repeat(maxLevel > 6 ? 6 : maxLevel), 10);
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  return React.createElement("div", {
-    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-badge']).join(' ')
-  }, React.createElement("div", {
-    className: "sendbird-badge__text"
-  }, React.createElement(Label, {
-    type: LabelTypography.CAPTION_2,
-    color: LabelColors.ONCONTENT_1
-  }, count > maximumNumber ? "".concat(maximumNumber).concat(LabelStringSet.BADGE__OVER) : count)));
-}
-Badge.propTypes = {
-  count: PropTypes.number.isRequired,
-  maxLevel: PropTypes.number,
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
-};
-Badge.defaultProps = {
-  maxLevel: 2,
-  className: []
-};
-
-var MessageStatusType = {
-  PENDING: 'PENDING',
-  SENT: 'SENT',
-  DELIVERED: 'DELIVERED',
-  READ: 'READ',
-  FAILED: 'FAILED'
-};
-
-var truncate = function truncate(fullStr, strLen) {
-  if (fullStr === null || fullStr === undefined) return '';
-  if (fullStr.length <= strLen) return fullStr;
-  var separator = '...';
-  var sepLen = separator.length;
-  var charsToShow = strLen - sepLen;
-  var frontChars = Math.ceil(charsToShow / 2);
-  var backChars = Math.floor(charsToShow / 2);
-  return fullStr.substr(0, frontChars) + separator + fullStr.substr(fullStr.length - backChars);
-};
-var getIsSentFromStatus = function getIsSentFromStatus(status) {
-  return status === MessageStatusType.SENT || status === MessageStatusType.DELIVERED || status === MessageStatusType.READ;
-};
-
-var getChannelAvatarSource = function getChannelAvatarSource(channel, currentUserId) {
-  if (channel && channel.coverUrl) {
-    if (channel.coverUrl !== 'https://static.sendbird.com/sample/cover/cover_') {
-      return channel.coverUrl;
-    }
-  }
-
-  return channel && channel.members ? channel.members.filter(function (member) {
-    return member.userId !== currentUserId;
-  }).map(function (_ref) {
-    var profileUrl = _ref.profileUrl;
-    return profileUrl;
-  }) : [];
-};
-var getChannelTitle = function getChannelTitle() {
-  var channel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  var currentUserId = arguments.length > 1 ? arguments[1] : undefined;
-
-  if (!channel || !channel.name && !channel.members) {
-    return LabelStringSet.NO_TITLE;
-  }
-
-  if (channel.name && channel.name !== 'Group Channel') {
-    return channel.name;
-  }
-
-  if (channel.members.length === 1) {
-    return LabelStringSet.NO_MEMBERS;
-  }
-
-  return channel.members.filter(function (_ref2) {
-    var userId = _ref2.userId;
-    return userId !== currentUserId;
-  }).map(function (_ref3) {
-    var nickname = _ref3.nickname;
-    return nickname || LabelStringSet.NO_NAME;
-  }).join(', ');
-};
-var getLastMessageCreatedAt = function getLastMessageCreatedAt(channel) {
-  if (!channel || !channel.lastMessage) {
-    return '';
-  }
-
-  var moment = Moment(channel.lastMessage.createdAt);
-
-  switch (moment.calendar().split(' ')[0]) {
-    case 'Today':
-      {
-        return moment.format('LT');
-      }
-
-    case 'Yesterday':
-      {
-        return 'Yesterday';
-      }
-
-    default:
-      return moment.format('ll').split(',')[0];
-  }
-};
-var getTotalMembers = function getTotalMembers(channel) {
-  return channel && channel.memberCount ? channel.memberCount : 0;
-};
-
-var getPrettyLastMessage = function getPrettyLastMessage() {
-  var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  var MAXLEN = 30;
-  var messageType = message.messageType,
-      name = message.name;
-
-  if (messageType === 'file') {
-    return truncate(name, MAXLEN);
-  }
-
-  return message.message;
-};
-
-var getLastMessage = function getLastMessage(channel) {
-  return channel && channel.lastMessage ? getPrettyLastMessage(channel.lastMessage) : '';
-};
-var getChannelUnreadMessageCount = function getChannelUnreadMessageCount(channel) {
-  return channel && channel.unreadMessageCount ? channel.unreadMessageCount : 0;
-};
-
-function ChannelPreview(_ref) {
-  var channel = _ref.channel,
-      isActive = _ref.isActive,
-      ChannelAction = _ref.ChannelAction,
-      onClick = _ref.onClick,
-      tabIndex = _ref.tabIndex,
-      currentUser = _ref.currentUser;
-  var userId = currentUser.userId;
-  var memoizedAvatar = useMemo(function () {
-    return React.createElement(Avatar, {
-      className: "sendbird-chat-header__avatar",
-      src: getChannelAvatarSource(channel, userId),
-      width: "56px",
-      height: "56px"
-    });
-  }, [channel.members, channel.coverUrl]);
-  return React.createElement("div", {
-    role: "link",
-    tabIndex: tabIndex,
-    onClick: onClick,
-    onKeyPress: onClick,
-    className: "\n        sendbird-channel-preview\n        ".concat(isActive ? 'sendbird-channel-preview--active' : null, "\n      ")
-  }, React.createElement("div", {
-    className: "sendbird-channel-preview__avatar"
-  }, memoizedAvatar), React.createElement("div", {
-    className: "sendbird-channel-preview__content"
-  }, React.createElement("div", {
-    className: "sendbird-channel-preview__content__upper"
-  }, React.createElement("div", {
-    className: "sendbird-channel-preview__content__upper__header"
-  }, React.createElement(Label, {
-    className: "sendbird-channel-preview__content__upper__header__channel-name",
-    type: LabelTypography.SUBTITLE_2,
-    color: LabelColors.ONBACKGROUND_1
-  }, getChannelTitle(channel, userId)), React.createElement(Label, {
-    className: "sendbird-channel-preview__content__upper__header__total-members",
-    type: LabelTypography.CAPTION_2,
-    color: LabelColors.ONBACKGROUND_2
-  }, getTotalMembers(channel))), React.createElement(Label, {
-    className: "sendbird-channel-preview__content__upper__last-message-at",
-    type: LabelTypography.CAPTION_3,
-    color: LabelColors.ONBACKGROUND_2
-  }, getLastMessageCreatedAt(channel))), React.createElement("div", {
-    className: "sendbird-channel-preview__content__lower"
-  }, React.createElement(Label, {
-    className: "sendbird-channel-preview__content__lower__last-message",
-    type: LabelTypography.BODY_2,
-    color: LabelColors.ONBACKGROUND_3
-  }, getLastMessage(channel)), React.createElement("div", {
-    className: "sendbird-channel-preview__content__lower__unread-message-count"
-  }, getChannelUnreadMessageCount(channel) ? React.createElement(Badge, {
-    count: getChannelUnreadMessageCount(channel)
-  }) : null))), React.createElement("div", {
-    className: "sendbird-channel-preview__action"
-  }, ChannelAction));
-}
-ChannelPreview.propTypes = {
-  isActive: PropTypes.bool,
-  channel: PropTypes.shape({
-    members: PropTypes.arrayOf(PropTypes.shape({})),
-    coverUrl: PropTypes.string
-  }),
-  ChannelAction: PropTypes.element.isRequired,
-  onClick: PropTypes.func,
-  tabIndex: PropTypes.number,
-  currentUser: PropTypes.shape({
-    userId: PropTypes.string
-  })
-};
-ChannelPreview.defaultProps = {
-  channel: {},
-  isActive: false,
-  onClick: function onClick() {},
-  tabIndex: 0,
-  currentUser: {}
-};
-
-var CLASS_NAME$1 = 'sendbird-iconbutton';
-var IconButton = React.forwardRef(function (props, ref) {
-  var children = props.children,
-      className = props.className,
-      _props$disabled = props.disabled,
-      disabled = _props$disabled === void 0 ? false : _props$disabled,
-      type = props.type,
-      height = props.height,
-      width = props.width,
-      _onClick = props.onClick;
-
-  var _useState = useState(''),
-      _useState2 = _slicedToArray(_useState, 2),
-      pressed = _useState2[0],
-      setPressed = _useState2[1];
-
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.unshift(CLASS_NAME$1);
-  return (// eslint-disable-next-line react/button-has-type
-    React.createElement("button", {
-      className: "".concat(injectingClassName.join(' '), " ").concat(pressed),
-      disabled: disabled,
-      ref: ref,
-      type: type,
-      style: {
-        height: height,
-        width: width
-      },
-      onClick: function onClick(e) {
-        if (disabled) {
-          return;
-        }
-
-        setPressed('sendbird-iconbutton--pressed');
-
-        _onClick(e);
-      },
-      onBlur: function onBlur() {
-        setPressed('');
-      }
-    }, React.createElement("span", {
-      className: "sendbird-iconbutton__inner"
-    }, children))
-  );
-});
-IconButton.propTypes = {
-  height: PropTypes.string,
-  width: PropTypes.string,
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element), PropTypes.any]).isRequired,
-  type: PropTypes.string,
-  disabled: PropTypes.bool,
-  onClick: PropTypes.func
-};
-IconButton.defaultProps = {
-  height: '56px',
-  width: '56px',
-  className: '',
-  type: 'button',
-  disabled: false,
-  onClick: function onClick() {}
-};
-
-function ChannelHeader(_ref) {
-  var title = _ref.title,
-      iconButton = _ref.iconButton;
-  return React.createElement("div", {
-    className: "sendbird-channel-header"
-  }, React.createElement("div", {
-    className: "sendbird-channel-header__title"
-  }, React.createElement(Label, {
-    type: LabelTypography.H_2,
-    color: LabelColors.ONBACKGROUND_1
-  }, title || LabelStringSet.CHANNEL_LIST__TITLE)), React.createElement("div", {
-    className: "sendbird-channel-header__right-icon"
-  }, iconButton));
-}
-ChannelHeader.propTypes = {
-  title: PropTypes.string,
-  iconButton: PropTypes.oneOfType([PropTypes.element, PropTypes.instanceOf(IconButton)])
-};
-ChannelHeader.defaultProps = {
-  title: '',
-  iconButton: null
-};
-
-function Types() {
-  return {
-    LOADING: 'LOADING',
-    NO_CHANNELS: 'NO_CHANNELS',
-    WRONG: 'WRONG'
-  };
-}
-var PlaceHolderTypes = Types();
-
 var Type = {
   ADD: 'ADD',
   ATTACH: 'ATTACH',
   ARROW_LEFT: 'ARROW_LEFT',
   AVATAR_DARK: 'AVATAR_DARK',
   AVATAR_LIGHT: 'AVATAR_LIGHT',
+  BROADCAST_LARGE_DARK: 'BROADCAST_LARGE_DARK',
+  BROADCAST_LARGE_LIGHT: 'BROADCAST_LARGE_LIGHT',
+  BROADCAST_DARK: 'BROADCAST_DARK',
+  BROADCAST_LIGHT: 'BROADCAST_LIGHT',
+  FROZEN_DARK: 'FROZEN_DARK',
+  FROZEN_LIGHT: 'FROZEN_LIGHT',
   CAMERA: 'CAMERA',
   MORE: 'MORE',
   MUTE: 'MUTE',
@@ -1873,6 +1407,124 @@ function _extends$5() { _extends$5 = Object.assign || function (target) { for (v
 
 var _ref$5 =
 /*#__PURE__*/
+React.createElement("g", {
+  className: "icon-broadcast-lrg-dark_svg__fill",
+  fill: "none",
+  fillRule: "evenodd"
+}, React.createElement("circle", {
+  cx: 28,
+  cy: 28,
+  r: 28,
+  fill: "#6FD6BE"
+}), React.createElement("path", {
+  fill: "#000",
+  fillOpacity: 0.88,
+  d: "M41.273 16.083c.04.128.06.262.06.397v23.04a1.333 1.333 0 01-1.731 1.273l-8.975-2.805A5.335 5.335 0 0120 37.333v-2.666h-2.667a4 4 0 01-3.995-3.8l-.005-.2v-5.334a4 4 0 014-4H20l19.602-6.125a1.332 1.332 0 011.67.875zM22.667 35.627v1.706a2.667 2.667 0 005.326.199l.007-.239-5.333-1.666zm16-17.334l-16 4.999v9.415l16 4.998V18.293zM20 24h-2.667c-.683 0-1.247.515-1.324 1.178l-.009.155v5.334c0 .736.597 1.333 1.333 1.333H20v-8z"
+}));
+
+function SvgIconBroadcastLrgDark(props) {
+  return React.createElement("svg", _extends$5({
+    viewBox: "0 0 56 56"
+  }, props), _ref$5);
+}
+
+function _extends$6() { _extends$6 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$6.apply(this, arguments); }
+
+var _ref$6 =
+/*#__PURE__*/
+React.createElement("g", {
+  className: "icon-broadcast-lrg-light_svg__fill",
+  fill: "none",
+  fillRule: "evenodd"
+}, React.createElement("circle", {
+  cx: 28,
+  cy: 28,
+  r: 28,
+  fill: "#2EBA9F"
+}), React.createElement("path", {
+  fill: "#FFF",
+  fillOpacity: 0.88,
+  d: "M41.273 16.083c.04.128.06.262.06.397v23.04a1.333 1.333 0 01-1.731 1.273l-8.975-2.805A5.335 5.335 0 0120 37.333v-2.666h-2.667a4 4 0 01-3.995-3.8l-.005-.2v-5.334a4 4 0 014-4H20l19.602-6.125a1.332 1.332 0 011.67.875zM22.667 35.627v1.706a2.667 2.667 0 005.326.199l.007-.239-5.333-1.666zm16-17.334l-16 4.999v9.415l16 4.998V18.293zM20 24h-2.667c-.683 0-1.247.515-1.324 1.178l-.009.155v5.334c0 .736.597 1.333 1.333 1.333H20v-8z"
+}));
+
+function SvgIconBroadcastLrgLight(props) {
+  return React.createElement("svg", _extends$6({
+    viewBox: "0 0 56 56"
+  }, props), _ref$6);
+}
+
+function _extends$7() { _extends$7 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$7.apply(this, arguments); }
+
+var _ref$7 =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-broadcast-dark_svg__fill",
+  fill: "#6FD6BE",
+  fillRule: "evenodd",
+  d: "M14.636 2.041c.02.065.03.132.03.2V13.76a.667.667 0 01-.865.637l-4.488-1.403A2.667 2.667 0 014 12.666v-1.334H2.667a2 2 0 01-1.995-1.85l-.005-.15V6.667a2 2 0 012-2H4l9.801-3.063a.666.666 0 01.835.437zm-9.303 9.772v.854a1.333 1.333 0 002.664.099l.003-.12-2.667-.833zm8-8.666l-8 2.499v4.707l8 2.5V3.147zM4 6H2.667a.668.668 0 00-.663.589L2 6.667v2.666c0 .369.298.667.667.667H4V6z"
+});
+
+function SvgIconBroadcastDark(props) {
+  return React.createElement("svg", _extends$7({
+    viewBox: "0 0 16 16"
+  }, props), _ref$7);
+}
+
+function _extends$8() { _extends$8 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$8.apply(this, arguments); }
+
+var _ref$8 =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-broadcast-light_svg__fill",
+  fill: "#2EBA9F",
+  fillRule: "evenodd",
+  d: "M14.636 2.041c.02.065.03.132.03.2V13.76a.667.667 0 01-.865.637l-4.488-1.403A2.667 2.667 0 014 12.666v-1.334H2.667a2 2 0 01-1.995-1.85l-.005-.15V6.667a2 2 0 012-2H4l9.801-3.063a.666.666 0 01.835.437zm-9.303 9.772v.854a1.333 1.333 0 002.664.099l.003-.12-2.667-.833zm8-8.666l-8 2.499v4.707l8 2.5V3.147zM4 6H2.667a.668.668 0 00-.663.589L2 6.667v2.666c0 .369.298.667.667.667H4V6z"
+});
+
+function SvgIconBroadcastLight(props) {
+  return React.createElement("svg", _extends$8({
+    viewBox: "0 0 16 16"
+  }, props), _ref$8);
+}
+
+function _extends$9() { _extends$9 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$9.apply(this, arguments); }
+
+var _ref$9 =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "frozen-dark_svg__fill",
+  fill: "#9E8CF5",
+  fillRule: "evenodd",
+  d: "M10.409.806l.063.056c.24.24.259.618.055.88l-.055.063-1.805 1.804v3.236l2.801-1.618.662-2.465a.665.665 0 011.304.263l-.016.082-.56 2.088 2.088.56a.665.665 0 01.488.734l-.016.082a.666.666 0 01-.735.488l-.082-.016-2.465-.661L9.334 8l2.801 1.618 2.466-.66.082-.017a.667.667 0 01.735.488l.016.082a.666.666 0 01-.488.734l-2.088.56.56 2.088.016.082a.666.666 0 01-1.304.263l-.662-2.465-2.801-1.618v3.236l1.805 1.804a.668.668 0 01-.88.999l-.063-.056L8 13.61l-1.528 1.53a.668.668 0 01-.88.055l-.063-.056a.668.668 0 01-.056-.88l.056-.063 1.804-1.805V9.155L4.53 10.773l-.66 2.465a.667.667 0 01-1.304-.263l.017-.082.559-2.088-2.088-.56a.667.667 0 01-.488-.734l.017-.082a.665.665 0 01.734-.488l.082.016 2.466.66L6.666 8 3.864 6.382l-2.465.66-.082.017a.666.666 0 01-.734-.488L.566 6.49a.667.667 0 01.488-.734l2.088-.56-.56-2.088-.016-.082a.667.667 0 011.305-.263l.659 2.465 2.803 1.618V3.61L5.529 1.805a.668.668 0 01.88-.999l.063.056L8 2.39 9.53.862a.668.668 0 01.88-.056z"
+});
+
+function SvgFrozenDark(props) {
+  return React.createElement("svg", _extends$9({
+    viewBox: "0 0 16 16"
+  }, props), _ref$9);
+}
+
+function _extends$a() { _extends$a = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$a.apply(this, arguments); }
+
+var _ref$a =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "frozen-light_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M10.409.806l.063.056c.24.24.259.618.055.88l-.055.063-1.805 1.804v3.236l2.801-1.618.662-2.465a.665.665 0 011.304.263l-.016.082-.56 2.088 2.088.56a.665.665 0 01.488.734l-.016.082a.666.666 0 01-.735.488l-.082-.016-2.465-.661L9.334 8l2.801 1.618 2.466-.66.082-.017a.667.667 0 01.735.488l.016.082a.666.666 0 01-.488.734l-2.088.56.56 2.088.016.082a.666.666 0 01-1.304.263l-.662-2.465-2.801-1.618v3.236l1.805 1.804a.668.668 0 01-.88.999l-.063-.056L8 13.61l-1.528 1.53a.668.668 0 01-.88.055l-.063-.056a.668.668 0 01-.056-.88l.056-.063 1.804-1.805V9.155L4.53 10.773l-.66 2.465a.667.667 0 01-1.304-.263l.017-.082.559-2.088-2.088-.56a.667.667 0 01-.488-.734l.017-.082a.665.665 0 01.734-.488l.082.016 2.466.66L6.666 8 3.864 6.382l-2.465.66-.082.017a.666.666 0 01-.734-.488L.566 6.49a.667.667 0 01.488-.734l2.088-.56-.56-2.088-.016-.082a.667.667 0 011.305-.263l.659 2.465 2.803 1.618V3.61L5.529 1.805a.668.668 0 01.88-.999l.063.056L8 2.39 9.53.862a.668.668 0 01.88-.056z"
+});
+
+function SvgFrozenLight(props) {
+  return React.createElement("svg", _extends$a({
+    viewBox: "0 0 16 16"
+  }, props), _ref$a);
+}
+
+function _extends$b() { _extends$b = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$b.apply(this, arguments); }
+
+var _ref$b =
+/*#__PURE__*/
 React.createElement("path", {
   className: "icon-camera_svg__fill",
   fill: "#7B53EF",
@@ -1881,14 +1533,14 @@ React.createElement("path", {
 });
 
 function SvgIconCamera(props) {
-  return React.createElement("svg", _extends$5({
+  return React.createElement("svg", _extends$b({
     viewBox: "0 0 24 24"
-  }, props), _ref$5);
+  }, props), _ref$b);
 }
 
-function _extends$6() { _extends$6 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$6.apply(this, arguments); }
+function _extends$c() { _extends$c = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$c.apply(this, arguments); }
 
-var _ref$6 =
+var _ref$c =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-more_svg__fill",
@@ -1897,14 +1549,14 @@ React.createElement("path", {
 });
 
 function SvgIconMore(props) {
-  return React.createElement("svg", _extends$6({
+  return React.createElement("svg", _extends$c({
     viewBox: "0 0 24 24"
-  }, props), _ref$6);
+  }, props), _ref$c);
 }
 
-function _extends$7() { _extends$7 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$7.apply(this, arguments); }
+function _extends$d() { _extends$d = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$d.apply(this, arguments); }
 
-var _ref$7 =
+var _ref$d =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-mute_svg__fill",
@@ -1914,14 +1566,14 @@ React.createElement("path", {
 });
 
 function SvgIconMute(props) {
-  return React.createElement("svg", _extends$7({
+  return React.createElement("svg", _extends$d({
     viewBox: "0 0 24 24"
-  }, props), _ref$7);
+  }, props), _ref$d);
 }
 
-function _extends$8() { _extends$8 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$8.apply(this, arguments); }
+function _extends$e() { _extends$e = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$e.apply(this, arguments); }
 
-var _ref$8 =
+var _ref$e =
 /*#__PURE__*/
 React.createElement("g", {
   className: "icon-checkbox_svg__fill",
@@ -1934,14 +1586,14 @@ React.createElement("g", {
 }));
 
 function SvgIconCheckbox(props) {
-  return React.createElement("svg", _extends$8({
+  return React.createElement("svg", _extends$e({
     viewBox: "0 0 24 24"
-  }, props), _ref$8);
+  }, props), _ref$e);
 }
 
-function _extends$9() { _extends$9 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$9.apply(this, arguments); }
+function _extends$f() { _extends$f = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$f.apply(this, arguments); }
 
-var _ref$9 =
+var _ref$f =
 /*#__PURE__*/
 React.createElement("g", {
   className: "icon-checkbox-off_svg__fill",
@@ -1954,108 +1606,6 @@ React.createElement("g", {
 }));
 
 function SvgIconCheckboxOff(props) {
-  return React.createElement("svg", _extends$9({
-    viewBox: "0 0 24 24"
-  }, props), _ref$9);
-}
-
-function _extends$a() { _extends$a = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$a.apply(this, arguments); }
-
-var _ref$a =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-close_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M6.613 5.21l.094.083L12 10.585l5.293-5.292a1 1 0 011.497 1.32l-.083.094L13.415 12l5.292 5.293a1 1 0 01-1.32 1.497l-.094-.083L12 13.415l-5.293 5.292a1 1 0 01-1.497-1.32l.083-.094L10.585 12 5.293 6.707a1 1 0 011.32-1.497z"
-});
-
-function SvgIconClose(props) {
-  return React.createElement("svg", _extends$a({
-    viewBox: "0 0 24 24"
-  }, props), _ref$a);
-}
-
-function _extends$b() { _extends$b = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$b.apply(this, arguments); }
-
-var _ref$b =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-copy_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M20 8a3 3 0 013 3v9a3 3 0 01-3 3h-9a3 3 0 01-3-3v-9a3 3 0 013-3zm0 2h-9a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1v-9a1 1 0 00-1-1zm-7-9a3 3 0 012.995 2.824L16 4v1a1 1 0 01-1.993.117L14 5V4a1 1 0 00-.883-.993L13 3H4a1 1 0 00-.993.883L3 4v9a1 1 0 00.883.993L4 14h1a1 1 0 01.117 1.993L5 16H4a3 3 0 01-2.995-2.824L1 13V4a3 3 0 012.824-2.995L4 1h9z"
-});
-
-function SvgIconCopy(props) {
-  return React.createElement("svg", _extends$b({
-    viewBox: "0 0 24 24"
-  }, props), _ref$b);
-}
-
-function _extends$c() { _extends$c = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$c.apply(this, arguments); }
-
-var _ref$c =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-chat_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11c-1.67 0-3.255-.373-4.673-1.039l-.657.218c-2.237.716-3.8.964-4.69.742-1.049-.261-1.256-.72-.62-1.373.439-.524.805-1.178 1.097-1.963.234-.625.142-1.5-.276-2.625A10.933 10.933 0 011 12C1 5.925 5.925 1 12 1zm0 2a9 9 0 00-8.187 12.742l.152.314.051.101.04.107c.569 1.532.709 2.859.275 4.02l-.143.365-.072.162.088-.019a23.181 23.181 0 001.832-.511l.646-.213.765-.26.73.343A8.962 8.962 0 0012 21a9 9 0 000-18z"
-});
-
-function SvgIconChat(props) {
-  return React.createElement("svg", _extends$c({
-    viewBox: "0 0 24 24"
-  }, props), _ref$c);
-}
-
-function _extends$d() { _extends$d = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$d.apply(this, arguments); }
-
-var _ref$d =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-create_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11c-1.67 0-3.255-.373-4.673-1.039l-.657.218c-2.237.716-3.8.964-4.69.742-1.049-.261-1.256-.72-.62-1.373.439-.524.805-1.178 1.097-1.963.234-.625.142-1.5-.276-2.625A10.933 10.933 0 011 12C1 5.925 5.925 1 12 1zm0 2a9 9 0 00-8.187 12.742l.152.314.051.101.04.107c.569 1.532.709 2.859.275 4.02l-.143.365-.072.162.088-.019a23.181 23.181 0 001.832-.511l.646-.213.765-.26.73.343A8.962 8.962 0 0012 21a9 9 0 000-18zm1 6v2h2c1.333 0 1.333 2 0 2h-2v2c0 1.333-2 1.333-2 0v-2H9c-1.333 0-1.333-2 0-2h2V9c0-1.333 2-1.333 2 0z"
-});
-
-function SvgIconCreate(props) {
-  return React.createElement("svg", _extends$d({
-    viewBox: "0 0 24 24"
-  }, props), _ref$d);
-}
-
-function _extends$e() { _extends$e = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$e.apply(this, arguments); }
-
-var _ref$e =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-delete_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M14 1a3 3 0 012.995 2.824L17 4v1h4a1 1 0 01.117 1.993L21 7h-1v13a3 3 0 01-2.824 2.995L17 23H7a3 3 0 01-2.995-2.824L4 20V7H3a1 1 0 01-.117-1.993L3 5h4V4a3 3 0 012.824-2.995L10 1h4zm4 6H6v13a1 1 0 00.883.993L7 21h10a1 1 0 00.993-.883L18 20V7zm-8 3a1 1 0 01.993.883L11 11v6a1 1 0 01-1.993.117L9 17v-6a1 1 0 011-1zm4 0a1 1 0 01.993.883L15 11v6a1 1 0 01-1.993.117L13 17v-6a1 1 0 011-1zm0-7h-4a1 1 0 00-.993.883L9 4v1h6V4a1 1 0 00-.883-.993L14 3z"
-});
-
-function SvgIconDelete(props) {
-  return React.createElement("svg", _extends$e({
-    viewBox: "0 0 24 24"
-  }, props), _ref$e);
-}
-
-function _extends$f() { _extends$f = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$f.apply(this, arguments); }
-
-var _ref$f =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-dummy_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-});
-
-function SvgIconDummy(props) {
   return React.createElement("svg", _extends$f({
     viewBox: "0 0 24 24"
   }, props), _ref$f);
@@ -2066,6 +1616,108 @@ function _extends$g() { _extends$g = Object.assign || function (target) { for (v
 var _ref$g =
 /*#__PURE__*/
 React.createElement("path", {
+  className: "icon-close_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M6.613 5.21l.094.083L12 10.585l5.293-5.292a1 1 0 011.497 1.32l-.083.094L13.415 12l5.292 5.293a1 1 0 01-1.32 1.497l-.094-.083L12 13.415l-5.293 5.292a1 1 0 01-1.497-1.32l.083-.094L10.585 12 5.293 6.707a1 1 0 011.32-1.497z"
+});
+
+function SvgIconClose(props) {
+  return React.createElement("svg", _extends$g({
+    viewBox: "0 0 24 24"
+  }, props), _ref$g);
+}
+
+function _extends$h() { _extends$h = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$h.apply(this, arguments); }
+
+var _ref$h =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-copy_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M20 8a3 3 0 013 3v9a3 3 0 01-3 3h-9a3 3 0 01-3-3v-9a3 3 0 013-3zm0 2h-9a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1v-9a1 1 0 00-1-1zm-7-9a3 3 0 012.995 2.824L16 4v1a1 1 0 01-1.993.117L14 5V4a1 1 0 00-.883-.993L13 3H4a1 1 0 00-.993.883L3 4v9a1 1 0 00.883.993L4 14h1a1 1 0 01.117 1.993L5 16H4a3 3 0 01-2.995-2.824L1 13V4a3 3 0 012.824-2.995L4 1h9z"
+});
+
+function SvgIconCopy(props) {
+  return React.createElement("svg", _extends$h({
+    viewBox: "0 0 24 24"
+  }, props), _ref$h);
+}
+
+function _extends$i() { _extends$i = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$i.apply(this, arguments); }
+
+var _ref$i =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-chat_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11c-1.67 0-3.255-.373-4.673-1.039l-.657.218c-2.237.716-3.8.964-4.69.742-1.049-.261-1.256-.72-.62-1.373.439-.524.805-1.178 1.097-1.963.234-.625.142-1.5-.276-2.625A10.933 10.933 0 011 12C1 5.925 5.925 1 12 1zm0 2a9 9 0 00-8.187 12.742l.152.314.051.101.04.107c.569 1.532.709 2.859.275 4.02l-.143.365-.072.162.088-.019a23.181 23.181 0 001.832-.511l.646-.213.765-.26.73.343A8.962 8.962 0 0012 21a9 9 0 000-18z"
+});
+
+function SvgIconChat(props) {
+  return React.createElement("svg", _extends$i({
+    viewBox: "0 0 24 24"
+  }, props), _ref$i);
+}
+
+function _extends$j() { _extends$j = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$j.apply(this, arguments); }
+
+var _ref$j =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-create_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11c-1.67 0-3.255-.373-4.673-1.039l-.657.218c-2.237.716-3.8.964-4.69.742-1.049-.261-1.256-.72-.62-1.373.439-.524.805-1.178 1.097-1.963.234-.625.142-1.5-.276-2.625A10.933 10.933 0 011 12C1 5.925 5.925 1 12 1zm0 2a9 9 0 00-8.187 12.742l.152.314.051.101.04.107c.569 1.532.709 2.859.275 4.02l-.143.365-.072.162.088-.019a23.181 23.181 0 001.832-.511l.646-.213.765-.26.73.343A8.962 8.962 0 0012 21a9 9 0 000-18zm1 6v2h2c1.333 0 1.333 2 0 2h-2v2c0 1.333-2 1.333-2 0v-2H9c-1.333 0-1.333-2 0-2h2V9c0-1.333 2-1.333 2 0z"
+});
+
+function SvgIconCreate(props) {
+  return React.createElement("svg", _extends$j({
+    viewBox: "0 0 24 24"
+  }, props), _ref$j);
+}
+
+function _extends$k() { _extends$k = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$k.apply(this, arguments); }
+
+var _ref$k =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-delete_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M14 1a3 3 0 012.995 2.824L17 4v1h4a1 1 0 01.117 1.993L21 7h-1v13a3 3 0 01-2.824 2.995L17 23H7a3 3 0 01-2.995-2.824L4 20V7H3a1 1 0 01-.117-1.993L3 5h4V4a3 3 0 012.824-2.995L10 1h4zm4 6H6v13a1 1 0 00.883.993L7 21h10a1 1 0 00.993-.883L18 20V7zm-8 3a1 1 0 01.993.883L11 11v6a1 1 0 01-1.993.117L9 17v-6a1 1 0 011-1zm4 0a1 1 0 01.993.883L15 11v6a1 1 0 01-1.993.117L13 17v-6a1 1 0 011-1zm0-7h-4a1 1 0 00-.993.883L9 4v1h6V4a1 1 0 00-.883-.993L14 3z"
+});
+
+function SvgIconDelete(props) {
+  return React.createElement("svg", _extends$k({
+    viewBox: "0 0 24 24"
+  }, props), _ref$k);
+}
+
+function _extends$l() { _extends$l = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$l.apply(this, arguments); }
+
+var _ref$l =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-dummy_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+});
+
+function SvgIconDummy(props) {
+  return React.createElement("svg", _extends$l({
+    viewBox: "0 0 24 24"
+  }, props), _ref$l);
+}
+
+function _extends$m() { _extends$m = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$m.apply(this, arguments); }
+
+var _ref$m =
+/*#__PURE__*/
+React.createElement("path", {
   className: "icon-edit_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -2073,14 +1725,14 @@ React.createElement("path", {
 });
 
 function SvgIconEdit(props) {
-  return React.createElement("svg", _extends$g({
+  return React.createElement("svg", _extends$m({
     viewBox: "0 0 26 26"
-  }, props), _ref$g);
+  }, props), _ref$m);
 }
 
-function _extends$h() { _extends$h = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$h.apply(this, arguments); }
+function _extends$n() { _extends$n = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$n.apply(this, arguments); }
 
-var _ref$h =
+var _ref$n =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-error_svg__fill",
@@ -2090,14 +1742,14 @@ React.createElement("path", {
 });
 
 function SvgIconError(props) {
-  return React.createElement("svg", _extends$h({
+  return React.createElement("svg", _extends$n({
     viewBox: "0 0 16 16"
-  }, props), _ref$h);
+  }, props), _ref$n);
 }
 
-function _extends$i() { _extends$i = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$i.apply(this, arguments); }
+function _extends$o() { _extends$o = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$o.apply(this, arguments); }
 
-var _ref$i =
+var _ref$o =
 /*#__PURE__*/
 React.createElement("g", {
   fill: "none",
@@ -2113,14 +1765,14 @@ React.createElement("g", {
 }));
 
 function SvgIconErrorFilled(props) {
-  return React.createElement("svg", _extends$i({
+  return React.createElement("svg", _extends$o({
     viewBox: "0 0 24 24"
-  }, props), _ref$i);
+  }, props), _ref$o);
 }
 
-function _extends$j() { _extends$j = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$j.apply(this, arguments); }
+function _extends$p() { _extends$p = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$p.apply(this, arguments); }
 
-var _ref$j =
+var _ref$p =
 /*#__PURE__*/
 React.createElement("g", {
   className: "emoji-fail_svg__fill",
@@ -2140,14 +1792,14 @@ React.createElement("g", {
 }));
 
 function SvgEmojiFail(props) {
-  return React.createElement("svg", _extends$j({
+  return React.createElement("svg", _extends$p({
     viewBox: "0 0 28 28"
-  }, props), _ref$j);
+  }, props), _ref$p);
 }
 
-function _extends$k() { _extends$k = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$k.apply(this, arguments); }
+function _extends$q() { _extends$q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$q.apply(this, arguments); }
 
-var _ref$k =
+var _ref$q =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-reactions-add_svg__fill",
@@ -2157,14 +1809,14 @@ React.createElement("path", {
 });
 
 function SvgIconReactionsAdd(props) {
-  return React.createElement("svg", _extends$k({
+  return React.createElement("svg", _extends$q({
     viewBox: "0 0 22 22"
-  }, props), _ref$k);
+  }, props), _ref$q);
 }
 
-function _extends$l() { _extends$l = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$l.apply(this, arguments); }
+function _extends$r() { _extends$r = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$r.apply(this, arguments); }
 
-var _ref$l =
+var _ref$r =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-emoji-reactions-add_svg__fill",
@@ -2174,14 +1826,14 @@ React.createElement("path", {
 });
 
 function SvgIconEmojiReactionsAdd(props) {
-  return React.createElement("svg", _extends$l({
+  return React.createElement("svg", _extends$r({
     viewBox: "0 0 20 20"
-  }, props), _ref$l);
+  }, props), _ref$r);
 }
 
-function _extends$m() { _extends$m = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$m.apply(this, arguments); }
+function _extends$s() { _extends$s = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$s.apply(this, arguments); }
 
-var _ref$m =
+var _ref$s =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-delivered_svg__fill",
@@ -2191,14 +1843,14 @@ React.createElement("path", {
 });
 
 function SvgIconDelivered(props) {
-  return React.createElement("svg", _extends$m({
+  return React.createElement("svg", _extends$s({
     viewBox: "0 0 24 24"
-  }, props), _ref$m);
+  }, props), _ref$s);
 }
 
-function _extends$n() { _extends$n = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$n.apply(this, arguments); }
+function _extends$t() { _extends$t = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$t.apply(this, arguments); }
 
-var _ref$n =
+var _ref$t =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-disconnected_svg__fill",
@@ -2207,14 +1859,14 @@ React.createElement("path", {
 });
 
 function SvgIconDisconnected(props) {
-  return React.createElement("svg", _extends$n({
+  return React.createElement("svg", _extends$t({
     viewBox: "0 0 24 24"
-  }, props), _ref$n);
+  }, props), _ref$t);
 }
 
-function _extends$o() { _extends$o = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$o.apply(this, arguments); }
+function _extends$u() { _extends$u = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$u.apply(this, arguments); }
 
-var _ref$o =
+var _ref$u =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-document_svg__fill",
@@ -2224,14 +1876,14 @@ React.createElement("path", {
 });
 
 function SvgIconDocument(props) {
-  return React.createElement("svg", _extends$o({
+  return React.createElement("svg", _extends$u({
     viewBox: "0 0 24 24"
-  }, props), _ref$o);
+  }, props), _ref$u);
 }
 
-function _extends$p() { _extends$p = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$p.apply(this, arguments); }
+function _extends$v() { _extends$v = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$v.apply(this, arguments); }
 
-var _ref$p =
+var _ref$v =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-download_svg__fill",
@@ -2241,14 +1893,14 @@ React.createElement("path", {
 });
 
 function SvgIconDownload(props) {
-  return React.createElement("svg", _extends$p({
+  return React.createElement("svg", _extends$v({
     viewBox: "0 0 24 24"
-  }, props), _ref$p);
+  }, props), _ref$v);
 }
 
-function _extends$q() { _extends$q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$q.apply(this, arguments); }
+function _extends$w() { _extends$w = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$w.apply(this, arguments); }
 
-var _ref$q =
+var _ref$w =
 /*#__PURE__*/
 React.createElement("g", {
   fill: "none",
@@ -2264,14 +1916,14 @@ React.createElement("g", {
 }));
 
 function SvgIconFileAudio(props) {
-  return React.createElement("svg", _extends$q({
+  return React.createElement("svg", _extends$w({
     viewBox: "0 0 28 28"
-  }, props), _ref$q);
+  }, props), _ref$w);
 }
 
-function _extends$r() { _extends$r = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$r.apply(this, arguments); }
+function _extends$x() { _extends$x = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$x.apply(this, arguments); }
 
-var _ref$r =
+var _ref$x =
 /*#__PURE__*/
 React.createElement("g", {
   fill: "none",
@@ -2290,14 +1942,14 @@ React.createElement("g", {
 }));
 
 function SvgIconFileDocument(props) {
-  return React.createElement("svg", _extends$r({
+  return React.createElement("svg", _extends$x({
     viewBox: "0 0 28 28"
-  }, props), _ref$r);
+  }, props), _ref$x);
 }
 
-function _extends$s() { _extends$s = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$s.apply(this, arguments); }
+function _extends$y() { _extends$y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$y.apply(this, arguments); }
 
-var _ref$s =
+var _ref$y =
 /*#__PURE__*/
 React.createElement("g", {
   fill: "none",
@@ -2316,14 +1968,14 @@ React.createElement("g", {
 }));
 
 function SvgIconGif(props) {
-  return React.createElement("svg", _extends$s({
+  return React.createElement("svg", _extends$y({
     viewBox: "0 0 56 56"
-  }, props), _ref$s);
+  }, props), _ref$y);
 }
 
-function _extends$t() { _extends$t = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$t.apply(this, arguments); }
+function _extends$z() { _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$z.apply(this, arguments); }
 
-var _ref$t =
+var _ref$z =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-info_svg__fill",
@@ -2333,14 +1985,14 @@ React.createElement("path", {
 });
 
 function SvgIconInfo(props) {
-  return React.createElement("svg", _extends$t({
+  return React.createElement("svg", _extends$z({
     viewBox: "0 0 24 24"
-  }, props), _ref$t);
+  }, props), _ref$z);
 }
 
-function _extends$u() { _extends$u = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$u.apply(this, arguments); }
+function _extends$A() { _extends$A = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$A.apply(this, arguments); }
 
-var _ref$u =
+var _ref$A =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-leave_svg__fill",
@@ -2350,14 +2002,14 @@ React.createElement("path", {
 });
 
 function SvgIconLeave(props) {
-  return React.createElement("svg", _extends$u({
+  return React.createElement("svg", _extends$A({
     viewBox: "0 0 24 24"
-  }, props), _ref$u);
+  }, props), _ref$A);
 }
 
-function _extends$v() { _extends$v = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$v.apply(this, arguments); }
+function _extends$B() { _extends$B = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$B.apply(this, arguments); }
 
-var _ref$v =
+var _ref$B =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-members_svg__fill",
@@ -2367,14 +2019,14 @@ React.createElement("path", {
 });
 
 function SvgIconMembers(props) {
-  return React.createElement("svg", _extends$v({
+  return React.createElement("svg", _extends$B({
     viewBox: "0 0 24 24"
-  }, props), _ref$v);
+  }, props), _ref$B);
 }
 
-function _extends$w() { _extends$w = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$w.apply(this, arguments); }
+function _extends$C() { _extends$C = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$C.apply(this, arguments); }
 
-var _ref$w =
+var _ref$C =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-notifications_svg__fill",
@@ -2384,14 +2036,14 @@ React.createElement("path", {
 });
 
 function SvgIconNotifications(props) {
-  return React.createElement("svg", _extends$w({
+  return React.createElement("svg", _extends$C({
     viewBox: "0 0 24 24"
-  }, props), _ref$w);
+  }, props), _ref$C);
 }
 
-function _extends$x() { _extends$x = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$x.apply(this, arguments); }
+function _extends$D() { _extends$D = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$D.apply(this, arguments); }
 
-var _ref$x =
+var _ref$D =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-photo_svg__fill",
@@ -2401,14 +2053,14 @@ React.createElement("path", {
 });
 
 function SvgIconPhoto(props) {
-  return React.createElement("svg", _extends$x({
+  return React.createElement("svg", _extends$D({
     viewBox: "0 0 24 24"
-  }, props), _ref$x);
+  }, props), _ref$D);
 }
 
-function _extends$y() { _extends$y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$y.apply(this, arguments); }
+function _extends$E() { _extends$E = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$E.apply(this, arguments); }
 
-var _ref$y =
+var _ref$E =
 /*#__PURE__*/
 React.createElement("g", {
   fill: "none",
@@ -2427,14 +2079,14 @@ React.createElement("g", {
 }));
 
 function SvgIconPlay(props) {
-  return React.createElement("svg", _extends$y({
+  return React.createElement("svg", _extends$E({
     viewBox: "0 0 56 56"
-  }, props), _ref$y);
+  }, props), _ref$E);
 }
 
-function _extends$z() { _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$z.apply(this, arguments); }
+function _extends$F() { _extends$F = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$F.apply(this, arguments); }
 
-var _ref$z =
+var _ref$F =
 /*#__PURE__*/
 React.createElement("path", {
   className: "icon-plus_svg__fill",
@@ -2444,109 +2096,6 @@ React.createElement("path", {
 });
 
 function SvgIconPlus(props) {
-  return React.createElement("svg", _extends$z({
-    viewBox: "0 0 24 24"
-  }, props), _ref$z);
-}
-
-function _extends$A() { _extends$A = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$A.apply(this, arguments); }
-
-var _ref$A =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-read_svg__fill",
-  fill: "#2EBA9F",
-  fillRule: "evenodd",
-  d: "M2.207 11.793l5 5a1 1 0 01-1.414 1.414l-5-5a1 1 0 011.414-1.414zm19.586-6a1 1 0 011.414 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414l4.293 4.293zm-3.586 0a1 1 0 010 1.414l-5.999 5.999a1 1 0 01-1.414-1.414l5.999-6a1 1 0 011.414 0z"
-});
-
-function SvgIconRead(props) {
-  return React.createElement("svg", _extends$A({
-    viewBox: "0 0 24 24"
-  }, props), _ref$A);
-}
-
-function _extends$B() { _extends$B = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$B.apply(this, arguments); }
-
-var _ref$B =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-refresh_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M14.419 4.51l.175.167 2.073 1.927V4.167c0-.428.321-.78.736-.828l.097-.006c.427 0 .78.322.828.736l.005.098v5c0 .427-.321.78-.736.827L17.5 10h-5a.833.833 0 01-.097-1.661l.097-.006h3.578L13.44 5.88a5.982 5.982 0 00-7.05-.986C4.083 6.15 2.898 8.756 3.48 11.286c.58 2.534 2.792 4.385 5.425 4.537 2.635.152 5.05-1.433 5.928-3.883a.833.833 0 011.569.561c-1.127 3.15-4.223 5.18-7.593 4.986-3.37-.195-6.206-2.57-6.954-5.828-.748-3.261.778-6.617 3.738-8.229 2.884-1.57 6.453-1.118 8.826 1.08z"
-});
-
-function SvgIconRefresh(props) {
-  return React.createElement("svg", _extends$B({
-    width: 20,
-    height: 20
-  }, props), _ref$B);
-}
-
-function _extends$C() { _extends$C = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$C.apply(this, arguments); }
-
-var _ref$C =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-send_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M20.554 10.117L2.52 1.024C1.613.619.605 1.428 1.008 2.337l2.115 5.685a2 2 0 001.545 1.275l10.345 1.73-10.345 1.728a2 2 0 00-1.545 1.275l-2.115 5.685c-.302.91.605 1.718 1.511 1.213l18.035-9.094c.706-.303.706-1.313 0-1.717z"
-});
-
-function SvgIconSend(props) {
-  return React.createElement("svg", _extends$C({
-    viewBox: "0 0 22 22"
-  }, props), _ref$C);
-}
-
-function _extends$D() { _extends$D = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$D.apply(this, arguments); }
-
-var _ref$D =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-sent_svg__fill",
-  fillOpacity: 0.38,
-  fillRule: "evenodd",
-  d: "M4.707 11.793a1 1 0 10-1.414 1.414l5 5a1 1 0 001.414 0l11-11a1 1 0 10-1.414-1.414L9 16.086l-4.293-4.293z"
-});
-
-function SvgIconSent(props) {
-  return React.createElement("svg", _extends$D({
-    viewBox: "0 0 24 24"
-  }, props), _ref$D);
-}
-
-function _extends$E() { _extends$E = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$E.apply(this, arguments); }
-
-var _ref$E =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-shevron_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M8.293 17.293a1 1 0 001.414 1.414l6-6a1 1 0 000-1.414l-6-6a1 1 0 00-1.414 1.414L13.586 12l-5.293 5.293z"
-});
-
-function SvgIconShevron(props) {
-  return React.createElement("svg", _extends$E({
-    viewBox: "0 0 24 24"
-  }, props), _ref$E);
-}
-
-function _extends$F() { _extends$F = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$F.apply(this, arguments); }
-
-var _ref$F =
-/*#__PURE__*/
-React.createElement("path", {
-  className: "icon-shevron-down_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M6.045 8.205a1.125 1.125 0 10-1.59 1.59l6.75 6.75c.439.44 1.151.44 1.59 0l6.75-6.75a1.125 1.125 0 10-1.59-1.59L12 14.159 6.045 8.205z"
-});
-
-function SvgIconShevronDown(props) {
   return React.createElement("svg", _extends$F({
     viewBox: "0 0 24 24"
   }, props), _ref$F);
@@ -2557,13 +2106,13 @@ function _extends$G() { _extends$G = Object.assign || function (target) { for (v
 var _ref$G =
 /*#__PURE__*/
 React.createElement("path", {
-  className: "icon-spinner-small_svg__fill",
-  fill: "#7B53EF",
+  className: "icon-read_svg__fill",
+  fill: "#2EBA9F",
   fillRule: "evenodd",
-  d: "M12 22.5c5.799 0 10.5-4.701 10.5-10.5S17.799 1.5 12 1.5 1.5 6.201 1.5 12a1.432 1.432 0 002.864 0A7.636 7.636 0 1112 19.636a1.432 1.432 0 000 2.864z"
+  d: "M2.207 11.793l5 5a1 1 0 01-1.414 1.414l-5-5a1 1 0 011.414-1.414zm19.586-6a1 1 0 011.414 1.414l-11 11a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414l4.293 4.293zm-3.586 0a1 1 0 010 1.414l-5.999 5.999a1 1 0 01-1.414-1.414l5.999-6a1 1 0 011.414 0z"
 });
 
-function SvgIconSpinnerSmall(props) {
+function SvgIconRead(props) {
   return React.createElement("svg", _extends$G({
     viewBox: "0 0 24 24"
   }, props), _ref$G);
@@ -2574,6 +2123,109 @@ function _extends$H() { _extends$H = Object.assign || function (target) { for (v
 var _ref$H =
 /*#__PURE__*/
 React.createElement("path", {
+  className: "icon-refresh_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M14.419 4.51l.175.167 2.073 1.927V4.167c0-.428.321-.78.736-.828l.097-.006c.427 0 .78.322.828.736l.005.098v5c0 .427-.321.78-.736.827L17.5 10h-5a.833.833 0 01-.097-1.661l.097-.006h3.578L13.44 5.88a5.982 5.982 0 00-7.05-.986C4.083 6.15 2.898 8.756 3.48 11.286c.58 2.534 2.792 4.385 5.425 4.537 2.635.152 5.05-1.433 5.928-3.883a.833.833 0 011.569.561c-1.127 3.15-4.223 5.18-7.593 4.986-3.37-.195-6.206-2.57-6.954-5.828-.748-3.261.778-6.617 3.738-8.229 2.884-1.57 6.453-1.118 8.826 1.08z"
+});
+
+function SvgIconRefresh(props) {
+  return React.createElement("svg", _extends$H({
+    width: 20,
+    height: 20
+  }, props), _ref$H);
+}
+
+function _extends$I() { _extends$I = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$I.apply(this, arguments); }
+
+var _ref$I =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-send_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M20.554 10.117L2.52 1.024C1.613.619.605 1.428 1.008 2.337l2.115 5.685a2 2 0 001.545 1.275l10.345 1.73-10.345 1.728a2 2 0 00-1.545 1.275l-2.115 5.685c-.302.91.605 1.718 1.511 1.213l18.035-9.094c.706-.303.706-1.313 0-1.717z"
+});
+
+function SvgIconSend(props) {
+  return React.createElement("svg", _extends$I({
+    viewBox: "0 0 22 22"
+  }, props), _ref$I);
+}
+
+function _extends$J() { _extends$J = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$J.apply(this, arguments); }
+
+var _ref$J =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-sent_svg__fill",
+  fillOpacity: 0.38,
+  fillRule: "evenodd",
+  d: "M4.707 11.793a1 1 0 10-1.414 1.414l5 5a1 1 0 001.414 0l11-11a1 1 0 10-1.414-1.414L9 16.086l-4.293-4.293z"
+});
+
+function SvgIconSent(props) {
+  return React.createElement("svg", _extends$J({
+    viewBox: "0 0 24 24"
+  }, props), _ref$J);
+}
+
+function _extends$K() { _extends$K = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$K.apply(this, arguments); }
+
+var _ref$K =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-shevron_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M8.293 17.293a1 1 0 001.414 1.414l6-6a1 1 0 000-1.414l-6-6a1 1 0 00-1.414 1.414L13.586 12l-5.293 5.293z"
+});
+
+function SvgIconShevron(props) {
+  return React.createElement("svg", _extends$K({
+    viewBox: "0 0 24 24"
+  }, props), _ref$K);
+}
+
+function _extends$L() { _extends$L = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$L.apply(this, arguments); }
+
+var _ref$L =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-shevron-down_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M6.045 8.205a1.125 1.125 0 10-1.59 1.59l6.75 6.75c.439.44 1.151.44 1.59 0l6.75-6.75a1.125 1.125 0 10-1.59-1.59L12 14.159 6.045 8.205z"
+});
+
+function SvgIconShevronDown(props) {
+  return React.createElement("svg", _extends$L({
+    viewBox: "0 0 24 24"
+  }, props), _ref$L);
+}
+
+function _extends$M() { _extends$M = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$M.apply(this, arguments); }
+
+var _ref$M =
+/*#__PURE__*/
+React.createElement("path", {
+  className: "icon-spinner-small_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M12 22.5c5.799 0 10.5-4.701 10.5-10.5S17.799 1.5 12 1.5 1.5 6.201 1.5 12a1.432 1.432 0 002.864 0A7.636 7.636 0 1112 19.636a1.432 1.432 0 000 2.864z"
+});
+
+function SvgIconSpinnerSmall(props) {
+  return React.createElement("svg", _extends$M({
+    viewBox: "0 0 24 24"
+  }, props), _ref$M);
+}
+
+function _extends$N() { _extends$N = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$N.apply(this, arguments); }
+
+var _ref$N =
+/*#__PURE__*/
+React.createElement("path", {
   className: "icon-user_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -2581,12 +2233,12 @@ React.createElement("path", {
 });
 
 function SvgIconUser(props) {
-  return React.createElement("svg", _extends$H({
+  return React.createElement("svg", _extends$N({
     viewBox: "0 0 24 24"
-  }, props), _ref$H);
+  }, props), _ref$N);
 }
 
-var Colors$1 = {
+var Colors = {
   DEFAULT: 'DEFAULT',
   PRIMARY: 'PRIMARY',
   SECONDARY: 'SECONDARY',
@@ -2597,27 +2249,27 @@ var Colors$1 = {
   READ: 'READ'
 };
 
-function changeColorToClassName$1(color) {
+function changeColorToClassName(color) {
   switch (color) {
-    case Colors$1.PRIMARY:
+    case Colors.PRIMARY:
       return 'sendbird-color--primary';
 
-    case Colors$1.SECONDARY:
+    case Colors.SECONDARY:
       return 'sendbird-color--secondary';
 
-    case Colors$1.CONTENT:
+    case Colors.CONTENT:
       return 'sendbird-color--content';
 
-    case Colors$1.CONTENT_INVERSE:
+    case Colors.CONTENT_INVERSE:
       return 'sendbird-color--content-inverse';
 
-    case Colors$1.WHITE:
+    case Colors.WHITE:
       return 'sendbird-color--white';
 
-    case Colors$1.SENT:
+    case Colors.SENT:
       return 'sendbird-color--sent';
 
-    case Colors$1.READ:
+    case Colors.READ:
       return 'sendbird-color--read';
 
     default:
@@ -2644,6 +2296,24 @@ function changeTypeToIconComponent(type) {
 
     case Type.AVATAR_LIGHT:
       return React.createElement(SvgIconAvatarLight, null);
+
+    case Type.BROADCAST_LARGE_DARK:
+      return React.createElement(SvgIconBroadcastLrgDark, null);
+
+    case Type.BROADCAST_LARGE_LIGHT:
+      return React.createElement(SvgIconBroadcastLrgLight, null);
+
+    case Type.BROADCAST_DARK:
+      return React.createElement(SvgIconBroadcastDark, null);
+
+    case Type.BROADCAST_LIGHT:
+      return React.createElement(SvgIconBroadcastLight, null);
+
+    case Type.FROZEN_DARK:
+      return React.createElement(SvgFrozenDark, null);
+
+    case Type.FROZEN_LIGHT:
+      return React.createElement(SvgFrozenLight, null);
 
     case Type.MORE:
       return React.createElement(SvgIconMore, null);
@@ -2782,7 +2452,7 @@ function Icon(_ref) {
     onKeyDown: onClick,
     role: "button",
     tabIndex: "0",
-    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-icon', changeColorToClassName$1(fillColor)]).join(' '),
+    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-icon', changeColorToClassName(fillColor)]).join(' '),
     style: style
   }, children || changeTypeToIconComponent(type));
 }
@@ -2793,7 +2463,7 @@ Icon.propTypes = {
   onClick: PropTypes.func,
   children: PropTypes.element,
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-  fillColor: PropTypes.oneOf(Object.keys(Colors$1))
+  fillColor: PropTypes.oneOf(Object.keys(Colors))
 };
 Icon.defaultProps = {
   onClick: function onClick() {},
@@ -2801,10 +2471,556 @@ Icon.defaultProps = {
   height: 26,
   children: null,
   className: '',
-  fillColor: Colors$1.DEFAULT
+  fillColor: Colors.DEFAULT
 };
 var IconTypes = Type;
-var IconColors = Colors$1;
+var IconColors = Colors;
+
+var DEFAULT_URL_PREFIX = 'https://static.sendbird.com/sample/cover/cover_';
+var getChannelAvatarSource = function getChannelAvatarSource(channel, currentUserId) {
+  if (channel && channel.coverUrl) {
+    if (!new RegExp("^" + DEFAULT_URL_PREFIX).test(channel.coverUrl)) {
+      return channel.coverUrl;
+    }
+  }
+
+  return channel && channel.members ? channel.members.filter(function (member) {
+    return member.userId !== currentUserId;
+  }).map(function (_a) {
+    var profileUrl = _a.profileUrl;
+    return profileUrl;
+  }) : [];
+};
+var useDefaultAvatar = function useDefaultAvatar(channel) {
+  if (channel && channel.coverUrl) {
+    if (new RegExp("^" + DEFAULT_URL_PREFIX).test(channel.coverUrl)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  return true;
+};
+
+function ChannelAvatar(_a) {
+  var channel = _a.channel,
+      userId = _a.userId,
+      theme = _a.theme,
+      _b = _a.height,
+      height = _b === void 0 ? 56 : _b,
+      _c = _a.width,
+      width = _c === void 0 ? 56 : _c;
+  var isBroadcast = channel.isBroadcast;
+  var memoizedAvatar = useMemo(function () {
+    return isBroadcast ? useDefaultAvatar(channel) ? theme === 'dark' ? React.createElement(Icon, {
+      type: IconTypes.BROADCAST_LARGE_DARK,
+      width: width,
+      height: height,
+      className: "sendbird-chat-header__default--broadcast-channel-dark"
+    }) : React.createElement(Icon, {
+      type: IconTypes.BROADCAST_LARGE_LIGHT,
+      width: width,
+      height: height,
+      className: "sendbird-chat-header__default--broadcast-channel-light"
+    }) : React.createElement(Avatar, {
+      className: "sendbird-chat-header__avatar--broadcast-channel",
+      src: getChannelAvatarSource(channel, userId),
+      width: width,
+      height: height
+    }) : React.createElement(Avatar, {
+      className: "sendbird-chat-header__avatar--group-channel",
+      src: getChannelAvatarSource(channel, userId),
+      width: width + "px",
+      height: height + "px"
+    });
+  }, [channel.members, channel.coverUrl, theme]);
+  return React.createElement(React.Fragment, null, memoizedAvatar);
+}
+
+var Typography = {
+  H_1: 'H_1',
+  H_2: 'H_2',
+  SUBTITLE_1: 'SUBTITLE_1',
+  SUBTITLE_2: 'SUBTITLE_2',
+  BODY_1: 'BODY_1',
+  BODY_2: 'BODY_2',
+  BUTTON_1: 'BUTTON_1',
+  BUTTON_2: 'BUTTON_2',
+  CAPTION_1: 'CAPTION_1',
+  CAPTION_2: 'CAPTION_2',
+  CAPTION_3: 'CAPTION_3'
+};
+var Colors$1 = {
+  ONBACKGROUND_1: 'ONBACKGROUND_1',
+  ONBACKGROUND_2: 'ONBACKGROUND_2',
+  ONBACKGROUND_3: 'ONBACKGROUND_3',
+  ONCONTENT_1: 'ONCONTENT_1',
+  PRIMARY: 'PRIMARY',
+  ERROR: 'ERROR'
+};
+
+function changeTypographyToClassName(type) {
+  switch (type) {
+    case Typography.H_1:
+      return 'sendbird-label--h-1';
+
+    case Typography.H_2:
+      return 'sendbird-label--h-2';
+
+    case Typography.SUBTITLE_1:
+      return 'sendbird-label--subtitle-1';
+
+    case Typography.SUBTITLE_2:
+      return 'sendbird-label--subtitle-2';
+
+    case Typography.BODY_1:
+      return 'sendbird-label--body-1';
+
+    case Typography.BODY_2:
+      return 'sendbird-label--body-2';
+
+    case Typography.BUTTON_1:
+      return 'sendbird-label--button-1';
+
+    case Typography.BUTTON_2:
+      return 'sendbird-label--button-2';
+
+    case Typography.CAPTION_1:
+      return 'sendbird-label--caption-1';
+
+    case Typography.CAPTION_2:
+      return 'sendbird-label--caption-2';
+
+    case Typography.CAPTION_3:
+      return 'sendbird-label--caption-3';
+
+    default:
+      return null;
+  }
+}
+function changeColorToClassName$1(color) {
+  switch (color) {
+    case Colors$1.ONBACKGROUND_1:
+      return 'sendbird-label--color-onbackground-1';
+
+    case Colors$1.ONBACKGROUND_2:
+      return 'sendbird-label--color-onbackground-2';
+
+    case Colors$1.ONBACKGROUND_3:
+      return 'sendbird-label--color-onbackground-3';
+
+    case Colors$1.ONCONTENT_1:
+      return 'sendbird-label--color-oncontent-1';
+
+    case Colors$1.PRIMARY:
+      return 'sendbird-label--color-primary';
+
+    case Colors$1.ERROR:
+      return 'sendbird-label--color-error';
+
+    default:
+      return null;
+  }
+}
+
+var getStringSet = function getStringSet(lang) {
+  var stringSet = {
+    en: {
+      TRYING_TO_CONNECT: 'Trying to connect…',
+      CHANNEL_LIST__TITLE: 'Channels',
+      CHANNEL__MESSAGE_INPUT__PLACE_HOLDER: 'Enter message',
+      CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__DISABLED: 'Chat is unavailable in this channel',
+      CHANNEL__MESSAGE_LIST__NOTIFICATION__NEW_MESSAGE: 'new message(s) since',
+      CHANNEL__MESSAGE_LIST__NOTIFICATION__ON: 'on',
+      CHANNEL_SETTING__HEADER__TITLE: 'Channel information',
+      CHANNEL_SETTING__PROFILE__EDIT: 'Edit',
+      CHANNEL_SETTING__MEMBERS__TITLE: 'Members',
+      CHANNEL_SETTING__MEMBERS__SEE_ALL_MEMBERS: 'All members',
+      CHANNEL_SETTING__MEMBERS__INVITE_MEMBER: 'Invite users',
+      CHANNEL_SETTING__LEAVE_CHANNEL__TITLE: 'Leave channel',
+      BUTTON__CANCEL: 'Cancel',
+      BUTTON__DELETE: 'Delete',
+      BUTTON__SAVE: 'Save',
+      BUTTON__CREATE: 'Create',
+      BUTTON__INVITE: 'Invite',
+      BUTTON__CLOSE: 'Close',
+      BADGE__OVER: '+',
+      MODAL__DELETE_MESSAGE__TITLE: 'Delete this message?',
+      MODAL__CHANNEL_INFORMATION__TITLE: 'Edit channel information',
+      MODAL__CHANNEL_INFORMATION__CHANNEL_IMAGE: 'Channel image',
+      MODAL__CHANNEL_INFORMATION__UPLOAD: 'Upload',
+      MODAL__CHANNEL_INFORMATION__CHANNEL_NAME: 'Channel name',
+      MODAL__CHANNEL_INFORMATION__INPUT__PLACE_HOLDER: 'Enter name',
+      MODAL__INVITE_MEMBER__TITLE: 'Invite member',
+      MODAL__INVITE_MEMBER__SELECTEC: 'selected',
+      MODAL__CREATE_CHANNEL__TITLE: 'New channel',
+      MODAL__CREATE_CHANNEL__SELECTED: 'selected',
+      MODAL__USER_LIST__TITLE: 'members',
+      TYPING_INDICATOR__IS_TYPING: 'is typing...',
+      TYPING_INDICATOR__AND: 'and',
+      TYPING_INDICATOR__ARE_TYPING: 'are typing...',
+      TYPING_INDICATOR__MULTIPLE_TYPING: 'Several people are typing...',
+      MESSAGE_STATUS__SENDING_FAILED: 'Couldn\'t send message.',
+      MESSAGE_STATUS__TRY_AGAIN: 'Try again',
+      MESSAGE_STATUS__OR: 'or',
+      MESSAGE_STATUS__DELETE: 'delete',
+      PLACE_HOLDER__NO_CHANNEL: 'No channels',
+      PLACE_HOLDER__WRONG: 'Something went wrong',
+      PLACE_HOLDER__RETRY_TO_CONNECT: 'Retry',
+      NO_TITLE: 'No title',
+      NO_NAME: '(No name)',
+      NO_MEMBERS: '(No members)',
+      TOOLTIP__AND_YOU: ', and you',
+      TOOLTIP__YOU: 'you',
+      TOOLTIP__UNKOWN_USER: '(no name)',
+      UNKNOWN__UNKNOWN_MESSAGE_TYPE: '(Unknown message type)',
+      UNKNOWN__CANNOT_READ_MESSAGE: 'Cannot read this message.'
+    }
+  };
+  return stringSet && stringSet[lang] ? stringSet[lang] : {};
+};
+
+var CLASS_NAME = 'sendbird-label';
+function Label(_ref) {
+  var type = _ref.type,
+      color = _ref.color,
+      children = _ref.children,
+      className = _ref.className;
+  var injectingClassName = Array.isArray(className) ? [CLASS_NAME].concat(_toConsumableArray(className)) : [CLASS_NAME, className];
+
+  if (type) {
+    injectingClassName.push(changeTypographyToClassName(type));
+  }
+
+  if (color) {
+    injectingClassName.push(changeColorToClassName$1(color));
+  }
+
+  return React.createElement("div", {
+    className: injectingClassName.join(' ')
+  }, children);
+}
+Label.propTypes = {
+  type: PropTypes.oneOf([].concat(_toConsumableArray(Object.keys(Typography)), [''])),
+  color: PropTypes.oneOf([].concat(_toConsumableArray(Object.keys(Colors$1)), [''])),
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.element, PropTypes.any]),
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
+};
+Label.defaultProps = {
+  type: '',
+  color: '',
+  className: [],
+  children: null
+};
+var LabelTypography = Typography;
+var LabelColors = Colors$1;
+var LabelStringSet = getStringSet('en');
+
+function Badge(_ref) {
+  var count = _ref.count,
+      maxLevel = _ref.maxLevel,
+      className = _ref.className;
+  var maximumNumber = parseInt('9'.repeat(maxLevel > 6 ? 6 : maxLevel), 10);
+  var injectingClassName = Array.isArray(className) ? className : [className];
+  return React.createElement("div", {
+    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-badge']).join(' ')
+  }, React.createElement("div", {
+    className: "sendbird-badge__text"
+  }, React.createElement(Label, {
+    type: LabelTypography.CAPTION_2,
+    color: LabelColors.ONCONTENT_1
+  }, count > maximumNumber ? "".concat(maximumNumber).concat(LabelStringSet.BADGE__OVER) : count)));
+}
+Badge.propTypes = {
+  count: PropTypes.number.isRequired,
+  maxLevel: PropTypes.number,
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
+};
+Badge.defaultProps = {
+  maxLevel: 2,
+  className: []
+};
+
+var MessageStatusType = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  DELIVERED: 'DELIVERED',
+  READ: 'READ',
+  FAILED: 'FAILED'
+};
+
+var truncate = function truncate(fullStr, strLen) {
+  if (fullStr === null || fullStr === undefined) return '';
+  if (fullStr.length <= strLen) return fullStr;
+  var separator = '...';
+  var sepLen = separator.length;
+  var charsToShow = strLen - sepLen;
+  var frontChars = Math.ceil(charsToShow / 2);
+  var backChars = Math.floor(charsToShow / 2);
+  return fullStr.substr(0, frontChars) + separator + fullStr.substr(fullStr.length - backChars);
+};
+var getIsSentFromStatus = function getIsSentFromStatus(status) {
+  return status === MessageStatusType.SENT || status === MessageStatusType.DELIVERED || status === MessageStatusType.READ;
+};
+
+var getChannelTitle = function getChannelTitle() {
+  var channel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var currentUserId = arguments.length > 1 ? arguments[1] : undefined;
+
+  if (!channel || !channel.name && !channel.members) {
+    return LabelStringSet.NO_TITLE;
+  }
+
+  if (channel.name && channel.name !== 'Group Channel') {
+    return channel.name;
+  }
+
+  if (channel.members.length === 1) {
+    return LabelStringSet.NO_MEMBERS;
+  }
+
+  return channel.members.filter(function (_ref) {
+    var userId = _ref.userId;
+    return userId !== currentUserId;
+  }).map(function (_ref2) {
+    var nickname = _ref2.nickname;
+    return nickname || LabelStringSet.NO_NAME;
+  }).join(', ');
+};
+var getLastMessageCreatedAt = function getLastMessageCreatedAt(channel) {
+  if (!channel || !channel.lastMessage) {
+    return '';
+  }
+
+  var moment = Moment(channel.lastMessage.createdAt);
+
+  switch (moment.calendar().split(' ')[0]) {
+    case 'Today':
+      {
+        return moment.format('LT');
+      }
+
+    case 'Yesterday':
+      {
+        return 'Yesterday';
+      }
+
+    default:
+      return moment.format('ll').split(',')[0];
+  }
+};
+var getTotalMembers = function getTotalMembers(channel) {
+  return channel && channel.memberCount ? channel.memberCount : 0;
+};
+
+var getPrettyLastMessage = function getPrettyLastMessage() {
+  var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var MAXLEN = 30;
+  var messageType = message.messageType,
+      name = message.name;
+
+  if (messageType === 'file') {
+    return truncate(name, MAXLEN);
+  }
+
+  return message.message;
+};
+
+var getLastMessage = function getLastMessage(channel) {
+  return channel && channel.lastMessage ? getPrettyLastMessage(channel.lastMessage) : '';
+};
+var getChannelUnreadMessageCount = function getChannelUnreadMessageCount(channel) {
+  return channel && channel.unreadMessageCount ? channel.unreadMessageCount : 0;
+};
+
+function ChannelPreview(_ref) {
+  var channel = _ref.channel,
+      isActive = _ref.isActive,
+      ChannelAction = _ref.ChannelAction,
+      theme = _ref.theme,
+      onClick = _ref.onClick,
+      tabIndex = _ref.tabIndex,
+      currentUser = _ref.currentUser;
+  var userId = currentUser.userId;
+  var isBroadcast = channel.isBroadcast,
+      isFrozen = channel.isFrozen;
+  return React.createElement("div", {
+    role: "link",
+    tabIndex: tabIndex,
+    onClick: onClick,
+    onKeyPress: onClick,
+    className: "\n        sendbird-channel-preview\n        ".concat(isActive ? 'sendbird-channel-preview--active' : null, "\n      ")
+  }, React.createElement("div", {
+    className: "sendbird-channel-preview__avatar"
+  }, React.createElement(ChannelAvatar, {
+    channel: channel,
+    userId: userId,
+    theme: theme
+  })), React.createElement("div", {
+    className: "sendbird-channel-preview__content"
+  }, React.createElement("div", {
+    className: "sendbird-channel-preview__content__upper"
+  }, React.createElement("div", {
+    className: "sendbird-channel-preview__content__upper__header"
+  }, isBroadcast && React.createElement("div", {
+    className: "sendbird-channel-preview__broadcast-icon"
+  }, React.createElement(Icon, {
+    type: theme === 'dark' ? IconTypes.BROADCAST_DARK : IconTypes.BROADCAST_LIGHT,
+    height: 12,
+    width: 12
+  })), React.createElement(Label, {
+    className: "sendbird-channel-preview__content__upper__header__channel-name",
+    type: LabelTypography.SUBTITLE_2,
+    color: LabelColors.ONBACKGROUND_1
+  }, getChannelTitle(channel, userId)), React.createElement(Label, {
+    className: "sendbird-channel-preview__content__upper__header__total-members",
+    type: LabelTypography.CAPTION_2,
+    color: LabelColors.ONBACKGROUND_2
+  }, getTotalMembers(channel)), isFrozen && React.createElement("div", {
+    title: "Frozen",
+    className: "sendbird-channel-preview__frozen-icon"
+  }, React.createElement(Icon, {
+    type: theme === 'dark' ? IconTypes.FROZEN_DARK : IconTypes.FROZEN_LIGHT,
+    height: 12,
+    width: 12
+  }))), React.createElement(Label, {
+    className: "sendbird-channel-preview__content__upper__last-message-at",
+    type: LabelTypography.CAPTION_3,
+    color: LabelColors.ONBACKGROUND_2
+  }, getLastMessageCreatedAt(channel))), React.createElement("div", {
+    className: "sendbird-channel-preview__content__lower"
+  }, React.createElement(Label, {
+    className: "sendbird-channel-preview__content__lower__last-message",
+    type: LabelTypography.BODY_2,
+    color: LabelColors.ONBACKGROUND_3
+  }, getLastMessage(channel)), React.createElement("div", {
+    className: "sendbird-channel-preview__content__lower__unread-message-count"
+  }, getChannelUnreadMessageCount(channel) ? React.createElement(Badge, {
+    count: getChannelUnreadMessageCount(channel)
+  }) : null))), React.createElement("div", {
+    className: "sendbird-channel-preview__action"
+  }, ChannelAction));
+}
+ChannelPreview.propTypes = {
+  isActive: PropTypes.bool,
+  theme: PropTypes.string,
+  channel: PropTypes.shape({
+    members: PropTypes.arrayOf(PropTypes.shape({})),
+    coverUrl: PropTypes.string,
+    isBroadcast: PropTypes.bool,
+    isFrozen: PropTypes.bool
+  }),
+  ChannelAction: PropTypes.element.isRequired,
+  onClick: PropTypes.func,
+  tabIndex: PropTypes.number,
+  currentUser: PropTypes.shape({
+    userId: PropTypes.string
+  })
+};
+ChannelPreview.defaultProps = {
+  channel: {},
+  isActive: false,
+  theme: 'light',
+  onClick: function onClick() {},
+  tabIndex: 0,
+  currentUser: {}
+};
+
+var CLASS_NAME$1 = 'sendbird-iconbutton';
+var IconButton = React.forwardRef(function (props, ref) {
+  var children = props.children,
+      className = props.className,
+      _props$disabled = props.disabled,
+      disabled = _props$disabled === void 0 ? false : _props$disabled,
+      type = props.type,
+      height = props.height,
+      width = props.width,
+      _onClick = props.onClick;
+
+  var _useState = useState(''),
+      _useState2 = _slicedToArray(_useState, 2),
+      pressed = _useState2[0],
+      setPressed = _useState2[1];
+
+  var injectingClassName = Array.isArray(className) ? className : [className];
+  injectingClassName.unshift(CLASS_NAME$1);
+  return (// eslint-disable-next-line react/button-has-type
+    React.createElement("button", {
+      className: "".concat(injectingClassName.join(' '), " ").concat(pressed),
+      disabled: disabled,
+      ref: ref,
+      type: type,
+      style: {
+        height: height,
+        width: width
+      },
+      onClick: function onClick(e) {
+        if (disabled) {
+          return;
+        }
+
+        setPressed('sendbird-iconbutton--pressed');
+
+        _onClick(e);
+      },
+      onBlur: function onBlur() {
+        setPressed('');
+      }
+    }, React.createElement("span", {
+      className: "sendbird-iconbutton__inner"
+    }, children))
+  );
+});
+IconButton.propTypes = {
+  height: PropTypes.string,
+  width: PropTypes.string,
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element), PropTypes.any]).isRequired,
+  type: PropTypes.string,
+  disabled: PropTypes.bool,
+  onClick: PropTypes.func
+};
+IconButton.defaultProps = {
+  height: '56px',
+  width: '56px',
+  className: '',
+  type: 'button',
+  disabled: false,
+  onClick: function onClick() {}
+};
+
+function ChannelHeader(_ref) {
+  var title = _ref.title,
+      iconButton = _ref.iconButton;
+  return React.createElement("div", {
+    className: "sendbird-channel-header"
+  }, React.createElement("div", {
+    className: "sendbird-channel-header__title"
+  }, React.createElement(Label, {
+    type: LabelTypography.H_2,
+    color: LabelColors.ONBACKGROUND_1
+  }, title || LabelStringSet.CHANNEL_LIST__TITLE)), React.createElement("div", {
+    className: "sendbird-channel-header__right-icon"
+  }, iconButton));
+}
+ChannelHeader.propTypes = {
+  title: PropTypes.string,
+  iconButton: PropTypes.oneOfType([PropTypes.element, PropTypes.instanceOf(IconButton)])
+};
+ChannelHeader.defaultProps = {
+  title: '',
+  iconButton: null
+};
+
+function Types() {
+  return {
+    LOADING: 'LOADING',
+    NO_CHANNELS: 'NO_CHANNELS',
+    WRONG: 'WRONG'
+  };
+}
+var PlaceHolderTypes = Types();
 
 // simple component to be used as modal root
 var MODAL_ROOT = 'sendbird-modal-root';
@@ -4023,6 +4239,14 @@ var createEventHandler = function createEventHandler(_ref) {
     }
   };
 
+  ChannelHandler.onChannelHidden = function (channel) {
+    logger.info('ChannelList: onChannelHidden', channel);
+    channelListDispatcher({
+      type: ON_CHANNEL_ARCHIVED,
+      payload: channel.url
+    });
+  };
+
   logger.info('ChannelList: Added channelHandler');
   sdk.addChannelHandler(sdkChannelHandlerId, ChannelHandler);
 };
@@ -4139,11 +4363,31 @@ var pubSubHandler = function pubSubHandler(pubSub, channelListDispatcher) {
       payload: channel
     });
   }));
+  subScriber.set(UPDATE_USER_MESSAGE, pubSub.subscribe(UPDATE_USER_MESSAGE, function (msg) {
+    var channel = msg.channel,
+        message = msg.message;
+    var updatedChannel = channel;
+    updatedChannel.lastMessage = message;
+
+    if (channel) {
+      channelListDispatcher({
+        type: ON_LAST_MESSAGE_UPDATED,
+        payload: updatedChannel
+      });
+    }
+  }));
   subScriber.set(LEAVE_CHANNEL, pubSub.subscribe(LEAVE_CHANNEL, function (msg) {
     var channel = msg.channel;
     channelListDispatcher({
       type: LEAVE_CHANNEL_SUCCESS,
       payload: channel.url
+    });
+  }));
+  subScriber.set(SEND_MESSAGE_START, pubSub.subscribe(SEND_MESSAGE_START, function (msg) {
+    var channel = msg.channel;
+    channelListDispatcher({
+      type: CHANNEL_REPLACED_TO_TOP,
+      payload: channel
     });
   }));
   return subScriber;
@@ -4163,6 +4407,7 @@ function ChannelList(props) {
       userListQuery = _props$config.userListQuery,
       logger = _props$config.logger,
       pubSub = _props$config.pubSub,
+      theme = _props$config.theme,
       _props$queries = props.queries,
       queries = _props$queries === void 0 ? {} : _props$queries,
       renderChannelPreview = props.renderChannelPreview,
@@ -4360,6 +4605,7 @@ function ChannelList(props) {
       onClick: onClick,
       channel: channel,
       currentUser: user,
+      theme: theme,
       isActive: channel.url === currentChannel // todo - potential performance hit refactor
       ,
       ChannelAction: React.createElement(ChannelPreviewAction, {
@@ -4389,6 +4635,7 @@ ChannelList.propTypes = {
   config: PropTypes.shape({
     userId: PropTypes.string.isRequired,
     userListQuery: PropTypes.func,
+    theme: PropTypes.string,
     isOnline: PropTypes.bool,
     logger: PropTypes.shape({
       info: PropTypes.func,
@@ -4428,7 +4675,7 @@ ChannelList.propTypes = {
     })
   }),
   onBeforeCreateChannel: PropTypes.func,
-  renderChannelPreview: PropTypes.element,
+  renderChannelPreview: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   onChannelSelect: PropTypes.func
 };
 ChannelList.defaultProps = {
@@ -4527,9 +4774,10 @@ var pubSubHandler$1 = function pubSubHandler(channelUrl, pubSub, dispatcher) {
   }));
   subscriber.set(UPDATE_USER_MESSAGE, pubSub.subscribe(UPDATE_USER_MESSAGE, function (msg) {
     var channel = msg.channel,
-        message = msg.message;
+        message = msg.message,
+        fromSelector = msg.fromSelector;
 
-    if (channel && channelUrl === channel.url) {
+    if (fromSelector && channel && channelUrl === channel.url) {
       dispatcher({
         type: ON_MESSAGE_UPDATED,
         payload: message
@@ -5243,6 +5491,7 @@ function useUpdateMessageCallback(_ref, _ref2) {
       messagesDispatcher = _ref.messagesDispatcher,
       onBeforeUpdateUserMessage = _ref.onBeforeUpdateUserMessage;
   var logger = _ref2.logger,
+      pubSub = _ref2.pubSub,
       sdk = _ref2.sdk;
   return useCallback(function (messageId, text, cb) {
     var createParamsDefault = function createParamsDefault(txt) {
@@ -5278,6 +5527,10 @@ function useUpdateMessageCallback(_ref, _ref2) {
         messagesDispatcher({
           type: ON_MESSAGE_UPDATED,
           payload: message
+        });
+        pubSub.publish(UPDATE_USER_MESSAGE, {
+          message: message,
+          channel: currentGroupChannel
         });
       } else {
         logger.warning('Channel: Updating message failed!', err);
@@ -5373,6 +5626,7 @@ function useSendMessageCallback(_ref, _ref2) {
       onBeforeSendUserMessage = _ref.onBeforeSendUserMessage;
   var sdk = _ref2.sdk,
       logger = _ref2.logger,
+      pubSub = _ref2.pubSub,
       messagesDispatcher = _ref2.messagesDispatcher;
   var messageInputRef = useRef(null);
   var sendMessage = useCallback(function () {
@@ -5421,9 +5675,11 @@ function useSendMessageCallback(_ref, _ref2) {
         payload: message
       });
     });
-    messagesDispatcher({
-      type: SEND_MESSAGEGE_START,
-      payload: pendingMsg
+    pubSub.publish(SEND_MESSAGE_START, {
+      /* pubSub is used instead of messagesDispatcher
+        to avoid redundantly calling `messageActionTypes.SEND_MESSAGEGE_START` */
+      message: pendingMsg,
+      channel: currentGroupChannel
     });
     setTimeout(function () {
       return scrollIntoLast('.sendbird-msg--scroll-ref');
@@ -5437,6 +5693,7 @@ function useSendFileMessageCallback(_ref, _ref2) {
       onBeforeSendFileMessage = _ref.onBeforeSendFileMessage;
   var sdk = _ref2.sdk,
       logger = _ref2.logger,
+      pubSub = _ref2.pubSub,
       messagesDispatcher = _ref2.messagesDispatcher;
   var sendMessage = useCallback(function (file) {
     var createParamsDefault = function createParamsDefault(file_) {
@@ -5482,13 +5739,15 @@ function useSendFileMessageCallback(_ref, _ref2) {
         payload: message
       });
     });
-    messagesDispatcher({
-      type: SEND_MESSAGEGE_START,
-      payload: _objectSpread2({}, pendingMsg, {
+    pubSub.publish(SEND_MESSAGE_START, {
+      /* pubSub is used instead of messagesDispatcher
+        to avoid redundantly calling `messageActionTypes.SEND_MESSAGEGE_START` */
+      message: _objectSpread2({}, pendingMsg, {
         url: URL.createObjectURL(file),
         // pending thumbnail message seems to be failed
         requestState: 'pending'
-      })
+      }),
+      channel: currentGroupChannel
     });
     setTimeout(function () {
       return scrollIntoLast('.sendbird-msg--scroll-ref');
@@ -5646,7 +5905,7 @@ function useMemoizedEmojiListItems(_ref, _ref2) {
         }));
       }));
     };
-  }, [emojiContainer]);
+  }, [emojiContainer, toggleReaction]);
 }
 
 function useToggleReactionCallback(_ref, _ref2) {
@@ -8110,26 +8369,14 @@ function ConnectionStatus() {
 var prettyDate = function prettyDate(date) {
   return Moment(date, 'x').fromNow();
 };
-var getChannelAvatarSource$1 = function getChannelAvatarSource(channel, currentUserId) {
-  if (channel && channel.coverUrl) {
-    if (channel.coverUrl !== 'https://static.sendbird.com/sample/cover/cover_') {
-      return channel.coverUrl;
-    }
-  }
-
-  return channel && channel.members ? channel.members.filter(function (member) {
-    return member.userId !== currentUserId;
-  }).map(function (_ref) {
-    var profileUrl = _ref.profileUrl;
-    return profileUrl;
-  }) : [];
-};
 var getOthersLastSeenAt = function getOthersLastSeenAt(channel) {
   if (!channel || !channel.getReadStatus || !channel.members || channel.members.length !== 2) {
     return '';
   }
 
-  var lastSeenAt = _toConsumableArray(Object.values(channel.getReadStatus()))[0].last_seen_at;
+  var lastSeenList = _toConsumableArray(Object.values(channel.getReadStatus()));
+
+  var lastSeenAt = lastSeenList.length > 0 ? lastSeenList[0].last_seen_at : 0;
 
   if (lastSeenAt === 0) {
     return '';
@@ -8153,11 +8400,11 @@ var getChannelTitle$1 = function getChannelTitle() {
     return LabelStringSet.NO_MEMBERS;
   }
 
-  return channel.members.filter(function (_ref2) {
-    var userId = _ref2.userId;
+  return channel.members.filter(function (_ref) {
+    var userId = _ref.userId;
     return userId !== currentUserId;
-  }).map(function (_ref3) {
-    var nickname = _ref3.nickname;
+  }).map(function (_ref2) {
+    var nickname = _ref2.nickname;
     return nickname || LabelStringSet.NO_NAME;
   }).join(', ');
 };
@@ -8195,21 +8442,20 @@ function ChatHeader(props) {
       subTitle = props.subTitle,
       isActive = props.isActive,
       isMuted = props.isMuted,
-      onActionClick = props.onActionClick;
+      onActionClick = props.onActionClick,
+      theme = props.theme;
   var userId = currentUser.userId;
-  var memoizedAvatar = useMemo(function () {
-    return React.createElement(Avatar, {
-      className: "sendbird-chat-header__avatar",
-      src: getChannelAvatarSource$1(currentGroupChannel, userId),
-      width: "32px",
-      height: "32px"
-    });
-  }, [currentGroupChannel.members, currentGroupChannel.coverUrl]);
   return React.createElement("div", {
     className: "sendbird-chat-header"
   }, React.createElement("div", {
     className: "sendbird-chat-header__left"
-  }, memoizedAvatar, React.createElement(Label, {
+  }, React.createElement(ChannelAvatar, {
+    theme: theme,
+    channel: currentGroupChannel,
+    userId: userId,
+    height: 32,
+    width: 32
+  }), React.createElement(Label, {
     className: "sendbird-chat-header__title",
     type: LabelTypography.H_2,
     color: LabelColors.ONBACKGROUND_1
@@ -8247,6 +8493,7 @@ ChatHeader.propTypes = {
     members: PropTypes.arrayOf(PropTypes.shape({})),
     coverUrl: PropTypes.string
   }),
+  theme: PropTypes.string,
   currentUser: PropTypes.shape({
     userId: PropTypes.string
   }),
@@ -8259,6 +8506,7 @@ ChatHeader.propTypes = {
 ChatHeader.defaultProps = {
   currentGroupChannel: {},
   title: '',
+  theme: 'light',
   subTitle: '',
   isActive: false,
   isMuted: false,
@@ -8278,6 +8526,7 @@ var ConversationPanel = function ConversationPanel(props) {
       logger = _props$config.logger,
       pubSub = _props$config.pubSub,
       isOnline = _props$config.isOnline,
+      theme = _props$config.theme,
       reconnect = props.dispatchers.reconnect,
       _props$queries = props.queries,
       queries = _props$queries === void 0 ? {} : _props$queries,
@@ -8417,7 +8666,8 @@ var ConversationPanel = function ConversationPanel(props) {
     onBeforeUpdateUserMessage: onBeforeUpdateUserMessage
   }, {
     logger: logger,
-    sdk: sdk
+    sdk: sdk,
+    pubSub: pubSub
   });
   var resendMessage = useResendMessageCallback({
     currentGroupChannel: currentGroupChannel,
@@ -8432,6 +8682,7 @@ var ConversationPanel = function ConversationPanel(props) {
   }, {
     sdk: sdk,
     logger: logger,
+    pubSub: pubSub,
     messagesDispatcher: messagesDispatcher
   }),
       _useSendMessageCallba2 = _slicedToArray(_useSendMessageCallba, 2),
@@ -8444,6 +8695,7 @@ var ConversationPanel = function ConversationPanel(props) {
   }, {
     sdk: sdk,
     logger: logger,
+    pubSub: pubSub,
     messagesDispatcher: messagesDispatcher
   }),
       _useSendFileMessageCa2 = _slicedToArray(_useSendFileMessageCa, 1),
@@ -8493,6 +8745,7 @@ var ConversationPanel = function ConversationPanel(props) {
     channel: currentGroupChannel,
     user: user
   }) : React.createElement(ChatHeader, {
+    theme: theme,
     currentGroupChannel: currentGroupChannel,
     currentUser: user,
     onActionClick: onChatHeaderActionClick,
@@ -8590,6 +8843,7 @@ ConversationPanel.propTypes = {
   config: PropTypes.shape({
     userId: PropTypes.string.isRequired,
     isOnline: PropTypes.bool.isRequired,
+    theme: PropTypes.string,
     logger: PropTypes.shape({
       info: PropTypes.func,
       error: PropTypes.func,
@@ -8708,13 +8962,14 @@ Input.defaultProps = {
 var EditDetails = function EditDetails(props) {
   var _onSubmit = props.onSubmit,
       onCancel = props.onCancel,
-      avatar = props.avatar,
-      title = props.title;
+      channel = props.channel,
+      userId = props.userId,
+      theme = props.theme;
   var inputRef = useRef(null);
   var formRef = useRef(null);
   var hiddenInputRef = useRef(null);
 
-  var _useState = useState(avatar),
+  var _useState = useState(null),
       _useState2 = _slicedToArray(_useState, 2),
       currentImg = _useState2[0],
       setCurrentImg = _useState2[1];
@@ -8724,6 +8979,7 @@ var EditDetails = function EditDetails(props) {
       newFile = _useState4[0],
       setNewFile = _useState4[1];
 
+  var title = channel.name;
   return React.createElement(Modal, {
     titleText: LabelStringSet.MODAL__CHANNEL_INFORMATION__TITLE,
     submitText: LabelStringSet.BUTTON__SAVE,
@@ -8753,10 +9009,16 @@ var EditDetails = function EditDetails(props) {
     className: "channel-profile-form__img-section"
   }, React.createElement(InputLabel, null, LabelStringSet.MODAL__CHANNEL_INFORMATION__CHANNEL_IMAGE), React.createElement("div", {
     className: "channel-profile-form__avatar"
-  }, React.createElement(Avatar, {
+  }, currentImg ? React.createElement(Avatar, {
     height: "80px",
     width: "80px",
     src: currentImg
+  }) : React.createElement(ChannelAvatar, {
+    height: 80,
+    width: 80,
+    channel: channel,
+    userId: userId,
+    theme: theme
   })), React.createElement("input", {
     ref: hiddenInputRef,
     type: "file",
@@ -8792,15 +9054,20 @@ var EditDetails = function EditDetails(props) {
 EditDetails.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-  avatar: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]).isRequired,
-  title: PropTypes.string.isRequired
+  channel: PropTypes.shape({
+    name: PropTypes.string
+  }).isRequired,
+  userId: PropTypes.string.isRequired,
+  theme: PropTypes.string.isRequired
 };
 
 var ChannelProfile = function ChannelProfile(props) {
-  var avatar = props.avatar,
-      disabled = props.disabled,
-      title = props.title,
+  var disabled = props.disabled,
+      channel = props.channel,
+      userId = props.userId,
+      theme = props.theme,
       onChannelInfoChange = props.onChannelInfoChange;
+  var title = channel.name;
 
   var _useState = useState(false),
       _useState2 = _slicedToArray(_useState, 2),
@@ -8813,8 +9080,10 @@ var ChannelProfile = function ChannelProfile(props) {
     className: "sendbird-channel-profile--inner"
   }, React.createElement("div", {
     className: "sendbird-channel-profile__avatar"
-  }, React.createElement(Avatar, {
-    src: avatar
+  }, React.createElement(ChannelAvatar, {
+    channel: channel,
+    userId: userId,
+    theme: theme
   })), React.createElement(Label, {
     type: LabelTypography.SUBTITLE_2,
     color: LabelColors.ONBACKGROUND_1,
@@ -8838,20 +9107,23 @@ var ChannelProfile = function ChannelProfile(props) {
       return setShowModal(false);
     },
     onSubmit: onChannelInfoChange,
-    avatar: avatar,
-    title: title
+    channel: channel,
+    userId: userId,
+    theme: theme
   })));
 };
 
 ChannelProfile.propTypes = {
-  avatar: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  channel: PropTypes.shape({
+    name: PropTypes.string
+  }).isRequired,
+  userId: PropTypes.string.isRequired,
+  theme: PropTypes.string,
   disabled: PropTypes.bool,
-  title: PropTypes.string,
   onChannelInfoChange: PropTypes.func
 };
 ChannelProfile.defaultProps = {
-  avatar: '',
-  title: '',
+  theme: 'light',
   disabled: false,
   onChannelInfoChange: function onChannelInfoChange() {}
 };
@@ -8964,6 +9236,7 @@ function ChannelSettings(props) {
   var sdkStore = props.stores.sdkStore,
       _props$config = props.config,
       userListQuery = _props$config.userListQuery,
+      theme = _props$config.theme,
       userId = _props$config.userId,
       logger = _props$config.logger,
       isOnline = _props$config.isOnline,
@@ -9065,8 +9338,9 @@ function ChannelSettings(props) {
     className: "sendbird-channel-settings__scroll-area"
   }, React.createElement(ChannelProfile, {
     disabled: !isOnline,
-    avatar: getChannelAvatarSource(channel, userId),
-    title: channel.name,
+    channel: channel,
+    userId: userId,
+    theme: theme,
     onChannelInfoChange: function onChannelInfoChange(currentImg, currentTitle) {
       logger.info('ChannelSettings: Channel information being updated');
       var swapParams = sdk.getErrorFirstCallback();
@@ -9212,6 +9486,7 @@ ChannelSettings.propTypes = {
   }).isRequired,
   config: PropTypes.shape({
     userId: PropTypes.string,
+    theme: PropTypes.string,
     userListQuery: PropTypes.func,
     isOnline: PropTypes.bool,
     logger: PropTypes.shape({
@@ -9524,7 +9799,10 @@ var getUpdateUserMessage = function getUpdateUserMessage(store) {
           resolve(message);
           pubsub.publish(UPDATE_USER_MESSAGE, {
             message: message,
-            channel: channel
+            channel: channel,
+            // workaround for updating channelPreview on message-edit
+            // https://sendbird.atlassian.net/browse/UIKIT-268
+            fromSelector: true
           });
         });
       }).catch(reject);
