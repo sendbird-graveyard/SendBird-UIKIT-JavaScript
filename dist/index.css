@@ -176,6 +176,12 @@
 .sendbird-theme--dark .sendbird-color--read [class*='fill'] {
   fill: #6FD6BE; }
 
+.sendbird-theme--light .sendbird-color--on-background [class*='fill'] {
+  fill: rgba(0, 0, 0, 0.38); }
+
+.sendbird-theme--dark .sendbird-color--on-background [class*='fill'] {
+  fill: rgba(255, 255, 255, 0.38); }
+
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap");
 .sendbird-badge {
   height: 20px;
@@ -304,6 +310,12 @@
 
 .sendbird-theme--dark .sendbird-label--color-oncontent-1 {
   color: rgba(0, 0, 0, 0.88); }
+
+.sendbird-theme--light .sendbird-label--color-oncontent-2 {
+  color: rgba(255, 255, 255, 0.5); }
+
+.sendbird-theme--dark .sendbird-label--color-oncontent-2 {
+  color: rgba(0, 0, 0, 0.5); }
 
 .sendbird-theme--light .sendbird-label--color-primary {
   color: #7B53EF; }
@@ -980,9 +992,10 @@
   padding-right: 24px; }
 
 .sendbird-conversation__messages .sendbird-message,
-.sendbird-conversation__messages .sendbird-separator,
-.sendbird-conversation__messages .sendbird-admin-message,
 .sendbird-conversation__messages .sendbird-thumbnail,
+.sendbird-conversation__messages .sendbird-separator,
+.sendbird-conversation__messages .sendbird-og-message,
+.sendbird-conversation__messages .sendbird-admin-message,
 .sendbird-conversation__messages .sendbird-unknown-message {
   padding-top: 8px;
   padding-bottom: 8px; }
@@ -1159,6 +1172,8 @@
   .sendbird-emoji-reactions .sendbird-emoji-reactions__emoji-reaction-add {
     width: 36px;
     height: 24px; }
+  .sendbird-emoji-reactions:focus {
+    outline: none; }
 
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap");
 .sendbird-reaction-badge {
@@ -1891,6 +1906,252 @@
       margin-left: 10px; }
 
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap");
+.sendbird-og-message {
+  position: relative; }
+  .sendbird-og-message--outgoing {
+    text-align: right; }
+  .sendbird-og-message--incoming {
+    text-align: left; }
+
+.sendbird-outgoing-og-message {
+  position: relative;
+  right: 0px;
+  display: inline-block;
+  box-sizing: border-box;
+  text-align: right; }
+  .sendbird-theme--light .sendbird-outgoing-og-message:hover .sendbird-outgoing-og-message__text-balloon {
+    background-color: #9E8CF5; }
+  .sendbird-theme--dark .sendbird-outgoing-og-message:hover .sendbird-outgoing-og-message__text-balloon {
+    background-color: #6440C4; }
+  .sendbird-theme--light .sendbird-outgoing-og-message:hover .sendbird-outgoing-og-message__og-tag {
+    background-color: #D9D9D9; }
+  .sendbird-theme--dark .sendbird-outgoing-og-message:hover .sendbird-outgoing-og-message__og-tag {
+    background-color: #393939; }
+  .sendbird-theme--light .sendbird-outgoing-og-message:hover .sendbird-outgoing-og-message__og-tag__emoji-reactions {
+    border: 1px solid #D9D9D9; }
+  .sendbird-theme--dark .sendbird-outgoing-og-message:hover .sendbird-outgoing-og-message__og-tag__emoji-reactions {
+    border: 1px solid #393939; }
+  .sendbird-outgoing-og-message:hover .sendbird-outgoing-og-message__more {
+    display: block; }
+  .sendbird-outgoing-og-message__more {
+    display: none;
+    position: absolute;
+    left: 0px;
+    top: 2px; }
+    .sendbird-outgoing-og-message__more[class*='--pressed'] {
+      display: block !important; }
+  .sendbird-outgoing-og-message__text-balloon {
+    box-sizing: border-box;
+    width: 320px;
+    padding: 8px 12px;
+    border-radius: 16px 16px 0px 0px;
+    word-break: break-all;
+    text-align: left; }
+    .sendbird-theme--light .sendbird-outgoing-og-message__text-balloon {
+      background-color: #E2DFFF; }
+    .sendbird-theme--dark .sendbird-outgoing-og-message__text-balloon {
+      background-color: #7B53EF; }
+  .sendbird-outgoing-og-message__thumbnail--disabled:hover {
+    cursor: not-allowed !important; }
+  .sendbird-outgoing-og-message__thumbnail {
+    width: 320px;
+    box-sizing: border-box; }
+    .sendbird-theme--light .sendbird-outgoing-og-message__thumbnail {
+      background-color: #F0F0F0; }
+    .sendbird-theme--dark .sendbird-outgoing-og-message__thumbnail {
+      background-color: #2C2C2C; }
+    .sendbird-outgoing-og-message__thumbnail__image__placeholder {
+      width: 320px;
+      height: 160px;
+      display: flex;
+      justify-content: center;
+      align-items: center; }
+    .sendbird-outgoing-og-message__thumbnail:hover {
+      cursor: pointer; }
+    .sendbird-outgoing-og-message__thumbnail:focus {
+      outline: none; }
+  .sendbird-outgoing-og-message__og-tag--disabled:hover {
+    cursor: not-allowed !important; }
+  .sendbird-outgoing-og-message__og-tag {
+    padding: 8px 12px 12px 12px;
+    border-radius: 0px 0px 16px 16px;
+    text-align: left;
+    box-sizing: border-box;
+    width: 320px; }
+    .sendbird-theme--light .sendbird-outgoing-og-message__og-tag {
+      background-color: #F0F0F0; }
+    .sendbird-theme--dark .sendbird-outgoing-og-message__og-tag {
+      background-color: #2C2C2C; }
+    .sendbird-outgoing-og-message__og-tag__title {
+      max-height: 150px;
+      overflow-y: hidden;
+      margin-bottom: 4px; }
+    .sendbird-outgoing-og-message__og-tag__description {
+      margin-bottom: 8px; }
+      .sendbird-outgoing-og-message__og-tag__description__label {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden; }
+    .sendbird-outgoing-og-message__og-tag__url__label {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden; }
+    .sendbird-outgoing-og-message__og-tag__emoji-reactions--wrapper:focus {
+      outline: none; }
+    .sendbird-outgoing-og-message__og-tag__emoji-reactions {
+      margin: 8px -12px -12px -12px;
+      width: 320px; }
+      .sendbird-theme--light .sendbird-outgoing-og-message__og-tag__emoji-reactions {
+        border: 1px solid #F0F0F0; }
+      .sendbird-theme--dark .sendbird-outgoing-og-message__og-tag__emoji-reactions {
+        border: 1px solid #2C2C2C; }
+      .sendbird-outgoing-og-message__og-tag__emoji-reactions:hover {
+        cursor: default; }
+      .sendbird-outgoing-og-message__og-tag__emoji-reactions:focus {
+        outline: none; }
+    .sendbird-outgoing-og-message__og-tag:hover {
+      cursor: pointer; }
+    .sendbird-outgoing-og-message__og-tag:focus {
+      outline: none; }
+  .sendbird-outgoing-og-message__message-status {
+    margin-top: 2px;
+    margin-right: 4px;
+    text-align: right; }
+
+.sendbird-incoming-og-message {
+  position: relative;
+  left: 0px;
+  display: inline-block;
+  box-sizing: border-box;
+  text-align: left;
+  padding-left: 40px; }
+  .sendbird-theme--light .sendbird-incoming-og-message:hover .sendbird-incoming-og-message__text-balloon {
+    background-color: #D9D9D9; }
+  .sendbird-theme--dark .sendbird-incoming-og-message:hover .sendbird-incoming-og-message__text-balloon {
+    background-color: #393939; }
+  .sendbird-theme--light .sendbird-incoming-og-message:hover .sendbird-incoming-og-message__og-tag {
+    background-color: #D9D9D9; }
+  .sendbird-theme--dark .sendbird-incoming-og-message:hover .sendbird-incoming-og-message__og-tag {
+    background-color: #393939; }
+  .sendbird-theme--light .sendbird-incoming-og-message:hover .sendbird-incoming-og-message__og-tag__emoji-reactions {
+    border: 1px solid #D9D9D9; }
+  .sendbird-theme--dark .sendbird-incoming-og-message:hover .sendbird-incoming-og-message__og-tag__emoji-reactions {
+    border: 1px solid #393939; }
+  .sendbird-incoming-og-message:hover .sendbird-incoming-og-message__more {
+    display: block; }
+  .sendbird-incoming-og-message__avatar {
+    position: absolute;
+    bottom: 18px;
+    left: 0px; }
+  .sendbird-incoming-og-message__sender-name {
+    margin-left: 12px; }
+  .sendbird-incoming-og-message__text-balloon {
+    margin-top: 4px;
+    box-sizing: border-box;
+    max-width: 320px;
+    padding: 8px 12px;
+    border-radius: 16px 16px 0px 0px;
+    word-break: break-all;
+    text-align: left; }
+    .sendbird-theme--light .sendbird-incoming-og-message__text-balloon {
+      background-color: #F0F0F0; }
+    .sendbird-theme--dark .sendbird-incoming-og-message__text-balloon {
+      background-color: #2C2C2C; }
+  .sendbird-incoming-og-message__thumbnail--disabled:hover {
+    cursor: not-allowed !important; }
+  .sendbird-incoming-og-message__thumbnail {
+    box-sizing: border-box;
+    width: 320px; }
+    .sendbird-theme--light .sendbird-incoming-og-message__thumbnail {
+      background-color: #F0F0F0; }
+    .sendbird-theme--dark .sendbird-incoming-og-message__thumbnail {
+      background-color: #2C2C2C; }
+    .sendbird-incoming-og-message__thumbnail__image__placeholder {
+      width: 320px;
+      height: 160px;
+      display: flex;
+      justify-content: center;
+      align-items: center; }
+    .sendbird-incoming-og-message__thumbnail:hover {
+      cursor: pointer; }
+    .sendbird-incoming-og-message__thumbnail:focus {
+      outline: none; }
+  .sendbird-incoming-og-message__og-tag--disabled:hover {
+    cursor: not-allowed !important; }
+  .sendbird-incoming-og-message__og-tag {
+    padding: 8px 12px 12px 12px;
+    border-radius: 0px 0px 16px 16px;
+    text-align: left;
+    box-sizing: border-box;
+    width: 320px; }
+    .sendbird-theme--light .sendbird-incoming-og-message__og-tag {
+      background-color: #F0F0F0; }
+    .sendbird-theme--dark .sendbird-incoming-og-message__og-tag {
+      background-color: #2C2C2C; }
+    .sendbird-incoming-og-message__og-tag__title {
+      max-height: 150px;
+      overflow-y: hidden;
+      margin-bottom: 4px; }
+    .sendbird-incoming-og-message__og-tag__description {
+      margin-bottom: 8px; }
+      .sendbird-incoming-og-message__og-tag__description__label {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden; }
+    .sendbird-incoming-og-message__og-tag__url__label {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden; }
+    .sendbird-incoming-og-message__og-tag__emoji-reactions--wrapper:focus {
+      outline: none; }
+    .sendbird-incoming-og-message__og-tag__emoji-reactions {
+      margin: 8px -12px -12px -12px;
+      width: 320px; }
+      .sendbird-theme--light .sendbird-incoming-og-message__og-tag__emoji-reactions {
+        border: 1px solid #F0F0F0; }
+      .sendbird-theme--dark .sendbird-incoming-og-message__og-tag__emoji-reactions {
+        border: 1px solid #2C2C2C; }
+      .sendbird-incoming-og-message__og-tag__emoji-reactions:hover {
+        cursor: default; }
+      .sendbird-incoming-og-message__og-tag__emoji-reactions:focus {
+        outline: none; }
+    .sendbird-incoming-og-message__og-tag:hover {
+      cursor: pointer; }
+    .sendbird-incoming-og-message__og-tag:focus {
+      outline: none; }
+  .sendbird-incoming-og-message__sent-at {
+    margin-top: 4px;
+    margin-left: 12px; }
+  .sendbird-incoming-og-message__more {
+    display: none;
+    position: absolute;
+    top: 18px;
+    right: 0px; }
+
+.sendbird-og-message-word {
+  display: inline;
+  margin: 0px 2px; }
+
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap");
+.sendbird-theme--light .sendbird-link-label {
+  color: rgba(0, 0, 0, 0.88); }
+
+.sendbird-theme--dark .sendbird-link-label {
+  color: rgba(255, 255, 255, 0.88); }
+
+.sendbird-theme--light .sendbird-link-label:active, .sendbird-theme--light .sendbird-link-label:visited, .sendbird-theme--light .sendbird-link-label:focus {
+  color: rgba(0, 0, 0, 0.88); }
+
+.sendbird-theme--dark .sendbird-link-label:active, .sendbird-theme--dark .sendbird-link-label:visited, .sendbird-theme--dark .sendbird-link-label:focus {
+  color: rgba(255, 255, 255, 0.88); }
+
+.sendbird-link-label:focus {
+  outline: none; }
+
+.sendbird-link-label__label {
+  display: inline; }
+
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap");
 .sendbird-notification {
   margin-top: 8px;
   margin-left: 24px;
@@ -1911,6 +2172,14 @@
       background-color: #6440C4; }
     .sendbird-theme--dark .sendbird-notification:hover {
       background-color: #7B53EF; }
+  .sendbird-theme--light .sendbird-notification.sendbird-notification--frozen {
+    background-color: #b2d9ff; }
+  .sendbird-theme--dark .sendbird-notification.sendbird-notification--frozen {
+    background-color: #b2d9ff; }
+  .sendbird-theme--light .sendbird-notification.sendbird-notification--frozen .sendbird-notification__text {
+    color: rgba(0, 0, 0, 0.88); }
+  .sendbird-theme--dark .sendbird-notification.sendbird-notification--frozen .sendbird-notification__text {
+    color: rgba(0, 0, 0, 0.88); }
   .sendbird-notification .sendbird-notification__text {
     display: flex;
     align-items: center;

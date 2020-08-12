@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.4(Aug 12, 2020)
+
+- Features:
+  * Implement OG tag messages
+  * Apply broadcast/Freeze indicators in Conversation
+
+- Bugfixes:
+  * Reload conversation and ChannelList on query change
+  * Change channel placeholder to match design
+  * Fix typing indicator bug
+
+- Dependency updates:
+  * SDK version - 3.0.129
+
 ## 1.1.3(July 29, 2020)
 
 - Features:
