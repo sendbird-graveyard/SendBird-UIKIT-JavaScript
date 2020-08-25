@@ -222,7 +222,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.1.4';
+var APP_VERSION_STRING = '1.1.5';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -2196,7 +2196,6 @@ var _ref$J =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-send_svg__fill",
-  fill: "#7B53EF",
   fillRule: "evenodd",
   d: "M20.554 10.117L2.52 1.024C1.613.619.605 1.428 1.008 2.337l2.115 5.685a2 2 0 001.545 1.275l10.345 1.73-10.345 1.728a2 2 0 00-1.545 1.275l-2.115 5.685c-.302.91.605 1.718 1.511 1.213l18.035-9.094c.706-.303.706-1.313 0-1.717z"
 });
@@ -2761,7 +2760,8 @@ var getStringSet = function getStringSet(lang) {
       TOOLTIP__YOU: 'you',
       TOOLTIP__UNKOWN_USER: '(no name)',
       UNKNOWN__UNKNOWN_MESSAGE_TYPE: '(Unknown message type)',
-      UNKNOWN__CANNOT_READ_MESSAGE: 'Cannot read this message.'
+      UNKNOWN__CANNOT_READ_MESSAGE: 'Cannot read this message.',
+      MESSAGE_EDITED: '(edited)'
     }
   };
   return stringSet && stringSet[lang] ? stringSet[lang] : {};
@@ -5064,7 +5064,17 @@ function reducer$3(state, action) {
 
     case GET_PREV_MESSAGES_SUCESS:
       {
-        var recivedMessages = action.payload.messages || []; // remove duplicate messages
+        var recivedMessages = action.payload.messages || [];
+        var _action$payload$curre = action.payload.currentGroupChannel,
+            currentGroupChannel = _action$payload$curre === void 0 ? {} : _action$payload$curre;
+        var stateChannel = state.currentGroupChannel || {};
+        var stateChannelUrl = stateChannel.url;
+        var actionChannelUrl = currentGroupChannel.url;
+
+        if (actionChannelUrl !== stateChannelUrl) {
+          return state;
+        } // remove duplicate messages
+
 
         var filteredAllMessages = state.allMessages.filter(function (msg) {
           return !recivedMessages.find(function (_ref) {
@@ -5124,11 +5134,13 @@ function reducer$3(state, action) {
         var _action$payload = action.payload,
             channel = _action$payload.channel,
             message = _action$payload.message;
+
         var _state$currentGroupCh = state.currentGroupChannel,
-            currentGroupChannel = _state$currentGroupCh === void 0 ? {} : _state$currentGroupCh,
+            _currentGroupChannel = _state$currentGroupCh === void 0 ? {} : _state$currentGroupCh,
             unreadCount = state.unreadCount,
             unreadSince = state.unreadSince;
-        var currentGroupChannelUrl = currentGroupChannel.url;
+
+        var currentGroupChannelUrl = _currentGroupChannel.url;
 
         if (!compareIds(channel.url, currentGroupChannelUrl)) {
           return state;
@@ -5408,7 +5420,8 @@ function useInitialMessagesFetch(_ref, _ref2) {
           payload: {
             messages: messages,
             hasMore: hasMore,
-            lastMessageTimeStamp: lastMessageTimeStamp
+            lastMessageTimeStamp: lastMessageTimeStamp,
+            currentGroupChannel: currentGroupChannel
           }
         });
       }).catch(function (error) {
@@ -5418,7 +5431,8 @@ function useInitialMessagesFetch(_ref, _ref2) {
           payload: {
             messages: [],
             hasMore: false,
-            lastMessageTimeStamp: 0
+            lastMessageTimeStamp: 0,
+            currentGroupChannel: currentGroupChannel
           }
         });
       }).finally(function () {
@@ -5478,7 +5492,8 @@ function useHandleReconnect(_ref, _ref2) {
               payload: {
                 messages: messages,
                 hasMore: hasMore,
-                lastMessageTimeStamp: lastMessageTimeStamp
+                lastMessageTimeStamp: lastMessageTimeStamp,
+                currentGroupChannel: currentGroupChannel
               }
             });
             setTimeout(function () {
@@ -5531,7 +5546,8 @@ function useScrollCallback(_ref, _ref2) {
         payload: {
           messages: messages,
           hasMore: hasMoreMessages,
-          lastMessageTimeStamp: lastMessageTs
+          lastMessageTimeStamp: lastMessageTs,
+          currentGroupChannel: currentGroupChannel
         }
       });
       cb([messages, null]);
@@ -5542,7 +5558,8 @@ function useScrollCallback(_ref, _ref2) {
         payload: {
           messages: [],
           hasMore: false,
-          lastMessageTimeStamp: 0
+          lastMessageTimeStamp: 0,
+          currentGroupChannel: currentGroupChannel
         }
       });
       cb([null, error]);
@@ -6349,7 +6366,8 @@ function EmojiReactions(_ref) {
       }, React__default.createElement(Icon, {
         width: imageWidth,
         height: imageHeight,
-        type: IconTypes.EMOJI_REACTIONS_ADD_GRAY
+        fillColor: IconColors.ON_BACKGROUND_3,
+        type: IconTypes.EMOJI_REACTIONS_ADD
       }));
     },
     menuItems: function menuItems(closeDropdown) {
@@ -6424,6 +6442,145 @@ var getIsSentFromStatus$1 = function getIsSentFromStatus(status) {
   return status === MessageStatusType.SENT || status === MessageStatusType.DELIVERED || status === MessageStatusType.READ;
 };
 
+var LINK_LABEL = 'sendbird-link-label';
+var http = /https?:\/\//;
+function LinkLabel(_ref) {
+  var className = _ref.className,
+      src = _ref.src,
+      type = _ref.type,
+      color = _ref.color,
+      children = _ref.children;
+  var injecingClassName = Array.isArray(className) ? className : [className];
+  var url = http.test(src) ? src : "http://".concat(src);
+  return React__default.createElement("a", {
+    className: "".concat(LINK_LABEL, " ").concat(injecingClassName.join(' ')),
+    href: url
+  }, React__default.createElement(Label, {
+    type: type,
+    color: color,
+    className: "".concat(LINK_LABEL, "__label")
+  }, children));
+}
+LinkLabel.propTypes = {
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element, PropTypes.arrayOf(PropTypes.string), PropTypes.arrayOf(PropTypes.element)]).isRequired,
+  src: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(Object.keys(LabelTypography)).isRequired,
+  color: PropTypes.oneOf(Object.keys(LabelColors)).isRequired
+};
+LinkLabel.defaultProps = {
+  className: ''
+};
+
+var createUrlTester = function createUrlTester(regexp) {
+  return function (text) {
+    return regexp.test(text);
+  };
+};
+var getIsSentFromStatus$2 = function getIsSentFromStatus(status) {
+  return status === MessageStatusType.SENT || status === MessageStatusType.DELIVERED || status === MessageStatusType.READ;
+};
+var copyToClipboard$1 = function copyToClipboard(text) {
+  try {
+    if (window.clipboardData && window.clipboardData.setData) {
+      // Internet Explorer-specific code path
+      // to prevent textarea being shown while dialog is visible.
+      return window.clipboardData.setData('Text', text);
+    }
+
+    if (document.queryCommandSupported && document.queryCommandSupported('copy')) {
+      var textarea = document.createElement('textarea');
+      textarea.textContent = text;
+      textarea.style.position = 'fixed'; // Prevent scrolling to bottom of page in Microsoft Edge.
+
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      try {
+        return document.execCommand('copy'); // Security exception may be thrown by some browsers.
+      } catch (ex) {
+        return false;
+      } finally {
+        document.body.removeChild(textarea);
+      }
+    }
+
+    return false;
+  } catch (err) {
+    return err;
+  }
+};
+var getSenderProfileUrl$2 = function getSenderProfileUrl(message) {
+  return message.sender && message.sender.profileUrl;
+};
+var getSenderName$2 = function getSenderName(message) {
+  return message.sender && (message.sender.friendName || message.sender.nickname || message.sender.userId);
+};
+var getMessageCreatedAt$2 = function getMessageCreatedAt(message) {
+  return Moment(message.createdAt).format('LT');
+};
+var checkOGIsEnalbed = function checkOGIsEnalbed(message) {
+  var ogMetaData = message.ogMetaData;
+
+  if (!ogMetaData) {
+    return false;
+  }
+
+  var url = ogMetaData.url;
+
+  if (!url) {
+    return false;
+  }
+
+  return true;
+};
+
+var URL_REG = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
+var OG_MESSAGE = 'sendbird-og-message';
+var OUTGOING_OG_MESSAGE = 'sendbird-outgoing-og-message';
+var INCOMING_OG_MESSAGE = 'sendbird-incoming-og-message';
+
+var WORD_TYPOGRAPHY = LabelTypography.BODY_1;
+var WORD_COLOR = LabelColors.ONBACKGROUND_1;
+var EDITED_COLOR = LabelColors.ONBACKGROUND_2;
+var isUrl = createUrlTester(URL_REG);
+function useMemoizedMessageText(_ref) {
+  var message = _ref.message,
+      updatedAt = _ref.updatedAt,
+      className = _ref.className;
+  return React.useMemo(function () {
+    return function () {
+      var splitMessage = message.split(' ');
+      var matchedMessage = splitMessage.map(function (word) {
+        return isUrl(word) ? React__default.createElement(LinkLabel, {
+          key: uuidv4(),
+          className: className,
+          src: word,
+          type: WORD_TYPOGRAPHY,
+          color: WORD_COLOR
+        }, word) : React__default.createElement(Label, {
+          key: uuidv4(),
+          className: className,
+          type: WORD_TYPOGRAPHY,
+          color: WORD_COLOR
+        }, word);
+      });
+
+      if (updatedAt > 0) {
+        matchedMessage.push(React__default.createElement(Label, {
+          key: uuidv4(),
+          className: className,
+          type: WORD_TYPOGRAPHY,
+          color: EDITED_COLOR
+        }, LabelStringSet.MESSAGE_EDITED));
+      } // return (<>{matchedMessage}</>);
+
+
+      return matchedMessage;
+    };
+  }, [message, updatedAt, className]);
+}
+
 var noop$1 = function noop() {};
 
 var SPACE_BETWEEN_MORE = 4;
@@ -6446,6 +6603,11 @@ function Message(props) {
   if (!message) return null;
   var injectingClassName = Array.isArray(className) ? className : [className];
   injectingClassName.push("sendbird-message".concat(isByMe ? '--outgoing' : '--incoming'));
+  var memoizedMessageText = useMemoizedMessageText({
+    message: message.message,
+    updatedAt: message.updatedAt,
+    className: 'sendbird-user-message-word'
+  });
   return React__default.createElement("div", {
     className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-message']).join(' ')
   }, isByMe ? React__default.createElement(OutgoingUserMessage, {
@@ -6460,6 +6622,7 @@ function Message(props) {
     emojiAllMap: emojiAllMap,
     membersMap: membersMap,
     toggleReaction: toggleReaction,
+    memoizedMessageText: memoizedMessageText,
     memoizedEmojiListItems: memoizedEmojiListItems
   }) : React__default.createElement(IncomingUserMessage, {
     userId: userId,
@@ -6468,6 +6631,7 @@ function Message(props) {
     emojiAllMap: emojiAllMap,
     membersMap: membersMap,
     toggleReaction: toggleReaction,
+    memoizedMessageText: memoizedMessageText,
     memoizedEmojiListItems: memoizedEmojiListItems
   }));
 }
@@ -6516,7 +6680,9 @@ function OutgoingUserMessage(_ref) {
       emojiAllMap = _ref.emojiAllMap,
       membersMap = _ref.membersMap,
       toggleReaction = _ref.toggleReaction,
+      memoizedMessageText = _ref.memoizedMessageText,
       memoizedEmojiListItems = _ref.memoizedEmojiListItems;
+  var MemoizedMessageText = memoizedMessageText;
   var MemoizedEmojiListItems = memoizedEmojiListItems; // TODO: when message.requestState is succeeded, consider if it's SENT or DELIVERED
 
   var parentRefReactions = React.useRef(null);
@@ -6616,7 +6782,7 @@ function OutgoingUserMessage(_ref) {
     className: "sendbird-user-message__text-balloon__inner__text-place__text",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, message.message)), useReaction && message.reactions && message.reactions.length > 0 && React__default.createElement(EmojiReactions, {
+  }, React__default.createElement(MemoizedMessageText, null))), useReaction && message.reactions && message.reactions.length > 0 && React__default.createElement(EmojiReactions, {
     className: "sendbird-user-message__text-balloon__inner__emoji-reactions",
     userId: userId,
     message: message,
@@ -6645,7 +6811,9 @@ function IncomingUserMessage(_ref2) {
       emojiAllMap = _ref2.emojiAllMap,
       membersMap = _ref2.membersMap,
       toggleReaction = _ref2.toggleReaction,
+      memoizedMessageText = _ref2.memoizedMessageText,
       memoizedEmojiListItems = _ref2.memoizedEmojiListItems;
+  var MemoizedMessageText = memoizedMessageText;
   var MemoizedEmojiListItems = memoizedEmojiListItems;
   var parentRefReactions = React.useRef(null);
   var parentRefMenus = React.useRef(null);
@@ -6675,7 +6843,7 @@ function IncomingUserMessage(_ref2) {
     className: "sendbird-user-message__text-balloon__inner__text-place__text",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, message.message)), useReaction && message.reactions && message.reactions.length > 0 && React__default.createElement(EmojiReactions, {
+  }, React__default.createElement(MemoizedMessageText, null))), useReaction && message.reactions && message.reactions.length > 0 && React__default.createElement(EmojiReactions, {
     className: "sendbird-user-message__text-balloon__inner__emoji-reactions",
     userId: userId,
     message: message,
@@ -6752,6 +6920,7 @@ IncomingUserMessage.propTypes = {
   emojiAllMap: PropTypes.instanceOf(Map),
   membersMap: PropTypes.instanceOf(Map),
   toggleReaction: PropTypes.func,
+  memoizedMessageText: PropTypes.func.isRequired,
   memoizedEmojiListItems: PropTypes.func
 };
 IncomingUserMessage.defaultProps = {
@@ -6775,6 +6944,7 @@ OutgoingUserMessage.propTypes = {
   emojiAllMap: PropTypes.instanceOf(Map),
   membersMap: PropTypes.instanceOf(Map),
   toggleReaction: PropTypes.func,
+  memoizedMessageText: PropTypes.func.isRequired,
   memoizedEmojiListItems: PropTypes.func
 };
 OutgoingUserMessage.defaultProps = {
@@ -6818,10 +6988,10 @@ AdminMessage.defaultProps = {
   className: ''
 };
 
-var getMessageCreatedAt$2 = function getMessageCreatedAt(message) {
+var getMessageCreatedAt$3 = function getMessageCreatedAt(message) {
   return Moment(message.createdAt).format('LT');
 };
-var getIsSentFromStatus$2 = function getIsSentFromStatus(status) {
+var getIsSentFromStatus$3 = function getIsSentFromStatus(status) {
   return status === MessageStatusType.SENT || status === MessageStatusType.DELIVERED || status === MessageStatusType.READ;
 };
 
@@ -6867,7 +7037,7 @@ function ThumbnailMessage(_ref) {
   var reactionAddRef = React.useRef(null);
   var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
   var MemoizedEmojiListItems = memoizedEmojiListItems;
-  var isMessageSent = getIsSentFromStatus$2(status);
+  var isMessageSent = getIsSentFromStatus$3(status);
   return React__default.createElement("div", {
     className: ['sendbird-thumbnail', !isByMe ? 'sendbird-thumbnail--incoming' : ''].join(' ')
   }, !isByMe && React__default.createElement(React__default.Fragment, null, React__default.createElement(Avatar, {
@@ -7002,7 +7172,7 @@ function ThumbnailMessage(_ref) {
     className: "sendbird-thumbnail__sent-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
-  }, getMessageCreatedAt$2(message)), !isByMe && showReactionAddButton && React__default.createElement("div", {
+  }, getMessageCreatedAt$3(message)), !isByMe && showReactionAddButton && React__default.createElement("div", {
     className: "sendbird-thumbnail__more",
     ref: parentContainRef,
     style: {
@@ -7653,6 +7823,7 @@ var MessageInput = React__default.forwardRef(function (props, ref) {
     onClick: sendMessage
   }, React__default.createElement(Icon, {
     type: IconTypes.SEND,
+    fillColor: IconColors.PRIMARY,
     width: "20px",
     height: "20px"
   }))), isEdit && React__default.createElement("div", {
@@ -7848,7 +8019,7 @@ RemoveMessage.propTypes = {
   onDeleteMessage: PropTypes.func.isRequired
 };
 
-var getMessageCreatedAt$3 = function getMessageCreatedAt(message) {
+var getMessageCreatedAt$4 = function getMessageCreatedAt(message) {
   return Moment(message.createdAt).format('LT');
 };
 
@@ -7982,7 +8153,7 @@ function IncomingUnknownMessage(_ref3) {
     className: "".concat(className, "__body__sent-at"),
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
-  }, getMessageCreatedAt$3(message))));
+  }, getMessageCreatedAt$4(message))));
 }
 
 OutgoingUnknownMessage.propTypes = {
@@ -8000,104 +8171,6 @@ IncomingUnknownMessage.propTypes = {
       profileUrl: PropTypes.string
     })
   }).isRequired
-};
-
-var URL_REG = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
-var OG_MESSAGE = 'sendbird-og-message';
-var OUTGOING_OG_MESSAGE = 'sendbird-outgoing-og-message';
-var INCOMING_OG_MESSAGE = 'sendbird-incoming-og-message';
-
-var createUrlTester = function createUrlTester(regexp) {
-  return function (text) {
-    return regexp.test(text);
-  };
-};
-var getIsSentFromStatus$3 = function getIsSentFromStatus(status) {
-  return status === MessageStatusType.SENT || status === MessageStatusType.DELIVERED || status === MessageStatusType.READ;
-};
-var copyToClipboard$1 = function copyToClipboard(text) {
-  try {
-    if (window.clipboardData && window.clipboardData.setData) {
-      // Internet Explorer-specific code path
-      // to prevent textarea being shown while dialog is visible.
-      return window.clipboardData.setData('Text', text);
-    }
-
-    if (document.queryCommandSupported && document.queryCommandSupported('copy')) {
-      var textarea = document.createElement('textarea');
-      textarea.textContent = text;
-      textarea.style.position = 'fixed'; // Prevent scrolling to bottom of page in Microsoft Edge.
-
-      document.body.appendChild(textarea);
-      textarea.select();
-
-      try {
-        return document.execCommand('copy'); // Security exception may be thrown by some browsers.
-      } catch (ex) {
-        return false;
-      } finally {
-        document.body.removeChild(textarea);
-      }
-    }
-
-    return false;
-  } catch (err) {
-    return err;
-  }
-};
-var getSenderProfileUrl$2 = function getSenderProfileUrl(message) {
-  return message.sender && message.sender.profileUrl;
-};
-var getSenderName$2 = function getSenderName(message) {
-  return message.sender && (message.sender.friendName || message.sender.nickname || message.sender.userId);
-};
-var getMessageCreatedAt$4 = function getMessageCreatedAt(message) {
-  return Moment(message.createdAt).format('LT');
-};
-var checkOGIsEnalbed = function checkOGIsEnalbed(message) {
-  var ogMetaData = message.ogMetaData;
-
-  if (!ogMetaData) {
-    return false;
-  }
-
-  var url = ogMetaData.url;
-
-  if (!url) {
-    return false;
-  }
-
-  return true;
-};
-
-var LINK_LABEL = 'sendbird-link-label';
-var http = /https?:\/\//;
-function LinkLabel(_ref) {
-  var className = _ref.className,
-      src = _ref.src,
-      type = _ref.type,
-      color = _ref.color,
-      children = _ref.children;
-  var injecingClassName = Array.isArray(className) ? className : [className];
-  var url = http.test(src) ? src : "http://".concat(src);
-  return React__default.createElement("a", {
-    className: "".concat(LINK_LABEL, " ").concat(injecingClassName.join(' ')),
-    href: url
-  }, React__default.createElement(Label, {
-    type: type,
-    color: color,
-    className: "".concat(LINK_LABEL, "__label")
-  }, children));
-}
-LinkLabel.propTypes = {
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element, PropTypes.arrayOf(PropTypes.string), PropTypes.arrayOf(PropTypes.element)]).isRequired,
-  src: PropTypes.string.isRequired,
-  type: PropTypes.oneOf(Object.keys(LabelTypography)).isRequired,
-  color: PropTypes.oneOf(Object.keys(LabelColors)).isRequired
-};
-LinkLabel.defaultProps = {
-  className: ''
 };
 
 var SPACE_BETWEEN_MORE$3 = 4;
@@ -8120,28 +8193,11 @@ var OGMessageSwitch = function OGMessageSwitch(_ref) {
       memoizedEmojiListItems = _ref.memoizedEmojiListItems;
   var ogMetaData = message.ogMetaData;
   var injectingClassName = Array.isArray(className) ? className : [className];
-  var isUrl = createUrlTester(URL_REG);
-
-  var textMatchedWithLinks = function textMatchedWithLinks(_ref2) {
-    var document = _ref2.document;
-    var classNameWord = 'sendbird-og-message-word';
-    var wordTypography = LabelTypography.BODY_1;
-    var wordColor = LabelColors.ONBACKGROUND_1;
-    return document.split(' ').map(function (word) {
-      return isUrl(word) ? React__default.createElement(LinkLabel, {
-        key: uuidv4(),
-        className: classNameWord,
-        src: word,
-        type: wordTypography,
-        color: wordColor
-      }, word) : React__default.createElement(Label, {
-        key: uuidv4(),
-        className: classNameWord,
-        type: wordTypography,
-        color: wordColor
-      }, word);
-    });
-  };
+  var memoizedMessageText = useMemoizedMessageText({
+    message: message.message,
+    updatedAt: message.updatedAt,
+    className: 'sendbird-og-message-word'
+  });
 
   var openLink = function openLink() {
     if (checkOGIsEnalbed(message)) {
@@ -8165,7 +8221,7 @@ var OGMessageSwitch = function OGMessageSwitch(_ref) {
     emojiAllMap: emojiAllMap,
     resendMessage: resendMessage,
     toggleReaction: toggleReaction,
-    textMatchedWithLinks: textMatchedWithLinks,
+    memoizedMessageText: memoizedMessageText,
     memoizedEmojiListItems: memoizedEmojiListItems
   }) : React__default.createElement(IncomingOGMessage, {
     userId: userId,
@@ -8175,7 +8231,7 @@ var OGMessageSwitch = function OGMessageSwitch(_ref) {
     useReaction: useReaction,
     emojiAllMap: emojiAllMap,
     toggleReaction: toggleReaction,
-    textMatchedWithLinks: textMatchedWithLinks,
+    memoizedMessageText: memoizedMessageText,
     memoizedEmojiListItems: memoizedEmojiListItems
   }));
 };
@@ -8193,15 +8249,16 @@ function OutgoingOGMessage(props) {
       useReaction = props.useReaction,
       resendMessage = props.resendMessage,
       toggleReaction = props.toggleReaction,
-      textMatchedWithLinks = props.textMatchedWithLinks,
+      memoizedMessageText = props.memoizedMessageText,
       memoizedEmojiListItems = props.memoizedEmojiListItems;
   var ogMetaData = message.ogMetaData;
   var defaultImage = ogMetaData.defaultImage;
+  var MemoizedMessageText = memoizedMessageText;
   var MemoizedEmojiListItems = memoizedEmojiListItems;
   var parentRefReactions = React.useRef(null);
   var parentRefMenus = React.useRef(null);
   var parentContainRef = React.useRef(null);
-  var isMessageSent = getIsSentFromStatus$3(status);
+  var isMessageSent = getIsSentFromStatus$2(status);
   var showEmojiReactions = useReaction && message.reactions && message.reactions.length > 0;
   return React__default.createElement("div", {
     className: OUTGOING_OG_MESSAGE,
@@ -8288,11 +8345,7 @@ function OutgoingOGMessage(props) {
     }
   })), React__default.createElement("div", {
     className: "".concat(OUTGOING_OG_MESSAGE, "__text-balloon")
-  }, textMatchedWithLinks({
-    document: message.message,
-    textComponent: Label,
-    linkComponent: LinkLabel
-  })), React__default.createElement("div", {
+  }, React__default.createElement(MemoizedMessageText, null)), React__default.createElement("div", {
     className: "".concat(OUTGOING_OG_MESSAGE, "__thumbnail ").concat(checkOGIsEnalbed(message) ? '' : "".concat(OUTGOING_OG_MESSAGE, "__thumbnail--disabled")),
     onClick: openLink,
     onKeyDown: openLink,
@@ -8374,10 +8427,11 @@ function IncomingOGMessage(props) {
       useReaction = props.useReaction,
       emojiAllMap = props.emojiAllMap,
       toggleReaction = props.toggleReaction,
-      textMatchedWithLinks = props.textMatchedWithLinks,
+      memoizedMessageText = props.memoizedMessageText,
       memoizedEmojiListItems = props.memoizedEmojiListItems;
   var ogMetaData = message.ogMetaData;
   var defaultImage = ogMetaData.defaultImage;
+  var MemoizedMessageText = memoizedMessageText;
   var MemoizedEmojiListItems = memoizedEmojiListItems;
   var parentRefReactions = React.useRef(null);
   var parentRefMenus = React.useRef(null);
@@ -8400,11 +8454,7 @@ function IncomingOGMessage(props) {
     color: LabelColors.ONBACKGROUND_2
   }, getSenderName$2(message)), React__default.createElement("div", {
     className: "".concat(INCOMING_OG_MESSAGE, "__text-balloon")
-  }, textMatchedWithLinks({
-    document: message.message,
-    textComponent: Label,
-    linkComponent: LinkLabel
-  })), React__default.createElement("div", {
+  }, React__default.createElement(MemoizedMessageText, null)), React__default.createElement("div", {
     className: "".concat(INCOMING_OG_MESSAGE, "__thumbnail ").concat(checkOGIsEnalbed(message) ? '' : "".concat(INCOMING_OG_MESSAGE, "__thumbnail--disabled")),
     onClick: openLink,
     onKeyDown: openLink,
@@ -8468,7 +8518,7 @@ function IncomingOGMessage(props) {
     className: "".concat(INCOMING_OG_MESSAGE, "__sent-at"),
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
-  }, getMessageCreatedAt$4(message)), React__default.createElement("div", {
+  }, getMessageCreatedAt$2(message)), React__default.createElement("div", {
     className: "".concat(INCOMING_OG_MESSAGE, "__more"),
     ref: parentContainRef
   }, showReactionAddButton && React__default.createElement(ContextMenu, {
@@ -8542,7 +8592,8 @@ OGMessageSwitch.propTypes = {
         alt: PropTypes.string
       })
     }),
-    reactions: PropTypes.array
+    reactions: PropTypes.array,
+    updatedAt: PropTypes.number
   }).isRequired,
   useReaction: PropTypes.bool.isRequired,
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
@@ -8582,7 +8633,8 @@ OutgoingOGMessage.propTypes = {
         alt: PropTypes.string
       })
     }),
-    reactions: PropTypes.array
+    reactions: PropTypes.array,
+    updatedAt: PropTypes.number
   }).isRequired,
   disabled: PropTypes.bool.isRequired,
   openLink: PropTypes.func.isRequired,
@@ -8593,7 +8645,7 @@ OutgoingOGMessage.propTypes = {
   useReaction: PropTypes.bool.isRequired,
   resendMessage: PropTypes.func.isRequired,
   toggleReaction: PropTypes.func.isRequired,
-  textMatchedWithLinks: PropTypes.func.isRequired,
+  memoizedMessageText: PropTypes.func.isRequired,
   memoizedEmojiListItems: PropTypes.func.isRequired
 };
 OutgoingOGMessage.defaultProps = {
@@ -8612,14 +8664,15 @@ IncomingOGMessage.propTypes = {
         alt: PropTypes.string
       })
     }),
-    reactions: PropTypes.array
+    reactions: PropTypes.array,
+    updatedAt: PropTypes.number
   }).isRequired,
   openLink: PropTypes.func.isRequired,
   membersMap: PropTypes.instanceOf(Map).isRequired,
   emojiAllMap: PropTypes.instanceOf(Map).isRequired,
   useReaction: PropTypes.bool.isRequired,
   toggleReaction: PropTypes.func.isRequired,
-  textMatchedWithLinks: PropTypes.func.isRequired,
+  memoizedMessageText: PropTypes.func.isRequired,
   memoizedEmojiListItems: PropTypes.func.isRequired
 };
 

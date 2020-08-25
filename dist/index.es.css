@@ -1132,6 +1132,10 @@
 .sendbird-user-message__text-balloon {
   display: inline-block; }
 
+.sendbird-user-message-word {
+  display: inline;
+  margin: 0px 2px; }
+
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap");
 .sendbird-message-status {
   display: inline-flex; }
@@ -1283,6 +1287,25 @@
     .sendbird-tooltip-wrapper__hover-tooltip__inner__tooltip-container {
       position: relative;
       display: inline-flex; }
+
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap");
+.sendbird-theme--light .sendbird-link-label {
+  color: rgba(0, 0, 0, 0.88); }
+
+.sendbird-theme--dark .sendbird-link-label {
+  color: rgba(255, 255, 255, 0.88); }
+
+.sendbird-theme--light .sendbird-link-label:active, .sendbird-theme--light .sendbird-link-label:visited, .sendbird-theme--light .sendbird-link-label:focus {
+  color: rgba(0, 0, 0, 0.88); }
+
+.sendbird-theme--dark .sendbird-link-label:active, .sendbird-theme--dark .sendbird-link-label:visited, .sendbird-theme--dark .sendbird-link-label:focus {
+  color: rgba(255, 255, 255, 0.88); }
+
+.sendbird-link-label:focus {
+  outline: none; }
+
+.sendbird-link-label__label {
+  display: inline; }
 
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap");
 .sendbird-admin-message {
@@ -2131,25 +2154,6 @@
 .sendbird-og-message-word {
   display: inline;
   margin: 0px 2px; }
-
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap");
-.sendbird-theme--light .sendbird-link-label {
-  color: rgba(0, 0, 0, 0.88); }
-
-.sendbird-theme--dark .sendbird-link-label {
-  color: rgba(255, 255, 255, 0.88); }
-
-.sendbird-theme--light .sendbird-link-label:active, .sendbird-theme--light .sendbird-link-label:visited, .sendbird-theme--light .sendbird-link-label:focus {
-  color: rgba(0, 0, 0, 0.88); }
-
-.sendbird-theme--dark .sendbird-link-label:active, .sendbird-theme--dark .sendbird-link-label:visited, .sendbird-theme--dark .sendbird-link-label:focus {
-  color: rgba(255, 255, 255, 0.88); }
-
-.sendbird-link-label:focus {
-  outline: none; }
-
-.sendbird-link-label__label {
-  display: inline; }
 
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap");
 .sendbird-notification {

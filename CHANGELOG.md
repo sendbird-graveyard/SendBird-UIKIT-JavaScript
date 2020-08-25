@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.5(Aug 25, 2020)
+
+- Features:
+  * Edit sign on updated messages
+
+- Bugfixes:
+  * Race condition on Channel switch
+  * Visual glitches
+
 ## 1.1.4(Aug 12, 2020)
 
 - Features:
