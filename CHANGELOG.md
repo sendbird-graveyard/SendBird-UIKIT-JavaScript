@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.2.0(Aug 27, 2020)
+
+- Features:
+  * Add GroupChannel type selector UI to create channel
+  * Ability to create supergroup(to be enabled from dashboard)
+  * Channel creator will become operator user
+  * Channel moderation for operator user
+    * Mute user
+    * Ban user
+    * Promote/Demote other users to operator
+    * Freeze/Unfreeze Channels
+  * Visual indicators for different channel states in ChannelList
+  * Visual indicators for MessageInput based on channel state
+
+- Bugfixes:
+  * Remove multiple imports of font family
+  * Visual glitches
+
+- Dependency updates:
+  * SDK version - 3.0.132
+
 ## 1.1.5(Aug 25, 2020)
 
 - Features:
