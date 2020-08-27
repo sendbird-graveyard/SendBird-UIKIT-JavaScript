@@ -222,7 +222,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.1.5';
+var APP_VERSION_STRING = '1.2.0';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -1344,6 +1344,7 @@ var Type = {
   BROADCAST_LARGE_LIGHT: 'BROADCAST_LARGE_LIGHT',
   BROADCAST_DARK: 'BROADCAST_DARK',
   BROADCAST_LIGHT: 'BROADCAST_LIGHT',
+  BROADCAST: 'BROADCAST',
   FROZEN_DARK: 'FROZEN_DARK',
   FROZEN_LIGHT: 'FROZEN_LIGHT',
   CAMERA: 'CAMERA',
@@ -1382,11 +1383,19 @@ var Type = {
   REFRESH: 'REFRESH',
   SEND: 'SEND',
   SENT: 'SENT',
+  SUPER_GROUP: 'SUPER_GROUP',
   SHEVRON: 'SHEVRON',
   SHEVRON_DOWN: 'SHEVRON_DOWN',
   SPINNER: 'SPINNER',
   SPINNER_LARGE: 'SPINNER_LARGE',
-  USER: 'USER'
+  USER: 'USER',
+  ICON_OPERATOR: 'ICON_OPERATOR',
+  ICON_BANNED: 'ICON_BANNED',
+  ICON_FREEZE: 'ICON_FREEZE',
+  ICON_MUTED: 'ICON_MUTED',
+  ICON_MUTED_FG: 'ICON_MUTED_FG',
+  TOGGLE_ON: 'TOGGLE_ON',
+  TOGGLE_OFF: 'TOGGLE_OFF'
 };
 
 function _extends$2() { _extends$2 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$2.apply(this, arguments); }
@@ -1529,13 +1538,13 @@ function _extends$9() { _extends$9 = Object.assign || function (target) { for (v
 var _ref$9 =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "frozen-dark_svg__fill",
-  fill: "#9E8CF5",
+  className: "icon-broadcast_svg__fill",
+  fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M10.409.806l.063.056c.24.24.259.618.055.88l-.055.063-1.805 1.804v3.236l2.801-1.618.662-2.465a.665.665 0 011.304.263l-.016.082-.56 2.088 2.088.56a.665.665 0 01.488.734l-.016.082a.666.666 0 01-.735.488l-.082-.016-2.465-.661L9.334 8l2.801 1.618 2.466-.66.082-.017a.667.667 0 01.735.488l.016.082a.666.666 0 01-.488.734l-2.088.56.56 2.088.016.082a.666.666 0 01-1.304.263l-.662-2.465-2.801-1.618v3.236l1.805 1.804a.668.668 0 01-.88.999l-.063-.056L8 13.61l-1.528 1.53a.668.668 0 01-.88.055l-.063-.056a.668.668 0 01-.056-.88l.056-.063 1.804-1.805V9.155L4.53 10.773l-.66 2.465a.667.667 0 01-1.304-.263l.017-.082.559-2.088-2.088-.56a.667.667 0 01-.488-.734l.017-.082a.665.665 0 01.734-.488l.082.016 2.466.66L6.666 8 3.864 6.382l-2.465.66-.082.017a.666.666 0 01-.734-.488L.566 6.49a.667.667 0 01.488-.734l2.088-.56-.56-2.088-.016-.082a.667.667 0 011.305-.263l.659 2.465 2.803 1.618V3.61L5.529 1.805a.668.668 0 01.88-.999l.063.056L8 2.39 9.53.862a.668.668 0 01.88-.056z"
+  d: "M14.636 2.041c.02.065.03.132.03.2V13.76a.667.667 0 01-.865.637l-4.488-1.403A2.667 2.667 0 014 12.666v-1.334H2.667a2 2 0 01-1.995-1.85l-.005-.15V6.667a2 2 0 012-2H4l9.801-3.063a.666.666 0 01.835.437zm-9.303 9.772v.854a1.333 1.333 0 002.664.099l.003-.12-2.667-.833zm8-8.666l-8 2.499v4.707l8 2.5V3.147zM4 6H2.667a.668.668 0 00-.663.589L2 6.667v2.666c0 .369.298.667.667.667H4V6z"
 });
 
-function SvgFrozenDark(props) {
+function SvgIconBroadcast(props) {
   return React__default.createElement("svg", _extends$9({
     viewBox: "0 0 16 16"
   }, props), _ref$9);
@@ -1546,13 +1555,13 @@ function _extends$a() { _extends$a = Object.assign || function (target) { for (v
 var _ref$a =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "frozen-light_svg__fill",
-  fill: "#7B53EF",
+  className: "frozen-dark_svg__fill",
+  fill: "#9E8CF5",
   fillRule: "evenodd",
   d: "M10.409.806l.063.056c.24.24.259.618.055.88l-.055.063-1.805 1.804v3.236l2.801-1.618.662-2.465a.665.665 0 011.304.263l-.016.082-.56 2.088 2.088.56a.665.665 0 01.488.734l-.016.082a.666.666 0 01-.735.488l-.082-.016-2.465-.661L9.334 8l2.801 1.618 2.466-.66.082-.017a.667.667 0 01.735.488l.016.082a.666.666 0 01-.488.734l-2.088.56.56 2.088.016.082a.666.666 0 01-1.304.263l-.662-2.465-2.801-1.618v3.236l1.805 1.804a.668.668 0 01-.88.999l-.063-.056L8 13.61l-1.528 1.53a.668.668 0 01-.88.055l-.063-.056a.668.668 0 01-.056-.88l.056-.063 1.804-1.805V9.155L4.53 10.773l-.66 2.465a.667.667 0 01-1.304-.263l.017-.082.559-2.088-2.088-.56a.667.667 0 01-.488-.734l.017-.082a.665.665 0 01.734-.488l.082.016 2.466.66L6.666 8 3.864 6.382l-2.465.66-.082.017a.666.666 0 01-.734-.488L.566 6.49a.667.667 0 01.488-.734l2.088-.56-.56-2.088-.016-.082a.667.667 0 011.305-.263l.659 2.465 2.803 1.618V3.61L5.529 1.805a.668.668 0 01.88-.999l.063.056L8 2.39 9.53.862a.668.668 0 01.88-.056z"
 });
 
-function SvgFrozenLight(props) {
+function SvgFrozenDark(props) {
   return React__default.createElement("svg", _extends$a({
     viewBox: "0 0 16 16"
   }, props), _ref$a);
@@ -1563,15 +1572,15 @@ function _extends$b() { _extends$b = Object.assign || function (target) { for (v
 var _ref$b =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-camera_svg__fill",
+  className: "frozen-light_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M15 2a1 1 0 01.832.445L17.535 5H21a3 3 0 012.995 2.824L24 8v11a3 3 0 01-3 3H3a3 3 0 01-3-3V8a3 3 0 013-3h3.464l1.704-2.555a1 1 0 01.708-.437L9 2zm-.536 2H9.535L7.832 6.555a1 1 0 01-.708.437L7 7H3a1 1 0 00-1 1v11a1 1 0 001 1h18a1 1 0 001-1V8a1 1 0 00-1-1h-4a1 1 0 01-.832-.445L14.464 4zM12 8a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"
+  d: "M10.409.806l.063.056c.24.24.259.618.055.88l-.055.063-1.805 1.804v3.236l2.801-1.618.662-2.465a.665.665 0 011.304.263l-.016.082-.56 2.088 2.088.56a.665.665 0 01.488.734l-.016.082a.666.666 0 01-.735.488l-.082-.016-2.465-.661L9.334 8l2.801 1.618 2.466-.66.082-.017a.667.667 0 01.735.488l.016.082a.666.666 0 01-.488.734l-2.088.56.56 2.088.016.082a.666.666 0 01-1.304.263l-.662-2.465-2.801-1.618v3.236l1.805 1.804a.668.668 0 01-.88.999l-.063-.056L8 13.61l-1.528 1.53a.668.668 0 01-.88.055l-.063-.056a.668.668 0 01-.056-.88l.056-.063 1.804-1.805V9.155L4.53 10.773l-.66 2.465a.667.667 0 01-1.304-.263l.017-.082.559-2.088-2.088-.56a.667.667 0 01-.488-.734l.017-.082a.665.665 0 01.734-.488l.082.016 2.466.66L6.666 8 3.864 6.382l-2.465.66-.082.017a.666.666 0 01-.734-.488L.566 6.49a.667.667 0 01.488-.734l2.088-.56-.56-2.088-.016-.082a.667.667 0 011.305-.263l.659 2.465 2.803 1.618V3.61L5.529 1.805a.668.668 0 01.88-.999l.063.056L8 2.39 9.53.862a.668.668 0 01.88-.056z"
 });
 
-function SvgIconCamera(props) {
+function SvgFrozenLight(props) {
   return React__default.createElement("svg", _extends$b({
-    viewBox: "0 0 24 24"
+    viewBox: "0 0 16 16"
   }, props), _ref$b);
 }
 
@@ -1580,12 +1589,13 @@ function _extends$c() { _extends$c = Object.assign || function (target) { for (v
 var _ref$c =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-more_svg__fill",
+  className: "icon-camera_svg__fill",
+  fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M12 17a2 2 0 110 4 2 2 0 010-4zm0-6.5a2 2 0 110 4 2 2 0 010-4zM12 4a2 2 0 110 4 2 2 0 010-4z"
+  d: "M15 2a1 1 0 01.832.445L17.535 5H21a3 3 0 012.995 2.824L24 8v11a3 3 0 01-3 3H3a3 3 0 01-3-3V8a3 3 0 013-3h3.464l1.704-2.555a1 1 0 01.708-.437L9 2zm-.536 2H9.535L7.832 6.555a1 1 0 01-.708.437L7 7H3a1 1 0 00-1 1v11a1 1 0 001 1h18a1 1 0 001-1V8a1 1 0 00-1-1h-4a1 1 0 01-.832-.445L14.464 4zM12 8a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"
 });
 
-function SvgIconMore(props) {
+function SvgIconCamera(props) {
   return React__default.createElement("svg", _extends$c({
     viewBox: "0 0 24 24"
   }, props), _ref$c);
@@ -1596,13 +1606,12 @@ function _extends$d() { _extends$d = Object.assign || function (target) { for (v
 var _ref$d =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-mute_svg__fill",
-  fill: "#7B53EF",
+  className: "icon-more_svg__fill",
   fillRule: "evenodd",
-  d: "M15.125 20.09c0 .602-.694 2.41-2.778 2.41-1.389 0-2.315-.804-2.778-2.41zM12.789 1.606a6.496 6.496 0 015.388 2.861l2.464-2.463a.788.788 0 011.025-.077l.088.077a.788.788 0 010 1.113L3.378 21.494a.788.788 0 01-1.025.077l-.088-.077a.788.788 0 010-1.113l1.9-1.903-.04-.004a.387.387 0 01-.241-.596l1.557-2.295.001-.208a545.875 545.875 0 00-.028-6.563l-.008-.614a6.503 6.503 0 016.414-6.59h.969zm6.381 5.246c.08.407.122.827.122 1.257l-.001 7.53 1.52 2.238a.387.387 0 01-.32.604H7.54l3.214-3.214 8.415-8.415z"
+  d: "M12 17a2 2 0 110 4 2 2 0 010-4zm0-6.5a2 2 0 110 4 2 2 0 010-4zM12 4a2 2 0 110 4 2 2 0 010-4z"
 });
 
-function SvgIconMute(props) {
+function SvgIconMore(props) {
   return React__default.createElement("svg", _extends$d({
     viewBox: "0 0 24 24"
   }, props), _ref$d);
@@ -1613,6 +1622,23 @@ function _extends$e() { _extends$e = Object.assign || function (target) { for (v
 var _ref$e =
 /*#__PURE__*/
 React__default.createElement("path", {
+  className: "icon-mute_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M15.125 20.09c0 .602-.694 2.41-2.778 2.41-1.389 0-2.315-.804-2.778-2.41zM12.789 1.606a6.496 6.496 0 015.388 2.861l2.464-2.463a.788.788 0 011.025-.077l.088.077a.788.788 0 010 1.113L3.378 21.494a.788.788 0 01-1.025.077l-.088-.077a.788.788 0 010-1.113l1.9-1.903-.04-.004a.387.387 0 01-.241-.596l1.557-2.295.001-.208a545.875 545.875 0 00-.028-6.563l-.008-.614a6.503 6.503 0 016.414-6.59h.969zm6.381 5.246c.08.407.122.827.122 1.257l-.001 7.53 1.52 2.238a.387.387 0 01-.32.604H7.54l3.214-3.214 8.415-8.415z"
+});
+
+function SvgIconMute(props) {
+  return React__default.createElement("svg", _extends$e({
+    viewBox: "0 0 24 24"
+  }, props), _ref$e);
+}
+
+function _extends$f() { _extends$f = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$f.apply(this, arguments); }
+
+var _ref$f =
+/*#__PURE__*/
+React__default.createElement("path", {
   className: "icon-no-thumbnail_svg__fill",
   fillOpacity: 0.5,
   fillRule: "evenodd",
@@ -1620,14 +1646,14 @@ React__default.createElement("path", {
 });
 
 function SvgIconNoThumbnail(props) {
-  return React__default.createElement("svg", _extends$e({
+  return React__default.createElement("svg", _extends$f({
     viewBox: "0 0 56 56"
-  }, props), _ref$e);
+  }, props), _ref$f);
 }
 
-function _extends$f() { _extends$f = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$f.apply(this, arguments); }
+function _extends$g() { _extends$g = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$g.apply(this, arguments); }
 
-var _ref$f =
+var _ref$g =
 /*#__PURE__*/
 React__default.createElement("g", {
   className: "icon-checkbox_svg__fill",
@@ -1640,14 +1666,14 @@ React__default.createElement("g", {
 }));
 
 function SvgIconCheckbox(props) {
-  return React__default.createElement("svg", _extends$f({
+  return React__default.createElement("svg", _extends$g({
     viewBox: "0 0 24 24"
-  }, props), _ref$f);
+  }, props), _ref$g);
 }
 
-function _extends$g() { _extends$g = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$g.apply(this, arguments); }
+function _extends$h() { _extends$h = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$h.apply(this, arguments); }
 
-var _ref$g =
+var _ref$h =
 /*#__PURE__*/
 React__default.createElement("g", {
   className: "icon-checkbox-off_svg__fill",
@@ -1660,23 +1686,6 @@ React__default.createElement("g", {
 }));
 
 function SvgIconCheckboxOff(props) {
-  return React__default.createElement("svg", _extends$g({
-    viewBox: "0 0 24 24"
-  }, props), _ref$g);
-}
-
-function _extends$h() { _extends$h = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$h.apply(this, arguments); }
-
-var _ref$h =
-/*#__PURE__*/
-React__default.createElement("path", {
-  className: "icon-close_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M6.613 5.21l.094.083L12 10.585l5.293-5.292a1 1 0 011.497 1.32l-.083.094L13.415 12l5.292 5.293a1 1 0 01-1.32 1.497l-.094-.083L12 13.415l-5.293 5.292a1 1 0 01-1.497-1.32l.083-.094L10.585 12 5.293 6.707a1 1 0 011.32-1.497z"
-});
-
-function SvgIconClose(props) {
   return React__default.createElement("svg", _extends$h({
     viewBox: "0 0 24 24"
   }, props), _ref$h);
@@ -1687,13 +1696,13 @@ function _extends$i() { _extends$i = Object.assign || function (target) { for (v
 var _ref$i =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-copy_svg__fill",
+  className: "icon-close_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M20 8a3 3 0 013 3v9a3 3 0 01-3 3h-9a3 3 0 01-3-3v-9a3 3 0 013-3zm0 2h-9a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1v-9a1 1 0 00-1-1zm-7-9a3 3 0 012.995 2.824L16 4v1a1 1 0 01-1.993.117L14 5V4a1 1 0 00-.883-.993L13 3H4a1 1 0 00-.993.883L3 4v9a1 1 0 00.883.993L4 14h1a1 1 0 01.117 1.993L5 16H4a3 3 0 01-2.995-2.824L1 13V4a3 3 0 012.824-2.995L4 1h9z"
+  d: "M6.613 5.21l.094.083L12 10.585l5.293-5.292a1 1 0 011.497 1.32l-.083.094L13.415 12l5.292 5.293a1 1 0 01-1.32 1.497l-.094-.083L12 13.415l-5.293 5.292a1 1 0 01-1.497-1.32l.083-.094L10.585 12 5.293 6.707a1 1 0 011.32-1.497z"
 });
 
-function SvgIconCopy(props) {
+function SvgIconClose(props) {
   return React__default.createElement("svg", _extends$i({
     viewBox: "0 0 24 24"
   }, props), _ref$i);
@@ -1704,13 +1713,13 @@ function _extends$j() { _extends$j = Object.assign || function (target) { for (v
 var _ref$j =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-chat_svg__fill",
+  className: "icon-copy_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11c-1.67 0-3.255-.373-4.673-1.039l-.657.218c-2.237.716-3.8.964-4.69.742-1.049-.261-1.256-.72-.62-1.373.439-.524.805-1.178 1.097-1.963.234-.625.142-1.5-.276-2.625A10.933 10.933 0 011 12C1 5.925 5.925 1 12 1zm0 2a9 9 0 00-8.187 12.742l.152.314.051.101.04.107c.569 1.532.709 2.859.275 4.02l-.143.365-.072.162.088-.019a23.181 23.181 0 001.832-.511l.646-.213.765-.26.73.343A8.962 8.962 0 0012 21a9 9 0 000-18z"
+  d: "M20 8a3 3 0 013 3v9a3 3 0 01-3 3h-9a3 3 0 01-3-3v-9a3 3 0 013-3zm0 2h-9a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1v-9a1 1 0 00-1-1zm-7-9a3 3 0 012.995 2.824L16 4v1a1 1 0 01-1.993.117L14 5V4a1 1 0 00-.883-.993L13 3H4a1 1 0 00-.993.883L3 4v9a1 1 0 00.883.993L4 14h1a1 1 0 01.117 1.993L5 16H4a3 3 0 01-2.995-2.824L1 13V4a3 3 0 012.824-2.995L4 1h9z"
 });
 
-function SvgIconChat(props) {
+function SvgIconCopy(props) {
   return React__default.createElement("svg", _extends$j({
     viewBox: "0 0 24 24"
   }, props), _ref$j);
@@ -1721,13 +1730,13 @@ function _extends$k() { _extends$k = Object.assign || function (target) { for (v
 var _ref$k =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-create_svg__fill",
+  className: "icon-chat_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11c-1.67 0-3.255-.373-4.673-1.039l-.657.218c-2.237.716-3.8.964-4.69.742-1.049-.261-1.256-.72-.62-1.373.439-.524.805-1.178 1.097-1.963.234-.625.142-1.5-.276-2.625A10.933 10.933 0 011 12C1 5.925 5.925 1 12 1zm0 2a9 9 0 00-8.187 12.742l.152.314.051.101.04.107c.569 1.532.709 2.859.275 4.02l-.143.365-.072.162.088-.019a23.181 23.181 0 001.832-.511l.646-.213.765-.26.73.343A8.962 8.962 0 0012 21a9 9 0 000-18zm1 6v2h2c1.333 0 1.333 2 0 2h-2v2c0 1.333-2 1.333-2 0v-2H9c-1.333 0-1.333-2 0-2h2V9c0-1.333 2-1.333 2 0z"
+  d: "M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11c-1.67 0-3.255-.373-4.673-1.039l-.657.218c-2.237.716-3.8.964-4.69.742-1.049-.261-1.256-.72-.62-1.373.439-.524.805-1.178 1.097-1.963.234-.625.142-1.5-.276-2.625A10.933 10.933 0 011 12C1 5.925 5.925 1 12 1zm0 2a9 9 0 00-8.187 12.742l.152.314.051.101.04.107c.569 1.532.709 2.859.275 4.02l-.143.365-.072.162.088-.019a23.181 23.181 0 001.832-.511l.646-.213.765-.26.73.343A8.962 8.962 0 0012 21a9 9 0 000-18z"
 });
 
-function SvgIconCreate(props) {
+function SvgIconChat(props) {
   return React__default.createElement("svg", _extends$k({
     viewBox: "0 0 24 24"
   }, props), _ref$k);
@@ -1738,15 +1747,15 @@ function _extends$l() { _extends$l = Object.assign || function (target) { for (v
 var _ref$l =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-delete_svg__fill",
+  className: "icon-supergroup_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M14 1a3 3 0 012.995 2.824L17 4v1h4a1 1 0 01.117 1.993L21 7h-1v13a3 3 0 01-2.824 2.995L17 23H7a3 3 0 01-2.995-2.824L4 20V7H3a1 1 0 01-.117-1.993L3 5h4V4a3 3 0 012.824-2.995L10 1h4zm4 6H6v13a1 1 0 00.883.993L7 21h10a1 1 0 00.993-.883L18 20V7zm-8 3a1 1 0 01.993.883L11 11v6a1 1 0 01-1.993.117L9 17v-6a1 1 0 011-1zm4 0a1 1 0 01.993.883L15 11v6a1 1 0 01-1.993.117L13 17v-6a1 1 0 011-1zm0-7h-4a1 1 0 00-.993.883L9 4v1h6V4a1 1 0 00-.883-.993L14 3z"
+  d: "M16.139 18.818c2.89 0 5.303 2.05 5.438 4.696l.006.235v1.626a1.166 1.166 0 01-2.326.136l-.007-.136v-1.626c0-1.343-1.255-2.501-2.903-2.592l-.208-.006H11.86c-1.679 0-3.001 1.105-3.105 2.431l-.006.167v1.626a1.166 1.166 0 01-2.325.136l-.008-.136v-1.626c0-2.68 2.329-4.806 5.19-4.926l.254-.005h4.278zm8.128-7.565c.116 0 .232.018.343.052 2.026.624 3.289 2.1 3.384 4.239l.006.26v5.6a1.166 1.166 0 01-2.325.136l-.008-.137v-5.599c-.001-1.135-.509-1.825-1.543-2.202l-.046-.016h-1.095c-.598 0-1.091-.45-1.158-1.03l-.008-.136c0-.598.45-1.092 1.03-1.159l.136-.008h1.284zm-19.25 0l.136.008c.58.067 1.03.56 1.03 1.159l-.008.136c-.067.58-.56 1.03-1.158 1.03H3.919l-.052.018c-.983.372-1.533 1.126-1.534 2.252v5.547l-.008.136A1.166 1.166 0 010 21.404v-5.548l.006-.259c.099-2.132 1.402-3.681 3.374-4.29.112-.035.228-.053.345-.053h1.292zM14 8.732c2.412 0 4.375 1.928 4.375 4.318 0 2.39-1.963 4.319-4.375 4.319S9.625 15.44 9.625 13.05c0-2.39 1.963-4.318 4.375-4.318zm0 2.333c-1.132 0-2.042.893-2.042 1.985s.91 1.986 2.042 1.986c1.132 0 2.042-.894 2.042-1.986s-.91-1.985-2.042-1.985zM7.583 1.167c2.412 0 4.375 1.929 4.375 4.318 0 2.39-1.963 4.32-4.375 4.32-2.411 0-4.375-1.93-4.375-4.32 0-2.39 1.964-4.318 4.375-4.318zm12.834 0c2.411 0 4.375 1.929 4.375 4.318 0 2.39-1.964 4.32-4.375 4.32-2.412 0-4.375-1.93-4.375-4.32 0-2.39 1.963-4.318 4.375-4.318zM7.583 3.5c-1.132 0-2.041.894-2.041 1.985 0 1.092.91 1.986 2.041 1.986 1.132 0 2.042-.894 2.042-1.986 0-1.091-.91-1.985-2.042-1.985zm12.834 0c-1.132 0-2.042.894-2.042 1.985 0 1.092.91 1.986 2.042 1.986 1.132 0 2.041-.894 2.041-1.986 0-1.091-.91-1.985-2.041-1.985z"
 });
 
-function SvgIconDelete(props) {
+function SvgIconSupergroup(props) {
   return React__default.createElement("svg", _extends$l({
-    viewBox: "0 0 24 24"
+    viewBox: "0 0 28 28"
   }, props), _ref$l);
 }
 
@@ -1755,13 +1764,13 @@ function _extends$m() { _extends$m = Object.assign || function (target) { for (v
 var _ref$m =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-dummy_svg__fill",
+  className: "icon-create_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+  d: "M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11c-1.67 0-3.255-.373-4.673-1.039l-.657.218c-2.237.716-3.8.964-4.69.742-1.049-.261-1.256-.72-.62-1.373.439-.524.805-1.178 1.097-1.963.234-.625.142-1.5-.276-2.625A10.933 10.933 0 011 12C1 5.925 5.925 1 12 1zm0 2a9 9 0 00-8.187 12.742l.152.314.051.101.04.107c.569 1.532.709 2.859.275 4.02l-.143.365-.072.162.088-.019a23.181 23.181 0 001.832-.511l.646-.213.765-.26.73.343A8.962 8.962 0 0012 21a9 9 0 000-18zm1 6v2h2c1.333 0 1.333 2 0 2h-2v2c0 1.333-2 1.333-2 0v-2H9c-1.333 0-1.333-2 0-2h2V9c0-1.333 2-1.333 2 0z"
 });
 
-function SvgIconDummy(props) {
+function SvgIconCreate(props) {
   return React__default.createElement("svg", _extends$m({
     viewBox: "0 0 24 24"
   }, props), _ref$m);
@@ -1772,6 +1781,40 @@ function _extends$n() { _extends$n = Object.assign || function (target) { for (v
 var _ref$n =
 /*#__PURE__*/
 React__default.createElement("path", {
+  className: "icon-delete_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M14 1a3 3 0 012.995 2.824L17 4v1h4a1 1 0 01.117 1.993L21 7h-1v13a3 3 0 01-2.824 2.995L17 23H7a3 3 0 01-2.995-2.824L4 20V7H3a1 1 0 01-.117-1.993L3 5h4V4a3 3 0 012.824-2.995L10 1h4zm4 6H6v13a1 1 0 00.883.993L7 21h10a1 1 0 00.993-.883L18 20V7zm-8 3a1 1 0 01.993.883L11 11v6a1 1 0 01-1.993.117L9 17v-6a1 1 0 011-1zm4 0a1 1 0 01.993.883L15 11v6a1 1 0 01-1.993.117L13 17v-6a1 1 0 011-1zm0-7h-4a1 1 0 00-.993.883L9 4v1h6V4a1 1 0 00-.883-.993L14 3z"
+});
+
+function SvgIconDelete(props) {
+  return React__default.createElement("svg", _extends$n({
+    viewBox: "0 0 24 24"
+  }, props), _ref$n);
+}
+
+function _extends$o() { _extends$o = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$o.apply(this, arguments); }
+
+var _ref$o =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-dummy_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+});
+
+function SvgIconDummy(props) {
+  return React__default.createElement("svg", _extends$o({
+    viewBox: "0 0 24 24"
+  }, props), _ref$o);
+}
+
+function _extends$p() { _extends$p = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$p.apply(this, arguments); }
+
+var _ref$p =
+/*#__PURE__*/
+React__default.createElement("path", {
   className: "icon-edit_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -1779,14 +1822,14 @@ React__default.createElement("path", {
 });
 
 function SvgIconEdit(props) {
-  return React__default.createElement("svg", _extends$n({
+  return React__default.createElement("svg", _extends$p({
     viewBox: "0 0 26 26"
-  }, props), _ref$n);
+  }, props), _ref$p);
 }
 
-function _extends$o() { _extends$o = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$o.apply(this, arguments); }
+function _extends$q() { _extends$q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$q.apply(this, arguments); }
 
-var _ref$o =
+var _ref$q =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-error_svg__fill",
@@ -1796,14 +1839,14 @@ React__default.createElement("path", {
 });
 
 function SvgIconError(props) {
-  return React__default.createElement("svg", _extends$o({
+  return React__default.createElement("svg", _extends$q({
     viewBox: "0 0 16 16"
-  }, props), _ref$o);
+  }, props), _ref$q);
 }
 
-function _extends$p() { _extends$p = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$p.apply(this, arguments); }
+function _extends$r() { _extends$r = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$r.apply(this, arguments); }
 
-var _ref$p =
+var _ref$r =
 /*#__PURE__*/
 React__default.createElement("g", {
   fill: "none",
@@ -1819,14 +1862,14 @@ React__default.createElement("g", {
 }));
 
 function SvgIconErrorFilled(props) {
-  return React__default.createElement("svg", _extends$p({
+  return React__default.createElement("svg", _extends$r({
     viewBox: "0 0 24 24"
-  }, props), _ref$p);
+  }, props), _ref$r);
 }
 
-function _extends$q() { _extends$q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$q.apply(this, arguments); }
+function _extends$s() { _extends$s = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$s.apply(this, arguments); }
 
-var _ref$q =
+var _ref$s =
 /*#__PURE__*/
 React__default.createElement("g", {
   className: "emoji-fail_svg__fill",
@@ -1846,14 +1889,14 @@ React__default.createElement("g", {
 }));
 
 function SvgEmojiFail(props) {
-  return React__default.createElement("svg", _extends$q({
+  return React__default.createElement("svg", _extends$s({
     viewBox: "0 0 28 28"
-  }, props), _ref$q);
+  }, props), _ref$s);
 }
 
-function _extends$r() { _extends$r = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$r.apply(this, arguments); }
+function _extends$t() { _extends$t = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$t.apply(this, arguments); }
 
-var _ref$r =
+var _ref$t =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-reactions-add_svg__fill",
@@ -1863,14 +1906,14 @@ React__default.createElement("path", {
 });
 
 function SvgIconReactionsAdd(props) {
-  return React__default.createElement("svg", _extends$r({
+  return React__default.createElement("svg", _extends$t({
     viewBox: "0 0 22 22"
-  }, props), _ref$r);
+  }, props), _ref$t);
 }
 
-function _extends$s() { _extends$s = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$s.apply(this, arguments); }
+function _extends$u() { _extends$u = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$u.apply(this, arguments); }
 
-var _ref$s =
+var _ref$u =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-emoji-reactions-add_svg__fill",
@@ -1880,14 +1923,14 @@ React__default.createElement("path", {
 });
 
 function SvgIconEmojiReactionsAdd(props) {
-  return React__default.createElement("svg", _extends$s({
+  return React__default.createElement("svg", _extends$u({
     viewBox: "0 0 20 20"
-  }, props), _ref$s);
+  }, props), _ref$u);
 }
 
-function _extends$t() { _extends$t = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$t.apply(this, arguments); }
+function _extends$v() { _extends$v = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$v.apply(this, arguments); }
 
-var _ref$t =
+var _ref$v =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-delivered_svg__fill",
@@ -1897,39 +1940,6 @@ React__default.createElement("path", {
 });
 
 function SvgIconDelivered(props) {
-  return React__default.createElement("svg", _extends$t({
-    viewBox: "0 0 24 24"
-  }, props), _ref$t);
-}
-
-function _extends$u() { _extends$u = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$u.apply(this, arguments); }
-
-var _ref$u =
-/*#__PURE__*/
-React__default.createElement("path", {
-  className: "icon-disconnected_svg__fill",
-  fillRule: "evenodd",
-  d: "M3.55 2.276l.093.081L10.9 9.615a.895.895 0 01.148.147l10.594 10.595a.91.91 0 01-1.193 1.367l-.093-.081-5.015-5.015a.913.913 0 01-.705-.15 4.545 4.545 0 00-5.265 0 .91.91 0 01-1.053-1.483 6.358 6.358 0 014.24-1.151l-2.529-2.53c-1.4.316-2.706.96-3.81 1.883a.91.91 0 01-1.167-1.394 10.854 10.854 0 013.504-1.962L6.445 7.728a13.518 13.518 0 00-3.461 2.226.909.909 0 01-1.204-1.362 15.38 15.38 0 013.299-2.229l-2.722-2.72A.91.91 0 013.55 2.276zm13.14 8.052c.812.397 1.572.894 2.262 1.479a.908.908 0 11-1.177 1.386 9.015 9.015 0 00-1.883-1.23.91.91 0 01.798-1.635zm5.53-1.737a.91.91 0 01-1.203 1.363A13.642 13.642 0 0010.9 6.588a.91.91 0 01-.146-1.813A15.457 15.457 0 0122.22 8.591z"
-});
-
-function SvgIconDisconnected(props) {
-  return React__default.createElement("svg", _extends$u({
-    viewBox: "0 0 24 24"
-  }, props), _ref$u);
-}
-
-function _extends$v() { _extends$v = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$v.apply(this, arguments); }
-
-var _ref$v =
-/*#__PURE__*/
-React__default.createElement("path", {
-  className: "icon-document_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M14 1a1.01 1.01 0 01.25.031l.03.009c.03.009.061.02.091.031l.027.012a.914.914 0 01.195.112c.04.03.078.062.114.098l-.093-.082.011.009.082.073 6 6a1.006 1.006 0 01.21.309l.012.027c.012.03.022.06.031.091l.008.03A.921.921 0 0121 8l-.008-.126.001.01L21 8v12a3 3 0 01-3 3H6a3 3 0 01-3-3V4a3 3 0 013-3h8zm-1 2H6a1 1 0 00-1 1v16a1 1 0 001 1h12a1 1 0 001-1V9h-5a1 1 0 01-.993-.883L13 8V3zm4.585 4L15 4.415V7h2.585z"
-});
-
-function SvgIconDocument(props) {
   return React__default.createElement("svg", _extends$v({
     viewBox: "0 0 24 24"
   }, props), _ref$v);
@@ -1940,13 +1950,12 @@ function _extends$w() { _extends$w = Object.assign || function (target) { for (v
 var _ref$w =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-download_svg__fill",
-  fill: "#7B53EF",
+  className: "icon-disconnected_svg__fill",
   fillRule: "evenodd",
-  d: "M21 16a1 1 0 01.993.883L22 17v3a3 3 0 01-2.824 2.995L19 23H5a3 3 0 01-2.995-2.824L2 20v-3a1 1 0 011.993-.117L4 17v3a1 1 0 00.883.993L5 21h14a1 1 0 00.993-.883L20 20v-3a1 1 0 011-1zM12 1a1 1 0 01.993.883L13 2v11.585l2.293-2.292a1 1 0 011.32-.083l.094.083a1 1 0 01.083 1.32l-.083.094-4 4a1.006 1.006 0 01-.09.08l.09-.08a1.008 1.008 0 01-.674.292L12 17h-.032l-.054-.004L12 17a1.008 1.008 0 01-.613-.21 1.037 1.037 0 01-.094-.083l-4-4a1 1 0 011.32-1.497l.094.083L11 13.585V2a1 1 0 011-1z"
+  d: "M3.55 2.276l.093.081L10.9 9.615a.895.895 0 01.148.147l10.594 10.595a.91.91 0 01-1.193 1.367l-.093-.081-5.015-5.015a.913.913 0 01-.705-.15 4.545 4.545 0 00-5.265 0 .91.91 0 01-1.053-1.483 6.358 6.358 0 014.24-1.151l-2.529-2.53c-1.4.316-2.706.96-3.81 1.883a.91.91 0 01-1.167-1.394 10.854 10.854 0 013.504-1.962L6.445 7.728a13.518 13.518 0 00-3.461 2.226.909.909 0 01-1.204-1.362 15.38 15.38 0 013.299-2.229l-2.722-2.72A.91.91 0 013.55 2.276zm13.14 8.052c.812.397 1.572.894 2.262 1.479a.908.908 0 11-1.177 1.386 9.015 9.015 0 00-1.883-1.23.91.91 0 01.798-1.635zm5.53-1.737a.91.91 0 01-1.203 1.363A13.642 13.642 0 0010.9 6.588a.91.91 0 01-.146-1.813A15.457 15.457 0 0122.22 8.591z"
 });
 
-function SvgIconDownload(props) {
+function SvgIconDisconnected(props) {
   return React__default.createElement("svg", _extends$w({
     viewBox: "0 0 24 24"
   }, props), _ref$w);
@@ -1955,6 +1964,40 @@ function SvgIconDownload(props) {
 function _extends$x() { _extends$x = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$x.apply(this, arguments); }
 
 var _ref$x =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-document_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M14 1a1.01 1.01 0 01.25.031l.03.009c.03.009.061.02.091.031l.027.012a.914.914 0 01.195.112c.04.03.078.062.114.098l-.093-.082.011.009.082.073 6 6a1.006 1.006 0 01.21.309l.012.027c.012.03.022.06.031.091l.008.03A.921.921 0 0121 8l-.008-.126.001.01L21 8v12a3 3 0 01-3 3H6a3 3 0 01-3-3V4a3 3 0 013-3h8zm-1 2H6a1 1 0 00-1 1v16a1 1 0 001 1h12a1 1 0 001-1V9h-5a1 1 0 01-.993-.883L13 8V3zm4.585 4L15 4.415V7h2.585z"
+});
+
+function SvgIconDocument(props) {
+  return React__default.createElement("svg", _extends$x({
+    viewBox: "0 0 24 24"
+  }, props), _ref$x);
+}
+
+function _extends$y() { _extends$y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$y.apply(this, arguments); }
+
+var _ref$y =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-download_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M21 16a1 1 0 01.993.883L22 17v3a3 3 0 01-2.824 2.995L19 23H5a3 3 0 01-2.995-2.824L2 20v-3a1 1 0 011.993-.117L4 17v3a1 1 0 00.883.993L5 21h14a1 1 0 00.993-.883L20 20v-3a1 1 0 011-1zM12 1a1 1 0 01.993.883L13 2v11.585l2.293-2.292a1 1 0 011.32-.083l.094.083a1 1 0 01.083 1.32l-.083.094-4 4a1.006 1.006 0 01-.09.08l.09-.08a1.008 1.008 0 01-.674.292L12 17h-.032l-.054-.004L12 17a1.008 1.008 0 01-.613-.21 1.037 1.037 0 01-.094-.083l-4-4a1 1 0 011.32-1.497l.094.083L11 13.585V2a1 1 0 011-1z"
+});
+
+function SvgIconDownload(props) {
+  return React__default.createElement("svg", _extends$y({
+    viewBox: "0 0 24 24"
+  }, props), _ref$y);
+}
+
+function _extends$z() { _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$z.apply(this, arguments); }
+
+var _ref$z =
 /*#__PURE__*/
 React__default.createElement("g", {
   fill: "none",
@@ -1970,14 +2013,14 @@ React__default.createElement("g", {
 }));
 
 function SvgIconFileAudio(props) {
-  return React__default.createElement("svg", _extends$x({
+  return React__default.createElement("svg", _extends$z({
     viewBox: "0 0 28 28"
-  }, props), _ref$x);
+  }, props), _ref$z);
 }
 
-function _extends$y() { _extends$y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$y.apply(this, arguments); }
+function _extends$A() { _extends$A = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$A.apply(this, arguments); }
 
-var _ref$y =
+var _ref$A =
 /*#__PURE__*/
 React__default.createElement("g", {
   fill: "none",
@@ -1996,14 +2039,14 @@ React__default.createElement("g", {
 }));
 
 function SvgIconFileDocument(props) {
-  return React__default.createElement("svg", _extends$y({
+  return React__default.createElement("svg", _extends$A({
     viewBox: "0 0 28 28"
-  }, props), _ref$y);
+  }, props), _ref$A);
 }
 
-function _extends$z() { _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$z.apply(this, arguments); }
+function _extends$B() { _extends$B = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$B.apply(this, arguments); }
 
-var _ref$z =
+var _ref$B =
 /*#__PURE__*/
 React__default.createElement("g", {
   fill: "none",
@@ -2022,14 +2065,14 @@ React__default.createElement("g", {
 }));
 
 function SvgIconGif(props) {
-  return React__default.createElement("svg", _extends$z({
+  return React__default.createElement("svg", _extends$B({
     viewBox: "0 0 56 56"
-  }, props), _ref$z);
+  }, props), _ref$B);
 }
 
-function _extends$A() { _extends$A = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$A.apply(this, arguments); }
+function _extends$C() { _extends$C = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$C.apply(this, arguments); }
 
-var _ref$A =
+var _ref$C =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-info_svg__fill",
@@ -2039,40 +2082,6 @@ React__default.createElement("path", {
 });
 
 function SvgIconInfo(props) {
-  return React__default.createElement("svg", _extends$A({
-    viewBox: "0 0 24 24"
-  }, props), _ref$A);
-}
-
-function _extends$B() { _extends$B = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$B.apply(this, arguments); }
-
-var _ref$B =
-/*#__PURE__*/
-React__default.createElement("path", {
-  className: "icon-leave_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M12 2a1 1 0 01.117 1.993L12 4H4a1 1 0 00-.993.883L3 5v14a1 1 0 00.883.993L4 20h8a1 1 0 01.117 1.993L12 22H4a3 3 0 01-2.995-2.824L1 19V5a3 3 0 012.824-2.995L4 2h8zm6.613 5.21l.094.083 4 4a1 1 0 01.083 1.32l-.083.094-4 4a1 1 0 01-1.497-1.32l.083-.094 1.792-1.793H7.5a1 1 0 01-.117-1.993L7.5 11.5h12.585l-2.792-2.793a1 1 0 01-.083-1.32l.083-.094a1 1 0 011.32-.083z"
-});
-
-function SvgIconLeave(props) {
-  return React__default.createElement("svg", _extends$B({
-    viewBox: "0 0 24 24"
-  }, props), _ref$B);
-}
-
-function _extends$C() { _extends$C = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$C.apply(this, arguments); }
-
-var _ref$C =
-/*#__PURE__*/
-React__default.createElement("path", {
-  className: "icon-members_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M13 14a5 5 0 014.995 4.783L18 19v2a1 1 0 01-1.993.117L16 21v-2a3 3 0 00-2.824-2.995L13 16H5a3 3 0 00-2.995 2.824L2 19v2a1 1 0 01-1.993.117L0 21v-2a5 5 0 014.783-4.995L5 14h8zm7.25.162a5 5 0 013.745 4.611L24 19v2a1 1 0 01-1.993.117L22 21v-2a3 3 0 00-2.25-2.902 1 1 0 11.5-1.936zM9 2a5 5 0 110 10A5 5 0 019 2zm7.248.161a5 5 0 010 9.688 1 1 0 01-.496-1.938 3 3 0 000-5.812 1 1 0 11.496-1.938zM9 4a3 3 0 100 6 3 3 0 000-6z"
-});
-
-function SvgIconMembers(props) {
   return React__default.createElement("svg", _extends$C({
     viewBox: "0 0 24 24"
   }, props), _ref$C);
@@ -2083,13 +2092,13 @@ function _extends$D() { _extends$D = Object.assign || function (target) { for (v
 var _ref$D =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-notifications_svg__fill",
+  className: "icon-leave_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M13.73 20a1 1 0 01.865 1.502 3 3 0 01-5.19 0 1 1 0 01.752-1.496L10.27 20h3.46zM12 1a8 8 0 017.996 7.75L20 9v5a2 2 0 001.85 1.995l.283.012c1.111.12 1.154 1.73.128 1.965l-.128.021L22 18H2l-.133-.007c-1.156-.124-1.156-1.862 0-1.986l.282-.012a2 2 0 001.845-1.838L4 14V9a8 8 0 018-8zm0 2a6 6 0 00-5.996 5.775L6 9v5c0 .586-.126 1.142-.352 1.643l-.103.212-.082.145h13.073l-.08-.145a3.973 3.973 0 01-.43-1.402l-.021-.253L18 14V9a6 6 0 00-6-6z"
+  d: "M12 2a1 1 0 01.117 1.993L12 4H4a1 1 0 00-.993.883L3 5v14a1 1 0 00.883.993L4 20h8a1 1 0 01.117 1.993L12 22H4a3 3 0 01-2.995-2.824L1 19V5a3 3 0 012.824-2.995L4 2h8zm6.613 5.21l.094.083 4 4a1 1 0 01.083 1.32l-.083.094-4 4a1 1 0 01-1.497-1.32l.083-.094 1.792-1.793H7.5a1 1 0 01-.117-1.993L7.5 11.5h12.585l-2.792-2.793a1 1 0 01-.083-1.32l.083-.094a1 1 0 011.32-.083z"
 });
 
-function SvgIconNotifications(props) {
+function SvgIconLeave(props) {
   return React__default.createElement("svg", _extends$D({
     viewBox: "0 0 24 24"
   }, props), _ref$D);
@@ -2100,13 +2109,13 @@ function _extends$E() { _extends$E = Object.assign || function (target) { for (v
 var _ref$E =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-photo_svg__fill",
+  className: "icon-members_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M19 2a3 3 0 013 3v14a3 3 0 01-3 3H4.941v-.002l-.117-.003A3 3 0 012 19V5a3 3 0 013-3zm-3 9.415L7.414 20H19a1 1 0 00.993-.883L20 19v-3.585l-4-4zM19 4H5a1 1 0 00-1 1v14a1 1 0 00.65.937L15.292 9.293a1 1 0 011.32-.083l.094.083L20 12.585V5a1 1 0 00-.883-.993L19 4zM8.5 6a2.5 2.5 0 110 5 2.5 2.5 0 010-5zm0 2a.5.5 0 100 1 .5.5 0 000-1z"
+  d: "M13 14a5 5 0 014.995 4.783L18 19v2a1 1 0 01-1.993.117L16 21v-2a3 3 0 00-2.824-2.995L13 16H5a3 3 0 00-2.995 2.824L2 19v2a1 1 0 01-1.993.117L0 21v-2a5 5 0 014.783-4.995L5 14h8zm7.25.162a5 5 0 013.745 4.611L24 19v2a1 1 0 01-1.993.117L22 21v-2a3 3 0 00-2.25-2.902 1 1 0 11.5-1.936zM9 2a5 5 0 110 10A5 5 0 019 2zm7.248.161a5 5 0 010 9.688 1 1 0 01-.496-1.938 3 3 0 000-5.812 1 1 0 11.496-1.938zM9 4a3 3 0 100 6 3 3 0 000-6z"
 });
 
-function SvgIconPhoto(props) {
+function SvgIconMembers(props) {
   return React__default.createElement("svg", _extends$E({
     viewBox: "0 0 24 24"
   }, props), _ref$E);
@@ -2115,6 +2124,40 @@ function SvgIconPhoto(props) {
 function _extends$F() { _extends$F = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$F.apply(this, arguments); }
 
 var _ref$F =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-notifications_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M13.73 20a1 1 0 01.865 1.502 3 3 0 01-5.19 0 1 1 0 01.752-1.496L10.27 20h3.46zM12 1a8 8 0 017.996 7.75L20 9v5a2 2 0 001.85 1.995l.283.012c1.111.12 1.154 1.73.128 1.965l-.128.021L22 18H2l-.133-.007c-1.156-.124-1.156-1.862 0-1.986l.282-.012a2 2 0 001.845-1.838L4 14V9a8 8 0 018-8zm0 2a6 6 0 00-5.996 5.775L6 9v5c0 .586-.126 1.142-.352 1.643l-.103.212-.082.145h13.073l-.08-.145a3.973 3.973 0 01-.43-1.402l-.021-.253L18 14V9a6 6 0 00-6-6z"
+});
+
+function SvgIconNotifications(props) {
+  return React__default.createElement("svg", _extends$F({
+    viewBox: "0 0 24 24"
+  }, props), _ref$F);
+}
+
+function _extends$G() { _extends$G = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$G.apply(this, arguments); }
+
+var _ref$G =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-photo_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M19 2a3 3 0 013 3v14a3 3 0 01-3 3H4.941v-.002l-.117-.003A3 3 0 012 19V5a3 3 0 013-3zm-3 9.415L7.414 20H19a1 1 0 00.993-.883L20 19v-3.585l-4-4zM19 4H5a1 1 0 00-1 1v14a1 1 0 00.65.937L15.292 9.293a1 1 0 011.32-.083l.094.083L20 12.585V5a1 1 0 00-.883-.993L19 4zM8.5 6a2.5 2.5 0 110 5 2.5 2.5 0 010-5zm0 2a.5.5 0 100 1 .5.5 0 000-1z"
+});
+
+function SvgIconPhoto(props) {
+  return React__default.createElement("svg", _extends$G({
+    viewBox: "0 0 24 24"
+  }, props), _ref$G);
+}
+
+function _extends$H() { _extends$H = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$H.apply(this, arguments); }
+
+var _ref$H =
 /*#__PURE__*/
 React__default.createElement("g", {
   fill: "none",
@@ -2133,14 +2176,14 @@ React__default.createElement("g", {
 }));
 
 function SvgIconPlay(props) {
-  return React__default.createElement("svg", _extends$F({
+  return React__default.createElement("svg", _extends$H({
     viewBox: "0 0 56 56"
-  }, props), _ref$F);
+  }, props), _ref$H);
 }
 
-function _extends$G() { _extends$G = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$G.apply(this, arguments); }
+function _extends$I() { _extends$I = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$I.apply(this, arguments); }
 
-var _ref$G =
+var _ref$I =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-plus_svg__fill",
@@ -2150,14 +2193,14 @@ React__default.createElement("path", {
 });
 
 function SvgIconPlus(props) {
-  return React__default.createElement("svg", _extends$G({
+  return React__default.createElement("svg", _extends$I({
     viewBox: "0 0 24 24"
-  }, props), _ref$G);
+  }, props), _ref$I);
 }
 
-function _extends$H() { _extends$H = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$H.apply(this, arguments); }
+function _extends$J() { _extends$J = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$J.apply(this, arguments); }
 
-var _ref$H =
+var _ref$J =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-read_svg__fill",
@@ -2167,14 +2210,14 @@ React__default.createElement("path", {
 });
 
 function SvgIconRead(props) {
-  return React__default.createElement("svg", _extends$H({
+  return React__default.createElement("svg", _extends$J({
     viewBox: "0 0 24 24"
-  }, props), _ref$H);
+  }, props), _ref$J);
 }
 
-function _extends$I() { _extends$I = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$I.apply(this, arguments); }
+function _extends$K() { _extends$K = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$K.apply(this, arguments); }
 
-var _ref$I =
+var _ref$K =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-refresh_svg__fill",
@@ -2184,15 +2227,15 @@ React__default.createElement("path", {
 });
 
 function SvgIconRefresh(props) {
-  return React__default.createElement("svg", _extends$I({
+  return React__default.createElement("svg", _extends$K({
     width: 20,
     height: 20
-  }, props), _ref$I);
+  }, props), _ref$K);
 }
 
-function _extends$J() { _extends$J = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$J.apply(this, arguments); }
+function _extends$L() { _extends$L = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$L.apply(this, arguments); }
 
-var _ref$J =
+var _ref$L =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-send_svg__fill",
@@ -2201,14 +2244,14 @@ React__default.createElement("path", {
 });
 
 function SvgIconSend(props) {
-  return React__default.createElement("svg", _extends$J({
+  return React__default.createElement("svg", _extends$L({
     viewBox: "0 0 22 22"
-  }, props), _ref$J);
+  }, props), _ref$L);
 }
 
-function _extends$K() { _extends$K = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$K.apply(this, arguments); }
+function _extends$M() { _extends$M = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$M.apply(this, arguments); }
 
-var _ref$K =
+var _ref$M =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-sent_svg__fill",
@@ -2218,40 +2261,6 @@ React__default.createElement("path", {
 });
 
 function SvgIconSent(props) {
-  return React__default.createElement("svg", _extends$K({
-    viewBox: "0 0 24 24"
-  }, props), _ref$K);
-}
-
-function _extends$L() { _extends$L = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$L.apply(this, arguments); }
-
-var _ref$L =
-/*#__PURE__*/
-React__default.createElement("path", {
-  className: "icon-shevron_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M8.293 17.293a1 1 0 001.414 1.414l6-6a1 1 0 000-1.414l-6-6a1 1 0 00-1.414 1.414L13.586 12l-5.293 5.293z"
-});
-
-function SvgIconShevron(props) {
-  return React__default.createElement("svg", _extends$L({
-    viewBox: "0 0 24 24"
-  }, props), _ref$L);
-}
-
-function _extends$M() { _extends$M = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$M.apply(this, arguments); }
-
-var _ref$M =
-/*#__PURE__*/
-React__default.createElement("path", {
-  className: "icon-shevron-down_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M6.045 8.205a1.125 1.125 0 10-1.59 1.59l6.75 6.75c.439.44 1.151.44 1.59 0l6.75-6.75a1.125 1.125 0 10-1.59-1.59L12 14.159 6.045 8.205z"
-});
-
-function SvgIconShevronDown(props) {
   return React__default.createElement("svg", _extends$M({
     viewBox: "0 0 24 24"
   }, props), _ref$M);
@@ -2262,13 +2271,13 @@ function _extends$N() { _extends$N = Object.assign || function (target) { for (v
 var _ref$N =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-spinner-small_svg__fill",
+  className: "icon-shevron_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
-  d: "M12 22.5c5.799 0 10.5-4.701 10.5-10.5S17.799 1.5 12 1.5 1.5 6.201 1.5 12a1.432 1.432 0 002.864 0A7.636 7.636 0 1112 19.636a1.432 1.432 0 000 2.864z"
+  d: "M8.293 17.293a1 1 0 001.414 1.414l6-6a1 1 0 000-1.414l-6-6a1 1 0 00-1.414 1.414L13.586 12l-5.293 5.293z"
 });
 
-function SvgIconSpinnerSmall(props) {
+function SvgIconShevron(props) {
   return React__default.createElement("svg", _extends$N({
     viewBox: "0 0 24 24"
   }, props), _ref$N);
@@ -2279,6 +2288,40 @@ function _extends$O() { _extends$O = Object.assign || function (target) { for (v
 var _ref$O =
 /*#__PURE__*/
 React__default.createElement("path", {
+  className: "icon-shevron-down_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M6.045 8.205a1.125 1.125 0 10-1.59 1.59l6.75 6.75c.439.44 1.151.44 1.59 0l6.75-6.75a1.125 1.125 0 10-1.59-1.59L12 14.159 6.045 8.205z"
+});
+
+function SvgIconShevronDown(props) {
+  return React__default.createElement("svg", _extends$O({
+    viewBox: "0 0 24 24"
+  }, props), _ref$O);
+}
+
+function _extends$P() { _extends$P = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$P.apply(this, arguments); }
+
+var _ref$P =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-spinner-small_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M12 22.5c5.799 0 10.5-4.701 10.5-10.5S17.799 1.5 12 1.5 1.5 6.201 1.5 12a1.432 1.432 0 002.864 0A7.636 7.636 0 1112 19.636a1.432 1.432 0 000 2.864z"
+});
+
+function SvgIconSpinnerSmall(props) {
+  return React__default.createElement("svg", _extends$P({
+    viewBox: "0 0 24 24"
+  }, props), _ref$P);
+}
+
+function _extends$Q() { _extends$Q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$Q.apply(this, arguments); }
+
+var _ref$Q =
+/*#__PURE__*/
+React__default.createElement("path", {
   className: "icon-spinner-large_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -2286,14 +2329,14 @@ React__default.createElement("path", {
 });
 
 function SvgIconSpinnerLarge(props) {
-  return React__default.createElement("svg", _extends$O({
+  return React__default.createElement("svg", _extends$Q({
     viewBox: "0 0 48 48"
-  }, props), _ref$O);
+  }, props), _ref$Q);
 }
 
-function _extends$P() { _extends$P = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$P.apply(this, arguments); }
+function _extends$R() { _extends$R = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$R.apply(this, arguments); }
 
-var _ref$P =
+var _ref$R =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-user_svg__fill",
@@ -2303,9 +2346,169 @@ React__default.createElement("path", {
 });
 
 function SvgIconUser(props) {
-  return React__default.createElement("svg", _extends$P({
+  return React__default.createElement("svg", _extends$R({
     viewBox: "0 0 24 24"
-  }, props), _ref$P);
+  }, props), _ref$R);
+}
+
+function _extends$S() { _extends$S = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$S.apply(this, arguments); }
+
+var _ref$S =
+/*#__PURE__*/
+React__default.createElement("g", {
+  className: "icon-operator_svg__fill",
+  fill: "none",
+  fillRule: "evenodd"
+}, React__default.createElement("path", {
+  stroke: "#7B53EF",
+  strokeLinejoin: "round",
+  strokeWidth: 2,
+  d: "M2 6l5 4 5-7 5 7 5-4-3 14H5z"
+}), React__default.createElement("circle", {
+  cx: 12,
+  cy: 14,
+  r: 2,
+  fill: "#7B53EF"
+}));
+
+function SvgIconOperator(props) {
+  return React__default.createElement("svg", _extends$S({
+    viewBox: "0 0 24 24"
+  }, props), _ref$S);
+}
+
+function _extends$T() { _extends$T = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$T.apply(this, arguments); }
+
+var _ref$T =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-banned_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M12 1c6.075 0 11 4.925 11 11s-4.925 11-11 11S1 18.075 1 12 5.925 1 12 1zm0 2a9 9 0 10.001 18.001A9 9 0 0012 3zm4 8a1 1 0 010 2H8a1 1 0 010-2h8z"
+});
+
+function SvgIconBanned(props) {
+  return React__default.createElement("svg", _extends$T({
+    viewBox: "0 0 24 24"
+  }, props), _ref$T);
+}
+
+function _extends$U() { _extends$U = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$U.apply(this, arguments); }
+
+var _ref$U =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-muted_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M20.857 7.357l.026.045A9.96 9.96 0 0122 12a9.937 9.937 0 01-1.074 4.51c-.38 1.021-.463 1.817-.25 2.386.265.713.598 1.308.997 1.784.578.594.39 1.01-.565 1.249-.763.19-2.073 0-3.929-.571l-.333-.105-.598-.198A9.965 9.965 0 0112 22a9.952 9.952 0 01-4.622-1.13l-.022-.011 1.5-1.5c.982.42 2.046.641 3.144.641 1.073 0 2.114-.21 3.079-.613l.318-.142.722-.339 1.355.449.26.082c.228.07.445.133.65.19l.298.08.182.045-.063-.157-.075-.223c-.295-.974-.189-2.057.225-3.275l.1-.284.04-.107.198-.406A7.949 7.949 0 0020 12a7.97 7.97 0 00-.64-3.143l1.497-1.5zM12 2c2.401 0 4.604.846 6.328 2.257l1.965-1.964a1 1 0 011.497 1.32l-.083.094-18 18a1 1 0 01-1.497-1.32l.083-.094 1.963-1.965a9.956 9.956 0 01-2.25-5.998L2 12C2 6.477 6.477 2 12 2zm0 2a8 8 0 00-6.32 12.906L16.905 5.68a7.957 7.957 0 00-4.607-1.675L12 4z"
+});
+
+function SvgIconMuted(props) {
+  return React__default.createElement("svg", _extends$U({
+    viewBox: "0 0 24 24"
+  }, props), _ref$U);
+}
+
+function _extends$V() { _extends$V = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$V.apply(this, arguments); }
+
+var _ref$V =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-muted-foreground_svg__fill",
+  fill: "#FFF",
+  fillOpacity: 0.88,
+  fillRule: "evenodd",
+  d: "M13.904 4.904l.018.03c.476.919.745 1.96.745 3.066a6.628 6.628 0 01-.716 3.006c-.253.682-.309 1.212-.168 1.591.178.476.4.872.666 1.19.385.396.26.674-.377.832-.503.125-1.361.003-2.576-.367l-.266-.083-.398-.132c-.86.404-1.82.63-2.832.63a6.632 6.632 0 01-3.082-.754l-.014-.007 1-1c.655.28 1.364.427 2.096.427a5.32 5.32 0 001.999-.386l.266-.117.481-.226.903.299.174.055c.152.047.296.089.433.126l.199.054.121.03-.042-.105-.05-.149c-.192-.635-.129-1.34.133-2.132l.084-.24.026-.071.132-.271a5.294 5.294 0 00.474-2.2c0-.732-.147-1.44-.427-2.096l.998-1zm.567-3.375c.24.24.26.618.056.88l-.056.062-12 12a.666.666 0 01-.998-.88l.056-.062 1.31-1.31a6.636 6.636 0 01-1.5-3.94L1.333 8A6.667 6.667 0 0112.22 2.838l1.309-1.31c.26-.26.682-.26.942 0zM8 2.667a5.332 5.332 0 00-4.213 8.603l7.484-7.484a5.32 5.32 0 00-3.006-1.113L8 2.667z"
+});
+
+function SvgIconMutedForeground(props) {
+  return React__default.createElement("svg", _extends$V({
+    viewBox: "0 0 16 16"
+  }, props), _ref$V);
+}
+
+function _extends$W() { _extends$W = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$W.apply(this, arguments); }
+
+var _ref$W =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-freeze_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M9.613 1.21l.095.083L12 3.585l2.293-2.292a1 1 0 011.32-.083l.095.083a1 1 0 01.083 1.32l-.083.094L13 5.414v4.853l4.203-2.427.992-3.697a1 1 0 011.957.395l-.025.123-.84 3.131 3.133.84c.492.132.8.61.732 1.102l-.025.123c-.132.492-.61.8-1.102.732l-.123-.025-3.698-.991L14.001 12l4.203 2.426 3.698-.99.123-.025c.492-.068.97.24 1.102.732l.025.123a1 1 0 01-.732 1.102l-3.133.839.84 3.132.025.123a1 1 0 01-1.957.395l-.992-3.698L13 13.732v4.853l2.708 2.708a1 1 0 01-1.32 1.497l-.095-.083L12 20.414l-2.292 2.293a1 1 0 01-1.32.083l-.095-.083a1 1 0 01-.083-1.32l.083-.094L11 18.585v-4.853l-4.203 2.427-.99 3.698a1.002 1.002 0 01-1.958-.395l.025-.123.839-3.131-3.132-.84c-.492-.132-.8-.61-.732-1.102l.025-.123c.132-.492.61-.8 1.102-.732l.123.025 3.697.99 4.203-2.427-4.203-2.426-3.697.991-.123.025c-.492.068-.97-.24-1.102-.732L.85 9.734a1 1 0 01.732-1.102l3.132-.84-.839-3.131-.025-.123a1 1 0 011.957-.395l.991 3.697L11 10.267V5.414L8.293 2.707a1 1 0 011.32-1.497z"
+});
+
+function SvgIconFreeze(props) {
+  return React__default.createElement("svg", _extends$W({
+    viewBox: "0 0 24 24"
+  }, props), _ref$W);
+}
+
+function _extends$X() { _extends$X = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$X.apply(this, arguments); }
+
+var _ref$X =
+/*#__PURE__*/
+React__default.createElement("g", {
+  className: "icon-toggleon_svg__fill",
+  fill: "none",
+  fillRule: "evenodd"
+}, React__default.createElement("rect", {
+  width: 40,
+  height: 20,
+  x: 2,
+  y: 2,
+  fill: "#7B53EF",
+  rx: 10
+}), React__default.createElement("circle", {
+  cx: 32,
+  cy: 12,
+  r: 6,
+  fill: "#FFF"
+}), React__default.createElement("path", {
+  fill: "#7B53EF",
+  d: "M32 0H12C5.373 0 0 5.373 0 12s5.373 12 12 12h20c6.627 0 12-5.373 12-12S38.627 0 32 0zm0 2c5.523 0 10 4.477 10 10s-4.477 10-10 10H12C6.477 22 2 17.523 2 12S6.477 2 12 2h20z"
+}));
+
+function SvgIconToggleon(props) {
+  return React__default.createElement("svg", _extends$X({
+    viewBox: "0 0 44 24"
+  }, props), _ref$X);
+}
+
+function _extends$Y() { _extends$Y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$Y.apply(this, arguments); }
+
+var _ref$Y =
+/*#__PURE__*/
+React__default.createElement("g", {
+  className: "icon-toggleoff_svg__fill",
+  fill: "none",
+  fillRule: "evenodd"
+}, React__default.createElement("rect", {
+  width: 40,
+  height: 20,
+  x: 2,
+  y: 2,
+  fill: "#A8A8A8",
+  rx: 10
+}), React__default.createElement("circle", {
+  cx: 12,
+  cy: 12,
+  r: 6,
+  fill: "#FFF"
+}), React__default.createElement("path", {
+  fill: "#A8A8A8",
+  d: "M32 2c5.523 0 10 4.477 10 10s-4.477 10-10 10H12C6.477 22 2 17.523 2 12S6.477 2 12 2h20zm0 1H12a9 9 0 00-.265 17.996L12 21h20a9 9 0 00.265-17.996L32 3z"
+}), React__default.createElement("path", {
+  fill: "#FFF",
+  d: "M32 0H12C5.373 0 0 5.373 0 12s5.373 12 12 12h20c6.627 0 12-5.373 12-12S38.627 0 32 0zm0 2c5.523 0 10 4.477 10 10s-4.477 10-10 10H12C6.477 22 2 17.523 2 12S6.477 2 12 2h20z"
+}));
+
+function SvgIconToggleoff(props) {
+  return React__default.createElement("svg", _extends$Y({
+    viewBox: "0 0 44 24"
+  }, props), _ref$Y);
 }
 
 var Colors = {
@@ -2383,6 +2586,9 @@ function changeTypeToIconComponent(type) {
     case Type.BROADCAST_LIGHT:
       return React__default.createElement(SvgIconBroadcastLight, null);
 
+    case Type.BROADCAST:
+      return React__default.createElement(SvgIconBroadcast, null);
+
     case Type.FROZEN_DARK:
       return React__default.createElement(SvgFrozenDark, null);
 
@@ -2412,6 +2618,9 @@ function changeTypeToIconComponent(type) {
 
     case Type.CHAT:
       return React__default.createElement(SvgIconChat, null);
+
+    case Type.SUPER_GROUP:
+      return React__default.createElement(SvgIconSupergroup, null);
 
     case Type.CREATE:
       return React__default.createElement(SvgIconCreate, null);
@@ -2509,6 +2718,27 @@ function changeTypeToIconComponent(type) {
     case Type.USER:
       return React__default.createElement(SvgIconUser, null);
 
+    case Type.ICON_OPERATOR:
+      return React__default.createElement(SvgIconOperator, null);
+
+    case Type.ICON_BANNED:
+      return React__default.createElement(SvgIconBanned, null);
+
+    case Type.ICON_MUTED:
+      return React__default.createElement(SvgIconMuted, null);
+
+    case Type.ICON_MUTED_FG:
+      return React__default.createElement(SvgIconMutedForeground, null);
+
+    case Type.ICON_FREEZE:
+      return React__default.createElement(SvgIconFreeze, null);
+
+    case Type.TOGGLE_ON:
+      return React__default.createElement(SvgIconToggleon, null);
+
+    case Type.TOGGLE_OFF:
+      return React__default.createElement(SvgIconToggleoff, null);
+
     default:
       return null;
   }
@@ -2522,7 +2752,7 @@ function Icon(_ref) {
       className = _ref.className,
       onClick = _ref.onClick,
       fillColor = _ref.fillColor;
-  var style = {
+  var iconStyle = {
     width: typeof width === 'string' ? width : "".concat(width, "px"),
     height: typeof height === 'string' ? height : "".concat(height, "px")
   };
@@ -2533,7 +2763,7 @@ function Icon(_ref) {
     role: "button",
     tabIndex: "0",
     className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-icon', changeColorToClassName(fillColor)]).join(' '),
-    style: style
+    style: iconStyle
   }, children || changeTypeToIconComponent(type));
 }
 Icon.propTypes = {
@@ -2715,6 +2945,7 @@ var getStringSet = function getStringSet(lang) {
       CHANNEL_LIST__TITLE: 'Channels',
       CHANNEL__MESSAGE_INPUT__PLACE_HOLDER: 'Enter message',
       CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__DISABLED: 'Chat is unavailable in this channel',
+      CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__MUTED: 'Chat is unavailable because you are being muted',
       CHANNEL__MESSAGE_LIST__NOTIFICATION__NEW_MESSAGE: 'new message(s) since',
       CHANNEL__MESSAGE_LIST__NOTIFICATION__ON: 'on',
       CHANNEL_SETTING__HEADER__TITLE: 'Channel information',
@@ -2723,6 +2954,14 @@ var getStringSet = function getStringSet(lang) {
       CHANNEL_SETTING__MEMBERS__SEE_ALL_MEMBERS: 'All members',
       CHANNEL_SETTING__MEMBERS__INVITE_MEMBER: 'Invite users',
       CHANNEL_SETTING__LEAVE_CHANNEL__TITLE: 'Leave channel',
+      CHANNEL_SETTING__OPERATORS__TITLE: 'Operators',
+      CHANNEL_SETTING__OPERATORS__TITLE_ALL: 'All operators',
+      CHANNEL_SETTING__OPERATORS__TITLE_ADD: 'Add operator',
+      CHANNEL_SETTING__MUTED_MEMBERS__TITLE: 'Muted members',
+      CHANNEL_SETTING__MUTED_MEMBERS__TITLE_ALL: 'All muted members',
+      CHANNEL_SETTING__BANNED_MEMBERS__TITLE: 'Banned members',
+      CHANNEL_SETTING__BANNED_MEMBERS__TITLE_ALL: 'All banned members',
+      CHANNEL_SETTING__FREEZE_CHANNEL: 'Freeze Channel',
       BUTTON__CANCEL: 'Cancel',
       BUTTON__DELETE: 'Delete',
       BUTTON__SAVE: 'Save',
@@ -2751,6 +2990,7 @@ var getStringSet = function getStringSet(lang) {
       MESSAGE_STATUS__DELETE: 'delete',
       PLACE_HOLDER__NO_CHANNEL: 'No channels',
       CHANNEL_FROZEN: 'Channel frozen',
+      MUTED_PL: 'Channel frozen',
       PLACE_HOLDER__WRONG: 'Something went wrong',
       PLACE_HOLDER__RETRY_TO_CONNECT: 'Retry',
       NO_TITLE: 'No title',
@@ -3216,6 +3456,8 @@ ModalBody.defaultProps = {
 var ModalFooter = function ModalFooter(_ref3) {
   var onSubmit = _ref3.onSubmit,
       onCancel = _ref3.onCancel,
+      _ref3$disabled = _ref3.disabled,
+      disabled = _ref3$disabled === void 0 ? false : _ref3$disabled,
       submitText = _ref3.submitText,
       type = _ref3.type;
   return React__default.createElement("div", {
@@ -3228,6 +3470,7 @@ var ModalFooter = function ModalFooter(_ref3) {
     color: LabelColors.ONBACKGROUND_1
   }, LabelStringSet.BUTTON__CANCEL)), React__default.createElement(Button, {
     type: type,
+    disabled: disabled,
     onClick: onSubmit
   }, submitText));
 };
@@ -3235,9 +3478,11 @@ ModalFooter.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   submitText: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
   type: PropTypes.string
 };
 ModalFooter.defaultProps = {
+  disabled: false,
   type: Type$1.DANGER
 };
 
@@ -3245,6 +3490,7 @@ function Modal(props) {
   var children = props.children,
       onCancel = props.onCancel,
       onSubmit = props.onSubmit,
+      disabled = props.disabled,
       submitText = props.submitText,
       titleText = props.titleText,
       hideFooter = props.hideFooter,
@@ -3256,6 +3502,7 @@ function Modal(props) {
   }, React__default.createElement(ModalHeader, {
     titleText: titleText
   }), React__default.createElement(ModalBody, null, children), !hideFooter && React__default.createElement(ModalFooter, {
+    disabled: disabled,
     onCancel: onCancel,
     onSubmit: onSubmit,
     submitText: submitText,
@@ -3281,13 +3528,42 @@ Modal.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   hideFooter: PropTypes.bool,
+  disabled: PropTypes.bool,
   type: PropTypes.string
 };
 Modal.defaultProps = {
   children: null,
   hideFooter: false,
+  disabled: false,
   type: Type$1.DANGER
 };
+
+function MutedAvatarOverlay(props) {
+  var _a = props.height,
+      height = _a === void 0 ? 24 : _a,
+      _b = props.width,
+      width = _b === void 0 ? 24 : _b;
+  return React__default.createElement("div", {
+    className: "sendbird-muted-avatar",
+    style: {
+      height: height + "px",
+      width: width + "px"
+    }
+  }, React__default.createElement("div", {
+    className: "sendbird-muted-avatar__icon"
+  }, React__default.createElement("div", {
+    className: "sendbird-muted-avatar__bg",
+    style: {
+      height: height + "px",
+      width: width + "px"
+    }
+  }), React__default.createElement(Icon, {
+    fillColor: IconColors.WHITE,
+    type: IconTypes.ICON_MUTED,
+    width: height - 8 + "px",
+    height: width - 8 + "px"
+  })));
+}
 
 function Checkbox(_ref) {
   var id = _ref.id,
@@ -3330,13 +3606,21 @@ function UserListItem(_ref) {
   var user = _ref.user,
       className = _ref.className,
       checkBox = _ref.checkBox,
+      currentUser = _ref.currentUser,
       checked = _ref.checked,
-      _onChange = _ref.onChange;
+      _onChange = _ref.onChange,
+      action = _ref.action;
   var injectingClassNames = Array.isArray(className) ? className : [className];
   var uniqueKey = user.userId;
+  var actionRef = React__default.useRef(null);
+  var parentRef = React__default.useRef(null);
   return React__default.createElement("div", {
+    ref: parentRef,
     className: [COMPONENT_NAME].concat(_toConsumableArray(injectingClassNames)).join(' ')
-  }, React__default.createElement(Avatar, {
+  }, user.isMuted && React__default.createElement(MutedAvatarOverlay, {
+    height: 40,
+    width: 40
+  }), React__default.createElement(Avatar, {
     className: "".concat(COMPONENT_NAME, "__avatar"),
     src: user.profileUrl,
     width: "40px",
@@ -3345,7 +3629,7 @@ function UserListItem(_ref) {
     className: "".concat(COMPONENT_NAME, "__title"),
     type: LabelTypography.SUBTITLE_1,
     color: LabelColors.ONBACKGROUND_1
-  }, user.nickname || LabelStringSet.NO_NAME), // if there is now nickname, display userId
+  }, user.nickname || LabelStringSet.NO_NAME, currentUser === user.userId && ' (You)'), // if there is now nickname, display userId
   !user.nickname && React__default.createElement(Label, {
     className: "".concat(COMPONENT_NAME, "__subtitle"),
     type: LabelTypography.CAPTION_3,
@@ -3360,23 +3644,39 @@ function UserListItem(_ref) {
     onChange: function onChange(event) {
       return _onChange(event);
     }
+  })), user.role === 'operator' && React__default.createElement(Label, {
+    className: "".concat(COMPONENT_NAME, "__operator"),
+    type: LabelTypography.SUBTITLE_2,
+    color: LabelColors.ONBACKGROUND_2
+  }, "Operator"), action && React__default.createElement("div", {
+    ref: actionRef,
+    className: "".concat(COMPONENT_NAME, "__action")
+  }, action({
+    actionRef: actionRef,
+    parentRef: parentRef
   })));
 }
 UserListItem.propTypes = {
   user: PropTypes.shape({
     userId: PropTypes.string,
+    role: PropTypes.string,
+    isMuted: PropTypes.bool,
     nickname: PropTypes.string,
     profileUrl: PropTypes.string
   }).isRequired,
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  currentUser: PropTypes.string,
+  action: PropTypes.element,
   checkBox: PropTypes.bool,
   checked: PropTypes.bool,
   onChange: PropTypes.func
 };
 UserListItem.defaultProps = {
   className: '',
+  currentUser: '',
   checkBox: false,
   checked: false,
+  action: null,
   onChange: function onChange() {}
 };
 
@@ -3513,12 +3813,60 @@ var createDefaultUserListQuery = function createDefaultUserListQuery(_ref) {
 
   return params;
 };
-var createChannel = function createChannel(sdk, selectedUsers, onBeforeCreateChannel) {
+
+var getApplicationAttributes = function getApplicationAttributes() {
+  var sdk = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var _sdk$appInfo = sdk.appInfo,
+      appInfo = _sdk$appInfo === void 0 ? {} : _sdk$appInfo;
+  var _appInfo$applicationA = appInfo.applicationAttributes,
+      applicationAttributes = _appInfo$applicationA === void 0 ? [] : _appInfo$applicationA;
+  return applicationAttributes;
+};
+
+var isBroadcastChannelEnabled = function isBroadcastChannelEnabled() {
+  var sdk = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var ALLOW_BROADCAST_CHANNEL = 'allow_broadcast_channel';
+  var applicationAttributes = getApplicationAttributes(sdk);
+
+  if (Array.isArray(applicationAttributes)) {
+    return applicationAttributes.includes(ALLOW_BROADCAST_CHANNEL);
+  }
+
+  return false;
+};
+var isSuperGroupChannelEnabled = function isSuperGroupChannelEnabled() {
+  var sdk = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var ALLOW_SUPER_GROUP_CHANNEL = 'allow_super_group_channel';
+  var applicationAttributes = getApplicationAttributes(sdk);
+
+  if (Array.isArray(applicationAttributes)) {
+    return applicationAttributes.includes(ALLOW_SUPER_GROUP_CHANNEL);
+  }
+
+  return false;
+};
+var setChannelType = function setChannelType(params, type) {
+  if (type === 'broadcast') {
+    // eslint-disable-next-line no-param-reassign
+    params.isBroadcast = true;
+  }
+
+  if (type === 'supergroup') {
+    // eslint-disable-next-line no-param-reassign
+    params.isSuper = true;
+  }
+
+  return params;
+};
+var createChannel = function createChannel(sdk, selectedUsers, onBeforeCreateChannel, userId) {
+  var type = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 'group';
   return new Promise(function (resolve, reject) {
     // have custom params
     if (onBeforeCreateChannel) {
-      var params = onBeforeCreateChannel(selectedUsers);
-      sdk.GroupChannel.createChannel(params, function (response, error) {
+      var _params = onBeforeCreateChannel(selectedUsers);
+
+      setChannelType(_params, type);
+      sdk.GroupChannel.createChannel(_params, function (response, error) {
         var swapParams = sdk.getErrorFirstCallback();
         var groupChannel = response;
         var err = error;
@@ -3535,14 +3883,19 @@ var createChannel = function createChannel(sdk, selectedUsers, onBeforeCreateCha
         resolve(groupChannel);
       });
       return;
-    } // do not have custom params
+    }
 
+    var params = new sdk.GroupChannelParams();
+    params.addUserIds(selectedUsers);
+    params.isDistinct = false;
 
-    sdk.GroupChannel.createChannelWithUserIds(selectedUsers, false, // 'distinct' is false
-    '', // NAME
-    '', // COVER_IMAGE_OR_URL
-    '', // DATA
-    function (response, error) {
+    if (userId) {
+      params.operatorUserIds = [userId];
+    }
+
+    setChannelType(params, type); // do not have custom params
+
+    sdk.GroupChannel.createChannel(params, function (response, error) {
       var swapParams = sdk.getErrorFirstCallback();
       var groupChannel = response;
       var err = error;
@@ -3573,17 +3926,29 @@ function AddChannel(_ref) {
   var _useState = React.useState(false),
       _useState2 = _slicedToArray(_useState, 2),
       showModal = _useState2[0],
-      setshowModal = _useState2[1];
+      setShowModal = _useState2[1];
+
+  var _useState3 = React.useState(0),
+      _useState4 = _slicedToArray(_useState3, 2),
+      step = _useState4[0],
+      setStep = _useState4[1];
+
+  var _useState5 = React.useState('group'),
+      _useState6 = _slicedToArray(_useState5, 2),
+      type = _useState6[0],
+      setType = _useState6[1];
 
   if (!sdk || !sdk.createApplicationUserListQuery) {
     return null;
   }
 
+  var isBroadcastAvailable = isBroadcastChannelEnabled(sdk);
+  var isSupergroupAvailable = isSuperGroupChannelEnabled(sdk);
   return React__default.createElement(React__default.Fragment, null, React__default.createElement(IconButton, {
     height: "32px",
     width: "32px",
     onClick: function onClick() {
-      setshowModal(true);
+      setShowModal(true);
     },
     disabled: disabled
   }, React__default.createElement(Icon, {
@@ -3591,12 +3956,73 @@ function AddChannel(_ref) {
     fillColor: IconColors.PRIMARY,
     width: "24px",
     height: "24px"
-  })), showModal && React__default.createElement(InviteMembers, {
+  })), showModal && step === 0 && React__default.createElement(Modal, {
+    titleText: "New channel",
+    hideFooter: true,
+    onCancel: function onCancel() {
+      setShowModal(false);
+    },
+    onSubmit: function onSubmit() {}
+  }, React__default.createElement("div", {
+    className: "sendbird-add-channel__rectangle-wrap"
+  }, React__default.createElement("div", {
+    className: "sendbird-add-channel__rectangle",
+    onClick: function onClick() {
+      setType('group');
+      setStep(1);
+    },
+    role: "button",
+    tabIndex: 0,
+    onKeyDown: function onKeyDown() {
+      setType('group');
+      setStep(1);
+    }
+  }, React__default.createElement(Icon, {
+    type: IconTypes.CHAT
+  }), React__default.createElement(Label, {
+    type: LabelTypography.SUBTITLE_1,
+    color: LabelColors.ONBACKGROUND_1
+  }, "Group")), isSupergroupAvailable && React__default.createElement("div", {
+    className: "sendbird-add-channel__rectangle",
+    onClick: function onClick() {
+      setType('supergroup');
+      setStep(1);
+    },
+    role: "button",
+    tabIndex: 0,
+    onKeyDown: function onKeyDown() {
+      setType('supergroup');
+      setStep(1);
+    }
+  }, React__default.createElement(Icon, {
+    type: IconTypes.SUPER_GROUP
+  }), React__default.createElement(Label, {
+    type: LabelTypography.SUBTITLE_1,
+    color: LabelColors.ONBACKGROUND_1
+  }, "Super group")), isBroadcastAvailable && React__default.createElement("div", {
+    className: "sendbird-add-channel__rectangle",
+    onClick: function onClick() {
+      setType('broadcast');
+      setStep(1);
+    },
+    role: "button",
+    tabIndex: 0,
+    onKeyDown: function onKeyDown() {
+      setType('broadcast');
+      setStep(1);
+    }
+  }, React__default.createElement(Icon, {
+    type: IconTypes.BROADCAST
+  }), React__default.createElement(Label, {
+    type: LabelTypography.SUBTITLE_1,
+    color: LabelColors.ONBACKGROUND_1
+  }, "Broadcast")))), showModal && step === 1 && React__default.createElement(InviteMembers, {
     swapParams: sdk && sdk.getErrorFirstCallback && sdk.getErrorFirstCallback(),
     titleText: LabelStringSet.MODAL__CREATE_CHANNEL__TITLE,
     submitText: LabelStringSet.BUTTON__CREATE,
     closeModal: function closeModal() {
-      return setshowModal(false);
+      setStep(0);
+      setShowModal(false);
     },
     idsToFilter: [userId],
     userQueryCreator: function userQueryCreator() {
@@ -3606,7 +4032,7 @@ function AddChannel(_ref) {
       });
     },
     onSubmit: function onSubmit(selectedUsers) {
-      return createChannel(sdk, selectedUsers, onBeforeCreateChannel).then(function (channel) {
+      return createChannel(sdk, selectedUsers, onBeforeCreateChannel, userId, type).then(function (channel) {
         // maybe - do this in event listener
         channelListDispatcher({
           type: CREATE_CHANNEL,
@@ -3728,7 +4154,9 @@ function (_Component) {
       menuStyle.top += 32;
 
       if (openLeft) {
-        menuStyle.left -= 108;
+        var padding = Number.isNaN(rect.width - 30) ? 108 // default
+        : rect.width - 30;
+        menuStyle.left -= padding;
       }
 
       return _this.setState({
@@ -4287,6 +4715,29 @@ var createEventHandler = function createEventHandler(_ref) {
       channelListDispatcher({
         type: ON_USER_JOINED,
         payload: channel
+      });
+    }
+  };
+
+  ChannelHandler.onUserBanned = function (channel, user) {
+    var currentUser = sdk.currentUser;
+    logger.info('Channel | useHandleChannelEvents: onUserBanned', channel);
+
+    if (user.userId === currentUser.userId) {
+      channelListDispatcher({
+        type: ON_USER_LEFT,
+        payload: {
+          channel: channel,
+          isMe: true
+        }
+      });
+    } else {
+      channelListDispatcher({
+        type: ON_USER_LEFT,
+        payload: {
+          channel: channel,
+          isMe: false
+        }
       });
     }
   };
@@ -4948,6 +5399,11 @@ var isDisabledBecauseFrozen = function isDisabledBecauseFrozen() {
   var isFrozen = groupChannel.isFrozen;
   return isFrozen && !isOperator(groupChannel);
 };
+var isDisabledBecauseMuted = function isDisabledBecauseMuted() {
+  var groupChannel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var myMutedState = groupChannel.myMutedState;
+  return myMutedState === 'muted';
+};
 var getEmojiCategoriesFromEmojiContainer = function getEmojiCategoriesFromEmojiContainer() {
   var emojiContainer = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   return emojiContainer.emojiCategories ? emojiContainer.emojiCategories : [];
@@ -5319,6 +5775,46 @@ function useHandleChannelEvents(_ref, _ref2) {
       ChannelHandler.onChannelUnfrozen = function (groupChannel) {
         if (compareIds(groupChannel.url, currentGroupChannel.url)) {
           logger.info('Channel | useHandleChannelEvents: onChannelUnFrozen', groupChannel);
+          messagesDispatcher({
+            type: SET_CURRENT_CHANNEL$1,
+            payload: groupChannel
+          });
+        }
+      };
+
+      ChannelHandler.onUserMuted = function (groupChannel) {
+        if (compareIds(groupChannel.url, currentGroupChannel.url)) {
+          logger.info('Channel | useHandleChannelEvents: onUserMuted', groupChannel);
+          messagesDispatcher({
+            type: SET_CURRENT_CHANNEL$1,
+            payload: groupChannel
+          });
+        }
+      };
+
+      ChannelHandler.onUserUnmuted = function (groupChannel) {
+        if (compareIds(groupChannel.url, currentGroupChannel.url)) {
+          logger.info('Channel | useHandleChannelEvents: onUserUnmuted', groupChannel);
+          messagesDispatcher({
+            type: SET_CURRENT_CHANNEL$1,
+            payload: groupChannel
+          });
+        }
+      };
+
+      ChannelHandler.onUserBanned = function (groupChannel) {
+        if (compareIds(groupChannel.url, currentGroupChannel.url)) {
+          logger.info('Channel | useHandleChannelEvents: onUserBanned', groupChannel);
+          messagesDispatcher({
+            type: SET_CURRENT_CHANNEL$1,
+            payload: groupChannel
+          });
+        }
+      };
+
+      ChannelHandler.onOperatorUpdated = function (groupChannel) {
+        if (compareIds(groupChannel.url, currentGroupChannel.url)) {
+          logger.info('Channel | useHandleChannelEvents: onOperatorUpdated', groupChannel);
           messagesDispatcher({
             type: SET_CURRENT_CHANNEL$1,
             payload: groupChannel
@@ -6056,6 +6552,7 @@ function useToggleReactionCallback(_ref, _ref2) {
   }, [currentGroupChannel]);
 }
 
+var noop$1 = function noop() {};
 var getMessageCreatedAt = function getMessageCreatedAt(message) {
   return Moment(message.createdAt).format('LT');
 };
@@ -6581,7 +7078,7 @@ function useMemoizedMessageText(_ref) {
   }, [message, updatedAt, className]);
 }
 
-var noop$1 = function noop() {};
+var noop$2 = function noop() {};
 
 var SPACE_BETWEEN_MORE = 4;
 var MORE_WIDTH = 32;
@@ -6655,14 +7152,14 @@ Message.defaultProps = {
   isByMe: false,
   disabled: false,
   userId: '',
-  resendMessage: noop$1,
+  resendMessage: noop$2,
   className: '',
-  showEdit: noop$1,
-  showRemove: noop$1,
+  showEdit: noop$2,
+  showRemove: noop$2,
   status: '',
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$1,
+  toggleReaction: noop$2,
   memoizedEmojiListItems: function memoizedEmojiListItems() {
     return '';
   }
@@ -6927,7 +7424,7 @@ IncomingUserMessage.defaultProps = {
   message: {},
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$1,
+  toggleReaction: noop$2,
   memoizedEmojiListItems: function memoizedEmojiListItems() {
     return '';
   }
@@ -6949,13 +7446,13 @@ OutgoingUserMessage.propTypes = {
 };
 OutgoingUserMessage.defaultProps = {
   message: {},
-  resendMessage: noop$1,
-  showEdit: noop$1,
-  showRemove: noop$1,
+  resendMessage: noop$2,
+  showEdit: noop$2,
+  showRemove: noop$2,
   disabled: false,
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$1,
+  toggleReaction: noop$2,
   memoizedEmojiListItems: function memoizedEmojiListItems() {
     return '';
   }
@@ -7011,7 +7508,7 @@ var unSupported = function unSupported(type) {
   return !(isImage(type) || isVideo(type));
 };
 
-var noop$2 = function noop() {};
+var noop$3 = function noop() {};
 
 var SPACE_BETWEEN_MORE$1 = 4;
 var MORE_WIDTH$1 = 32;
@@ -7226,14 +7723,14 @@ ThumbnailMessage.propTypes = {
 ThumbnailMessage.defaultProps = {
   isByMe: false,
   disabled: false,
-  resendMessage: noop$2,
-  onClick: noop$2,
-  showRemove: noop$2,
+  resendMessage: noop$3,
+  onClick: noop$3,
+  showRemove: noop$3,
   status: '',
   userId: '',
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$2,
+  toggleReaction: noop$3,
   memoizedEmojiListItems: function memoizedEmojiListItems() {
     return '';
   }
@@ -7312,7 +7809,7 @@ var MAX_TRUNCATE_LENGTH = 40;
 var SPACE_BETWEEN_MORE$2 = 4;
 var MORE_WIDTH$2 = 32;
 
-var noop$3 = function noop() {};
+var noop$4 = function noop() {};
 
 function checkFileType(fileUrl) {
   var result = null;
@@ -7554,14 +8051,14 @@ OutgoingFileMessage.propTypes = {
 };
 OutgoingFileMessage.defaultProps = {
   status: '',
-  showRemove: noop$3,
-  resendMessage: noop$3,
+  showRemove: noop$4,
+  resendMessage: noop$4,
   message: {},
   userId: '',
   disabled: false,
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$3,
+  toggleReaction: noop$4,
   memoizedEmojiListItems: function memoizedEmojiListItems() {
     return '';
   }
@@ -7580,7 +8077,7 @@ IncomingFileMessage.defaultProps = {
   userId: '',
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$3,
+  toggleReaction: noop$4,
   memoizedEmojiListItems: function memoizedEmojiListItems() {
     return '';
   }
@@ -7642,12 +8139,12 @@ MessageSwitch.defaultProps = {
   message: {},
   isByMe: false,
   disabled: false,
-  showRemove: noop$3,
-  resendMessage: noop$3,
+  showRemove: noop$4,
+  resendMessage: noop$4,
   userId: '',
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$3,
+  toggleReaction: noop$4,
   memoizedEmojiListItems: function memoizedEmojiListItems() {
     return '';
   }
@@ -7686,7 +8183,7 @@ DateSeparator.defaultProps = {
 
 var LINE_HEIGHT = 76;
 
-var noop$4 = function noop() {};
+var noop$5 = function noop() {};
 
 var KeyCode = {
   SHIFT: 16,
@@ -7861,15 +8358,15 @@ MessageInput.propTypes = {
 };
 MessageInput.defaultProps = {
   value: '',
-  onSendMessage: noop$4,
+  onSendMessage: noop$5,
   name: 'sendbird-message-input',
   isEdit: false,
   disabled: false,
   placeholder: '',
   maxLength: 5000,
-  onFileUpload: noop$4,
-  onCancelEdit: noop$4,
-  onStartTyping: noop$4
+  onFileUpload: noop$5,
+  onCancelEdit: noop$5,
+  onStartTyping: noop$5
 };
 
 var FileViewerComponent = function FileViewerComponent(_ref) {
@@ -8576,7 +9073,7 @@ function IncomingOGMessage(props) {
   })));
 }
 
-var noop$5 = function noop() {};
+var noop$6 = function noop() {};
 
 OGMessageSwitch.propTypes = {
   isByMe: PropTypes.bool.isRequired,
@@ -8611,13 +9108,13 @@ OGMessageSwitch.defaultProps = {
   className: '',
   status: '',
   disabled: false,
-  showEdit: noop$5,
-  showRemove: noop$5,
-  resendMessage: noop$5,
-  toggleReaction: noop$5,
+  showEdit: noop$6,
+  showRemove: noop$6,
+  resendMessage: noop$6,
+  toggleReaction: noop$6,
   membersMap: new Map(),
   emojiAllMap: new Map(),
-  memoizedEmojiListItems: noop$5
+  memoizedEmojiListItems: noop$6
 };
 OutgoingOGMessage.propTypes = {
   status: PropTypes.string,
@@ -9197,7 +9694,7 @@ var MessageInputWrapper = function MessageInputWrapper(_a, ref) {
       renderMessageInput = _a.renderMessageInput,
       isOnline = _a.isOnline,
       initialized = _a.initialized;
-  var disabled = !initialized || isDisabledBecauseFrozen(channel) || !isOnline;
+  var disabled = !initialized || isDisabledBecauseFrozen(channel) || isDisabledBecauseMuted(channel) || !isOnline;
   var isOperator$1 = isOperator(channel);
   var isBroadcast = channel.isBroadcast; // custom message
 
@@ -9216,7 +9713,7 @@ var MessageInputWrapper = function MessageInputWrapper(_a, ref) {
 
 
   return React__default.createElement(MessageInput, {
-    placeholder: isDisabledBecauseFrozen(channel) && LabelStringSet.CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__DISABLED,
+    placeholder: isDisabledBecauseFrozen(channel) && LabelStringSet.CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__DISABLED || isDisabledBecauseMuted(channel) && LabelStringSet.CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__MUTED,
     ref: ref,
     disabled: disabled,
     onStartTyping: function onStartTyping() {
@@ -9391,7 +9888,7 @@ ChatHeader.defaultProps = {
   onActionClick: function onActionClick() {}
 };
 
-var noop$6 = function noop() {};
+var noop$7 = function noop() {};
 
 var ConversationPanel = function ConversationPanel(props) {
   var channelUrl = props.channelUrl,
@@ -9432,9 +9929,6 @@ var ConversationPanel = function ConversationPanel(props) {
       messagesDispatcher = _useReducer2[1];
 
   var scrollRef = React.useRef(null);
-  var _sdk$appInfo = sdk.appInfo,
-      appInfo = _sdk$appInfo === void 0 ? {} : _sdk$appInfo;
-  var useReaction = appInfo.isUsingReaction || false;
   var allMessages = messagesStore.allMessages,
       loading = messagesStore.loading,
       hasMore = messagesStore.hasMore,
@@ -9447,7 +9941,11 @@ var ConversationPanel = function ConversationPanel(props) {
       lastMessageTimeStamp = messagesStore.lastMessageTimeStamp,
       emojiContainer = messagesStore.emojiContainer,
       readStatus = messagesStore.readStatus;
-  var isFrozen = currentGroupChannel.isFrozen;
+  var isFrozen = currentGroupChannel.isFrozen,
+      isBroadcast = currentGroupChannel.isBroadcast;
+  var _sdk$appInfo = sdk.appInfo,
+      appInfo = _sdk$appInfo === void 0 ? {} : _sdk$appInfo;
+  var useReaction = appInfo.isUsingReaction && !isBroadcast || false;
   var emojiAllMap = React.useMemo(function () {
     return useReaction ? getAllEmojisMapFromEmojiContainer(emojiContainer) : new Map();
   }, [emojiContainer]);
@@ -9493,7 +9991,8 @@ var ConversationPanel = function ConversationPanel(props) {
 
   useHandleChannelEvents({
     currentGroupChannel: currentGroupChannel,
-    sdkInit: sdkInit
+    sdkInit: sdkInit,
+    userId: userId
   }, {
     messagesDispatcher: messagesDispatcher,
     sdk: sdk,
@@ -9769,7 +10268,7 @@ ConversationPanel.defaultProps = {
   renderChatItem: null,
   renderMessageInput: null,
   renderChatHeader: null,
-  onChatHeaderActionClick: noop$6
+  onChatHeaderActionClick: noop$7
 };
 var getEmojiCategoriesFromEmojiContainer$1 = getEmojiCategoriesFromEmojiContainer,
     getAllEmojisFromEmojiContainer$1 = getAllEmojisFromEmojiContainer,
@@ -10001,14 +10500,206 @@ ChannelProfile.defaultProps = {
   onChannelInfoChange: function onChannelInfoChange() {}
 };
 
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+function __spreadArrays() {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+}
+
+function MembersModal(_a) {
+  var hideModal = _a.hideModal,
+      channel = _a.channel,
+      currentUser = _a.currentUser;
+
+  var _b = React.useState([]),
+      members = _b[0],
+      setMembers = _b[1];
+
+  var _c = React.useState(null),
+      memberQuery = _c[0],
+      setMemberQuery = _c[1];
+
+  React.useEffect(function () {
+    var memberListQuery = channel.createMemberListQuery();
+    memberListQuery.limit = 20;
+    memberListQuery.next(function (members, error) {
+      if (error) {
+        return;
+      }
+
+      setMembers(members);
+    });
+    setMemberQuery(memberListQuery);
+  }, []);
+  return React__default.createElement("div", null, React__default.createElement(Modal, {
+    hideFooter: true,
+    onCancel: function onCancel() {
+      return hideModal();
+    },
+    onSubmit: noop$1,
+    titleText: "All Members"
+  }, React__default.createElement("div", {
+    className: "sendbird-more-members__popup-scroll",
+    onScroll: function onScroll(e) {
+      var hasNext = memberQuery.hasNext;
+      var target = e.target;
+      var fetchMore = target.clientHeight + target.scrollTop === target.scrollHeight;
+
+      if (hasNext && fetchMore) {
+        memberQuery.next(function (o, error) {
+          if (error) {
+            return;
+          }
+
+          setMembers(__spreadArrays(members, o));
+        });
+      }
+    }
+  }, members.map(function (member) {
+    return React__default.createElement(UserListItem, {
+      user: member,
+      key: member.userId,
+      currentUser: currentUser,
+      action: function action(_a) {
+        var parentRef = _a.parentRef,
+            actionRef = _a.actionRef;
+        return React__default.createElement(React__default.Fragment, null, channel.myRole === 'operator' && React__default.createElement(ContextMenu, {
+          menuTrigger: function menuTrigger(toggleDropdown) {
+            return React__default.createElement(IconButton, {
+              className: "sendbird-user-message__more__menu",
+              width: "32px",
+              height: "32px",
+              onClick: toggleDropdown
+            }, React__default.createElement(Icon, {
+              width: "24px",
+              height: "24px",
+              type: IconTypes.MORE,
+              fillColor: IconColors.CONTENT_INVERSE
+            }));
+          },
+          menuItems: function menuItems(closeDropdown) {
+            return React__default.createElement(MenuItems$1, {
+              parentContainRef: parentRef,
+              parentRef: actionRef // for catching location(x, y) of MenuItems
+              ,
+              closeDropdown: closeDropdown,
+              openLeft: true
+            }, React__default.createElement(MenuItem, {
+              onClick: function onClick() {
+                if (member.role !== 'operator') {
+                  channel.addOperators([member.userId], function () {
+                    setMembers(members.map(function (m) {
+                      if (m.userId === member.userId) {
+                        return __assign(__assign({}, member), {
+                          role: 'operator'
+                        });
+                      }
+
+                      return m;
+                    }));
+                    closeDropdown();
+                  });
+                } else {
+                  channel.removeOperators([member.userId], function () {
+                    setMembers(members.map(function (m) {
+                      if (m.userId === member.userId) {
+                        return __assign(__assign({}, member), {
+                          role: ''
+                        });
+                      }
+
+                      return m;
+                    }));
+                    closeDropdown();
+                  });
+                }
+              }
+            }, member.role !== 'operator' ? 'Promote to operator' : 'Demote operator'), // No muted members in broadcast channel
+            !channel.isBroadcast && React__default.createElement(MenuItem, {
+              onClick: function onClick() {
+                if (member.isMuted) {
+                  channel.unmuteUser(member, function () {
+                    setMembers(members.map(function (m) {
+                      if (m.userId === member.userId) {
+                        return __assign(__assign({}, member), {
+                          isMuted: false
+                        });
+                      }
+
+                      return m;
+                    }));
+                    closeDropdown();
+                  });
+                } else {
+                  channel.muteUser(member, function () {
+                    setMembers(members.map(function (m) {
+                      if (m.userId === member.userId) {
+                        return __assign(__assign({}, member), {
+                          isMuted: true
+                        });
+                      }
+
+                      return m;
+                    }));
+                    closeDropdown();
+                  });
+                }
+              }
+            }, member.isMuted ? 'Unmute' : 'Mute'), React__default.createElement(MenuItem, {
+              onClick: function onClick() {
+                channel.banUser(member, -1, '', function () {
+                  setMembers(members.filter(function (_a) {
+                    var userId = _a.userId;
+                    return userId !== member.userId;
+                  }));
+                });
+              }
+            }, "Ban"));
+          }
+        }));
+      }
+    });
+  }))));
+}
+
 var SHOWN_MEMBER_MAX = 10;
 
 var MemebersAccordion = function MemebersAccordion(_ref) {
-  var members = _ref.members,
+  var channel = _ref.channel,
       disabled = _ref.disabled,
+      currentUser = _ref.currentUser,
       userQueryCreator = _ref.userQueryCreator,
       onInviteMemebers = _ref.onInviteMemebers,
       swapParams = _ref.swapParams;
+  var members = channel.members || [];
 
   var _useState = React.useState(false),
       _useState2 = _slicedToArray(_useState, 2),
@@ -10037,7 +10728,7 @@ var MemebersAccordion = function MemebersAccordion(_ref) {
     })), React__default.createElement(Label, {
       type: LabelTypography.SUBTITLE_2,
       color: LabelColors.ONBACKGROUND_1
-    }, member.nickname || LabelStringSet.NO_NAME));
+    }, member.nickname || LabelStringSet.NO_NAME, currentUser === member.userId && ' (You)'));
   })), React__default.createElement("div", {
     className: "sendbird-members-accordion__footer"
   }, members.length >= SHOWN_MEMBER_MAX && React__default.createElement(Button, {
@@ -10047,21 +10738,13 @@ var MemebersAccordion = function MemebersAccordion(_ref) {
     onClick: function onClick() {
       return setShowMoreModal(true);
     }
-  }, LabelStringSet.CHANNEL_SETTING__MEMBERS__SEE_ALL_MEMBERS), members.length >= SHOWN_MEMBER_MAX && showMoreModal && React__default.createElement(Modal, {
-    hideFooter: true,
-    onCancel: function onCancel() {
-      return setShowMoreModal(false);
+  }, LabelStringSet.CHANNEL_SETTING__MEMBERS__SEE_ALL_MEMBERS), members.length >= SHOWN_MEMBER_MAX && showMoreModal && React__default.createElement(MembersModal, {
+    currentUser: currentUser,
+    hideModal: function hideModal() {
+      setShowMoreModal(false);
     },
-    onSubmit: function onSubmit() {},
-    titleText: "".concat(members.length, " ").concat(LabelStringSet.MODAL__USER_LIST__TITLE)
-  }, React__default.createElement("div", {
-    className: "sendbird-more-members__popup-scroll"
-  }, members.map(function (member) {
-    return React__default.createElement(UserListItem, {
-      user: member,
-      key: member.userId
-    });
-  }))), React__default.createElement(Button, {
+    channel: channel
+  }), React__default.createElement(Button, {
     className: "sendbird-members-accordion__footer__invite-users",
     type: Type$1.SECONDARY,
     size: Size.SMALL,
@@ -10091,371 +10774,99 @@ var MemebersAccordion = function MemebersAccordion(_ref) {
 MemebersAccordion.propTypes = {
   swapParams: PropTypes.bool,
   disabled: PropTypes.bool,
-  members: PropTypes.arrayOf(PropTypes.shape({})),
+  channel: PropTypes.shape({
+    members: PropTypes.arrayOf(PropTypes.shape({}))
+  }),
+  currentUser: PropTypes.string,
   userQueryCreator: PropTypes.func.isRequired,
   onInviteMemebers: PropTypes.func.isRequired
 };
 MemebersAccordion.defaultProps = {
   swapParams: false,
+  currentUser: '',
   disabled: false,
-  members: []
+  channel: {}
 };
 
-function ChannelSettings(props) {
-  var onCloseClick = props.onCloseClick,
-      channelUrl = props.channelUrl,
-      onChannelModified = props.onChannelModified,
-      onBeforeUpdateChannel = props.onBeforeUpdateChannel;
-  var sdkStore = props.stores.sdkStore,
-      _props$config = props.config,
-      userListQuery = _props$config.userListQuery,
-      theme = _props$config.theme,
-      userId = _props$config.userId,
-      logger = _props$config.logger,
-      isOnline = _props$config.isOnline,
-      _props$queries = props.queries,
-      queries = _props$queries === void 0 ? {} : _props$queries;
-  var userFilledApplicationUserListQuery = queries.applicationUserListQuery;
-  var sdk = sdkStore.sdk,
-      initialized = sdkStore.initialized; // hack to kepp track of channel updates by triggering useEffect
+var Context = React__default.createContext({
+  opened: '',
+  setOpened: noop$1
+});
+var Consumer = Context.Consumer;
+var Provider = Context.Provider;
 
-  var _useState = React.useState(uuidv4()),
-      _useState2 = _slicedToArray(_useState, 2),
-      channelUpdateId = _useState2[0],
-      setChannelUpdateId = _useState2[1];
+// Wraps all the accordions in an accordion set
+function AccordionGroup(_a) {
+  var children = _a.children,
+      _b = _a.className,
+      className = _b === void 0 ? '' : _b;
 
-  var _useState3 = React.useState(null),
-      _useState4 = _slicedToArray(_useState3, 2),
-      channel = _useState4[0],
-      setChannel = _useState4[1];
+  var _c = React.useState(''),
+      opened = _c[0],
+      setOpened = _c[1];
 
-  var _useState5 = React.useState(false),
-      _useState6 = _slicedToArray(_useState5, 2),
-      invalidChannel = _useState6[0],
-      setInvalidChannel = _useState6[1];
+  return React__default.createElement(Provider, {
+    value: {
+      opened: opened,
+      setOpened: setOpened
+    }
+  }, React__default.createElement("div", {
+    className: className
+  }, children));
+}
 
-  var _useState7 = React.useState(false),
-      _useState8 = _slicedToArray(_useState7, 2),
-      showAccordion = _useState8[0],
-      setShowAccordion = _useState8[1];
+function Accordion(_a) {
+  var id = _a.id,
+      renderTitle = _a.renderTitle,
+      renderContent = _a.renderContent,
+      renderFooter = _a.renderFooter,
+      className = _a.className;
 
-  var _useState9 = React.useState(false),
-      _useState10 = _slicedToArray(_useState9, 2),
-      showLeaveChannelModal = _useState10[0],
-      setShowLeaveChannelModal = _useState10[1];
+  var _b = React.useState(false),
+      showAccordion = _b[0],
+      setShowAccordion = _b[1];
 
-  React.useEffect(function () {
-    logger.info('ChannelSettings: Setting up');
+  return React__default.createElement(Consumer, null, function (value) {
+    var opened = value.opened,
+        setOpened = value.setOpened;
 
-    if (!channelUrl || !initialized || !sdk) {
-      logger.warning('ChannelSettings: Setting up failed', 'No channelUrl or sdk uninitialized');
-      setInvalidChannel(false);
+    if (id === opened) {
+      setShowAccordion(true);
     } else {
-      if (!sdk || !sdk.GroupChannel) {
-        logger.warning('ChannelSettings: No GroupChannel');
-        return;
-      }
-
-      sdk.GroupChannel.getChannel(channelUrl, function (groupChannel) {
-        if (!groupChannel) {
-          logger.warning('ChannelSettings: Channel not found');
-          setInvalidChannel(true);
-        } else {
-          logger.info('ChannelSettings: Fetched group channel', groupChannel);
-          setInvalidChannel(false);
-          setChannel(groupChannel);
-        }
-      });
+      setShowAccordion(false);
     }
-  }, [channelUrl, initialized, channelUpdateId]);
 
-  if (!channel || invalidChannel) {
-    return React__default.createElement("div", {
-      className: "sendbird-channel-settings"
-    }, React__default.createElement("div", {
-      className: "sendbird-channel-settings__header"
-    }, React__default.createElement(Label, {
-      type: LabelTypography.H_2,
-      color: LabelColors.ONBACKGROUND_1
-    }, LabelStringSet.CHANNEL_SETTING__HEADER__TITLE), React__default.createElement(Icon, {
-      type: IconTypes.CLOSE,
-      className: "sendbird-channel-settings__close-icon",
-      height: "24px",
-      width: "24px",
-      onClick: function onClick() {
-        logger.info('ChannelSettings: Click close');
-        onCloseClick();
-      }
-    })), React__default.createElement("div", null, React__default.createElement(PlaceHolder, {
-      type: PlaceHolderTypes.WRONG
-    })));
-  }
-
-  return React__default.createElement("div", {
-    className: "sendbird-channel-settings"
-  }, React__default.createElement("div", {
-    className: "sendbird-channel-settings__header"
-  }, React__default.createElement(Label, {
-    type: LabelTypography.H_2,
-    color: LabelColors.ONBACKGROUND_1
-  }, LabelStringSet.CHANNEL_SETTING__HEADER__TITLE), React__default.createElement(Icon, {
-    type: IconTypes.CLOSE,
-    className: "sendbird-channel-settings__close-icon",
-    height: "24px",
-    width: "24px",
-    onClick: function onClick() {
-      logger.info('ChannelSettings: Click close');
-      onCloseClick();
-    }
-  })), React__default.createElement("div", {
-    className: "sendbird-channel-settings__scroll-area"
-  }, React__default.createElement(ChannelProfile, {
-    disabled: !isOnline,
-    channel: channel,
-    userId: userId,
-    theme: theme,
-    onChannelInfoChange: function onChannelInfoChange(currentImg, currentTitle) {
-      logger.info('ChannelSettings: Channel information being updated');
-      var swapParams = sdk.getErrorFirstCallback();
-
-      if (onBeforeUpdateChannel) {
-        var params = onBeforeUpdateChannel(currentTitle, currentImg, channel.data); // swapParams
-
-        channel.updateChannel(params, function (response, error) {
-          var groupChannel = response;
-
-          if (swapParams) {
-            groupChannel = error;
-          }
-
-          onChannelModified(groupChannel);
-          setChannelUpdateId(uuidv4());
-        });
-        return;
-      }
-
-      channel.updateChannel(currentTitle, currentImg, channel.data, function (response, error) {
-        var groupChannel = response;
-
-        if (swapParams) {
-          groupChannel = error;
-        }
-
-        logger.info('ChannelSettings: Channel information updated', groupChannel);
-        onChannelModified(groupChannel);
-        setChannelUpdateId(uuidv4());
-      });
-    }
-  }), React__default.createElement("div", {
-    role: "switch",
-    "aria-checked": showAccordion,
-    tabIndex: 0,
-    onKeyDown: function onKeyDown() {
-      return setShowAccordion(!showAccordion);
-    },
-    className: "sendbird-channel-settings__panel-item",
-    onClick: function onClick() {
-      return setShowAccordion(!showAccordion);
-    }
-  }, React__default.createElement(Icon, {
-    type: IconTypes.MEMBERS,
-    className: "sendbird-channel-settings__panel-icon-left",
-    height: "24px",
-    width: "24px",
-    fillColor: IconColors.PRIMARY
-  }), React__default.createElement(Label, {
-    type: LabelTypography.SUBTITLE_1,
-    color: LabelColors.ONBACKGROUND_1
-  }, "".concat(LabelStringSet.CHANNEL_SETTING__MEMBERS__TITLE, " (").concat(channel.members.length, ")")), React__default.createElement(Icon, {
-    type: IconTypes.SHEVRON,
-    className: ['sendbird-channel-settings__panel-icon-right', 'sendbird-channel-settings__panel-icon--chevron', showAccordion ? 'sendbird-channel-settings__panel-icon--open' : ''].join(' '),
-    height: "24px",
-    width: "24px"
-  })), showAccordion && React__default.createElement(MemebersAccordion, {
-    disabled: !isOnline // eslint-disable-next-line
-    ,
-    userQueryCreator: function userQueryCreator() {
-      return userListQuery && typeof userListQuery === 'function' ? userListQuery() : createDefaultUserListQuery({
-        sdk: sdk,
-        userFilledApplicationUserListQuery: userFilledApplicationUserListQuery
-      });
-    },
-    swapParams: sdk && sdk.getErrorFirstCallback && sdk.getErrorFirstCallback(),
-    members: channel.members,
-    onInviteMemebers: function onInviteMemebers(selectedMemebers) {
-      logger.info('ChannelSettings: Inviting new users');
-      channel.inviteWithUserIds(selectedMemebers).then(function (res) {
-        onChannelModified(res);
-        setChannelUpdateId(uuidv4());
-        logger.info('ChannelSettings: Inviting new users success!', res);
-      });
-    }
-  }), React__default.createElement("div", {
-    className: "sendbird-channel-settings__panel-item\n              ".concat(!isOnline ? 'sendbird-channel-settings__panel-item__disabled' : ''),
-    role: "button",
-    tabIndex: 0,
-    disabled: true,
-    onKeyDown: function onKeyDown() {
-      if (!isOnline) {
-        return;
-      }
-
-      setShowLeaveChannelModal(true);
-    },
-    onClick: function onClick() {
-      if (!isOnline) {
-        return;
-      }
-
-      setShowLeaveChannelModal(true);
-    }
-  }, React__default.createElement(Icon, {
-    type: IconTypes.LEAVE,
-    className: ['sendbird-channel-settings__panel-icon-left', 'sendbird-channel-settings__panel-icon__leave'].join(' '),
-    height: "24px",
-    width: "24px"
-  }), React__default.createElement(Label, {
-    type: LabelTypography.SUBTITLE_1,
-    color: LabelColors.ONBACKGROUND_1
-  }, LabelStringSet.CHANNEL_SETTING__LEAVE_CHANNEL__TITLE)), showLeaveChannelModal && React__default.createElement(LeaveChannel, {
-    onCloseModal: function onCloseModal() {
-      return setShowLeaveChannelModal(false);
-    },
-    onLeaveChannel: function onLeaveChannel() {
-      logger.info('ChannelSettings: Leaving channel', channel);
-      channel.leave().then(function () {
-        logger.info('ChannelSettings: Leaving channel successful!', channel);
-        onCloseClick();
-      });
-    }
-  })));
-}
-
-ChannelSettings.propTypes = {
-  onCloseClick: PropTypes.func,
-  onChannelModified: PropTypes.func,
-  onBeforeUpdateChannel: PropTypes.func,
-  channelUrl: PropTypes.string.isRequired,
-  queries: PropTypes.shape({
-    applicationUserListQuery: PropTypes.shape({
-      limit: PropTypes.number,
-      userIdsFilter: PropTypes.arrayOf(PropTypes.string),
-      metaDataKeyFilter: PropTypes.string,
-      metaDataValuesFilter: PropTypes.arrayOf(PropTypes.string)
-    })
-  }),
-  // from withSendbirdContext
-  stores: PropTypes.shape({
-    sdkStore: PropTypes.shape({
-      sdk: PropTypes.shape({
-        getErrorFirstCallback: PropTypes.func,
-        GroupChannel: PropTypes.oneOfType([PropTypes.shape({
-          getChannel: PropTypes.func
-        }), PropTypes.func]),
-        createApplicationUserListQuery: PropTypes.any
-      }),
-      initialized: PropTypes.bool
-    })
-  }).isRequired,
-  config: PropTypes.shape({
-    userId: PropTypes.string,
-    theme: PropTypes.string,
-    userListQuery: PropTypes.func,
-    isOnline: PropTypes.bool,
-    logger: PropTypes.shape({
-      info: PropTypes.func,
-      error: PropTypes.func,
-      warning: PropTypes.func
-    })
-  }).isRequired
-};
-ChannelSettings.defaultProps = {
-  onBeforeUpdateChannel: null,
-  queries: {},
-  onCloseClick: function onCloseClick() {},
-  onChannelModified: function onChannelModified() {}
-};
-var ChannelSettings$1 = withSendbirdContext(ChannelSettings);
-
-function App(props) {
-  var appId = props.appId,
-      userId = props.userId,
-      accessToken = props.accessToken,
-      theme = props.theme,
-      userListQuery = props.userListQuery,
-      nickname = props.nickname,
-      profileUrl = props.profileUrl,
-      _props$config = props.config,
-      config = _props$config === void 0 ? {} : _props$config;
-
-  var _useState = React.useState(null),
-      _useState2 = _slicedToArray(_useState, 2),
-      currentChannelUrl = _useState2[0],
-      setCurrentChannelUrl = _useState2[1];
-
-  var _useState3 = React.useState(false),
-      _useState4 = _slicedToArray(_useState3, 2),
-      showSettings = _useState4[0],
-      setShowSettings = _useState4[1];
-
-  return React__default.createElement(Sendbird, {
-    appId: appId,
-    userId: userId,
-    accessToken: accessToken,
-    theme: theme,
-    nickname: nickname,
-    profileUrl: profileUrl,
-    userListQuery: userListQuery,
-    config: config
-  }, React__default.createElement("div", {
-    className: "sendbird-app__wrap"
-  }, React__default.createElement("div", {
-    className: "sendbird-app__channellist-wrap"
-  }, React__default.createElement(ChannelList$1, {
-    onChannelSelect: function onChannelSelect(channel) {
-      if (channel && channel.url) {
-        setCurrentChannelUrl(channel.url);
+    var handleClick = function handleClick() {
+      if (showAccordion) {
+        setOpened('');
       } else {
-        setCurrentChannelUrl('');
+        setOpened(id);
       }
-    }
-  })), React__default.createElement("div", {
-    className: "sendbird-app__conversation-wrap"
-  }, React__default.createElement(Conversation, {
-    channelUrl: currentChannelUrl,
-    onChatHeaderActionClick: function onChatHeaderActionClick() {
-      setShowSettings(true);
-    }
-  }))), showSettings && React__default.createElement("div", {
-    className: "sendbird-app__settingspanel-wrap"
-  }, React__default.createElement(ChannelSettings$1, {
-    channelUrl: currentChannelUrl,
-    onCloseClick: function onCloseClick() {
-      setShowSettings(false);
-    }
-  })));
+    };
+
+    return React__default.createElement(React__default.Fragment, null, React__default.createElement("div", {
+      id: id,
+      role: "switch",
+      "aria-checked": false,
+      tabIndex: 0,
+      onKeyDown: handleClick,
+      className: "sendbird-accordion__panel-heder " + className,
+      onClick: handleClick
+    }, renderTitle(), React__default.createElement(Icon, {
+      type: IconTypes.SHEVRON,
+      className: ['sendbird-accordion__panel-icon-right', 'sendbird-accordion__panel-icon--chevron', showAccordion ? 'sendbird-accordion__panel-icon--open' : ''].join(' '),
+      height: "24px",
+      width: "24px"
+    })), showAccordion && React__default.createElement("div", {
+      className: "sendbird-accordion"
+    }, React__default.createElement("div", {
+      className: "sendbird-accordion__list"
+    }, renderContent()), renderFooter && React__default.createElement("div", {
+      className: "sendbird-accordion__footer"
+    }, renderFooter())));
+  });
 }
-App.propTypes = {
-  appId: PropTypes.string.isRequired,
-  userId: PropTypes.string.isRequired,
-  accessToken: PropTypes.string,
-  theme: PropTypes.string,
-  userListQuery: PropTypes.func,
-  nickname: PropTypes.string,
-  profileUrl: PropTypes.string,
-  config: PropTypes.shape({
-    // None Error Warning Info 'All/Debug'
-    logLevel: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
-  })
-};
-App.defaultProps = {
-  accessToken: '',
-  theme: 'light',
-  nickname: '',
-  profileUrl: '',
-  userListQuery: null,
-  config: {}
-};
+var AccordionGroup$1 = AccordionGroup;
 
 var getSdk = function getSdk(store) {
   var _store$stores = store.stores,
@@ -10845,6 +11256,1569 @@ var selectors = {
   getUnFreezeChannel: getUnFreezeChannel,
   getCreateChannel: getCreateChannel,
   getLeaveChannel: getLeaveChannel
+};
+
+// might move to reusable/UI
+var COMPONENT_NAME$1 = 'sendbird-user-list-item--small';
+
+var UserListItem$1 = function UserListItem(_a) {
+  var user = _a.user,
+      className = _a.className,
+      currentUser = _a.currentUser,
+      action = _a.action;
+  var actionRef = React.useRef(null);
+  var parentRef = React.useRef(null);
+  var injectingClassNames = Array.isArray(className) ? className : [className];
+  return React__default.createElement("div", {
+    ref: parentRef,
+    className: __spreadArrays([COMPONENT_NAME$1], injectingClassNames).join(' ')
+  }, user.isMuted && React__default.createElement(MutedAvatarOverlay, null), React__default.createElement(Avatar, {
+    className: COMPONENT_NAME$1 + "__avatar",
+    src: user.profileUrl,
+    width: 24,
+    height: 24
+  }), React__default.createElement(Label, {
+    className: COMPONENT_NAME$1 + "__title",
+    type: LabelTypography.SUBTITLE_1,
+    color: LabelColors.ONBACKGROUND_1
+  }, user.nickname || LabelStringSet.NO_NAME, currentUser === user.userId && " (You)"), !user.nickname && React__default.createElement(Label, {
+    className: COMPONENT_NAME$1 + "__subtitle",
+    type: LabelTypography.CAPTION_3,
+    color: LabelColors.ONBACKGROUND_2
+  }, user.userId), user.role === 'operator' && React__default.createElement(Label, {
+    className: COMPONENT_NAME$1 + "__operator",
+    type: LabelTypography.SUBTITLE_2,
+    color: LabelColors.ONBACKGROUND_2
+  }, "Operator"), action && React__default.createElement("div", {
+    ref: actionRef,
+    className: COMPONENT_NAME$1 + "__action"
+  }, action({
+    actionRef: actionRef,
+    parentRef: parentRef
+  })));
+};
+
+function OperatorsModal(_a) {
+  var hideModal = _a.hideModal,
+      channel = _a.channel,
+      currentUser = _a.currentUser;
+
+  var _b = React.useState([]),
+      operators = _b[0],
+      setOperators = _b[1];
+
+  var _c = React.useState(null),
+      operatorQuery = _c[0],
+      setOperatorQuery = _c[1];
+
+  React.useEffect(function () {
+    var operatorListQuery = channel.createOperatorListQuery();
+    operatorListQuery.limit = 20;
+    operatorListQuery.next(function (operators, error) {
+      if (error) {
+        return;
+      }
+
+      setOperators(operators);
+    });
+    setOperatorQuery(operatorListQuery);
+  }, []);
+  return React__default.createElement("div", null, React__default.createElement(Modal, {
+    hideFooter: true,
+    onCancel: function onCancel() {
+      return hideModal();
+    },
+    onSubmit: noop$1,
+    titleText: "All operators"
+  }, React__default.createElement("div", {
+    className: "sendbird-more-members__popup-scroll",
+    onScroll: function onScroll(e) {
+      var hasNext = operatorQuery.hasNext;
+      var target = e.target;
+      var fetchMore = target.clientHeight + target.scrollTop === target.scrollHeight;
+
+      if (hasNext && fetchMore) {
+        operatorQuery.next(function (o, error) {
+          if (error) {
+            return;
+          }
+
+          setOperators(__spreadArrays(operators, o));
+        });
+      }
+    }
+  }, operators.map(function (member) {
+    return React__default.createElement(UserListItem, {
+      currentUser: currentUser,
+      user: member,
+      key: member.userId,
+      action: function action(_a) {
+        var parentRef = _a.parentRef,
+            actionRef = _a.actionRef;
+        return React__default.createElement(ContextMenu, {
+          menuTrigger: function menuTrigger(toggleDropdown) {
+            return React__default.createElement(IconButton, {
+              className: "sendbird-user-message__more__menu",
+              width: "32px",
+              height: "32px",
+              onClick: toggleDropdown
+            }, React__default.createElement(Icon, {
+              width: "24px",
+              height: "24px",
+              type: IconTypes.MORE,
+              fillColor: IconColors.CONTENT_INVERSE
+            }));
+          },
+          menuItems: function menuItems(closeDropdown) {
+            return React__default.createElement(MenuItems$1, {
+              parentContainRef: parentRef,
+              parentRef: actionRef // for catching location(x, y) of MenuItems
+              ,
+              closeDropdown: closeDropdown,
+              openLeft: true
+            }, React__default.createElement(MenuItem, {
+              onClick: function onClick() {
+                channel.removeOperators([member.userId], function (response, error) {
+                  if (error) {
+                    return;
+                  }
+
+                  setOperators(operators.filter(function (_a) {
+                    var userId = _a.userId;
+                    return userId !== member.userId;
+                  }));
+                });
+                closeDropdown();
+              }
+            }, "Dismiss operator"));
+          }
+        });
+      }
+    });
+  }))));
+}
+
+function AddOperatorsModal(_a) {
+  var hideModal = _a.hideModal,
+      channel = _a.channel,
+      _onSubmit = _a.onSubmit;
+
+  var _b = React.useState([]),
+      members = _b[0],
+      setMembers = _b[1];
+
+  var _c = React.useState({}),
+      selectedMembers = _c[0],
+      setSelectedMembers = _c[1];
+
+  var _d = React.useState(null),
+      memberQuery = _d[0],
+      setMemberQuery = _d[1];
+
+  React.useEffect(function () {
+    var memberListQuery = channel.createMemberListQuery();
+    memberListQuery.limit = 20;
+    memberListQuery.next(function (members, error) {
+      if (error) {
+        return;
+      }
+
+      setMembers(members);
+    });
+    setMemberQuery(memberListQuery);
+  }, []);
+  var selectedCount = Object.keys(selectedMembers).filter(function (m) {
+    return selectedMembers[m];
+  }).length;
+  return React__default.createElement("div", null, React__default.createElement(Modal, {
+    type: Type$1.PRIMARY,
+    submitText: "Add",
+    onCancel: function onCancel() {
+      return hideModal();
+    },
+    onSubmit: function onSubmit() {
+      var members = Object.keys(selectedMembers).filter(function (m) {
+        return selectedMembers[m];
+      });
+
+      _onSubmit(members);
+    },
+    titleText: "Select members"
+  }, React__default.createElement(Label, {
+    color: selectedCount > 0 ? LabelColors.PRIMARY : LabelColors.ONBACKGROUND_3,
+    type: LabelTypography.CAPTION_1
+  }, selectedCount + " " + LabelStringSet.MODAL__INVITE_MEMBER__SELECTEC), React__default.createElement("div", {
+    className: "sendbird-more-members__popup-scroll",
+    onScroll: function onScroll(e) {
+      var hasNext = memberQuery.hasNext;
+      var target = e.target;
+      var fetchMore = target.clientHeight + target.scrollTop === target.scrollHeight;
+
+      if (hasNext && fetchMore) {
+        memberQuery.next(function (o, error) {
+          if (error) {
+            return;
+          }
+
+          setMembers(__spreadArrays(members, o));
+        });
+      }
+    }
+  }, members.map(function (member) {
+    return React__default.createElement(UserListItem, {
+      checkBox: true,
+      checked: selectedMembers[member.userId],
+      onChange: function onChange(event) {
+        var _a;
+
+        var modifiedSelectedMembers = __assign(__assign({}, selectedMembers), (_a = {}, _a[event.target.id] = event.target.checked, _a));
+
+        if (!event.target.checked) {
+          delete modifiedSelectedMembers[event.target.id];
+        }
+
+        setSelectedMembers(modifiedSelectedMembers);
+      },
+      user: member,
+      key: member.userId
+    });
+  }))));
+}
+
+var OperatorList = function OperatorList(_a) {
+  var sdk = _a.sdk,
+      channel = _a.channel;
+
+  var _b = React.useState([]),
+      operators = _b[0],
+      setOperators = _b[1];
+
+  var _c = React.useState(false),
+      showMore = _c[0],
+      setShowMore = _c[1];
+
+  var _d = React.useState(false),
+      showAdd = _d[0],
+      setShowAdd = _d[1];
+
+  var _e = React.useState(false),
+      hasNext = _e[0],
+      setHasNext = _e[1];
+
+  React.useEffect(function () {
+    if (!channel) {
+      setOperators([]);
+      return;
+    }
+
+    var operatorListQuery = channel.createOperatorListQuery();
+    operatorListQuery.limit = 10;
+    operatorListQuery.next(function (operators, error) {
+      if (error) {
+        return;
+      }
+
+      setOperators(operators);
+      setHasNext(operatorListQuery.hasNext);
+    });
+  }, [channel]);
+  var refershList = React.useCallback(function () {
+    if (!channel) {
+      setOperators([]);
+      return;
+    }
+
+    var operatorListQuery = channel.createOperatorListQuery();
+    operatorListQuery.limit = 10;
+    operatorListQuery.next(function (operators, error) {
+      if (error) {
+        return;
+      }
+
+      setOperators(operators);
+      setHasNext(operatorListQuery.hasNext);
+    });
+  }, [channel]);
+  return React__default.createElement(React__default.Fragment, null, operators.map(function (operator) {
+    return React__default.createElement(UserListItem$1, {
+      key: operator.userId,
+      user: operator,
+      currentUser: sdk.currentUser.userId,
+      action: function action(_a) {
+        var actionRef = _a.actionRef,
+            parentRef = _a.parentRef;
+        return React__default.createElement(ContextMenu, {
+          menuTrigger: function menuTrigger(toggleDropdown) {
+            return React__default.createElement(IconButton, {
+              className: "sendbird-user-message__more__menu",
+              width: "32px",
+              height: "32px",
+              onClick: toggleDropdown
+            }, React__default.createElement(Icon, {
+              width: "24px",
+              height: "24px",
+              type: IconTypes.MORE,
+              fillColor: IconColors.CONTENT_INVERSE
+            }));
+          },
+          menuItems: function menuItems(closeDropdown) {
+            return React__default.createElement(MenuItems$1, {
+              parentContainRef: parentRef,
+              parentRef: actionRef // for catching location(x, y) of MenuItems
+              ,
+              closeDropdown: closeDropdown,
+              openLeft: true
+            }, React__default.createElement(MenuItem, {
+              onClick: function onClick() {
+                channel.removeOperators([operator.userId], function (response, error) {
+                  if (error) {
+                    return;
+                  }
+
+                  setOperators(operators.filter(function (_a) {
+                    var userId = _a.userId;
+                    return userId !== operator.userId;
+                  }));
+                });
+                closeDropdown();
+              }
+            }, "Dismiss operator"));
+          }
+        });
+      }
+    });
+  }), hasNext && React__default.createElement("div", {
+    className: "sendbird-channel-settings-accordion__footer"
+  }, React__default.createElement(Button, {
+    type: Type$1.SECONDARY,
+    size: Size.SMALL,
+    onClick: function onClick() {
+      setShowMore(true);
+    }
+  }, LabelStringSet.CHANNEL_SETTING__OPERATORS__TITLE_ALL), React__default.createElement(Button, {
+    type: Type$1.SECONDARY,
+    size: Size.SMALL,
+    onClick: function onClick() {
+      setShowAdd(true);
+    }
+  }, LabelStringSet.CHANNEL_SETTING__OPERATORS__TITLE_ADD)), showMore && React__default.createElement(OperatorsModal, {
+    currentUser: sdk.currentUser.userId,
+    hideModal: function hideModal() {
+      setShowMore(false);
+      refershList();
+    },
+    channel: channel
+  }), showAdd && React__default.createElement(AddOperatorsModal, {
+    hideModal: function hideModal() {
+      return setShowAdd(false);
+    },
+    channel: channel,
+    onSubmit: function onSubmit(members) {
+      setShowAdd(false);
+      channel.addOperators(members, function () {
+        refershList();
+      });
+    }
+  }));
+};
+
+var mapStoreToProps = function mapStoreToProps(store) {
+  return {
+    sdk: getSdk(store)
+  };
+};
+
+var OperatorList$1 = withSendbirdContext(OperatorList, mapStoreToProps);
+
+function InviteMembers$1(_a) {
+  var hideModal = _a.hideModal,
+      userQueryCreator = _a.userQueryCreator,
+      _onSubmit = _a.onSubmit;
+
+  var _b = React.useState([]),
+      members = _b[0],
+      setMembers = _b[1];
+
+  var _c = React.useState({}),
+      selectedMembers = _c[0],
+      setSelectedMembers = _c[1];
+
+  var _d = React.useState(null),
+      userQuery = _d[0],
+      setUserQuery = _d[1];
+
+  React.useEffect(function () {
+    var userListQuery = userQueryCreator();
+    userListQuery.limit = 20;
+    userListQuery.next(function (members, error) {
+      if (error) {
+        return;
+      }
+
+      setMembers(members);
+    });
+    setUserQuery(userListQuery);
+  }, []);
+  return React__default.createElement("div", null, React__default.createElement(Modal, {
+    disabled: Object.keys(selectedMembers).length === 0,
+    submitText: "Invite",
+    type: Type$1.PRIMARY,
+    onCancel: function onCancel() {
+      return hideModal();
+    },
+    onSubmit: function onSubmit() {
+      var members = Object.keys(selectedMembers).filter(function (m) {
+        return selectedMembers[m];
+      });
+
+      _onSubmit(members);
+    },
+    titleText: "Select members"
+  }, React__default.createElement("div", {
+    className: "sendbird-more-members__popup-scroll",
+    onScroll: function onScroll(e) {
+      var hasNext = userQuery.hasNext;
+      var target = e.target;
+      var fetchMore = target.clientHeight + target.scrollTop === target.scrollHeight;
+
+      if (hasNext && fetchMore) {
+        userQuery.next(function (o, error) {
+          if (error) {
+            return;
+          }
+
+          setMembers(__spreadArrays(members, o));
+        });
+      }
+    }
+  }, members.map(function (member) {
+    return React__default.createElement(UserListItem, {
+      checkBox: true,
+      checked: selectedMembers[member.userId],
+      onChange: function onChange(event) {
+        var _a;
+
+        var modifiedSelectedMembers = __assign(__assign({}, selectedMembers), (_a = {}, _a[event.target.id] = event.target.checked, _a));
+
+        if (!event.target.checked) {
+          delete modifiedSelectedMembers[event.target.id];
+        }
+
+        setSelectedMembers(modifiedSelectedMembers);
+      },
+      user: member,
+      key: member.userId
+    });
+  }))));
+}
+
+var MemberList = function MemberList(_a) {
+  var sdk = _a.sdk,
+      channel = _a.channel,
+      userQueryCreator = _a.userQueryCreator;
+
+  var _b = React.useState([]),
+      members = _b[0],
+      setMembers = _b[1];
+
+  var _c = React.useState(false),
+      hasNext = _c[0],
+      setHasNext = _c[1];
+
+  var _d = React.useState(false),
+      showAllMembers = _d[0],
+      setShowAllMembers = _d[1];
+
+  var _e = React.useState(false),
+      showInviteMembers = _e[0],
+      setShowInviteMembers = _e[1];
+
+  React.useEffect(function () {
+    if (!channel) {
+      setMembers([]);
+      return;
+    }
+
+    var memberUserListQuery = channel.createMemberListQuery();
+    memberUserListQuery.limit = 10;
+    memberUserListQuery.next(function (members, error) {
+      if (error) {
+        return;
+      }
+
+      setMembers(members);
+      setHasNext(memberUserListQuery.hasNext);
+    });
+  }, [channel]);
+  var refershList = React.useCallback(function () {
+    if (!channel) {
+      setMembers([]);
+      return;
+    }
+
+    var memberUserListQuery = channel.createMemberListQuery();
+    memberUserListQuery.limit = 10;
+    memberUserListQuery.next(function (members, error) {
+      if (error) {
+        return;
+      }
+
+      setMembers(members);
+      setHasNext(memberUserListQuery.hasNext);
+    });
+  }, [channel]);
+  return React__default.createElement(React__default.Fragment, null, members.map(function (member) {
+    return React__default.createElement(UserListItem$1, {
+      key: member.userId,
+      user: member,
+      currentUser: sdk.currentUser.userId,
+      action: function action(_a) {
+        var actionRef = _a.actionRef,
+            parentRef = _a.parentRef;
+        return React__default.createElement(ContextMenu, {
+          menuTrigger: function menuTrigger(toggleDropdown) {
+            return React__default.createElement(IconButton, {
+              className: "sendbird-user-message__more__menu",
+              width: "32px",
+              height: "32px",
+              onClick: toggleDropdown
+            }, React__default.createElement(Icon, {
+              width: "24px",
+              height: "24px",
+              type: IconTypes.MORE,
+              fillColor: IconColors.CONTENT_INVERSE
+            }));
+          },
+          menuItems: function menuItems(closeDropdown) {
+            return React__default.createElement(MenuItems$1, {
+              parentContainRef: parentRef,
+              parentRef: actionRef // for catching location(x, y) of MenuItems
+              ,
+              closeDropdown: closeDropdown,
+              openLeft: true
+            }, React__default.createElement(MenuItem, {
+              onClick: function onClick() {
+                if (member.role !== 'operator') {
+                  channel.addOperators([member.userId], function () {
+                    refershList();
+                    closeDropdown();
+                  });
+                } else {
+                  channel.removeOperators([member.userId], function () {
+                    refershList();
+                    closeDropdown();
+                  });
+                }
+              }
+            }, member.role !== 'operator' ? 'Promote to operator' : 'Demote operator'), // No muted members in broadcast channel
+            !channel.isBroadcast && React__default.createElement(MenuItem, {
+              onClick: function onClick() {
+                if (member.isMuted) {
+                  channel.unmuteUser(member, function () {
+                    refershList();
+                    closeDropdown();
+                  });
+                } else {
+                  channel.muteUser(member, function () {
+                    refershList();
+                    closeDropdown();
+                  });
+                }
+              }
+            }, member.isMuted ? 'Unmute' : 'Mute'), React__default.createElement(MenuItem, {
+              onClick: function onClick() {
+                channel.banUser(member, -1, '', function () {
+                  refershList();
+                  closeDropdown();
+                });
+              }
+            }, "Ban"));
+          }
+        });
+      }
+    });
+  }), React__default.createElement("div", {
+    className: "sendbird-channel-settings-accordion__footer"
+  }, hasNext && React__default.createElement(Button, {
+    type: Type$1.SECONDARY,
+    size: Size.SMALL,
+    onClick: function onClick() {
+      return setShowAllMembers(true);
+    }
+  }, "All members"), React__default.createElement(Button, {
+    type: Type$1.SECONDARY,
+    size: Size.SMALL,
+    onClick: function onClick() {
+      return setShowInviteMembers(true);
+    }
+  }, "Invite members")), showAllMembers && React__default.createElement(MembersModal, {
+    currentUser: sdk.currentUser.userId,
+    channel: channel,
+    hideModal: function hideModal() {
+      setShowAllMembers(false);
+      refershList();
+    }
+  }), showInviteMembers && React__default.createElement(InviteMembers$1, {
+    userQueryCreator: userQueryCreator,
+    onSubmit: function onSubmit(selectedMemebers) {
+      channel.inviteWithUserIds(selectedMemebers, function () {
+        setShowInviteMembers(false);
+        refershList();
+      });
+    },
+    channel: channel,
+    hideModal: function hideModal() {
+      return setShowInviteMembers(false);
+    }
+  }));
+};
+
+var mapStoreToProps$1 = function mapStoreToProps(store) {
+  return {
+    sdk: getSdk(store)
+  };
+};
+
+var MemberList$1 = withSendbirdContext(MemberList, mapStoreToProps$1);
+
+function BannedMembersModal(_a) {
+  var hideModal = _a.hideModal,
+      channel = _a.channel;
+
+  var _b = React.useState([]),
+      members = _b[0],
+      setMembers = _b[1];
+
+  var _c = React.useState(null),
+      memberQuery = _c[0],
+      setMemberQuery = _c[1];
+
+  React.useEffect(function () {
+    var bannedUserListQuery = channel.createBannedUserListQuery();
+    bannedUserListQuery.next(function (users, error) {
+      if (error) {
+        return;
+      }
+
+      setMembers(users);
+    });
+    setMemberQuery(bannedUserListQuery);
+  }, []);
+  return React__default.createElement("div", null, React__default.createElement(Modal, {
+    hideFooter: true,
+    onCancel: function onCancel() {
+      return hideModal();
+    },
+    onSubmit: noop$1,
+    titleText: "Muted members"
+  }, React__default.createElement("div", {
+    className: "sendbird-more-members__popup-scroll",
+    onScroll: function onScroll(e) {
+      var hasNext = memberQuery.hasNext;
+      var target = e.target;
+      var fetchMore = target.clientHeight + target.scrollTop === target.scrollHeight;
+
+      if (hasNext && fetchMore) {
+        memberQuery.next(function (o, error) {
+          if (error) {
+            return;
+          }
+
+          setMembers(__spreadArrays(members, o));
+        });
+      }
+    }
+  }, members.map(function (member) {
+    return React__default.createElement(UserListItem, {
+      user: member,
+      key: member.userId,
+      action: function action(_a) {
+        var parentRef = _a.parentRef,
+            actionRef = _a.actionRef;
+        return React__default.createElement(ContextMenu, {
+          menuTrigger: function menuTrigger(toggleDropdown) {
+            return React__default.createElement(IconButton, {
+              className: "sendbird-user-message__more__menu",
+              width: "32px",
+              height: "32px",
+              onClick: toggleDropdown
+            }, React__default.createElement(Icon, {
+              width: "24px",
+              height: "24px",
+              type: IconTypes.MORE,
+              fillColor: IconColors.CONTENT_INVERSE
+            }));
+          },
+          menuItems: function menuItems(closeDropdown) {
+            return React__default.createElement(MenuItems$1, {
+              parentContainRef: parentRef,
+              parentRef: actionRef // for catching location(x, y) of MenuItems
+              ,
+              closeDropdown: closeDropdown,
+              openLeft: true
+            }, React__default.createElement(MenuItem, {
+              onClick: function onClick() {
+                channel.unbanUser(member, function () {
+                  closeDropdown();
+                  setMembers(members.filter(function (m) {
+                    return m.userId !== member.userId;
+                  }));
+                });
+              }
+            }, "Unban"));
+          }
+        });
+      }
+    });
+  }))));
+}
+
+var BannedMemberList = function BannedMemberList(_a) {
+  var channel = _a.channel;
+
+  var _b = React.useState([]),
+      members = _b[0],
+      setMembers = _b[1];
+
+  var _c = React.useState(false),
+      hasNext = _c[0],
+      setHasNext = _c[1];
+
+  var _d = React.useState(false),
+      showModal = _d[0],
+      setShowModal = _d[1];
+
+  React.useEffect(function () {
+    if (!channel) {
+      setMembers([]);
+      return;
+    }
+
+    var bannedUserListQuery = channel.createBannedUserListQuery();
+    bannedUserListQuery.next(function (users, error) {
+      if (error) {
+        return;
+      }
+
+      setMembers(users);
+      setHasNext(bannedUserListQuery.hasNext);
+    });
+  }, [channel]);
+  var refreshList = React.useCallback(function () {
+    if (!channel) {
+      setMembers([]);
+      return;
+    }
+
+    var bannedUserListQuery = channel.createBannedUserListQuery();
+    bannedUserListQuery.next(function (users, error) {
+      if (error) {
+        return;
+      }
+
+      setMembers(users);
+      setHasNext(bannedUserListQuery.hasNext);
+    });
+  }, [channel]);
+  return React__default.createElement(React__default.Fragment, null, members.map(function (member) {
+    return React__default.createElement(UserListItem$1, {
+      key: member.userId,
+      user: member,
+      action: function action(_a) {
+        var actionRef = _a.actionRef,
+            parentRef = _a.parentRef;
+        return React__default.createElement(ContextMenu, {
+          menuTrigger: function menuTrigger(toggleDropdown) {
+            return React__default.createElement(IconButton, {
+              className: "sendbird-user-message__more__menu",
+              width: "32px",
+              height: "32px",
+              onClick: toggleDropdown
+            }, React__default.createElement(Icon, {
+              width: "24px",
+              height: "24px",
+              type: IconTypes.MORE,
+              fillColor: IconColors.CONTENT_INVERSE
+            }));
+          },
+          menuItems: function menuItems(closeDropdown) {
+            return React__default.createElement(MenuItems$1, {
+              parentContainRef: parentRef,
+              parentRef: actionRef // for catching location(x, y) of MenuItems
+              ,
+              closeDropdown: closeDropdown,
+              openLeft: true
+            }, React__default.createElement(MenuItem, {
+              onClick: function onClick() {
+                channel.unbanUser(member, function () {
+                  closeDropdown();
+                  refreshList();
+                });
+              }
+            }, "Unban"));
+          }
+        });
+      }
+    });
+  }), members && members.length === 0 && React__default.createElement(Label, {
+    className: "sendbird-channel-settings__empty-list",
+    type: LabelTypography.SUBTITLE_2,
+    color: LabelColors.ONBACKGROUND_3
+  }, "No banned members yet"), hasNext && React__default.createElement("div", {
+    className: "sendbird-channel-settings-accordion__footer"
+  }, React__default.createElement(Button, {
+    type: Type$1.SECONDARY,
+    size: Size.SMALL,
+    onClick: function onClick() {
+      setShowModal(true);
+    }
+  }, "All banned members")), showModal && React__default.createElement(BannedMembersModal, {
+    channel: channel,
+    hideModal: function hideModal() {
+      setShowModal(false);
+      refreshList();
+    }
+  }));
+};
+
+var mapStoreToProps$2 = function mapStoreToProps(store) {
+  return {
+    sdk: getSdk(store)
+  };
+};
+
+var BannedMemberList$1 = withSendbirdContext(BannedMemberList, mapStoreToProps$2);
+
+function MutedMembersModal(_a) {
+  var hideModal = _a.hideModal,
+      channel = _a.channel,
+      currentUser = _a.currentUser;
+
+  var _b = React.useState([]),
+      members = _b[0],
+      setMembers = _b[1];
+
+  var _c = React.useState(null),
+      memberQuery = _c[0],
+      setMemberQuery = _c[1];
+
+  React.useEffect(function () {
+    var memberUserListQuery = channel.createMemberListQuery();
+    memberUserListQuery.limit = 10;
+    memberUserListQuery.mutedMemberFilter = 'muted';
+    memberUserListQuery.next(function (members, error) {
+      if (error) {
+        return;
+      }
+
+      setMembers(members);
+    });
+    setMemberQuery(memberUserListQuery);
+  }, []);
+  return React__default.createElement("div", null, React__default.createElement(Modal, {
+    hideFooter: true,
+    onCancel: function onCancel() {
+      return hideModal();
+    },
+    onSubmit: noop$1,
+    titleText: "Muted members"
+  }, React__default.createElement("div", {
+    className: "sendbird-more-members__popup-scroll",
+    onScroll: function onScroll(e) {
+      var hasNext = memberQuery.hasNext;
+      var target = e.target;
+      var fetchMore = target.clientHeight + target.scrollTop === target.scrollHeight;
+
+      if (hasNext && fetchMore) {
+        memberQuery.next(function (o, error) {
+          if (error) {
+            return;
+          }
+
+          setMembers(__spreadArrays(members, o));
+        });
+      }
+    }
+  }, members.map(function (member) {
+    return React__default.createElement(UserListItem, {
+      currentUser: currentUser,
+      user: member,
+      key: member.userId,
+      action: function action(_a) {
+        var actionRef = _a.actionRef,
+            parentRef = _a.parentRef;
+        return React__default.createElement(ContextMenu, {
+          menuTrigger: function menuTrigger(toggleDropdown) {
+            return React__default.createElement(IconButton, {
+              className: "sendbird-user-message__more__menu",
+              width: "32px",
+              height: "32px",
+              onClick: toggleDropdown
+            }, React__default.createElement(Icon, {
+              width: "24px",
+              height: "24px",
+              type: IconTypes.MORE,
+              fillColor: IconColors.CONTENT_INVERSE
+            }));
+          },
+          menuItems: function menuItems(closeDropdown) {
+            return React__default.createElement(MenuItems$1, {
+              parentContainRef: parentRef,
+              parentRef: actionRef // for catching location(x, y) of MenuItems
+              ,
+              closeDropdown: closeDropdown,
+              openLeft: true
+            }, React__default.createElement(MenuItem, {
+              onClick: function onClick() {
+                channel.unmuteUser(member, function () {
+                  closeDropdown();
+                  setMembers(members.filter(function (m) {
+                    return m.userId !== member.userId;
+                  }));
+                });
+              }
+            }, "Unmute"));
+          }
+        });
+      }
+    });
+  }))));
+}
+
+var MutedMemberList = function MutedMemberList(_a) {
+  var sdk = _a.sdk,
+      channel = _a.channel;
+
+  var _b = React.useState([]),
+      members = _b[0],
+      setMembers = _b[1];
+
+  var _c = React.useState(false),
+      hasNext = _c[0],
+      setHasNext = _c[1];
+
+  var _d = React.useState(false),
+      showModal = _d[0],
+      setShowModal = _d[1];
+
+  React.useEffect(function () {
+    if (!channel) {
+      setMembers([]);
+      return;
+    }
+
+    var memberUserListQuery = channel.createMemberListQuery();
+    memberUserListQuery.limit = 10;
+    memberUserListQuery.mutedMemberFilter = 'muted';
+    memberUserListQuery.next(function (members, error) {
+      if (error) {
+        return;
+      }
+
+      setMembers(members);
+      setHasNext(memberUserListQuery.hasNext);
+    });
+  }, [channel]);
+  var refreshList = React.useCallback(function () {
+    if (!channel) {
+      setMembers([]);
+      return;
+    }
+
+    var memberUserListQuery = channel.createMemberListQuery();
+    memberUserListQuery.limit = 10;
+    memberUserListQuery.mutedMemberFilter = 'muted';
+    memberUserListQuery.next(function (members, error) {
+      if (error) {
+        return;
+      }
+
+      setMembers(members);
+      setHasNext(memberUserListQuery.hasNext);
+    });
+  }, [channel]);
+  return React__default.createElement(React__default.Fragment, null, members.map(function (member) {
+    return React__default.createElement(UserListItem$1, {
+      key: member.userId,
+      user: member,
+      currentUser: sdk.currentUser.userId,
+      action: function action(_a) {
+        var actionRef = _a.actionRef,
+            parentRef = _a.parentRef;
+        return React__default.createElement(ContextMenu, {
+          menuTrigger: function menuTrigger(toggleDropdown) {
+            return React__default.createElement(IconButton, {
+              className: "sendbird-user-message__more__menu",
+              width: "32px",
+              height: "32px",
+              onClick: toggleDropdown
+            }, React__default.createElement(Icon, {
+              width: "24px",
+              height: "24px",
+              type: IconTypes.MORE,
+              fillColor: IconColors.CONTENT_INVERSE
+            }));
+          },
+          menuItems: function menuItems(closeDropdown) {
+            return React__default.createElement(MenuItems$1, {
+              closeDropdown: closeDropdown,
+              openLeft: true,
+              parentContainRef: parentRef,
+              parentRef: actionRef // for catching location(x, y) of MenuItems
+
+            }, React__default.createElement(MenuItem, {
+              onClick: function onClick() {
+                channel.unmuteUser(member, function () {
+                  refreshList();
+                  closeDropdown();
+                });
+              }
+            }, "Unmute"));
+          }
+        });
+      }
+    });
+  }), members && members.length === 0 && React__default.createElement(Label, {
+    className: "sendbird-channel-settings__empty-list",
+    type: LabelTypography.SUBTITLE_2,
+    color: LabelColors.ONBACKGROUND_3
+  }, "No muted members yet"), hasNext && React__default.createElement("div", {
+    className: "sendbird-channel-settings-accordion__footer"
+  }, React__default.createElement(Button, {
+    type: Type$1.SECONDARY,
+    size: Size.SMALL,
+    onClick: function onClick() {
+      setShowModal(true);
+    }
+  }, "All muted members")), showModal && React__default.createElement(MutedMembersModal, {
+    currentUser: sdk.currentUser.userId,
+    channel: channel,
+    hideModal: function hideModal() {
+      setShowModal(false);
+      refreshList();
+    }
+  }));
+};
+
+var mapStoreToProps$3 = function mapStoreToProps(store) {
+  return {
+    sdk: getSdk(store)
+  };
+};
+
+var MutedMemberList$1 = withSendbirdContext(MutedMemberList, mapStoreToProps$3);
+
+var kFormatter = function kFormatter(num) {
+  return Math.abs(num) > 999 ? (Math.abs(num) / 1000).toFixed(1) + "K" : num;
+};
+
+function index(_a) {
+  var userQueryCreator = _a.userQueryCreator,
+      channel = _a.channel;
+
+  var _b = React.useState(false),
+      frozen = _b[0],
+      setFrozen = _b[1]; // work around for
+  // https://sendbird.slack.com/archives/G01290GCDCN/p1595922832000900
+  // SDK bug - after frozen/unfrozen myRole becomes "none"
+
+
+  React.useEffect(function () {
+    setFrozen(channel.isFrozen);
+  }, [channel]);
+  return React__default.createElement(AccordionGroup$1, {
+    className: "sendbird-channel-settings__operator"
+  }, React__default.createElement(Accordion, {
+    className: "sendbird-channel-settings__operators-list",
+    id: "operators",
+    renderTitle: function renderTitle() {
+      return React__default.createElement(React__default.Fragment, null, React__default.createElement(Icon, {
+        type: IconTypes.ICON_OPERATOR,
+        width: 24,
+        height: 24,
+        className: "sendbird-channel-settings__accordion-icon"
+      }), React__default.createElement(Label, {
+        type: LabelTypography.SUBTITLE_1,
+        color: LabelColors.ONBACKGROUND_1
+      }, LabelStringSet.CHANNEL_SETTING__OPERATORS__TITLE));
+    },
+    renderContent: function renderContent() {
+      return React__default.createElement(React__default.Fragment, null, React__default.createElement(OperatorList$1, {
+        channel: channel
+      }));
+    }
+  }), React__default.createElement(Accordion, {
+    className: "sendbird-channel-settings__members-list",
+    id: "members",
+    renderTitle: function renderTitle() {
+      return React__default.createElement(React__default.Fragment, null, React__default.createElement(Icon, {
+        type: IconTypes.MEMBERS,
+        width: 24,
+        height: 24,
+        className: "sendbird-channel-settings__accordion-icon"
+      }), React__default.createElement(Label, {
+        type: LabelTypography.SUBTITLE_1,
+        color: LabelColors.ONBACKGROUND_1
+      }, LabelStringSet.CHANNEL_SETTING__MEMBERS__TITLE), React__default.createElement(Badge, {
+        count: kFormatter(channel.memberCount)
+      }));
+    },
+    renderContent: function renderContent() {
+      return React__default.createElement(React__default.Fragment, null, React__default.createElement(MemberList$1, {
+        userQueryCreator: userQueryCreator,
+        channel: channel
+      }));
+    }
+  }), // No muted members in broadcast channel
+  !channel.isBroadcast && React__default.createElement(Accordion, {
+    id: "mutedMembers",
+    className: "sendbird-channel-settings__muted-members-list",
+    renderTitle: function renderTitle() {
+      return React__default.createElement(React__default.Fragment, null, React__default.createElement(Icon, {
+        type: IconTypes.ICON_MUTED,
+        width: 24,
+        height: 24,
+        className: "sendbird-channel-settings__accordion-icon"
+      }), React__default.createElement(Label, {
+        type: LabelTypography.SUBTITLE_1,
+        color: LabelColors.ONBACKGROUND_1
+      }, LabelStringSet.CHANNEL_SETTING__MUTED_MEMBERS__TITLE));
+    },
+    renderContent: function renderContent() {
+      return React__default.createElement(React__default.Fragment, null, React__default.createElement(MutedMemberList$1, {
+        channel: channel
+      }));
+    }
+  }), React__default.createElement(Accordion, {
+    className: "sendbird-channel-settings__banned-members-list",
+    id: "bannedMembers",
+    renderTitle: function renderTitle() {
+      return React__default.createElement(React__default.Fragment, null, React__default.createElement(Icon, {
+        type: IconTypes.ICON_BANNED,
+        width: 24,
+        height: 24,
+        className: "sendbird-channel-settings__accordion-icon"
+      }), React__default.createElement(Label, {
+        type: LabelTypography.SUBTITLE_1,
+        color: LabelColors.ONBACKGROUND_1
+      }, LabelStringSet.CHANNEL_SETTING__BANNED_MEMBERS__TITLE));
+    },
+    renderContent: function renderContent() {
+      return React__default.createElement(React__default.Fragment, null, React__default.createElement(BannedMemberList$1, {
+        channel: channel
+      }));
+    }
+  }), // cannot frozen broadcast channel
+  !channel.isBroadcast && React__default.createElement("div", {
+    className: "sendbird-channel-settings__freeze"
+  }, React__default.createElement(Icon, {
+    type: IconTypes.FROZEN_LIGHT,
+    width: 24,
+    height: 24,
+    className: "sendbird-channel-settings__accordion-icon"
+  }), React__default.createElement(Label, {
+    type: LabelTypography.SUBTITLE_1,
+    color: LabelColors.ONBACKGROUND_1
+  }, LabelStringSet.CHANNEL_SETTING__FREEZE_CHANNEL), React__default.createElement("div", {
+    className: "sendbird-channel-settings__frozen-icon"
+  }, frozen ? React__default.createElement(Icon, {
+    onClick: function onClick() {
+      channel.unfreeze(function () {
+        setFrozen(false);
+      });
+    },
+    type: IconTypes.TOGGLE_ON,
+    width: 44,
+    height: 24
+  }) : React__default.createElement(Icon, {
+    onClick: function onClick() {
+      channel.freeze(function () {
+        setFrozen(true);
+      });
+    },
+    type: IconTypes.TOGGLE_OFF,
+    width: 44,
+    height: 24
+  }))));
+}
+
+function ChannelSettings(props) {
+  var onCloseClick = props.onCloseClick,
+      channelUrl = props.channelUrl,
+      _onChannelModified = props.onChannelModified,
+      renderChannelProfile = props.renderChannelProfile,
+      onBeforeUpdateChannel = props.onBeforeUpdateChannel;
+  var sdkStore = props.stores.sdkStore,
+      _props$config = props.config,
+      userListQuery = _props$config.userListQuery,
+      theme = _props$config.theme,
+      userId = _props$config.userId,
+      logger = _props$config.logger,
+      isOnline = _props$config.isOnline,
+      _props$queries = props.queries,
+      queries = _props$queries === void 0 ? {} : _props$queries;
+  var userFilledApplicationUserListQuery = queries.applicationUserListQuery;
+  var sdk = sdkStore.sdk,
+      initialized = sdkStore.initialized; // hack to kepp track of channel updates by triggering useEffect
+
+  var _useState = React.useState(uuidv4()),
+      _useState2 = _slicedToArray(_useState, 2),
+      channelUpdateId = _useState2[0],
+      setChannelUpdateId = _useState2[1];
+
+  var _useState3 = React.useState(null),
+      _useState4 = _slicedToArray(_useState3, 2),
+      channel = _useState4[0],
+      setChannel = _useState4[1];
+
+  var _useState5 = React.useState(false),
+      _useState6 = _slicedToArray(_useState5, 2),
+      invalidChannel = _useState6[0],
+      setInvalidChannel = _useState6[1];
+
+  var _useState7 = React.useState(false),
+      _useState8 = _slicedToArray(_useState7, 2),
+      showAccordion = _useState8[0],
+      setShowAccordion = _useState8[1];
+
+  var _useState9 = React.useState(false),
+      _useState10 = _slicedToArray(_useState9, 2),
+      showLeaveChannelModal = _useState10[0],
+      setShowLeaveChannelModal = _useState10[1];
+
+  React.useEffect(function () {
+    logger.info('ChannelSettings: Setting up');
+
+    if (!channelUrl || !initialized || !sdk) {
+      logger.warning('ChannelSettings: Setting up failed', 'No channelUrl or sdk uninitialized');
+      setInvalidChannel(false);
+    } else {
+      if (!sdk || !sdk.GroupChannel) {
+        logger.warning('ChannelSettings: No GroupChannel');
+        return;
+      }
+
+      sdk.GroupChannel.getChannel(channelUrl, function (groupChannel) {
+        if (!groupChannel) {
+          logger.warning('ChannelSettings: Channel not found');
+          setInvalidChannel(true);
+        } else {
+          logger.info('ChannelSettings: Fetched group channel', groupChannel);
+          setInvalidChannel(false);
+          setChannel(groupChannel);
+        }
+      });
+    }
+  }, [channelUrl, initialized, channelUpdateId]);
+
+  if (!channel || invalidChannel) {
+    return React__default.createElement("div", {
+      className: "sendbird-channel-settings"
+    }, React__default.createElement("div", {
+      className: "sendbird-channel-settings__header"
+    }, React__default.createElement(Label, {
+      type: LabelTypography.H_2,
+      color: LabelColors.ONBACKGROUND_1
+    }, LabelStringSet.CHANNEL_SETTING__HEADER__TITLE), React__default.createElement(Icon, {
+      type: IconTypes.CLOSE,
+      className: "sendbird-channel-settings__close-icon",
+      height: "24px",
+      width: "24px",
+      onClick: function onClick() {
+        logger.info('ChannelSettings: Click close');
+        onCloseClick();
+      }
+    })), React__default.createElement("div", null, React__default.createElement(PlaceHolder, {
+      type: PlaceHolderTypes.WRONG
+    })));
+  }
+
+  return React__default.createElement("div", {
+    className: "sendbird-channel-settings"
+  }, React__default.createElement("div", {
+    className: "sendbird-channel-settings__header"
+  }, React__default.createElement(Label, {
+    type: LabelTypography.H_2,
+    color: LabelColors.ONBACKGROUND_1
+  }, LabelStringSet.CHANNEL_SETTING__HEADER__TITLE), React__default.createElement(Icon, {
+    type: IconTypes.CLOSE,
+    className: "sendbird-channel-settings__close-icon",
+    height: "24px",
+    width: "24px",
+    onClick: function onClick() {
+      logger.info('ChannelSettings: Click close');
+      onCloseClick();
+    }
+  })), React__default.createElement("div", {
+    className: "sendbird-channel-settings__scroll-area"
+  }, renderChannelProfile ? renderChannelProfile({
+    channel: channel
+  }) : React__default.createElement(ChannelProfile, {
+    disabled: !isOnline,
+    channel: channel,
+    userId: userId,
+    theme: theme,
+    onChannelInfoChange: function onChannelInfoChange(currentImg, currentTitle) {
+      logger.info('ChannelSettings: Channel information being updated');
+      var swapParams = sdk.getErrorFirstCallback();
+
+      if (onBeforeUpdateChannel) {
+        var params = onBeforeUpdateChannel(currentTitle, currentImg, channel.data); // swapParams
+
+        channel.updateChannel(params, function (response, error) {
+          var groupChannel = response;
+
+          if (swapParams) {
+            groupChannel = error;
+          }
+
+          _onChannelModified(groupChannel);
+
+          setChannelUpdateId(uuidv4());
+        });
+        return;
+      }
+
+      channel.updateChannel(currentTitle, currentImg, channel.data, function (response, error) {
+        var groupChannel = response;
+
+        if (swapParams) {
+          groupChannel = error;
+        }
+
+        logger.info('ChannelSettings: Channel information updated', groupChannel);
+
+        _onChannelModified(groupChannel);
+
+        setChannelUpdateId(uuidv4());
+      });
+    }
+  }), channel.myRole === 'operator' ? React__default.createElement(index, {
+    channel: channel,
+    onChannelModified: function onChannelModified(groupChannel) {
+      // setChannelUpdateId(uuidv4());
+      _onChannelModified(groupChannel);
+    },
+    userQueryCreator: function userQueryCreator() {
+      return userListQuery && typeof userListQuery === 'function' ? userListQuery() : createDefaultUserListQuery({
+        sdk: sdk,
+        userFilledApplicationUserListQuery: userFilledApplicationUserListQuery
+      });
+    }
+  }) : React__default.createElement(React__default.Fragment, null, React__default.createElement("div", {
+    role: "switch",
+    "aria-checked": showAccordion,
+    tabIndex: 0,
+    onKeyDown: function onKeyDown() {
+      return setShowAccordion(!showAccordion);
+    },
+    className: "\n                    sendbird-channel-settings__panel-item\n                    sendbird-channel-settings__members\n                  ",
+    onClick: function onClick() {
+      return setShowAccordion(!showAccordion);
+    }
+  }, React__default.createElement(Icon, {
+    type: IconTypes.MEMBERS,
+    className: "sendbird-channel-settings__panel-icon-left",
+    height: "24px",
+    width: "24px",
+    fillColor: IconColors.PRIMARY
+  }), React__default.createElement(Label, {
+    type: LabelTypography.SUBTITLE_1,
+    color: LabelColors.ONBACKGROUND_1
+  }, "".concat(LabelStringSet.CHANNEL_SETTING__MEMBERS__TITLE, " (").concat(channel.memberCount, ")")), React__default.createElement(Icon, {
+    type: IconTypes.SHEVRON,
+    className: ['sendbird-channel-settings__panel-icon-right', 'sendbird-channel-settings__panel-icon--chevron', showAccordion ? 'sendbird-channel-settings__panel-icon--open' : ''].join(' '),
+    height: "24px",
+    width: "24px"
+  })), showAccordion && React__default.createElement(MemebersAccordion, {
+    currentUser: userId,
+    disabled: !isOnline // eslint-disable-next-line
+    ,
+    userQueryCreator: function userQueryCreator() {
+      return userListQuery && typeof userListQuery === 'function' ? userListQuery() : createDefaultUserListQuery({
+        sdk: sdk,
+        userFilledApplicationUserListQuery: userFilledApplicationUserListQuery
+      });
+    },
+    swapParams: sdk && sdk.getErrorFirstCallback && sdk.getErrorFirstCallback(),
+    channel: channel,
+    members: channel.members,
+    onInviteMemebers: function onInviteMemebers(selectedMemebers) {
+      logger.info('ChannelSettings: Inviting new users');
+      channel.inviteWithUserIds(selectedMemebers).then(function (res) {
+        _onChannelModified(res);
+
+        setChannelUpdateId(uuidv4());
+        logger.info('ChannelSettings: Inviting new users success!', res);
+      });
+    }
+  })), React__default.createElement("div", {
+    className: "sendbird-channel-settings__panel-item\n              sendbird-channel-settings__leave-channel\n              ".concat(!isOnline ? 'sendbird-channel-settings__panel-item__disabled' : ''),
+    role: "button",
+    tabIndex: 0,
+    disabled: true,
+    onKeyDown: function onKeyDown() {
+      if (!isOnline) {
+        return;
+      }
+
+      setShowLeaveChannelModal(true);
+    },
+    onClick: function onClick() {
+      if (!isOnline) {
+        return;
+      }
+
+      setShowLeaveChannelModal(true);
+    }
+  }, React__default.createElement(Icon, {
+    type: IconTypes.LEAVE,
+    className: ['sendbird-channel-settings__panel-icon-left', 'sendbird-channel-settings__panel-icon__leave'].join(' '),
+    height: "24px",
+    width: "24px"
+  }), React__default.createElement(Label, {
+    type: LabelTypography.SUBTITLE_1,
+    color: LabelColors.ONBACKGROUND_1
+  }, LabelStringSet.CHANNEL_SETTING__LEAVE_CHANNEL__TITLE)), showLeaveChannelModal && React__default.createElement(LeaveChannel, {
+    onCloseModal: function onCloseModal() {
+      return setShowLeaveChannelModal(false);
+    },
+    onLeaveChannel: function onLeaveChannel() {
+      logger.info('ChannelSettings: Leaving channel', channel);
+      channel.leave().then(function () {
+        logger.info('ChannelSettings: Leaving channel successful!', channel);
+        onCloseClick();
+      });
+    }
+  })));
+}
+
+ChannelSettings.propTypes = {
+  onCloseClick: PropTypes.func,
+  onChannelModified: PropTypes.func,
+  onBeforeUpdateChannel: PropTypes.func,
+  renderChannelProfile: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
+  channelUrl: PropTypes.string.isRequired,
+  queries: PropTypes.shape({
+    applicationUserListQuery: PropTypes.shape({
+      limit: PropTypes.number,
+      userIdsFilter: PropTypes.arrayOf(PropTypes.string),
+      metaDataKeyFilter: PropTypes.string,
+      metaDataValuesFilter: PropTypes.arrayOf(PropTypes.string)
+    })
+  }),
+  // from withSendbirdContext
+  stores: PropTypes.shape({
+    sdkStore: PropTypes.shape({
+      sdk: PropTypes.shape({
+        getErrorFirstCallback: PropTypes.func,
+        GroupChannel: PropTypes.oneOfType([PropTypes.shape({
+          getChannel: PropTypes.func
+        }), PropTypes.func]),
+        createApplicationUserListQuery: PropTypes.any
+      }),
+      initialized: PropTypes.bool
+    })
+  }).isRequired,
+  config: PropTypes.shape({
+    userId: PropTypes.string,
+    theme: PropTypes.string,
+    userListQuery: PropTypes.func,
+    isOnline: PropTypes.bool,
+    logger: PropTypes.shape({
+      info: PropTypes.func,
+      error: PropTypes.func,
+      warning: PropTypes.func
+    })
+  }).isRequired
+};
+ChannelSettings.defaultProps = {
+  onBeforeUpdateChannel: null,
+  queries: {},
+  renderChannelProfile: null,
+  onCloseClick: function onCloseClick() {},
+  onChannelModified: function onChannelModified() {}
+};
+var ChannelSettings$1 = withSendbirdContext(ChannelSettings);
+
+function App(props) {
+  var appId = props.appId,
+      userId = props.userId,
+      accessToken = props.accessToken,
+      theme = props.theme,
+      userListQuery = props.userListQuery,
+      nickname = props.nickname,
+      profileUrl = props.profileUrl,
+      _props$config = props.config,
+      config = _props$config === void 0 ? {} : _props$config;
+
+  var _useState = React.useState(null),
+      _useState2 = _slicedToArray(_useState, 2),
+      currentChannelUrl = _useState2[0],
+      setCurrentChannelUrl = _useState2[1];
+
+  var _useState3 = React.useState(false),
+      _useState4 = _slicedToArray(_useState3, 2),
+      showSettings = _useState4[0],
+      setShowSettings = _useState4[1];
+
+  return React__default.createElement(Sendbird, {
+    appId: appId,
+    userId: userId,
+    accessToken: accessToken,
+    theme: theme,
+    nickname: nickname,
+    profileUrl: profileUrl,
+    userListQuery: userListQuery,
+    config: config
+  }, React__default.createElement("div", {
+    className: "sendbird-app__wrap"
+  }, React__default.createElement("div", {
+    className: "sendbird-app__channellist-wrap"
+  }, React__default.createElement(ChannelList$1, {
+    onChannelSelect: function onChannelSelect(channel) {
+      if (channel && channel.url) {
+        setCurrentChannelUrl(channel.url);
+      } else {
+        setCurrentChannelUrl('');
+      }
+    }
+  })), React__default.createElement("div", {
+    className: "sendbird-app__conversation-wrap"
+  }, React__default.createElement(Conversation, {
+    channelUrl: currentChannelUrl,
+    onChatHeaderActionClick: function onChatHeaderActionClick() {
+      setShowSettings(true);
+    }
+  }))), showSettings && React__default.createElement("div", {
+    className: "sendbird-app__settingspanel-wrap"
+  }, React__default.createElement(ChannelSettings$1, {
+    channelUrl: currentChannelUrl,
+    onCloseClick: function onCloseClick() {
+      setShowSettings(false);
+    }
+  })));
+}
+App.propTypes = {
+  appId: PropTypes.string.isRequired,
+  userId: PropTypes.string.isRequired,
+  accessToken: PropTypes.string,
+  theme: PropTypes.string,
+  userListQuery: PropTypes.func,
+  nickname: PropTypes.string,
+  profileUrl: PropTypes.string,
+  config: PropTypes.shape({
+    // None Error Warning Info 'All/Debug'
+    logLevel: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
+  })
+};
+App.defaultProps = {
+  accessToken: '',
+  theme: 'light',
+  nickname: '',
+  profileUrl: '',
+  userListQuery: null,
+  config: {}
 };
 
 exports.App = App;
