@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1(Sept 01, 2020)
+
+- Bugfixes:
+  * Unordered message history
+  * Message text break on middle of word
+
 ## 1.2.0(Aug 27, 2020)
 
 - Features:

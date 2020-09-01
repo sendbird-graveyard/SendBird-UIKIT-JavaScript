@@ -1165,7 +1165,10 @@
     right: 0px; }
 
 .sendbird-user-message__text-balloon__inner__text-place__text {
-  word-break: break-word; }
+  word-break: break-word;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap; }
 
 .sendbird-user-message__text-balloon {
   display: inline-block; }
