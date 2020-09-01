@@ -222,7 +222,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.2.0';
+var APP_VERSION_STRING = '1.2.1';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -5503,6 +5503,9 @@ function reducer$3(state, action) {
 
     case RESET_MESSAGES:
       return _objectSpread2({}, state, {
+        // when user switches channel, if the previous channel `hasMore`
+        // the onScroll gets called twice, setting hasMore false prevents this
+        hasMore: false,
         allMessages: []
       });
 
