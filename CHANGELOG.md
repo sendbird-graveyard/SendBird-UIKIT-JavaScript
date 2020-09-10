@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.2(Sept 10, 2020)
+
+- Features:
+  * Message grouping
+
+- Bugfixes:
+  * Fix file upload issue with sendBirdSelectors.getSendFileMessage
+
+- Dependency updates:
+  * SDK version - 3.0.133
+
 ## 1.2.1(Sept 01, 2020)
 
 - Bugfixes:
