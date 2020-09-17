@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.2.4(Sept 17, 2020)
+
+- Features:
+  User profile viewer on Channel and ChannelSettings
+  Edit user profile on ChannelList(disabled by default)
+
+  * SendBirdProvider
+    * disableUserProfile: boolean
+    * renderUserProfile: React.Component
+    * allowProfileEdit: boolean
+  * Channel
+    * disableUserProfile: boolean
+    * renderUserProfile: React.Component
+  * ChannelSettings
+    * disableUserProfile: boolean
+    * renderUserProfile: React.Component
+  * ChannelList
+    * renderHeader(): React.Component
+    * allowProfileEdit: boolean
+    * onThemeChange(theme: string): void
+    * onProfileEditSuccess(user: User): void
+
 ## 1.2.3(Sept 10, 2020)
 
 - Features:

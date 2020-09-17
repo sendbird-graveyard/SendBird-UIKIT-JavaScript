@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer, useMemo, Component, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useReducer, useMemo, useRef, Component, useContext, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import Sb from 'sendbird';
 import Moment from 'moment';
@@ -215,7 +215,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.2.3';
+var APP_VERSION_STRING = '1.2.4';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -642,6 +642,9 @@ function Sendbird(props) {
       appId = props.appId,
       accessToken = props.accessToken,
       children = props.children,
+      disableUserProfile = props.disableUserProfile,
+      renderUserProfile = props.renderUserProfile,
+      allowProfileEdit = props.allowProfileEdit,
       theme = props.theme,
       nickname = props.nickname,
       profileUrl = props.profileUrl,
@@ -695,14 +698,23 @@ function Sendbird(props) {
   useEffect(function () {
     setLogger(LoggerFactory(logLevel));
   }, [logLevel]);
-  useAppendDomNode(['sendbird-modal-root', 'sendbird-dropdown-portal', 'sendbird-emoji-list-portal'], 'body'); // add-remove theme from body
+  useAppendDomNode(['sendbird-modal-root', 'sendbird-dropdown-portal', 'sendbird-emoji-list-portal'], 'body'); // should move to reducer
+
+  var _useState5 = useState(theme),
+      _useState6 = _slicedToArray(_useState5, 2),
+      currenttheme = _useState6[0],
+      setCurrenttheme = _useState6[1];
 
   useEffect(function () {
-    logger.info('Setup theme', "Theme: ".concat(theme));
+    setCurrenttheme(theme);
+  }, [theme]); // add-remove theme from body
+
+  useEffect(function () {
+    logger.info('Setup theme', "Theme: ".concat(currenttheme));
 
     try {
       var body = document.querySelector('body');
-      body.classList.add("sendbird-theme--".concat(theme || 'light'));
+      body.classList.add("sendbird-theme--".concat(currenttheme || 'light'));
       logger.info('Finish setup theme'); // eslint-disable-next-line no-empty
     } catch (e) {
       logger.warning('Setup theme failed', "".concat(e));
@@ -718,7 +730,7 @@ function Sendbird(props) {
 
       } catch (_unused) {}
     };
-  }, [theme]);
+  }, [currenttheme]);
   var isOnline = useConnectionStatus(sdkStore.sdk, logger);
   return React.createElement(SendbirdSdkContext.Provider, {
     value: {
@@ -746,11 +758,15 @@ function Sendbird(props) {
         }
       },
       config: {
+        disableUserProfile: disableUserProfile,
+        renderUserProfile: renderUserProfile,
+        allowProfileEdit: allowProfileEdit,
         isOnline: isOnline,
         userId: userId,
         appId: appId,
         accessToken: accessToken,
-        theme: theme,
+        theme: currenttheme,
+        setCurrenttheme: setCurrenttheme,
         userListQuery: userListQuery,
         logger: logger,
         pubSub: pubSub
@@ -766,6 +782,9 @@ Sendbird.propTypes = {
   theme: PropTypes.string,
   nickname: PropTypes.string,
   profileUrl: PropTypes.string,
+  disableUserProfile: PropTypes.bool,
+  renderUserProfile: PropTypes.func,
+  allowProfileEdit: PropTypes.bool,
   userListQuery: PropTypes.func,
   config: PropTypes.shape({
     // None Error Warning Info 'All/Debug'
@@ -781,6 +800,9 @@ Sendbird.defaultProps = {
   theme: 'light',
   nickname: '',
   profileUrl: '',
+  disableUserProfile: false,
+  renderUserProfile: null,
+  allowProfileEdit: false,
   userListQuery: null,
   config: {}
 };
@@ -1287,24 +1309,32 @@ AvatarInner.propTypes = {
   src: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  alt: PropTypes.string.isRequired
+  alt: PropTypes.string
 };
 AvatarInner.defaultProps = {
-  src: ''
+  src: '',
+  alt: ''
 };
-function Avatar(_ref3) {
+
+function Avatar(_ref3, ref) {
   var src = _ref3.src,
       height = _ref3.height,
       width = _ref3.width,
       alt = _ref3.alt,
-      className = _ref3.className;
+      className = _ref3.className,
+      onClick = _ref3.onClick;
   var injectingClassName = Array.isArray(className) ? className : [className];
   return React.createElement("div", {
     className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-avatar']).join(' '),
+    ref: ref,
     style: {
       height: height,
       width: width
-    }
+    },
+    onClick: onClick,
+    role: "button",
+    tabIndex: "0",
+    onKeyDown: onClick
   }, React.createElement(AvatarInner, {
     src: src,
     height: height,
@@ -1312,20 +1342,24 @@ function Avatar(_ref3) {
     alt: alt
   }));
 }
+
 Avatar.propTypes = {
   src: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   alt: PropTypes.string,
+  onClick: PropTypes.func,
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
 };
 Avatar.defaultProps = {
   height: '56px',
   width: '56px',
+  onClick: function onClick() {},
   alt: '',
   src: '',
   className: ''
 };
+var Avatar$1 = React.forwardRef(Avatar);
 
 var Type = {
   ADD: 'ADD',
@@ -2826,16 +2860,18 @@ function ChannelAvatar(_a) {
       width: width,
       height: height,
       className: "sendbird-chat-header__default--broadcast-channel-light"
-    }) : React.createElement(Avatar, {
+    }) : React.createElement(Avatar$1, {
       className: "sendbird-chat-header__avatar--broadcast-channel",
       src: getChannelAvatarSource(channel, userId),
       width: width,
-      height: height
-    }) : React.createElement(Avatar, {
+      height: height,
+      alt: channel.name
+    }) : React.createElement(Avatar$1, {
       className: "sendbird-chat-header__avatar--group-channel",
       src: getChannelAvatarSource(channel, userId),
       width: width + "px",
-      height: height + "px"
+      height: height + "px",
+      alt: channel.name
     });
   }, [channel.members, channel.coverUrl, theme]);
   return React.createElement(React.Fragment, null, memoizedAvatar);
@@ -2935,6 +2971,15 @@ var getStringSet = function getStringSet(lang) {
   var stringSet = {
     en: {
       TRYING_TO_CONNECT: 'Trying to connect…',
+      USER_PROFILE__MESSAGE: 'Message',
+      USER_PROFILE__USER_ID: 'User ID',
+      EDIT_PROFILE__TITLE: 'My profile',
+      EDIT_PROFILE__IMAGE_LABEL: 'Profile image',
+      EDIT_PROFILE__IMAGE_UPLOAD: 'Upload',
+      EDIT_PROFILE__NICKNAME_LABEL: 'Nickname',
+      EDIT_PROFILE__NICKNAME_PLACEHOLDER: 'Enter your nickname',
+      EDIT_PROFILE__USERID_LABEL: 'User ID',
+      EDIT_PROFILE__THEME_LABEL: 'Dark theme',
       CHANNEL_LIST__TITLE: 'Channels',
       CHANNEL__MESSAGE_INPUT__PLACE_HOLDER: 'Enter message',
       CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__DISABLED: 'Chat is unavailable in this channel',
@@ -3315,36 +3360,57 @@ IconButton.defaultProps = {
 };
 
 function ChannelHeader(_ref) {
-  var title = _ref.title,
-      iconButton = _ref.iconButton;
+  var user = _ref.user,
+      iconButton = _ref.iconButton,
+      onEdit = _ref.onEdit,
+      renderHeader = _ref.renderHeader,
+      allowProfileEdit = _ref.allowProfileEdit;
   return React.createElement("div", {
-    className: "sendbird-channel-header"
+    className: "\n        ".concat(allowProfileEdit && 'sendbird-channel-header--allow-edit', "\n        sendbird-channel-header\n      ")
+  }, renderHeader ? renderHeader() : React.createElement("div", {
+    className: "sendbird-channel-header__title",
+    role: "button",
+    onKeyDown: onEdit,
+    onClick: onEdit,
+    tabIndex: "0"
   }, React.createElement("div", {
-    className: "sendbird-channel-header__title"
+    className: "sendbird-channel-header__title--left"
+  }, React.createElement(Avatar$1, {
+    height: "32px",
+    width: "32px",
+    src: user.profileUrl,
+    alt: user.nickname
+  })), React.createElement("div", {
+    className: "sendbird-channel-header__title--right"
   }, React.createElement(Label, {
-    type: LabelTypography.H_2,
+    className: "sendbird-channel-header__title--name",
+    type: LabelTypography.SUBTITLE_2,
     color: LabelColors.ONBACKGROUND_1
-  }, title || LabelStringSet.CHANNEL_LIST__TITLE)), React.createElement("div", {
+  }, user.nickname || LabelStringSet.NO_NAME), React.createElement(Label, {
+    className: "sendbird-channel-header__title--user-id",
+    type: LabelTypography.BODY_2,
+    color: LabelColors.ONBACKGROUND_2
+  }, user.userId))), React.createElement("div", {
     className: "sendbird-channel-header__right-icon"
   }, iconButton));
 }
 ChannelHeader.propTypes = {
-  title: PropTypes.string,
+  user: PropTypes.shape({
+    profileUrl: PropTypes.string,
+    nickname: PropTypes.string,
+    userId: PropTypes.string
+  }),
+  renderHeader: PropTypes.func,
+  allowProfileEdit: PropTypes.bool,
+  onEdit: PropTypes.func.isRequired,
   iconButton: PropTypes.oneOfType([PropTypes.element, PropTypes.instanceOf(IconButton)])
 };
 ChannelHeader.defaultProps = {
-  title: '',
+  user: {},
+  renderHeader: null,
+  allowProfileEdit: false,
   iconButton: null
 };
-
-function Types() {
-  return {
-    LOADING: 'LOADING',
-    NO_CHANNELS: 'NO_CHANNELS',
-    WRONG: 'WRONG'
-  };
-}
-var PlaceHolderTypes = Types();
 
 // simple component to be used as modal root
 var MODAL_ROOT = 'sendbird-modal-root';
@@ -3536,6 +3602,305 @@ Modal.defaultProps = {
   type: Type$1.DANGER
 };
 
+var InputLabel = function InputLabel(_ref) {
+  var children = _ref.children;
+  return React.createElement(Label, {
+    type: LabelTypography.CAPTION_3,
+    color: LabelColors.ONBACKGROUND_1,
+    className: "sendbird-input-label"
+  }, children);
+};
+InputLabel.propTypes = {
+  children: PropTypes.string.isRequired
+}; // future: add validations? onChange? more props etc etc
+
+var Input = React.forwardRef(function (props, ref) {
+  var value = props.value,
+      placeHolder = props.placeHolder,
+      disabled = props.disabled,
+      name = props.name,
+      required = props.required;
+
+  var _useState = useState(value),
+      _useState2 = _slicedToArray(_useState, 2),
+      inputValue = _useState2[0],
+      setInputValue = _useState2[1];
+
+  return React.createElement("div", {
+    className: "sendbird-input"
+  }, React.createElement("input", {
+    required: required,
+    ref: ref,
+    name: name,
+    disabled: disabled,
+    value: inputValue,
+    className: "sendbird-input--input",
+    onChange: function onChange(e) {
+      setInputValue(e.target.value);
+    }
+  }), placeHolder && !inputValue && React.createElement(Label, {
+    className: "sendbird-input--placeholder",
+    type: LabelTypography.BODY_1,
+    color: LabelColors.ONBACKGROUND_3
+  }, placeHolder));
+});
+Input.propTypes = {
+  value: PropTypes.string,
+  placeHolder: PropTypes.string,
+  name: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
+  required: PropTypes.bool
+};
+Input.defaultProps = {
+  value: '',
+  placeHolder: '',
+  disabled: false,
+  required: false
+};
+
+var Colors$2 = {
+  ONBACKGROUND_1: 'ONBACKGROUND_1',
+  ONBACKGROUND_2: 'ONBACKGROUND_2',
+  ONBACKGROUND_3: 'ONBACKGROUND_3',
+  ONBACKGROUND_4: 'ONBACKGROUND_4',
+  ONCONTENT_1: 'ONCONTENT_1',
+  PRIMARY: 'PRIMARY',
+  ERROR: 'ERROR'
+};
+function changeColorToClassName$2(color) {
+  switch (color) {
+    case Colors$2.ONBACKGROUND_1:
+      return 'sendbird-color--onbackground-1';
+
+    case Colors$2.ONBACKGROUND_2:
+      return 'sendbird-color--onbackground-2';
+
+    case Colors$2.ONBACKGROUND_3:
+      return 'sendbird-color--onbackground-3';
+
+    case Colors$2.ONBACKGROUND_4:
+      return 'sendbird-color--onbackground-4';
+
+    case Colors$2.ONCONTENT_1:
+      return 'sendbird-color--oncontent-1';
+
+    case Colors$2.PRIMARY:
+      return 'sendbird-color--primary';
+
+    case Colors$2.ERROR:
+      return 'sendbird-color--error';
+
+    default:
+      return null;
+  }
+}
+
+function TextButton(_ref) {
+  var color = _ref.color,
+      children = _ref.children,
+      disabled = _ref.disabled,
+      className = _ref.className,
+      onClick = _ref.onClick,
+      notUnderline = _ref.notUnderline;
+  var injectingClassName = Array.isArray(className) ? className : [className];
+  return React.createElement("div", {
+    role: "button",
+    tabIndex: 0,
+    className: [].concat(_toConsumableArray(injectingClassName), [changeColorToClassName$2(color), notUnderline ? 'sendbird-textbutton--not-underline' : 'sendbird-textbutton', disabled ? 'sendbird-textbutton--disabled' : '']).join(' '),
+    onClick: onClick,
+    onKeyPress: onClick
+  }, children);
+}
+TextButton.propTypes = {
+  color: PropTypes.string,
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  onClick: PropTypes.func,
+  notUnderline: PropTypes.bool,
+  disabled: PropTypes.bool
+};
+TextButton.defaultProps = {
+  color: Colors$2.ONBACKGROUND_1,
+  className: '',
+  onClick: function onClick() {},
+  notUnderline: false,
+  disabled: false
+};
+
+var noop = function noop() {};
+var getMessageCreatedAt = function getMessageCreatedAt(message) {
+  return Moment(message.createdAt).format('LT');
+};
+var getSenderName = function getSenderName(message) {
+  return message.sender && (message.sender.friendName || message.sender.nickname || message.sender.userId);
+};
+var getSenderProfileUrl = function getSenderProfileUrl(message) {
+  return message.sender && message.sender.profileUrl;
+};
+
+function EditUserProfile(_a) {
+  var user = _a.user,
+      onCancel = _a.onCancel,
+      _onSubmit = _a.onSubmit,
+      _b = _a.onThemeChange,
+      onThemeChange = _b === void 0 ? null : _b,
+      _c = _a.theme,
+      theme = _c === void 0 ? 'light' : _c,
+      _d = _a.changeTheme,
+      changeTheme = _d === void 0 ? noop : _d;
+  var hiddenInputRef = useRef(null);
+  var inputRef = useRef(null);
+  var formRef = useRef(null);
+
+  var _e = useState(null),
+      currentImg = _e[0],
+      setCurrentImg = _e[1];
+
+  var _f = useState(null),
+      newFile = _f[0],
+      setNewFile = _f[1];
+
+  return React.createElement(Modal, {
+    titleText: LabelStringSet.EDIT_PROFILE__TITLE,
+    submitText: LabelStringSet.BUTTON__SAVE,
+    onCancel: onCancel,
+    onSubmit: function onSubmit() {
+      if (user.nickname !== '' && !inputRef.current.value) {
+        if (formRef.current.reportValidity) {
+          // might not work in explorer
+          formRef.current.reportValidity();
+        }
+
+        return;
+      }
+
+      _onSubmit(inputRef.current.value, newFile);
+
+      onCancel();
+    },
+    type: Type$1.PRIMARY
+  }, React.createElement("form", {
+    className: "sendbird__edit-user-profile",
+    ref: formRef,
+    onSubmit: function onSubmit(e) {
+      e.preventDefault();
+    }
+  }, React.createElement("section", {
+    className: "sendbird__edit-user-profile__img"
+  }, React.createElement(InputLabel, null, LabelStringSet.EDIT_PROFILE__IMAGE_LABEL), React.createElement("div", {
+    className: "sendbird__edit-user__avatar"
+  }, React.createElement(Avatar$1, {
+    height: "80px",
+    width: "80px",
+    src: currentImg || user.profileUrl
+  })), React.createElement("input", {
+    ref: hiddenInputRef,
+    type: "file",
+    accept: "image/gif, image/jpeg, image/png",
+    style: {
+      display: 'none'
+    },
+    onChange: function onChange(e) {
+      setCurrentImg(URL.createObjectURL(e.target.files[0]));
+      setNewFile(e.target.files[0]);
+      hiddenInputRef.current.value = '';
+    }
+  }), React.createElement(TextButton, {
+    className: "sendbird__edit-user__avatar-button",
+    onClick: function onClick() {
+      return hiddenInputRef.current.click();
+    },
+    notUnderline: true
+  }, React.createElement(Label, {
+    type: LabelTypography.BUTTON_1,
+    color: LabelColors.PRIMARY
+  }, LabelStringSet.EDIT_PROFILE__IMAGE_UPLOAD))), React.createElement("section", {
+    className: "sendbird__edit-user__name"
+  }, React.createElement(InputLabel, null, LabelStringSet.EDIT_PROFILE__NICKNAME_LABEL), React.createElement(Input, {
+    required: user.nickname !== '',
+    name: "sendbird__edit-user__name",
+    ref: inputRef,
+    value: user.nickname,
+    placeHolder: LabelStringSet.EDIT_PROFILE__NICKNAME_PLACEHOLDER
+  })), React.createElement("section", {
+    className: "sendbird__edit-user__userid"
+  }, React.createElement(InputLabel, null, LabelStringSet.EDIT_PROFILE__USERID_LABEL), React.createElement(Input, {
+    disabled: true,
+    name: "sendbird__edit-user__userid",
+    value: user.userId
+  })), React.createElement("section", {
+    className: "sendbird__edit-user__theme"
+  }, React.createElement(InputLabel, null, LabelStringSet.EDIT_PROFILE__THEME_LABEL), React.createElement("div", {
+    className: "sendbird__edit-user__theme-icon"
+  }, theme === 'dark' ? React.createElement(Icon, {
+    onClick: function onClick() {
+      changeTheme('light');
+
+      if (onThemeChange && typeof onThemeChange === 'function') {
+        onThemeChange('light');
+      }
+    },
+    type: IconTypes.TOGGLE_ON,
+    width: 44,
+    height: 24
+  }) : React.createElement(Icon, {
+    onClick: function onClick() {
+      changeTheme('dark');
+
+      if (onThemeChange && typeof onThemeChange === 'function') {
+        onThemeChange('dark');
+      }
+    },
+    type: IconTypes.TOGGLE_OFF,
+    width: 44,
+    height: 24
+  })))));
+}
+
+var mapStoreToProps = function mapStoreToProps(store) {
+  return {
+    theme: store.config.theme,
+    changeTheme: store.config.setCurrenttheme
+  };
+};
+
+var ConnectedEditUserProfile = withSendbirdContext(EditUserProfile, mapStoreToProps);
+
+function Types() {
+  return {
+    LOADING: 'LOADING',
+    NO_CHANNELS: 'NO_CHANNELS',
+    WRONG: 'WRONG'
+  };
+}
+var PlaceHolderTypes = Types();
+
+var UserProfileContext = React.createContext();
+
+var UserProfileProvider = function UserProfileProvider(props) {
+  var children = props.children,
+      className = props.className;
+  return React.createElement(UserProfileContext.Provider, {
+    value: props
+  }, React.createElement("div", {
+    className: className
+  }, children));
+};
+
+UserProfileProvider.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element), PropTypes.any]).isRequired,
+  // eslint-disable-next-line react/no-unused-prop-types
+  disableUserProfile: PropTypes.bool,
+  // eslint-disable-next-line react/no-unused-prop-types
+  renderUserProfile: PropTypes.func,
+  className: PropTypes.string
+};
+UserProfileProvider.defaultProps = {
+  className: null,
+  disableUserProfile: false,
+  renderUserProfile: null
+};
+
 function MutedAvatarOverlay(props) {
   var _a = props.height,
       height = _a === void 0 ? 24 : _a,
@@ -3599,6 +3964,899 @@ Checkbox.defaultProps = {
   onChange: function onChange() {}
 };
 
+var SEND_MESSAGE_START = 'SEND_MESSAGE_START';
+var SEND_USER_MESSAGE = 'SEND_USER_MESSAGE';
+var SEND_FILE_MESSAGE = 'SEND_FILE_MESSAGE';
+var UPDATE_USER_MESSAGE = 'UPDATE_USER_MESSAGE';
+var DELETE_MESSAGE = 'DELETE_MESSAGE';
+var LEAVE_CHANNEL = 'LEAVE_CHANNEL';
+var CREATE_CHANNEL$1 = 'CREATE_CHANNEL';
+
+var getSdk = function getSdk(store) {
+  var _store$stores = store.stores,
+      stores = _store$stores === void 0 ? {} : _store$stores;
+  var _stores$sdkStore = stores.sdkStore,
+      sdkStore = _stores$sdkStore === void 0 ? {} : _stores$sdkStore;
+  var sdk = sdkStore.sdk;
+  return sdk;
+};
+var getPubSub = function getPubSub(store) {
+  var _store$config = store.config,
+      config = _store$config === void 0 ? {} : _store$config;
+  var pubSub = config.pubSub;
+  return pubSub;
+}; // SendBird disconnect. Invalidates currentUser
+// eslint-disable-next-line max-len
+
+var getConnect = function getConnect(store) {
+  return function (userId, accessToken) {
+    return new Promise(function (resolve, reject) {
+      var sdk = getSdk(store);
+
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      if (!accessToken) {
+        sdk.connect(userId).then(function (res) {
+          return resolve(res);
+        }).catch(function (err) {
+          return reject(err);
+        });
+      } else {
+        sdk.connect(userId, accessToken).then(function (res) {
+          return resolve(res);
+        }).catch(function (err) {
+          return reject(err);
+        });
+      }
+    });
+  };
+}; // SendBird disconnect. Invalidates currentUser
+
+var getDisconnect = function getDisconnect(store) {
+  return function () {
+    return new Promise(function (resolve, reject) {
+      var sdk = getSdk(store);
+
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.disconnect().then(function (res) {
+        return resolve(res);
+      }).catch(function (err) {
+        return reject(err);
+      });
+    });
+  };
+}; // Using the updateCurrentUserInfo() method
+// you can update a user's nickname and profile image with a URL
+// eslint-disable-next-line max-len
+
+var getUpdateUserInfo = function getUpdateUserInfo(store) {
+  return function (nickName, profileUrl) {
+    return new Promise(function (resolve, reject) {
+      var sdk = getSdk(store);
+
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.updateCurrentUserInfo(nickName, profileUrl).then(function (res) {
+        return resolve(res);
+      }).catch(function (err) {
+        return reject(err);
+      });
+    });
+  };
+};
+var getSendUserMessage = function getSendUserMessage(store) {
+  return function (channelUrl, userMessageParams) {
+    var sdk = getSdk(store);
+    var pubsub = getPubSub(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
+        var promisify = function promisify() {
+          var pendingMsg = null;
+          var pendingPromise = new Promise(function (resolve_, reject_) {
+            pendingMsg = channel.sendUserMessage(userMessageParams, function (res, err) {
+              var swapParams = sdk.getErrorFirstCallback();
+              var message = res;
+              var error = err;
+
+              if (swapParams) {
+                message = err;
+                error = res;
+              }
+
+              if (error) {
+                reject_(error);
+                return;
+              }
+
+              resolve_(message);
+              pubsub.publish(SEND_USER_MESSAGE, {
+                message: message,
+                channel: channel
+              });
+            });
+            pubsub.publish(SEND_MESSAGE_START, {
+              message: pendingMsg,
+              channel: channel
+            });
+          });
+
+          pendingPromise.get = function () {
+            return pendingMsg;
+          };
+
+          return pendingPromise;
+        };
+
+        resolve(promisify());
+      }).catch(reject);
+    });
+  };
+};
+var getSendFileMessage = function getSendFileMessage(store) {
+  return function (channelUrl, fileMessageParams) {
+    var sdk = getSdk(store);
+    var pubsub = getPubSub(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
+        var promisify = function promisify() {
+          var pendingMsg = null;
+          var pendingPromise = new Promise(function (resolve_, reject_) {
+            pendingMsg = channel.sendFileMessage(fileMessageParams, function (res, err) {
+              var swapParams = sdk.getErrorFirstCallback();
+              var message = res;
+              var error = err;
+
+              if (swapParams) {
+                message = err;
+                error = res;
+              }
+
+              if (error) {
+                reject_(error);
+                return;
+              }
+
+              resolve_(message);
+              pubsub.publish(SEND_FILE_MESSAGE, {
+                message: message,
+                channel: channel
+              });
+            });
+          }); // keep the file's local version in pendingMsg.localUrl
+          // because promise doesnt allow overriding of pendingMsg.url
+          // eslint-disable-next-line no-param-reassign
+
+          pendingMsg.localUrl = URL.createObjectURL(fileMessageParams.file); // eslint-disable-next-line no-param-reassign
+
+          pendingMsg.requestState = 'pending';
+          pubsub.publish(SEND_MESSAGE_START, {
+            message: pendingMsg,
+            channel: channel
+          });
+
+          pendingPromise.get = function () {
+            return pendingMsg;
+          };
+
+          return pendingPromise;
+        };
+
+        resolve(promisify());
+      }).catch(reject);
+    });
+  };
+};
+var getUpdateUserMessage = function getUpdateUserMessage(store) {
+  return function (channelUrl, messageId, params) {
+    var sdk = getSdk(store);
+    var pubsub = getPubSub(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
+        channel.updateUserMessage(messageId, params, function (res, err) {
+          var swapParams = sdk.getErrorFirstCallback();
+          var message = res;
+          var error = err;
+
+          if (swapParams) {
+            message = err;
+            error = res;
+          }
+
+          if (error) {
+            reject(error);
+            return;
+          }
+
+          resolve(message);
+          pubsub.publish(UPDATE_USER_MESSAGE, {
+            message: message,
+            channel: channel,
+            // workaround for updating channelPreview on message-edit
+            // https://sendbird.atlassian.net/browse/UIKIT-268
+            fromSelector: true
+          });
+        });
+      }).catch(reject);
+    });
+  };
+};
+var getDeleteMessage = function getDeleteMessage(store) {
+  return function (channelUrl, message) {
+    var sdk = getSdk(store);
+    var pubsub = getPubSub(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
+        var messageId = message.messageId;
+        channel.deleteMessage(message, function (res, err) {
+          var swapParams = sdk.getErrorFirstCallback();
+          var error = err;
+
+          if (swapParams) {
+            error = res;
+          }
+
+          if (error) {
+            reject(error);
+            return;
+          }
+
+          resolve(message);
+          pubsub.publish(DELETE_MESSAGE, {
+            messageId: messageId,
+            channel: channel
+          });
+        });
+      }).catch(reject);
+    });
+  };
+};
+var getResendUserMessage = function getResendUserMessage(store) {
+  return function (channelUrl, failedMessage) {
+    var sdk = getSdk(store);
+    var pubsub = getPubSub(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
+        channel.resendUserMessage(failedMessage).then(function (message) {
+          resolve(message);
+          pubsub.publish(SEND_USER_MESSAGE, {
+            message: message,
+            channel: channel
+          });
+        }).catch(reject);
+      }).catch(reject);
+    });
+  };
+};
+var getResendFileMessage = function getResendFileMessage(store) {
+  return function (channelUrl, failedMessage) {
+    var sdk = getSdk(store);
+    var pubsub = getPubSub(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
+        channel.resendFileMessage(failedMessage).then(function (message) {
+          resolve(message);
+          pubsub.publish(SEND_FILE_MESSAGE, {
+            message: message,
+            channel: channel
+          });
+        }).catch(reject);
+      }).catch(reject);
+    });
+  };
+};
+var getCreateChannel = function getCreateChannel(store) {
+  return function (params) {
+    var sdk = getSdk(store);
+    var pubsub = getPubSub(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.GroupChannel.createChannel(params).then(function (channel) {
+        resolve(channel);
+        pubsub.publish(CREATE_CHANNEL$1, {
+          channel: channel
+        });
+      }).catch(reject);
+    });
+  };
+};
+var getLeaveChannel = function getLeaveChannel(store) {
+  return function (channelUrl) {
+    var sdk = getSdk(store);
+    var pubsub = getPubSub(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
+        channel.leave().then(function () {
+          resolve(channel);
+          pubsub.publish(LEAVE_CHANNEL, {
+            channel: channel
+          });
+        }).catch(reject);
+      }).catch(reject);
+    });
+  };
+};
+var getFreezeChannel = function getFreezeChannel(store) {
+  return function (channelUrl) {
+    var sdk = getSdk(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
+        channel.freeze().then(function () {
+          // do not need pubsub here - event listener works
+          resolve(channel);
+        }).catch(reject);
+      }).catch(reject);
+    });
+  };
+};
+var getUnFreezeChannel = function getUnFreezeChannel(store) {
+  return function (channelUrl) {
+    var sdk = getSdk(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
+        channel.unfreeze().then(function () {
+          // do not need pubsub here - event listener works
+          resolve(channel);
+        }).catch(reject);
+      }).catch(reject);
+    });
+  };
+};
+var selectors = {
+  getSdk: getSdk,
+  getConnect: getConnect,
+  getDisconnect: getDisconnect,
+  getUpdateUserInfo: getUpdateUserInfo,
+  getSendUserMessage: getSendUserMessage,
+  getSendFileMessage: getSendFileMessage,
+  getUpdateUserMessage: getUpdateUserMessage,
+  getDeleteMessage: getDeleteMessage,
+  getResendUserMessage: getResendUserMessage,
+  getResendFileMessage: getResendFileMessage,
+  getFreezeChannel: getFreezeChannel,
+  getUnFreezeChannel: getUnFreezeChannel,
+  getCreateChannel: getCreateChannel,
+  getLeaveChannel: getLeaveChannel
+};
+
+function UserProfile(_a) {
+  var user = _a.user,
+      currentUserId = _a.currentUserId,
+      sdk = _a.sdk,
+      logger = _a.logger,
+      createChannel = _a.createChannel,
+      onSuccess = _a.onSuccess;
+  return React.createElement("div", {
+    className: "sendbird__user-profile"
+  }, React.createElement("section", {
+    className: "sendbird__user-profile-avatar"
+  }, React.createElement(Avatar$1, {
+    height: "80px",
+    width: "80px",
+    src: user.profileUrl
+  })), React.createElement("section", {
+    className: "sendbird__user-profile-name"
+  }, React.createElement(Label, {
+    type: LabelTypography.H_2,
+    color: LabelColors.ONBACKGROUND_1
+  }, user.nickname || LabelStringSet.NO_NAME)), user.userId !== currentUserId && React.createElement("section", {
+    className: "sendbird__user-profile-message"
+  }, React.createElement(Button, {
+    type: Type$1.SECONDARY,
+    onClick: function onClick() {
+      var params = new sdk.GroupChannelParams();
+      params.isDistinct = true;
+      params.addUserIds([user.userId]);
+      onSuccess();
+      createChannel(params).then(function (groupChannel) {
+        logger.info('UserProfile, channel create', groupChannel);
+      });
+    }
+  }, LabelStringSet.USER_PROFILE__MESSAGE)), React.createElement("div", {
+    className: "sendbird__user-profile-seperator"
+  }), React.createElement("section", {
+    className: "sendbird__user-profile-userId"
+  }, React.createElement(Label, {
+    className: "sendbird__user-profile-userId--label",
+    type: LabelTypography.CAPTION_2,
+    color: LabelColors.ONBACKGROUND_2
+  }, LabelStringSet.USER_PROFILE__USER_ID), React.createElement(Label, {
+    className: "sendbird__user-profile-userId--value",
+    type: LabelTypography.BODY_1,
+    color: LabelColors.ONBACKGROUND_1
+  }, user.userId)));
+}
+
+var mapStoreToProps$1 = function mapStoreToProps(store) {
+  return {
+    sdk: getSdk(store),
+    createChannel: getCreateChannel(store),
+    logger: store.config.logger,
+    pubsub: store.config.pubSub
+  };
+};
+
+var ConnectedUserProfile = withSendbirdContext(UserProfile, mapStoreToProps$1);
+
+var MenuItems =
+/*#__PURE__*/
+function (_Component) {
+  _inherits(MenuItems, _Component);
+
+  function MenuItems(props) {
+    var _this;
+
+    _classCallCheck(this, MenuItems);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(MenuItems).call(this, props));
+
+    _defineProperty(_assertThisInitialized(_this), "showParent", function () {
+      var _this$props$parentCon = _this.props.parentContainRef,
+          parentContainRef = _this$props$parentCon === void 0 ? {} : _this$props$parentCon;
+      var current = parentContainRef.current;
+
+      if (parentContainRef && current) {
+        current.classList.add('sendbird-icon--pressed');
+      }
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "hideParent", function () {
+      var _this$props$parentCon2 = _this.props.parentContainRef,
+          parentContainRef = _this$props$parentCon2 === void 0 ? {} : _this$props$parentCon2;
+      var current = parentContainRef.current;
+
+      if (parentContainRef && current) {
+        current.classList.remove('sendbird-icon--pressed');
+      }
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "setupEvents", function () {
+      var closeDropdown = _this.props.closeDropdown;
+
+      var _assertThisInitialize = _assertThisInitialized(_this),
+          menuRef = _assertThisInitialize.menuRef;
+
+      var handleClickOutside = function handleClickOutside(event) {
+        if (menuRef.current && !menuRef.current.contains(event.target)) {
+          closeDropdown();
+        }
+      };
+
+      _this.setState({
+        handleClickOutside: handleClickOutside
+      });
+
+      document.addEventListener('mousedown', handleClickOutside);
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "cleanUpEvents", function () {
+      var handleClickOutside = _this.state.handleClickOutside;
+      document.removeEventListener('mousedown', handleClickOutside);
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "getMenuPosition", function () {
+      var _this$props = _this.props,
+          parentRef = _this$props.parentRef,
+          openLeft = _this$props.openLeft;
+      var parentRect = parentRef.current.getBoundingClientRect();
+      var x = parentRect.x || parentRect.left;
+      var y = parentRect.y || parentRect.top;
+      var menuStyle = {
+        top: y,
+        left: x
+      };
+      if (!_this.menuRef.current) return menuStyle;
+      var _window = window,
+          innerWidth = _window.innerWidth,
+          innerHeight = _window.innerHeight;
+
+      var rect = _this.menuRef.current.getBoundingClientRect();
+
+      if (y + rect.height > innerHeight) {
+        menuStyle.top -= rect.height;
+      }
+
+      if (x + rect.width > innerWidth && !openLeft) {
+        menuStyle.left -= rect.width;
+      }
+
+      if (menuStyle.top < 0) {
+        menuStyle.top = rect.height < innerHeight ? (innerHeight - rect.height) / 2 : 0;
+      }
+
+      if (menuStyle.left < 0) {
+        menuStyle.left = rect.width < innerWidth ? (innerWidth - rect.width) / 2 : 0;
+      }
+
+      menuStyle.top += 32;
+
+      if (openLeft) {
+        var padding = Number.isNaN(rect.width - 30) ? 108 // default
+        : rect.width - 30;
+        menuStyle.left -= padding;
+      }
+
+      return _this.setState({
+        menuStyle: menuStyle
+      });
+    });
+
+    _this.menuRef = React.createRef();
+    _this.state = {
+      menuStyle: {},
+      handleClickOutside: function handleClickOutside() {}
+    };
+    return _this;
+  }
+
+  _createClass(MenuItems, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.setupEvents();
+      this.getMenuPosition();
+      this.showParent();
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      this.cleanUpEvents();
+      this.hideParent();
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var menuStyle = this.state.menuStyle;
+      var _this$props2 = this.props,
+          children = _this$props2.children,
+          style = _this$props2.style;
+      return createPortal(React.createElement(React.Fragment, null, React.createElement("div", {
+        className: "sendbird-dropdown__menu-backdrop"
+      }), React.createElement("ul", {
+        className: "sendbird-dropdown__menu",
+        ref: this.menuRef,
+        style: _objectSpread2({
+          display: 'inline-block',
+          position: 'fixed',
+          left: "".concat(Math.round(menuStyle.left), "px"),
+          top: "".concat(Math.round(menuStyle.top), "px")
+        }, style)
+      }, children)), document.getElementById('sendbird-dropdown-portal'));
+    }
+  }]);
+
+  return MenuItems;
+}(Component);
+MenuItems.propTypes = {
+  closeDropdown: PropTypes.func.isRequired,
+  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
+  style: PropTypes.shape({}),
+  // https://stackoverflow.com/a/51127130
+  parentRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({
+    current: PropTypes.instanceOf(Element)
+  })]).isRequired,
+  parentContainRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({
+    current: PropTypes.instanceOf(Element)
+  })]).isRequired,
+  openLeft: PropTypes.bool
+};
+MenuItems.defaultProps = {
+  style: {},
+  openLeft: false
+};
+
+var componentClassName = 'sendbird-sort-by-row';
+function SortByRow(_ref) {
+  var className = _ref.className,
+      maxItemCount = _ref.maxItemCount,
+      itemWidth = _ref.itemWidth,
+      itemHeight = _ref.itemHeight,
+      children = _ref.children;
+  var injectingClassName = Array.isArray(className) ? className : [className];
+  injectingClassName.unshift(componentClassName);
+
+  if (children.length > maxItemCount) {
+    var result = [];
+
+    for (var i = 0; i < children.length; i += maxItemCount) {
+      result.push(React.createElement("div", {
+        className: injectingClassName.join(' '),
+        style: {
+          width: itemWidth * maxItemCount,
+          height: itemHeight
+        },
+        key: className + i
+      }, children.slice(i, i + maxItemCount)));
+    }
+
+    return result;
+  }
+
+  return React.createElement("div", {
+    className: injectingClassName.join(' '),
+    style: {
+      width: itemWidth * children.length,
+      height: itemHeight
+    }
+  }, children);
+}
+SortByRow.propTypes = {
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  maxItemCount: PropTypes.number.isRequired,
+  itemWidth: PropTypes.number.isRequired,
+  itemHeight: PropTypes.number.isRequired,
+  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element), PropTypes.string, PropTypes.arrayOf(PropTypes.string)]).isRequired
+};
+SortByRow.defaultProps = {
+  className: ''
+};
+
+var EmojiListItems =
+/*#__PURE__*/
+function (_Component) {
+  _inherits(EmojiListItems, _Component);
+
+  function EmojiListItems(props) {
+    var _this;
+
+    _classCallCheck(this, EmojiListItems);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(EmojiListItems).call(this, props));
+
+    _defineProperty(_assertThisInitialized(_this), "showParent", function () {
+      var _this$props$parentCon = _this.props.parentContainRef,
+          parentContainRef = _this$props$parentCon === void 0 ? {} : _this$props$parentCon;
+      var current = parentContainRef.current;
+
+      if (parentContainRef && current) {
+        current.classList.add('sendbird-reactions--pressed');
+      }
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "hideParent", function () {
+      var _this$props$parentCon2 = _this.props.parentContainRef,
+          parentContainRef = _this$props$parentCon2 === void 0 ? {} : _this$props$parentCon2;
+      var current = parentContainRef.current;
+
+      if (parentContainRef && current) {
+        current.classList.remove('sendbird-reactions--pressed');
+      }
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "setupEvents", function () {
+      var closeDropdown = _this.props.closeDropdown;
+
+      var _assertThisInitialize = _assertThisInitialized(_this),
+          reactionRef = _assertThisInitialize.reactionRef;
+
+      var handleClickOutside = function handleClickOutside(event) {
+        if (reactionRef.current && !reactionRef.current.contains(event.target)) {
+          closeDropdown();
+        }
+      };
+
+      _this.setState({
+        handleClickOutside: handleClickOutside
+      });
+
+      document.addEventListener('mousedown', handleClickOutside);
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "cleanUpEvents", function () {
+      var handleClickOutside = _this.state.handleClickOutside;
+      document.removeEventListener('mousedown', handleClickOutside);
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "getBarPosition", function () {
+      var _this$props = _this.props,
+          parentRef = _this$props.parentRef,
+          spaceFromTrigger = _this$props.spaceFromTrigger;
+      var spaceFromTriggerX = spaceFromTrigger.x || 0;
+      var spaceFromTriggerY = spaceFromTrigger.y || 0;
+      var parentRect = parentRef.current.getBoundingClientRect();
+      var x = parentRect.x || parentRect.left;
+      var y = parentRect.y || parentRect.top;
+      var reactionStyle = {
+        top: y,
+        left: x
+      };
+      if (!_this.reactionRef.current) return reactionStyle;
+
+      var rect = _this.reactionRef.current.getBoundingClientRect(); // const childRect = this.reactionRef.current.children[0].getBoundingClientRect();
+
+
+      if (reactionStyle.top < rect.height) {
+        reactionStyle.top += parentRect.height;
+        reactionStyle.top += spaceFromTriggerY;
+      } else {
+        reactionStyle.top -= rect.height;
+        reactionStyle.top -= spaceFromTriggerY;
+      }
+
+      reactionStyle.left -= rect.width / 2;
+      reactionStyle.left += parentRect.height / 2 - 2;
+      reactionStyle.left += spaceFromTriggerX;
+      var maximumLeft = window.innerWidth - rect.width;
+
+      if (maximumLeft < reactionStyle.left) {
+        reactionStyle.left = maximumLeft;
+      }
+
+      if (reactionStyle.left < 0) {
+        reactionStyle.left = 0;
+      }
+
+      return _this.setState({
+        reactionStyle: reactionStyle
+      });
+    });
+
+    _this.reactionRef = React.createRef();
+    _this.state = {
+      reactionStyle: {},
+      handleClickOutside: function handleClickOutside() {}
+    };
+    return _this;
+  }
+
+  _createClass(EmojiListItems, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.setupEvents();
+      this.getBarPosition();
+      this.showParent();
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      this.cleanUpEvents();
+      this.hideParent();
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var reactionStyle = this.state.reactionStyle;
+      var children = this.props.children;
+      return createPortal(React.createElement(React.Fragment, null, React.createElement("div", {
+        className: "sendbird-dropdown__menu-backdrop"
+      }), React.createElement("ul", {
+        className: "sendbird-dropdown__reaction-bar",
+        ref: this.reactionRef,
+        style: {
+          display: 'inline-block',
+          position: 'fixed',
+          left: "".concat(Math.round(reactionStyle.left), "px"),
+          top: "".concat(Math.round(reactionStyle.top), "px")
+        }
+      }, React.createElement(SortByRow, {
+        className: "sendbird-dropdown__reaction-bar__row",
+        maxItemCount: 8,
+        itemWidth: 44,
+        itemHeight: 40
+      }, children))), document.getElementById('sendbird-emoji-list-portal'));
+    }
+  }]);
+
+  return EmojiListItems;
+}(Component);
+EmojiListItems.propTypes = {
+  closeDropdown: PropTypes.func.isRequired,
+  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
+  parentRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({
+    current: PropTypes.instanceOf(Element)
+  })]).isRequired,
+  parentContainRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({
+    current: PropTypes.instanceOf(Element)
+  })]).isRequired,
+  spaceFromTrigger: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number
+  })
+};
+EmojiListItems.defaultProps = {
+  spaceFromTrigger: {}
+};
+
+var MenuItems$1 = MenuItems;
+var EmojiListItems$1 = EmojiListItems;
+var MenuItem = function MenuItem(_ref) {
+  var children = _ref.children,
+      onClick = _ref.onClick,
+      className = _ref.className;
+  var injectingClassName = Array.isArray(className) ? className : [className];
+  return React.createElement("li", {
+    tabIndex: 0,
+    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-dropdown__menu-item']).join(' '),
+    onClick: onClick,
+    onKeyPress: function onKeyPress(e) {
+      if (e.keyCode === 13) {
+        onClick(e);
+      }
+    },
+    role: "menuitem"
+  }, React.createElement(Label, {
+    type: LabelTypography.SUBTITLE_2,
+    color: LabelColors.ONBACKGROUND_1,
+    className: "sendbird-dropdown__menu-item__text"
+  }, children));
+};
+MenuItem.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired
+};
+MenuItem.defaultProps = {
+  className: ''
+};
+function ContextMenu(_ref2) {
+  var menuTrigger = _ref2.menuTrigger,
+      menuItems = _ref2.menuItems;
+
+  var _useState = useState(false),
+      _useState2 = _slicedToArray(_useState, 2),
+      showMenu = _useState2[0],
+      setShowMenu = _useState2[1];
+
+  return React.createElement("div", {
+    className: "sendbird-context-menu",
+    style: {
+      display: 'inline'
+    }
+  }, menuTrigger(function () {
+    return setShowMenu(!showMenu);
+  }), showMenu && menuItems(function () {
+    return setShowMenu(false);
+  }));
+}
+ContextMenu.propTypes = {
+  menuTrigger: PropTypes.func.isRequired,
+  menuItems: PropTypes.func.isRequired
+};
+
 var COMPONENT_NAME = 'sendbird-user-list-item';
 function UserListItem(_ref) {
   var user = _ref.user,
@@ -3612,17 +4870,55 @@ function UserListItem(_ref) {
   var uniqueKey = user.userId;
   var actionRef = React.useRef(null);
   var parentRef = React.useRef(null);
+  var avatarRef = React.useRef(null);
+
+  var _useContext = useContext(UserProfileContext),
+      disableUserProfile = _useContext.disableUserProfile,
+      renderUserProfile = _useContext.renderUserProfile;
+
   return React.createElement("div", {
     ref: parentRef,
     className: [COMPONENT_NAME].concat(_toConsumableArray(injectingClassNames)).join(' ')
   }, user.isMuted && React.createElement(MutedAvatarOverlay, {
     height: 40,
     width: 40
-  }), React.createElement(Avatar, {
-    className: "".concat(COMPONENT_NAME, "__avatar"),
-    src: user.profileUrl,
-    width: "40px",
-    height: "40px"
+  }), React.createElement(ContextMenu, {
+    menuTrigger: function menuTrigger(toggleDropdown) {
+      return React.createElement(Avatar$1, {
+        onClick: function onClick() {
+          if (!disableUserProfile) {
+            toggleDropdown();
+          }
+        },
+        ref: avatarRef,
+        className: "".concat(COMPONENT_NAME, "__avatar"),
+        src: user.profileUrl,
+        width: "40px",
+        height: "40px"
+      });
+    },
+    menuItems: function menuItems(closeDropdown) {
+      return React.createElement(MenuItems$1, {
+        openLeft: true,
+        parentRef: avatarRef // for catching location(x, y) of MenuItems
+        ,
+        parentContainRef: avatarRef // for toggling more options(menus & reactions)
+        ,
+        closeDropdown: closeDropdown,
+        style: {
+          paddingTop: 0,
+          paddingBottom: 0
+        }
+      }, renderUserProfile ? renderUserProfile({
+        user: user,
+        currentUserId: currentUser,
+        close: closeDropdown
+      }) : React.createElement(ConnectedUserProfile, {
+        user: user,
+        currentUserId: currentUser,
+        onSuccess: closeDropdown
+      }));
+    }
   }), React.createElement(Label, {
     className: "".concat(COMPONENT_NAME, "__title"),
     type: LabelTypography.SUBTITLE_1,
@@ -4059,436 +5355,6 @@ AddChannel.defaultProps = {
   userListQuery: null
 };
 
-var MenuItems =
-/*#__PURE__*/
-function (_Component) {
-  _inherits(MenuItems, _Component);
-
-  function MenuItems(props) {
-    var _this;
-
-    _classCallCheck(this, MenuItems);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(MenuItems).call(this, props));
-
-    _defineProperty(_assertThisInitialized(_this), "showParent", function () {
-      var _this$props$parentCon = _this.props.parentContainRef,
-          parentContainRef = _this$props$parentCon === void 0 ? {} : _this$props$parentCon;
-      var current = parentContainRef.current;
-
-      if (parentContainRef && current) {
-        current.classList.add('sendbird-icon--pressed');
-      }
-    });
-
-    _defineProperty(_assertThisInitialized(_this), "hideParent", function () {
-      var _this$props$parentCon2 = _this.props.parentContainRef,
-          parentContainRef = _this$props$parentCon2 === void 0 ? {} : _this$props$parentCon2;
-      var current = parentContainRef.current;
-
-      if (parentContainRef && current) {
-        current.classList.remove('sendbird-icon--pressed');
-      }
-    });
-
-    _defineProperty(_assertThisInitialized(_this), "setupEvents", function () {
-      var closeDropdown = _this.props.closeDropdown;
-
-      var _assertThisInitialize = _assertThisInitialized(_this),
-          menuRef = _assertThisInitialize.menuRef;
-
-      var handleClickOutside = function handleClickOutside(event) {
-        if (menuRef.current && !menuRef.current.contains(event.target)) {
-          closeDropdown();
-        }
-      };
-
-      _this.setState({
-        handleClickOutside: handleClickOutside
-      });
-
-      document.addEventListener('mousedown', handleClickOutside);
-    });
-
-    _defineProperty(_assertThisInitialized(_this), "cleanUpEvents", function () {
-      var handleClickOutside = _this.state.handleClickOutside;
-      document.removeEventListener('mousedown', handleClickOutside);
-    });
-
-    _defineProperty(_assertThisInitialized(_this), "getMenuPosition", function () {
-      var _this$props = _this.props,
-          parentRef = _this$props.parentRef,
-          openLeft = _this$props.openLeft;
-      var parentRect = parentRef.current.getBoundingClientRect();
-      var x = parentRect.x || parentRect.left;
-      var y = parentRect.y || parentRect.top;
-      var menuStyle = {
-        top: y,
-        left: x
-      };
-      if (!_this.menuRef.current) return menuStyle;
-      var _window = window,
-          innerWidth = _window.innerWidth,
-          innerHeight = _window.innerHeight;
-
-      var rect = _this.menuRef.current.getBoundingClientRect();
-
-      if (y + rect.height > innerHeight) {
-        menuStyle.top -= rect.height;
-      }
-
-      if (x + rect.width > innerWidth && !openLeft) {
-        menuStyle.left -= rect.width;
-      }
-
-      if (menuStyle.top < 0) {
-        menuStyle.top = rect.height < innerHeight ? (innerHeight - rect.height) / 2 : 0;
-      }
-
-      if (menuStyle.left < 0) {
-        menuStyle.left = rect.width < innerWidth ? (innerWidth - rect.width) / 2 : 0;
-      }
-
-      menuStyle.top += 32;
-
-      if (openLeft) {
-        var padding = Number.isNaN(rect.width - 30) ? 108 // default
-        : rect.width - 30;
-        menuStyle.left -= padding;
-      }
-
-      return _this.setState({
-        menuStyle: menuStyle
-      });
-    });
-
-    _this.menuRef = React.createRef();
-    _this.state = {
-      menuStyle: {},
-      handleClickOutside: function handleClickOutside() {}
-    };
-    return _this;
-  }
-
-  _createClass(MenuItems, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      this.setupEvents();
-      this.getMenuPosition();
-      this.showParent();
-    }
-  }, {
-    key: "componentWillUnmount",
-    value: function componentWillUnmount() {
-      this.cleanUpEvents();
-      this.hideParent();
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var menuStyle = this.state.menuStyle;
-      var children = this.props.children;
-      return createPortal(React.createElement(React.Fragment, null, React.createElement("div", {
-        className: "sendbird-dropdown__menu-backdrop"
-      }), React.createElement("ul", {
-        className: "sendbird-dropdown__menu",
-        ref: this.menuRef,
-        style: {
-          display: 'inline-block',
-          position: 'fixed',
-          left: "".concat(Math.round(menuStyle.left), "px"),
-          top: "".concat(Math.round(menuStyle.top), "px")
-        }
-      }, children)), document.getElementById('sendbird-dropdown-portal'));
-    }
-  }]);
-
-  return MenuItems;
-}(Component);
-MenuItems.propTypes = {
-  closeDropdown: PropTypes.func.isRequired,
-  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
-  // https://stackoverflow.com/a/51127130
-  parentRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({
-    current: PropTypes.instanceOf(Element)
-  })]).isRequired,
-  parentContainRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({
-    current: PropTypes.instanceOf(Element)
-  })]).isRequired,
-  openLeft: PropTypes.bool
-};
-MenuItems.defaultProps = {
-  openLeft: false
-};
-
-var componentClassName = 'sendbird-sort-by-row';
-function SortByRow(_ref) {
-  var className = _ref.className,
-      maxItemCount = _ref.maxItemCount,
-      itemWidth = _ref.itemWidth,
-      itemHeight = _ref.itemHeight,
-      children = _ref.children;
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.unshift(componentClassName);
-
-  if (children.length > maxItemCount) {
-    var result = [];
-
-    for (var i = 0; i < children.length; i += maxItemCount) {
-      result.push(React.createElement("div", {
-        className: injectingClassName.join(' '),
-        style: {
-          width: itemWidth * maxItemCount,
-          height: itemHeight
-        },
-        key: className + i
-      }, children.slice(i, i + maxItemCount)));
-    }
-
-    return result;
-  }
-
-  return React.createElement("div", {
-    className: injectingClassName.join(' '),
-    style: {
-      width: itemWidth * children.length,
-      height: itemHeight
-    }
-  }, children);
-}
-SortByRow.propTypes = {
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-  maxItemCount: PropTypes.number.isRequired,
-  itemWidth: PropTypes.number.isRequired,
-  itemHeight: PropTypes.number.isRequired,
-  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element), PropTypes.string, PropTypes.arrayOf(PropTypes.string)]).isRequired
-};
-SortByRow.defaultProps = {
-  className: ''
-};
-
-var EmojiListItems =
-/*#__PURE__*/
-function (_Component) {
-  _inherits(EmojiListItems, _Component);
-
-  function EmojiListItems(props) {
-    var _this;
-
-    _classCallCheck(this, EmojiListItems);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(EmojiListItems).call(this, props));
-
-    _defineProperty(_assertThisInitialized(_this), "showParent", function () {
-      var _this$props$parentCon = _this.props.parentContainRef,
-          parentContainRef = _this$props$parentCon === void 0 ? {} : _this$props$parentCon;
-      var current = parentContainRef.current;
-
-      if (parentContainRef && current) {
-        current.classList.add('sendbird-reactions--pressed');
-      }
-    });
-
-    _defineProperty(_assertThisInitialized(_this), "hideParent", function () {
-      var _this$props$parentCon2 = _this.props.parentContainRef,
-          parentContainRef = _this$props$parentCon2 === void 0 ? {} : _this$props$parentCon2;
-      var current = parentContainRef.current;
-
-      if (parentContainRef && current) {
-        current.classList.remove('sendbird-reactions--pressed');
-      }
-    });
-
-    _defineProperty(_assertThisInitialized(_this), "setupEvents", function () {
-      var closeDropdown = _this.props.closeDropdown;
-
-      var _assertThisInitialize = _assertThisInitialized(_this),
-          reactionRef = _assertThisInitialize.reactionRef;
-
-      var handleClickOutside = function handleClickOutside(event) {
-        if (reactionRef.current && !reactionRef.current.contains(event.target)) {
-          closeDropdown();
-        }
-      };
-
-      _this.setState({
-        handleClickOutside: handleClickOutside
-      });
-
-      document.addEventListener('mousedown', handleClickOutside);
-    });
-
-    _defineProperty(_assertThisInitialized(_this), "cleanUpEvents", function () {
-      var handleClickOutside = _this.state.handleClickOutside;
-      document.removeEventListener('mousedown', handleClickOutside);
-    });
-
-    _defineProperty(_assertThisInitialized(_this), "getBarPosition", function () {
-      var _this$props = _this.props,
-          parentRef = _this$props.parentRef,
-          spaceFromTrigger = _this$props.spaceFromTrigger;
-      var spaceFromTriggerX = spaceFromTrigger.x || 0;
-      var spaceFromTriggerY = spaceFromTrigger.y || 0;
-      var parentRect = parentRef.current.getBoundingClientRect();
-      var x = parentRect.x || parentRect.left;
-      var y = parentRect.y || parentRect.top;
-      var reactionStyle = {
-        top: y,
-        left: x
-      };
-      if (!_this.reactionRef.current) return reactionStyle;
-
-      var rect = _this.reactionRef.current.getBoundingClientRect(); // const childRect = this.reactionRef.current.children[0].getBoundingClientRect();
-
-
-      if (reactionStyle.top < rect.height) {
-        reactionStyle.top += parentRect.height;
-        reactionStyle.top += spaceFromTriggerY;
-      } else {
-        reactionStyle.top -= rect.height;
-        reactionStyle.top -= spaceFromTriggerY;
-      }
-
-      reactionStyle.left -= rect.width / 2;
-      reactionStyle.left += parentRect.height / 2 - 2;
-      reactionStyle.left += spaceFromTriggerX;
-      var maximumLeft = window.innerWidth - rect.width;
-
-      if (maximumLeft < reactionStyle.left) {
-        reactionStyle.left = maximumLeft;
-      }
-
-      if (reactionStyle.left < 0) {
-        reactionStyle.left = 0;
-      }
-
-      return _this.setState({
-        reactionStyle: reactionStyle
-      });
-    });
-
-    _this.reactionRef = React.createRef();
-    _this.state = {
-      reactionStyle: {},
-      handleClickOutside: function handleClickOutside() {}
-    };
-    return _this;
-  }
-
-  _createClass(EmojiListItems, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      this.setupEvents();
-      this.getBarPosition();
-      this.showParent();
-    }
-  }, {
-    key: "componentWillUnmount",
-    value: function componentWillUnmount() {
-      this.cleanUpEvents();
-      this.hideParent();
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var reactionStyle = this.state.reactionStyle;
-      var children = this.props.children;
-      return createPortal(React.createElement(React.Fragment, null, React.createElement("div", {
-        className: "sendbird-dropdown__menu-backdrop"
-      }), React.createElement("ul", {
-        className: "sendbird-dropdown__reaction-bar",
-        ref: this.reactionRef,
-        style: {
-          display: 'inline-block',
-          position: 'fixed',
-          left: "".concat(Math.round(reactionStyle.left), "px"),
-          top: "".concat(Math.round(reactionStyle.top), "px")
-        }
-      }, React.createElement(SortByRow, {
-        className: "sendbird-dropdown__reaction-bar__row",
-        maxItemCount: 8,
-        itemWidth: 44,
-        itemHeight: 40
-      }, children))), document.getElementById('sendbird-emoji-list-portal'));
-    }
-  }]);
-
-  return EmojiListItems;
-}(Component);
-EmojiListItems.propTypes = {
-  closeDropdown: PropTypes.func.isRequired,
-  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
-  parentRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({
-    current: PropTypes.instanceOf(Element)
-  })]).isRequired,
-  parentContainRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({
-    current: PropTypes.instanceOf(Element)
-  })]).isRequired,
-  spaceFromTrigger: PropTypes.shape({
-    x: PropTypes.number,
-    y: PropTypes.number
-  })
-};
-EmojiListItems.defaultProps = {
-  spaceFromTrigger: {}
-};
-
-var MenuItems$1 = MenuItems;
-var EmojiListItems$1 = EmojiListItems;
-var MenuItem = function MenuItem(_ref) {
-  var children = _ref.children,
-      onClick = _ref.onClick,
-      className = _ref.className;
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  return React.createElement("li", {
-    tabIndex: 0,
-    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-dropdown__menu-item']).join(' '),
-    onClick: onClick,
-    onKeyPress: function onKeyPress(e) {
-      if (e.keyCode === 13) {
-        onClick(e);
-      }
-    },
-    role: "menuitem"
-  }, React.createElement(Label, {
-    type: LabelTypography.SUBTITLE_2,
-    color: LabelColors.ONBACKGROUND_1,
-    className: "sendbird-dropdown__menu-item__text"
-  }, children));
-};
-MenuItem.propTypes = {
-  onClick: PropTypes.func.isRequired,
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired
-};
-MenuItem.defaultProps = {
-  className: ''
-};
-function ContextMenu(_ref2) {
-  var menuTrigger = _ref2.menuTrigger,
-      menuItems = _ref2.menuItems;
-
-  var _useState = useState(false),
-      _useState2 = _slicedToArray(_useState, 2),
-      showMenu = _useState2[0],
-      setShowMenu = _useState2[1];
-
-  return React.createElement("div", {
-    className: "sendbird-context-menu",
-    style: {
-      display: 'inline'
-    }
-  }, menuTrigger(function () {
-    return setShowMenu(!showMenu);
-  }), showMenu && menuItems(function () {
-    return setShowMenu(false);
-  }));
-}
-ContextMenu.propTypes = {
-  menuTrigger: PropTypes.func.isRequired,
-  menuItems: PropTypes.func.isRequired
-};
-
 var LeaveChannel = function LeaveChannel(props) {
   var onCloseModal = props.onCloseModal,
       onLeaveChannel = props.onLeaveChannel;
@@ -4674,14 +5540,6 @@ function ChannelsPlaceholder(_ref) {
 ChannelsPlaceholder.propTypes = {
   type: PropTypes.string.isRequired
 };
-
-var SEND_MESSAGE_START = 'SEND_MESSAGE_START';
-var SEND_USER_MESSAGE = 'SEND_USER_MESSAGE';
-var SEND_FILE_MESSAGE = 'SEND_FILE_MESSAGE';
-var UPDATE_USER_MESSAGE = 'UPDATE_USER_MESSAGE';
-var DELETE_MESSAGE = 'DELETE_MESSAGE';
-var LEAVE_CHANNEL = 'LEAVE_CHANNEL';
-var CREATE_CHANNEL$1 = 'CREATE_CHANNEL';
 
 var createEventHandler = function createEventHandler(_ref) {
   var sdk = _ref.sdk,
@@ -4952,7 +5810,7 @@ var pubSubHandler = function pubSubHandler(pubSub, channelListDispatcher) {
   return subScriber;
 };
 
-var noop = function noop() {};
+var noop$1 = function noop() {};
 
 function ChannelList(props) {
   var _props$stores = props.stores,
@@ -4967,18 +5825,34 @@ function ChannelList(props) {
       logger = _props$config.logger,
       pubSub = _props$config.pubSub,
       theme = _props$config.theme,
+      userDispatcher = props.dispatchers.userDispatcher,
       _props$queries = props.queries,
       queries = _props$queries === void 0 ? {} : _props$queries,
       renderChannelPreview = props.renderChannelPreview,
+      renderHeader = props.renderHeader,
+      allowProfileEdit = props.allowProfileEdit,
+      onProfileEditSuccess = props.onProfileEditSuccess,
+      onThemeChange = props.onThemeChange,
       onBeforeCreateChannel = props.onBeforeCreateChannel,
       onChannelSelect = props.onChannelSelect;
+  var _props$config2 = props.config,
+      config = _props$config2 === void 0 ? {} : _props$config2; // enable if it is true atleast once(both are flase by default)
+
+  var enableEditProfile = allowProfileEdit || config.allowProfileEdit;
   var _sdkStore$sdk = sdkStore.sdk,
       sdk = _sdkStore$sdk === void 0 ? {} : _sdkStore$sdk;
   var userFilledChannelListQuery = queries.channelListQuery;
   var userFilledApplicationUserListQuery = queries.applicationUserListQuery;
   var sdkError = sdkStore.error;
-  var _userStore$user = userStore.user,
-      user = _userStore$user === void 0 ? {} : _userStore$user;
+
+  var _useState = useState({}),
+      _useState2 = _slicedToArray(_useState, 2),
+      user = _useState2[0],
+      setUser = _useState2[1];
+
+  useEffect(function () {
+    setUser(userStore.user);
+  }, [userStore.user]);
   var sdkIntialized = sdkStore.initialized;
 
   var _useReducer = useReducer(reducer$2, channelListInitialState),
@@ -4986,15 +5860,20 @@ function ChannelList(props) {
       channelListStore = _useReducer2[0],
       channelListDispatcher = _useReducer2[1];
 
-  var _useState = useState({}),
-      _useState2 = _slicedToArray(_useState, 2),
-      channelSource = _useState2[0],
-      setChannelSource = _useState2[1];
-
-  var _useState3 = useState(null),
+  var _useState3 = useState({}),
       _useState4 = _slicedToArray(_useState3, 2),
-      sdkChannelHandlerId = _useState4[0],
-      setSdkChannelHandlerId = _useState4[1];
+      channelSource = _useState4[0],
+      setChannelSource = _useState4[1];
+
+  var _useState5 = useState(null),
+      _useState6 = _slicedToArray(_useState5, 2),
+      sdkChannelHandlerId = _useState6[0],
+      setSdkChannelHandlerId = _useState6[1];
+
+  var _useState7 = useState(false),
+      _useState8 = _slicedToArray(_useState7, 2),
+      showProfileEdit = _useState8[0],
+      setShowProfileEdit = _useState8[1];
 
   var loading = channelListStore.loading,
       currentChannel = channelListStore.currentChannel;
@@ -5060,7 +5939,14 @@ function ChannelList(props) {
   }, React.createElement("div", {
     className: "sendbird-channel-list__header"
   }, React.createElement(ChannelHeader, {
-    title: "Channels",
+    renderHeader: renderHeader,
+    user: user,
+    onEdit: function onEdit() {
+      if (enableEditProfile) {
+        setShowProfileEdit(true);
+      }
+    },
+    allowProfileEdit: enableEditProfile,
     iconButton: React.createElement(AddChannel, {
       disabled: !isOnline,
       userListQuery: userListQuery,
@@ -5070,7 +5956,25 @@ function ChannelList(props) {
       userFilledApplicationUserListQuery: userFilledApplicationUserListQuery,
       onBeforeCreateChannel: onBeforeCreateChannel
     })
-  })), React.createElement("div", {
+  })), showProfileEdit && React.createElement(ConnectedEditUserProfile, {
+    onThemeChange: onThemeChange,
+    user: user,
+    onCancel: function onCancel() {
+      setShowProfileEdit(false);
+    },
+    onSubmit: function onSubmit(newName, newFile) {
+      sdk.updateCurrentUserInfoWithProfileImage(newName, newFile, function (updatedUser) {
+        userDispatcher({
+          type: UPDATE_USER_INFO,
+          payload: updatedUser
+        });
+
+        if (onProfileEditSuccess && typeof onProfileEditSuccess === 'function') {
+          onProfileEditSuccess(updatedUser);
+        }
+      });
+    }
+  }), React.createElement("div", {
     className: "sendbird-channel-list__body",
     onScroll: function onScroll(e) {
       var fetchMore = e.target.clientHeight + e.target.scrollTop === e.target.scrollHeight;
@@ -5191,6 +6095,9 @@ ChannelList.propTypes = {
       user: PropTypes.shape({})
     })
   }).isRequired,
+  dispatchers: PropTypes.shape({
+    userDispatcher: PropTypes.func
+  }).isRequired,
   config: PropTypes.shape({
     userId: PropTypes.string.isRequired,
     userListQuery: PropTypes.func,
@@ -5235,13 +6142,21 @@ ChannelList.propTypes = {
   }),
   onBeforeCreateChannel: PropTypes.func,
   renderChannelPreview: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
+  allowProfileEdit: PropTypes.bool,
+  onThemeChange: PropTypes.func,
+  onProfileEditSuccess: PropTypes.func,
+  renderHeader: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   onChannelSelect: PropTypes.func
 };
 ChannelList.defaultProps = {
   onBeforeCreateChannel: null,
   renderChannelPreview: null,
+  renderHeader: null,
+  allowProfileEdit: false,
+  onThemeChange: null,
+  onProfileEditSuccess: null,
   queries: {},
-  onChannelSelect: noop
+  onChannelSelect: noop$1
 };
 var ChannelList$1 = withSendbirdContext(ChannelList);
 
@@ -5461,7 +6376,7 @@ var getNicknamesMapFromMembers = function getNicknamesMapFromMembers() {
 
   return nicknamesMap;
 };
-var getMessageCreatedAt = function getMessageCreatedAt(message) {
+var getMessageCreatedAt$1 = function getMessageCreatedAt(message) {
   return Moment(message.createdAt).format('LT');
 };
 var isSameGroup = function isSameGroup(message, comparingMessage) {
@@ -5469,7 +6384,7 @@ var isSameGroup = function isSameGroup(message, comparingMessage) {
     return false;
   }
 
-  return message.sendingStatus === comparingMessage.sendingStatus && message.sender.userId === comparingMessage.sender.userId && getMessageCreatedAt(message) === getMessageCreatedAt(comparingMessage);
+  return message.sendingStatus === comparingMessage.sendingStatus && message.sender.userId === comparingMessage.sender.userId && getMessageCreatedAt$1(message) === getMessageCreatedAt$1(comparingMessage);
 };
 var compareMessagesForGrouping = function compareMessagesForGrouping(prevMessage, currMessage, nextMessage) {
   return [isSameGroup(prevMessage, currMessage), isSameGroup(currMessage, nextMessage)];
@@ -6567,17 +7482,6 @@ function useToggleReactionCallback(_ref, _ref2) {
   }, [currentGroupChannel]);
 }
 
-var noop$1 = function noop() {};
-var getMessageCreatedAt$1 = function getMessageCreatedAt(message) {
-  return Moment(message.createdAt).format('LT');
-};
-var getSenderName = function getSenderName(message) {
-  return message.sender && (message.sender.friendName || message.sender.nickname || message.sender.userId);
-};
-var getSenderProfileUrl = function getSenderProfileUrl(message) {
-  return message.sender && message.sender.profileUrl;
-};
-
 function MessageStatus(_ref) {
   var message = _ref.message,
       status = _ref.status,
@@ -6601,7 +7505,7 @@ function MessageStatus(_ref) {
             className: "sendbird-message-status__text",
             type: LabelTypography.CAPTION_3,
             color: LabelColors.ONBACKGROUND_2
-          }, getMessageCreatedAt$1(message));
+          }, getMessageCreatedAt(message));
         }
 
       default:
@@ -7278,6 +8182,11 @@ function IncomingUserMessage(_ref2) {
   var parentRefReactions = useRef(null);
   var parentRefMenus = useRef(null);
   var parentContainRef = useRef(null);
+  var avatarRef = useRef(null);
+
+  var _React$useContext = React.useContext(UserProfileContext),
+      disableUserProfile = _React$useContext.disableUserProfile,
+      renderUserProfile = _React$useContext.renderUserProfile;
 
   var _useState5 = useState(false),
       _useState6 = _slicedToArray(_useState5, 2),
@@ -7315,11 +8224,40 @@ function IncomingUserMessage(_ref2) {
     className: "sendbird-user-message--inner"
   }, React.createElement("div", {
     className: "sendbird-user-message--body"
-  }, !chainBottom && React.createElement(Avatar, {
-    className: "sendbird-user-message__avatar",
-    src: getSenderProfileUrl$1(message),
-    width: "28px",
-    height: "28px"
+  }, !chainBottom && React.createElement(ContextMenu, {
+    menuTrigger: function menuTrigger(toggleDropdown) {
+      return React.createElement(Avatar$1, {
+        ref: avatarRef,
+        onClick: function onClick() {
+          if (!disableUserProfile) {
+            toggleDropdown();
+          }
+        },
+        className: "sendbird-user-message__avatar",
+        src: getSenderProfileUrl$1(message),
+        width: "28px",
+        height: "28px"
+      });
+    },
+    menuItems: function menuItems(closeDropdown) {
+      return React.createElement(MenuItems$1, {
+        parentRef: avatarRef // for catching location(x, y) of MenuItems
+        ,
+        parentContainRef: avatarRef // for toggling more options(menus & reactions)
+        ,
+        closeDropdown: closeDropdown,
+        style: {
+          paddingTop: 0,
+          paddingBottom: 0
+        }
+      }, renderUserProfile ? renderUserProfile({
+        user: message.sender,
+        close: closeDropdown
+      }) : React.createElement(ConnectedUserProfile, {
+        user: message.sender,
+        onSuccess: closeDropdown
+      }));
+    }
   }), !chainTop && React.createElement(Label, {
     className: "sendbird-user-message__sender-name",
     type: LabelTypography.CAPTION_2,
@@ -7773,9 +8711,15 @@ function IncomingThumbnailMessage(_ref3) {
   var type = message.type,
       url = message.url,
       localUrl = message.localUrl;
+
+  var _React$useContext = React.useContext(UserProfileContext),
+      disableUserProfile = _React$useContext.disableUserProfile,
+      renderUserProfile = _React$useContext.renderUserProfile;
+
   var messageRef = useRef(null);
   var parentContainRef = useRef(null);
   var reactionAddRef = useRef(null);
+  var avatarRef = useRef(null);
 
   var _useState5 = useState(false),
       _useState6 = _slicedToArray(_useState5, 2),
@@ -7820,11 +8764,39 @@ function IncomingThumbnailMessage(_ref3) {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__body")
   }, React.createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "-body__wrap")
-  }, !chainBottom && React.createElement(Avatar, {
-    className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__avatar"),
-    src: getSenderProfileUrl(message),
-    width: "28px",
-    height: "28px"
+  }, !chainBottom && React.createElement(ContextMenu, {
+    menuTrigger: function menuTrigger(toggleDropdown) {
+      return React.createElement(Avatar$1, {
+        onClick: function onClick() {
+          if (!disableUserProfile) {
+            toggleDropdown();
+          }
+        },
+        className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__avatar"),
+        src: getSenderProfileUrl(message),
+        width: "28px",
+        height: "28px"
+      });
+    },
+    menuItems: function menuItems(closeDropdown) {
+      return React.createElement(MenuItems$1, {
+        parentRef: avatarRef // for catching location(x, y) of MenuItems
+        ,
+        parentContainRef: avatarRef // for toggling more options(menus & reactions)
+        ,
+        closeDropdown: closeDropdown,
+        style: {
+          paddingTop: 0,
+          paddingBottom: 0
+        }
+      }, renderUserProfile ? renderUserProfile({
+        user: message.sender,
+        close: closeDropdown
+      }) : React.createElement(ConnectedUserProfile, {
+        user: message.sender,
+        onSuccess: closeDropdown
+      }));
+    }
   }), React.createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "-body__wrap--inner"),
     role: "button",
@@ -7989,75 +8961,6 @@ IncomingThumbnailMessage.propTypes = {
 };
 IncomingThumbnailMessage.defaultProps = {
   status: ''
-};
-
-var Colors$2 = {
-  ONBACKGROUND_1: 'ONBACKGROUND_1',
-  ONBACKGROUND_2: 'ONBACKGROUND_2',
-  ONBACKGROUND_3: 'ONBACKGROUND_3',
-  ONBACKGROUND_4: 'ONBACKGROUND_4',
-  ONCONTENT_1: 'ONCONTENT_1',
-  PRIMARY: 'PRIMARY',
-  ERROR: 'ERROR'
-};
-function changeColorToClassName$2(color) {
-  switch (color) {
-    case Colors$2.ONBACKGROUND_1:
-      return 'sendbird-color--onbackground-1';
-
-    case Colors$2.ONBACKGROUND_2:
-      return 'sendbird-color--onbackground-2';
-
-    case Colors$2.ONBACKGROUND_3:
-      return 'sendbird-color--onbackground-3';
-
-    case Colors$2.ONBACKGROUND_4:
-      return 'sendbird-color--onbackground-4';
-
-    case Colors$2.ONCONTENT_1:
-      return 'sendbird-color--oncontent-1';
-
-    case Colors$2.PRIMARY:
-      return 'sendbird-color--primary';
-
-    case Colors$2.ERROR:
-      return 'sendbird-color--error';
-
-    default:
-      return null;
-  }
-}
-
-function TextButton(_ref) {
-  var color = _ref.color,
-      children = _ref.children,
-      disabled = _ref.disabled,
-      className = _ref.className,
-      onClick = _ref.onClick,
-      notUnderline = _ref.notUnderline;
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  return React.createElement("div", {
-    role: "button",
-    tabIndex: 0,
-    className: [].concat(_toConsumableArray(injectingClassName), [changeColorToClassName$2(color), notUnderline ? 'sendbird-textbutton--not-underline' : 'sendbird-textbutton', disabled ? 'sendbird-textbutton--disabled' : '']).join(' '),
-    onClick: onClick,
-    onKeyPress: onClick
-  }, children);
-}
-TextButton.propTypes = {
-  color: PropTypes.string,
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-  onClick: PropTypes.func,
-  notUnderline: PropTypes.bool,
-  disabled: PropTypes.bool
-};
-TextButton.defaultProps = {
-  color: Colors$2.ONBACKGROUND_1,
-  className: '',
-  onClick: function onClick() {},
-  notUnderline: false,
-  disabled: false
 };
 
 var MAX_TRUNCATE_LENGTH = 40;
@@ -8261,7 +9164,13 @@ function IncomingFileMessage(_ref2) {
   };
 
   var messageRef = useRef(null);
+
+  var _React$useContext = React.useContext(UserProfileContext),
+      disableUserProfile = _React$useContext.disableUserProfile,
+      renderUserProfile = _React$useContext.renderUserProfile;
+
   var parentContainRef = useRef(null);
+  var avatarRef = useRef(null);
   var reactionAddButtonRef = useRef(null);
 
   var _useState5 = useState(false),
@@ -8300,11 +9209,40 @@ function IncomingFileMessage(_ref2) {
     className: "sendbird-file-message--inner"
   }, React.createElement("div", {
     className: "sendbird-file-message__body"
-  }, !chainBottom && React.createElement(Avatar, {
-    className: "sendbird-file-message__avatar",
-    src: getSenderProfileUrl(message),
-    width: "28px",
-    height: "28px"
+  }, !chainBottom && React.createElement(ContextMenu, {
+    menuTrigger: function menuTrigger(toggleDropdown) {
+      return React.createElement(Avatar$1, {
+        ref: avatarRef,
+        onClick: function onClick() {
+          if (!disableUserProfile) {
+            toggleDropdown();
+          }
+        },
+        className: "sendbird-file-message__avatar",
+        src: getSenderProfileUrl(message),
+        width: "28px",
+        height: "28px"
+      });
+    },
+    menuItems: function menuItems(closeDropdown) {
+      return React.createElement(MenuItems$1, {
+        parentRef: avatarRef // for catching location(x, y) of MenuItems
+        ,
+        parentContainRef: avatarRef // for toggling more options(menus & reactions)
+        ,
+        closeDropdown: closeDropdown,
+        style: {
+          paddingTop: 0,
+          paddingBottom: 0
+        }
+      }, renderUserProfile ? renderUserProfile({
+        user: message.sender,
+        close: closeDropdown
+      }) : React.createElement(ConnectedUserProfile, {
+        user: message.sender,
+        onSuccess: closeDropdown
+      }));
+    }
   }), !chainTop && React.createElement(Label, {
     className: "sendbird-file-message__sender-name",
     type: LabelTypography.CAPTION_2,
@@ -8372,7 +9310,7 @@ function IncomingFileMessage(_ref2) {
     className: "sendbird-file-message__sent-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
-  }, getMessageCreatedAt$1(message)))));
+  }, getMessageCreatedAt(message)))));
 }
 OutgoingFileMessage.propTypes = {
   message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])),
@@ -8738,7 +9676,7 @@ var FileViewerComponent = function FileViewerComponent(_ref) {
     className: "sendbird-fileviewer__header-left"
   }, React.createElement("div", {
     className: "sendbird-fileviewer__header-avatar"
-  }, React.createElement(Avatar, {
+  }, React.createElement(Avatar$1, {
     height: "32px",
     width: "32px",
     src: profileUrl
@@ -9027,6 +9965,12 @@ function IncomingUnknownMessage(_ref3) {
       chainBottom = _ref3.chainBottom;
   var className = 'sendbird-incoming-unknown-message';
   var sender = message.sender;
+  var avatarRef = useRef(null);
+
+  var _React$useContext = React.useContext(UserProfileContext),
+      disableUserProfile = _React$useContext.disableUserProfile,
+      renderUserProfile = _React$useContext.renderUserProfile;
+
   return React.createElement("div", {
     className: className,
     style: {
@@ -9037,12 +9981,41 @@ function IncomingUnknownMessage(_ref3) {
     className: "".concat(className, "--inner")
   }, React.createElement("div", {
     className: "".concat(className, "__left")
-  }, !chainBottom && React.createElement(Avatar, {
-    className: "".concat(className, "__left__sender-profile-image"),
-    src: sender.profileUrl || '',
-    width: "26px",
-    height: "26px",
-    alt: "sender-profile-image"
+  }, !chainBottom && React.createElement(ContextMenu, {
+    menuTrigger: function menuTrigger(toggleDropdown) {
+      return React.createElement(Avatar$1, {
+        ref: avatarRef,
+        onClick: function onClick() {
+          if (!disableUserProfile) {
+            toggleDropdown();
+          }
+        },
+        className: "".concat(className, "__left__sender-profile-image"),
+        src: sender.profileUrl,
+        width: "28px",
+        height: "28px",
+        alt: "sender-profile-image"
+      });
+    },
+    menuItems: function menuItems(closeDropdown) {
+      return React.createElement(MenuItems$1, {
+        parentRef: avatarRef // for catching location(x, y) of MenuItems
+        ,
+        parentContainRef: avatarRef // for toggling more options(menus & reactions)
+        ,
+        closeDropdown: closeDropdown,
+        style: {
+          paddingTop: 0,
+          paddingBottom: 0
+        }
+      }, renderUserProfile ? renderUserProfile({
+        user: message.sender,
+        close: closeDropdown
+      }) : React.createElement(ConnectedUserProfile, {
+        user: message.sender,
+        onSuccess: closeDropdown
+      }));
+    }
   })), React.createElement("div", {
     className: "".concat(className, "__body")
   }, !chainTop && React.createElement(Label, {
@@ -9534,9 +10507,14 @@ function IncomingOGMessage(props) {
   var MemoizedMessageText = memoizedMessageText;
   var MemoizedEmojiListItems = memoizedEmojiListItems;
   var messageRef = useRef(null);
+  var avatarRef = useRef(null);
   var parentRefReactions = useRef(null);
   var parentRefMenus = useRef(null);
   var parentContainRef = useRef(null);
+
+  var _React$useContext = React.useContext(UserProfileContext),
+      disableUserProfile = _React$useContext.disableUserProfile,
+      renderUserProfile = _React$useContext.renderUserProfile;
 
   var _useState5 = useState(false),
       _useState6 = _slicedToArray(_useState5, 2),
@@ -9574,11 +10552,41 @@ function IncomingOGMessage(props) {
     className: "".concat(INCOMING_OG_MESSAGE, "--inner")
   }, React.createElement("div", {
     className: "".concat(INCOMING_OG_MESSAGE, "--body")
-  }, !chainBottom && React.createElement(Avatar, {
-    className: "".concat(INCOMING_OG_MESSAGE, "__avatar"),
-    src: getSenderProfileUrl$2(message),
-    width: "28px",
-    height: "28px"
+  }, !chainBottom && React.createElement(ContextMenu, {
+    menuTrigger: function menuTrigger(toggleDropdown) {
+      return React.createElement(Avatar$1, {
+        ref: avatarRef,
+        onClick: function onClick() {
+          if (!disableUserProfile) {
+            toggleDropdown();
+          }
+        },
+        className: "".concat(INCOMING_OG_MESSAGE, "__avatar"),
+        src: getSenderProfileUrl$2(message),
+        width: "28px",
+        height: "28px",
+        alt: "sender-profile-image"
+      });
+    },
+    menuItems: function menuItems(closeDropdown) {
+      return React.createElement(MenuItems$1, {
+        parentRef: avatarRef // for catching location(x, y) of MenuItems
+        ,
+        parentContainRef: avatarRef // for toggling more options(menus & reactions)
+        ,
+        closeDropdown: closeDropdown,
+        style: {
+          paddingTop: 0,
+          paddingBottom: 0
+        }
+      }, renderUserProfile ? renderUserProfile({
+        user: message.sender,
+        close: closeDropdown
+      }) : React.createElement(ConnectedUserProfile, {
+        user: message.sender,
+        onSuccess: closeDropdown
+      }));
+    }
   }), !chainTop && React.createElement(Label, {
     className: "".concat(INCOMING_OG_MESSAGE, "__sender-name"),
     type: LabelTypography.CAPTION_2,
@@ -9728,6 +10736,7 @@ OGMessageSwitch.propTypes = {
   userId: PropTypes.string.isRequired,
   message: PropTypes.shape({
     message: PropTypes.string,
+    sender: PropTypes.shape({}),
     ogMetaData: PropTypes.shape({
       title: PropTypes.string,
       description: PropTypes.string,
@@ -9806,6 +10815,7 @@ IncomingOGMessage.propTypes = {
   userId: PropTypes.string.isRequired,
   message: PropTypes.shape({
     message: PropTypes.string,
+    sender: PropTypes.shape({}),
     ogMetaData: PropTypes.shape({
       title: PropTypes.string,
       description: PropTypes.string,
@@ -10596,6 +11606,7 @@ var ConversationPanel = function ConversationPanel(props) {
       onBeforeSendFileMessage = props.onBeforeSendFileMessage,
       onBeforeUpdateUserMessage = props.onBeforeUpdateUserMessage;
   var sdk = sdkStore.sdk;
+  var config = props.config;
   var sdkError = sdkStore.error;
   var sdkInit = sdkStore.initialized;
   var user = userStore.user;
@@ -10618,6 +11629,8 @@ var ConversationPanel = function ConversationPanel(props) {
       hasMore = messagesStore.hasMore,
       initialized = messagesStore.initialized,
       unreadCount = messagesStore.unreadCount,
+      disableUserProfile = messagesStore.disableUserProfile,
+      renderUserProfile = messagesStore.renderUserProfile,
       unreadSince = messagesStore.unreadSince,
       invalidChannel = messagesStore.invalidChannel,
       _messagesStore$curren = messagesStore.currentGroupChannel,
@@ -10630,6 +11643,8 @@ var ConversationPanel = function ConversationPanel(props) {
   var _sdk$appInfo = sdk.appInfo,
       appInfo = _sdk$appInfo === void 0 ? {} : _sdk$appInfo;
   var usingReaction = appInfo.isUsingReaction && !isBroadcast || useReaction || false;
+  var userDefinedDisableUserProfile = disableUserProfile || config.disableUserProfile;
+  var userDefinedRenderProfile = renderUserProfile || config.renderUserProfile;
   var emojiAllMap = useMemo(function () {
     return usingReaction ? getAllEmojisMapFromEmojiContainer(emojiContainer) : new Map();
   }, [emojiContainer]);
@@ -10799,8 +11814,10 @@ var ConversationPanel = function ConversationPanel(props) {
     }));
   }
 
-  return React.createElement("div", {
-    className: "sendbird-conversation"
+  return React.createElement(UserProfileProvider, {
+    className: "sendbird-conversation",
+    disableUserProfile: userDefinedDisableUserProfile,
+    renderUserProfile: userDefinedRenderProfile
   }, renderChatHeader ? renderChatHeader({
     channel: currentGroupChannel,
     user: user
@@ -10898,6 +11915,8 @@ ConversationPanel.propTypes = {
     reconnect: PropTypes.func
   }).isRequired,
   config: PropTypes.shape({
+    disableUserProfile: PropTypes.bool,
+    renderUserProfile: PropTypes.func,
     userId: PropTypes.string.isRequired,
     isOnline: PropTypes.bool.isRequired,
     theme: PropTypes.string,
@@ -10944,6 +11963,8 @@ ConversationPanel.propTypes = {
   renderChatHeader: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   onChatHeaderActionClick: PropTypes.func,
   useReaction: PropTypes.bool,
+  disableUserProfile: PropTypes.bool,
+  renderUserProfile: PropTypes.func,
   useMessageGrouping: PropTypes.bool
 };
 ConversationPanel.defaultProps = {
@@ -10956,6 +11977,8 @@ ConversationPanel.defaultProps = {
   renderMessageInput: null,
   renderChatHeader: null,
   useReaction: true,
+  disableUserProfile: false,
+  renderUserProfile: null,
   useMessageGrouping: true,
   onChatHeaderActionClick: noop$7
 };
@@ -10963,62 +11986,6 @@ var getEmojiCategoriesFromEmojiContainer$1 = getEmojiCategoriesFromEmojiContaine
     getAllEmojisFromEmojiContainer$1 = getAllEmojisFromEmojiContainer,
     getEmojisFromEmojiContainer$1 = getEmojisFromEmojiContainer;
 var Conversation = withSendbirdContext(ConversationPanel);
-
-var InputLabel = function InputLabel(_ref) {
-  var children = _ref.children;
-  return React.createElement(Label, {
-    type: LabelTypography.CAPTION_3,
-    color: LabelColors.ONBACKGROUND_1,
-    className: "sendbird-input-label"
-  }, children);
-};
-InputLabel.propTypes = {
-  children: PropTypes.string.isRequired
-}; // future: add validations? onChange? more props etc etc
-
-var Input = React.forwardRef(function (props, ref) {
-  var value = props.value,
-      placeHolder = props.placeHolder,
-      disabled = props.disabled,
-      name = props.name,
-      required = props.required;
-
-  var _useState = useState(value),
-      _useState2 = _slicedToArray(_useState, 2),
-      inputValue = _useState2[0],
-      setInputValue = _useState2[1];
-
-  return React.createElement("div", {
-    className: "sendbird-input"
-  }, React.createElement("input", {
-    required: required,
-    ref: ref,
-    name: name,
-    disabled: disabled,
-    value: inputValue,
-    className: "sendbird-input--input",
-    onChange: function onChange(e) {
-      setInputValue(e.target.value);
-    }
-  }), placeHolder && !inputValue && React.createElement(Label, {
-    className: "sendbird-input--placeholder",
-    type: LabelTypography.BODY_1,
-    color: LabelColors.ONBACKGROUND_3
-  }, placeHolder));
-});
-Input.propTypes = {
-  value: PropTypes.string,
-  placeHolder: PropTypes.string,
-  name: PropTypes.string.isRequired,
-  disabled: PropTypes.bool,
-  required: PropTypes.bool
-};
-Input.defaultProps = {
-  value: '',
-  placeHolder: '',
-  disabled: false,
-  required: false
-};
 
 var EditDetails = function EditDetails(props) {
   var _onSubmit = props.onSubmit,
@@ -11070,7 +12037,7 @@ var EditDetails = function EditDetails(props) {
     className: "channel-profile-form__img-section"
   }, React.createElement(InputLabel, null, LabelStringSet.MODAL__CHANNEL_INFORMATION__CHANNEL_IMAGE), React.createElement("div", {
     className: "channel-profile-form__avatar"
-  }, currentImg ? React.createElement(Avatar, {
+  }, currentImg ? React.createElement(Avatar$1, {
     height: "80px",
     width: "80px",
     src: currentImg
@@ -11253,7 +12220,7 @@ function MembersModal(_a) {
     onCancel: function onCancel() {
       return hideModal();
     },
-    onSubmit: noop$1,
+    onSubmit: noop,
     titleText: "All Members"
   }, React.createElement("div", {
     className: "sendbird-more-members__popup-scroll",
@@ -11381,13 +12348,79 @@ function MembersModal(_a) {
 
 var SHOWN_MEMBER_MAX = 10;
 
-var MemebersAccordion = function MemebersAccordion(_ref) {
-  var channel = _ref.channel,
-      disabled = _ref.disabled,
-      currentUser = _ref.currentUser,
-      userQueryCreator = _ref.userQueryCreator,
-      onInviteMemebers = _ref.onInviteMemebers,
-      swapParams = _ref.swapParams;
+var UserListItem$1 = function UserListItem(_ref) {
+  var _ref$member = _ref.member,
+      member = _ref$member === void 0 ? {} : _ref$member,
+      _ref$currentUser = _ref.currentUser,
+      currentUser = _ref$currentUser === void 0 ? '' : _ref$currentUser;
+  var avatarRef = useRef(null);
+
+  var _useContext = useContext(UserProfileContext),
+      disableUserProfile = _useContext.disableUserProfile,
+      renderUserProfile = _useContext.renderUserProfile;
+
+  return React.createElement("div", {
+    className: "sendbird-members-accordion__member"
+  }, React.createElement("div", {
+    className: "sendbird-members-accordion__member-avatar"
+  }, React.createElement(ContextMenu, {
+    menuTrigger: function menuTrigger(toggleDropdown) {
+      return React.createElement(Avatar$1, {
+        onClick: function onClick() {
+          if (!disableUserProfile) {
+            toggleDropdown();
+          }
+        },
+        ref: avatarRef,
+        src: member.profileUrl,
+        width: 24,
+        height: 24
+      });
+    },
+    menuItems: function menuItems(closeDropdown) {
+      return React.createElement(MenuItems$1, {
+        openLeft: true,
+        parentRef: avatarRef // for catching location(x, y) of MenuItems
+        ,
+        parentContainRef: avatarRef // for toggling more options(menus & reactions)
+        ,
+        closeDropdown: closeDropdown,
+        style: {
+          paddingTop: 0,
+          paddingBottom: 0
+        }
+      }, renderUserProfile ? renderUserProfile({
+        user: member,
+        currentUserId: currentUser,
+        close: closeDropdown
+      }) : React.createElement(ConnectedUserProfile, {
+        user: member,
+        currentUserId: currentUser,
+        onSuccess: closeDropdown
+      }));
+    }
+  })), React.createElement(Label, {
+    type: LabelTypography.SUBTITLE_2,
+    color: LabelColors.ONBACKGROUND_1
+  }, member.nickname || LabelStringSet.NO_NAME, currentUser === member.userId && ' (You)'));
+};
+
+UserListItem$1.propTypes = {
+  member: PropTypes.shape({
+    userId: PropTypes.string,
+    profileUrl: PropTypes.string,
+    nickname: PropTypes.string
+  }).isRequired,
+  currentUser: PropTypes.string.isRequired
+};
+
+var MemebersAccordion = function MemebersAccordion(_ref2) {
+  var channel = _ref2.channel,
+      disabled = _ref2.disabled,
+      currentUser = _ref2.currentUser,
+      userQueryCreator = _ref2.userQueryCreator,
+      onInviteMemebers = _ref2.onInviteMemebers,
+      swapParams = _ref2.swapParams;
   var members = channel.members || [];
 
   var _useState = useState(false),
@@ -11405,19 +12438,11 @@ var MemebersAccordion = function MemebersAccordion(_ref) {
   }, React.createElement("div", {
     className: "sendbird-members-accordion__list"
   }, members.slice(0, SHOWN_MEMBER_MAX).map(function (member) {
-    return React.createElement("div", {
-      className: "sendbird-members-accordion__member",
+    return React.createElement(UserListItem$1, {
+      member: member,
+      currentUser: currentUser,
       key: member.userId
-    }, React.createElement("div", {
-      className: "sendbird-members-accordion__member-avatar"
-    }, React.createElement(Avatar, {
-      height: "24px",
-      width: "24px",
-      src: member.profileUrl
-    })), React.createElement(Label, {
-      type: LabelTypography.SUBTITLE_2,
-      color: LabelColors.ONBACKGROUND_1
-    }, member.nickname || LabelStringSet.NO_NAME, currentUser === member.userId && ' (You)'));
+    });
   })), React.createElement("div", {
     className: "sendbird-members-accordion__footer"
   }, members.length >= SHOWN_MEMBER_MAX && React.createElement(Button, {
@@ -11479,7 +12504,7 @@ MemebersAccordion.defaultProps = {
 
 var Context = React.createContext({
   opened: '',
-  setOpened: noop$1
+  setOpened: noop
 });
 var Consumer = Context.Consumer;
 var Provider = Context.Provider;
@@ -11557,417 +12582,63 @@ function Accordion(_a) {
 }
 var AccordionGroup$1 = AccordionGroup;
 
-var getSdk = function getSdk(store) {
-  var _store$stores = store.stores,
-      stores = _store$stores === void 0 ? {} : _store$stores;
-  var _stores$sdkStore = stores.sdkStore,
-      sdkStore = _stores$sdkStore === void 0 ? {} : _stores$sdkStore;
-  var sdk = sdkStore.sdk;
-  return sdk;
-};
-var getPubSub = function getPubSub(store) {
-  var _store$config = store.config,
-      config = _store$config === void 0 ? {} : _store$config;
-  var pubSub = config.pubSub;
-  return pubSub;
-}; // SendBird disconnect. Invalidates currentUser
-// eslint-disable-next-line max-len
-
-var getConnect = function getConnect(store) {
-  return function (userId, accessToken) {
-    return new Promise(function (resolve, reject) {
-      var sdk = getSdk(store);
-
-      if (!sdk) {
-        reject(new Error('Sdk not found'));
-      }
-
-      if (!accessToken) {
-        sdk.connect(userId).then(function (res) {
-          return resolve(res);
-        }).catch(function (err) {
-          return reject(err);
-        });
-      } else {
-        sdk.connect(userId, accessToken).then(function (res) {
-          return resolve(res);
-        }).catch(function (err) {
-          return reject(err);
-        });
-      }
-    });
-  };
-}; // SendBird disconnect. Invalidates currentUser
-
-var getDisconnect = function getDisconnect(store) {
-  return function () {
-    return new Promise(function (resolve, reject) {
-      var sdk = getSdk(store);
-
-      if (!sdk) {
-        reject(new Error('Sdk not found'));
-      }
-
-      sdk.disconnect().then(function (res) {
-        return resolve(res);
-      }).catch(function (err) {
-        return reject(err);
-      });
-    });
-  };
-}; // Using the updateCurrentUserInfo() method
-// you can update a user's nickname and profile image with a URL
-// eslint-disable-next-line max-len
-
-var getUpdateUserInfo = function getUpdateUserInfo(store) {
-  return function (nickName, profileUrl) {
-    return new Promise(function (resolve, reject) {
-      var sdk = getSdk(store);
-
-      if (!sdk) {
-        reject(new Error('Sdk not found'));
-      }
-
-      sdk.updateCurrentUserInfo(nickName, profileUrl).then(function (res) {
-        return resolve(res);
-      }).catch(function (err) {
-        return reject(err);
-      });
-    });
-  };
-};
-var getSendUserMessage = function getSendUserMessage(store) {
-  return function (channelUrl, userMessageParams) {
-    var sdk = getSdk(store);
-    var pubsub = getPubSub(store);
-    return new Promise(function (resolve, reject) {
-      if (!sdk) {
-        reject(new Error('Sdk not found'));
-      }
-
-      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
-        var promisify = function promisify() {
-          var pendingMsg = null;
-          var pendingPromise = new Promise(function (resolve_, reject_) {
-            pendingMsg = channel.sendUserMessage(userMessageParams, function (res, err) {
-              var swapParams = sdk.getErrorFirstCallback();
-              var message = res;
-              var error = err;
-
-              if (swapParams) {
-                message = err;
-                error = res;
-              }
-
-              if (error) {
-                reject_(error);
-                return;
-              }
-
-              resolve_(message);
-              pubsub.publish(SEND_USER_MESSAGE, {
-                message: message,
-                channel: channel
-              });
-            });
-            pubsub.publish(SEND_MESSAGE_START, {
-              message: pendingMsg,
-              channel: channel
-            });
-          });
-
-          pendingPromise.get = function () {
-            return pendingMsg;
-          };
-
-          return pendingPromise;
-        };
-
-        resolve(promisify());
-      }).catch(reject);
-    });
-  };
-};
-var getSendFileMessage = function getSendFileMessage(store) {
-  return function (channelUrl, fileMessageParams) {
-    var sdk = getSdk(store);
-    var pubsub = getPubSub(store);
-    return new Promise(function (resolve, reject) {
-      if (!sdk) {
-        reject(new Error('Sdk not found'));
-      }
-
-      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
-        var promisify = function promisify() {
-          var pendingMsg = null;
-          var pendingPromise = new Promise(function (resolve_, reject_) {
-            pendingMsg = channel.sendFileMessage(fileMessageParams, function (res, err) {
-              var swapParams = sdk.getErrorFirstCallback();
-              var message = res;
-              var error = err;
-
-              if (swapParams) {
-                message = err;
-                error = res;
-              }
-
-              if (error) {
-                reject_(error);
-                return;
-              }
-
-              resolve_(message);
-              pubsub.publish(SEND_FILE_MESSAGE, {
-                message: message,
-                channel: channel
-              });
-            });
-          }); // keep the file's local version in pendingMsg.localUrl
-          // because promise doesnt allow overriding of pendingMsg.url
-          // eslint-disable-next-line no-param-reassign
-
-          pendingMsg.localUrl = URL.createObjectURL(fileMessageParams.file); // eslint-disable-next-line no-param-reassign
-
-          pendingMsg.requestState = 'pending';
-          pubsub.publish(SEND_MESSAGE_START, {
-            message: pendingMsg,
-            channel: channel
-          });
-
-          pendingPromise.get = function () {
-            return pendingMsg;
-          };
-
-          return pendingPromise;
-        };
-
-        resolve(promisify());
-      }).catch(reject);
-    });
-  };
-};
-var getUpdateUserMessage = function getUpdateUserMessage(store) {
-  return function (channelUrl, messageId, params) {
-    var sdk = getSdk(store);
-    var pubsub = getPubSub(store);
-    return new Promise(function (resolve, reject) {
-      if (!sdk) {
-        reject(new Error('Sdk not found'));
-      }
-
-      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
-        channel.updateUserMessage(messageId, params, function (res, err) {
-          var swapParams = sdk.getErrorFirstCallback();
-          var message = res;
-          var error = err;
-
-          if (swapParams) {
-            message = err;
-            error = res;
-          }
-
-          if (error) {
-            reject(error);
-            return;
-          }
-
-          resolve(message);
-          pubsub.publish(UPDATE_USER_MESSAGE, {
-            message: message,
-            channel: channel,
-            // workaround for updating channelPreview on message-edit
-            // https://sendbird.atlassian.net/browse/UIKIT-268
-            fromSelector: true
-          });
-        });
-      }).catch(reject);
-    });
-  };
-};
-var getDeleteMessage = function getDeleteMessage(store) {
-  return function (channelUrl, message) {
-    var sdk = getSdk(store);
-    var pubsub = getPubSub(store);
-    return new Promise(function (resolve, reject) {
-      if (!sdk) {
-        reject(new Error('Sdk not found'));
-      }
-
-      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
-        var messageId = message.messageId;
-        channel.deleteMessage(message, function (res, err) {
-          var swapParams = sdk.getErrorFirstCallback();
-          var error = err;
-
-          if (swapParams) {
-            error = res;
-          }
-
-          if (error) {
-            reject(error);
-            return;
-          }
-
-          resolve(message);
-          pubsub.publish(DELETE_MESSAGE, {
-            messageId: messageId,
-            channel: channel
-          });
-        });
-      }).catch(reject);
-    });
-  };
-};
-var getResendUserMessage = function getResendUserMessage(store) {
-  return function (channelUrl, failedMessage) {
-    var sdk = getSdk(store);
-    var pubsub = getPubSub(store);
-    return new Promise(function (resolve, reject) {
-      if (!sdk) {
-        reject(new Error('Sdk not found'));
-      }
-
-      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
-        channel.resendUserMessage(failedMessage).then(function (message) {
-          resolve(message);
-          pubsub.publish(SEND_USER_MESSAGE, {
-            message: message,
-            channel: channel
-          });
-        }).catch(reject);
-      }).catch(reject);
-    });
-  };
-};
-var getResendFileMessage = function getResendFileMessage(store) {
-  return function (channelUrl, failedMessage) {
-    var sdk = getSdk(store);
-    var pubsub = getPubSub(store);
-    return new Promise(function (resolve, reject) {
-      if (!sdk) {
-        reject(new Error('Sdk not found'));
-      }
-
-      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
-        channel.resendFileMessage(failedMessage).then(function (message) {
-          resolve(message);
-          pubsub.publish(SEND_FILE_MESSAGE, {
-            message: message,
-            channel: channel
-          });
-        }).catch(reject);
-      }).catch(reject);
-    });
-  };
-};
-var getCreateChannel = function getCreateChannel(store) {
-  return function (params) {
-    var sdk = getSdk(store);
-    var pubsub = getPubSub(store);
-    return new Promise(function (resolve, reject) {
-      if (!sdk) {
-        reject(new Error('Sdk not found'));
-      }
-
-      sdk.GroupChannel.createChannel(params).then(function (channel) {
-        resolve(channel);
-        pubsub.publish(CREATE_CHANNEL$1, {
-          channel: channel
-        });
-      }).catch(reject);
-    });
-  };
-};
-var getLeaveChannel = function getLeaveChannel(store) {
-  return function (channelUrl) {
-    var sdk = getSdk(store);
-    var pubsub = getPubSub(store);
-    return new Promise(function (resolve, reject) {
-      if (!sdk) {
-        reject(new Error('Sdk not found'));
-      }
-
-      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
-        channel.leave().then(function () {
-          resolve(channel);
-          pubsub.publish(LEAVE_CHANNEL, {
-            channel: channel
-          });
-        }).catch(reject);
-      }).catch(reject);
-    });
-  };
-};
-var getFreezeChannel = function getFreezeChannel(store) {
-  return function (channelUrl) {
-    var sdk = getSdk(store);
-    return new Promise(function (resolve, reject) {
-      if (!sdk) {
-        reject(new Error('Sdk not found'));
-      }
-
-      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
-        channel.freeze().then(function () {
-          // do not need pubsub here - event listener works
-          resolve(channel);
-        }).catch(reject);
-      }).catch(reject);
-    });
-  };
-};
-var getUnFreezeChannel = function getUnFreezeChannel(store) {
-  return function (channelUrl) {
-    var sdk = getSdk(store);
-    return new Promise(function (resolve, reject) {
-      if (!sdk) {
-        reject(new Error('Sdk not found'));
-      }
-
-      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
-        channel.unfreeze().then(function () {
-          // do not need pubsub here - event listener works
-          resolve(channel);
-        }).catch(reject);
-      }).catch(reject);
-    });
-  };
-};
-var selectors = {
-  getSdk: getSdk,
-  getConnect: getConnect,
-  getDisconnect: getDisconnect,
-  getUpdateUserInfo: getUpdateUserInfo,
-  getSendUserMessage: getSendUserMessage,
-  getSendFileMessage: getSendFileMessage,
-  getUpdateUserMessage: getUpdateUserMessage,
-  getDeleteMessage: getDeleteMessage,
-  getResendUserMessage: getResendUserMessage,
-  getResendFileMessage: getResendFileMessage,
-  getFreezeChannel: getFreezeChannel,
-  getUnFreezeChannel: getUnFreezeChannel,
-  getCreateChannel: getCreateChannel,
-  getLeaveChannel: getLeaveChannel
-};
-
 // might move to reusable/UI
 var COMPONENT_NAME$1 = 'sendbird-user-list-item--small';
 
-var UserListItem$1 = function UserListItem(_a) {
+var UserListItem$2 = function UserListItem(_a) {
   var user = _a.user,
       className = _a.className,
       currentUser = _a.currentUser,
       action = _a.action;
   var actionRef = useRef(null);
   var parentRef = useRef(null);
+  var avatarRef = useRef(null);
+
+  var _b = useContext(UserProfileContext),
+      disableUserProfile = _b.disableUserProfile,
+      renderUserProfile = _b.renderUserProfile;
+
   var injectingClassNames = Array.isArray(className) ? className : [className];
   return React.createElement("div", {
     ref: parentRef,
     className: __spreadArrays([COMPONENT_NAME$1], injectingClassNames).join(' ')
-  }, user.isMuted && React.createElement(MutedAvatarOverlay, null), React.createElement(Avatar, {
-    className: COMPONENT_NAME$1 + "__avatar",
-    src: user.profileUrl,
-    width: 24,
-    height: 24
+  }, user.isMuted && React.createElement(MutedAvatarOverlay, null), React.createElement(ContextMenu, {
+    menuTrigger: function menuTrigger(toggleDropdown) {
+      return React.createElement(Avatar$1, {
+        onClick: function onClick() {
+          if (!disableUserProfile) {
+            toggleDropdown();
+          }
+        },
+        ref: avatarRef,
+        className: COMPONENT_NAME$1 + "__avatar",
+        src: user.profileUrl,
+        width: 24,
+        height: 24
+      });
+    },
+    menuItems: function menuItems(closeDropdown) {
+      return React.createElement(MenuItems$1, {
+        openLeft: true,
+        parentRef: avatarRef // for catching location(x, y) of MenuItems
+        ,
+        parentContainRef: avatarRef // for toggling more options(menus & reactions)
+        ,
+        closeDropdown: closeDropdown,
+        style: {
+          paddingTop: 0,
+          paddingBottom: 0
+        }
+      }, renderUserProfile ? renderUserProfile({
+        user: user,
+        currentUserId: currentUser,
+        close: closeDropdown
+      }) : React.createElement(ConnectedUserProfile, {
+        user: user,
+        currentUserId: currentUser,
+        onSuccess: closeDropdown
+      }));
+    }
   }), React.createElement(Label, {
     className: COMPONENT_NAME$1 + "__title",
     type: LabelTypography.SUBTITLE_1,
@@ -12019,7 +12690,7 @@ function OperatorsModal(_a) {
     onCancel: function onCancel() {
       return hideModal();
     },
-    onSubmit: noop$1,
+    onSubmit: noop,
     titleText: "All operators"
   }, React.createElement("div", {
     className: "sendbird-more-members__popup-scroll",
@@ -12231,7 +12902,7 @@ var OperatorList = function OperatorList(_a) {
     });
   }, [channel]);
   return React.createElement(React.Fragment, null, operators.map(function (operator) {
-    return React.createElement(UserListItem$1, {
+    return React.createElement(UserListItem$2, {
       key: operator.userId,
       user: operator,
       currentUser: sdk.currentUser.userId,
@@ -12313,13 +12984,13 @@ var OperatorList = function OperatorList(_a) {
   }));
 };
 
-var mapStoreToProps = function mapStoreToProps(store) {
+var mapStoreToProps$2 = function mapStoreToProps(store) {
   return {
     sdk: getSdk(store)
   };
 };
 
-var OperatorList$1 = withSendbirdContext(OperatorList, mapStoreToProps);
+var OperatorList$1 = withSendbirdContext(OperatorList, mapStoreToProps$2);
 
 function InviteMembers$1(_a) {
   var hideModal = _a.hideModal,
@@ -12459,7 +13130,7 @@ var MemberList = function MemberList(_a) {
     });
   }, [channel]);
   return React.createElement(React.Fragment, null, members.map(function (member) {
-    return React.createElement(UserListItem$1, {
+    return React.createElement(UserListItem$2, {
       key: member.userId,
       user: member,
       currentUser: sdk.currentUser.userId,
@@ -12564,13 +13235,13 @@ var MemberList = function MemberList(_a) {
   }));
 };
 
-var mapStoreToProps$1 = function mapStoreToProps(store) {
+var mapStoreToProps$3 = function mapStoreToProps(store) {
   return {
     sdk: getSdk(store)
   };
 };
 
-var MemberList$1 = withSendbirdContext(MemberList, mapStoreToProps$1);
+var MemberList$1 = withSendbirdContext(MemberList, mapStoreToProps$3);
 
 function BannedMembersModal(_a) {
   var hideModal = _a.hideModal,
@@ -12600,7 +13271,7 @@ function BannedMembersModal(_a) {
     onCancel: function onCancel() {
       return hideModal();
     },
-    onSubmit: noop$1,
+    onSubmit: noop,
     titleText: "Muted members"
   }, React.createElement("div", {
     className: "sendbird-more-members__popup-scroll",
@@ -12712,7 +13383,7 @@ var BannedMemberList = function BannedMemberList(_a) {
     });
   }, [channel]);
   return React.createElement(React.Fragment, null, members.map(function (member) {
-    return React.createElement(UserListItem$1, {
+    return React.createElement(UserListItem$2, {
       key: member.userId,
       user: member,
       action: function action(_a) {
@@ -12772,13 +13443,13 @@ var BannedMemberList = function BannedMemberList(_a) {
   }));
 };
 
-var mapStoreToProps$2 = function mapStoreToProps(store) {
+var mapStoreToProps$4 = function mapStoreToProps(store) {
   return {
     sdk: getSdk(store)
   };
 };
 
-var BannedMemberList$1 = withSendbirdContext(BannedMemberList, mapStoreToProps$2);
+var BannedMemberList$1 = withSendbirdContext(BannedMemberList, mapStoreToProps$4);
 
 function MutedMembersModal(_a) {
   var hideModal = _a.hideModal,
@@ -12811,7 +13482,7 @@ function MutedMembersModal(_a) {
     onCancel: function onCancel() {
       return hideModal();
     },
-    onSubmit: noop$1,
+    onSubmit: noop,
     titleText: "Muted members"
   }, React.createElement("div", {
     className: "sendbird-more-members__popup-scroll",
@@ -12929,7 +13600,7 @@ var MutedMemberList = function MutedMemberList(_a) {
     });
   }, [channel]);
   return React.createElement(React.Fragment, null, members.map(function (member) {
-    return React.createElement(UserListItem$1, {
+    return React.createElement(UserListItem$2, {
       key: member.userId,
       user: member,
       currentUser: sdk.currentUser.userId,
@@ -12991,13 +13662,13 @@ var MutedMemberList = function MutedMemberList(_a) {
   }));
 };
 
-var mapStoreToProps$3 = function mapStoreToProps(store) {
+var mapStoreToProps$5 = function mapStoreToProps(store) {
   return {
     sdk: getSdk(store)
   };
 };
 
-var MutedMemberList$1 = withSendbirdContext(MutedMemberList, mapStoreToProps$3);
+var MutedMemberList$1 = withSendbirdContext(MutedMemberList, mapStoreToProps$5);
 
 var kFormatter = function kFormatter(num) {
   return Math.abs(num) > 999 ? (Math.abs(num) / 1000).toFixed(1) + "K" : num;
@@ -13133,9 +13804,15 @@ function index(_a) {
   }))));
 }
 
+var kFormatter$1 = function kFormatter(num) {
+  return Math.abs(num) > 999 ? "".concat((Math.abs(num) / 1000).toFixed(1), "K") : num;
+};
+
 function ChannelSettings(props) {
   var onCloseClick = props.onCloseClick,
       channelUrl = props.channelUrl,
+      disableUserProfile = props.disableUserProfile,
+      renderUserProfile = props.renderUserProfile,
       _onChannelModified = props.onChannelModified,
       renderChannelProfile = props.renderChannelProfile,
       onBeforeUpdateChannel = props.onBeforeUpdateChannel;
@@ -13148,6 +13825,10 @@ function ChannelSettings(props) {
       isOnline = _props$config.isOnline,
       _props$queries = props.queries,
       queries = _props$queries === void 0 ? {} : _props$queries;
+  var _props$config2 = props.config,
+      config = _props$config2 === void 0 ? {} : _props$config2;
+  var userDefinedDisableUserProfile = disableUserProfile || config.disableUserProfile;
+  var userDefinedRenderProfile = renderUserProfile || config.renderUserProfile;
   var userFilledApplicationUserListQuery = queries.applicationUserListQuery;
   var sdk = sdkStore.sdk,
       initialized = sdkStore.initialized; // hack to kepp track of channel updates by triggering useEffect
@@ -13224,23 +13905,30 @@ function ChannelSettings(props) {
     })));
   }
 
-  return React.createElement("div", {
+  return React.createElement(UserProfileProvider, {
+    disableUserProfile: userDefinedDisableUserProfile,
+    renderUserProfile: userDefinedRenderProfile,
     className: "sendbird-channel-settings"
   }, React.createElement("div", {
     className: "sendbird-channel-settings__header"
   }, React.createElement(Label, {
     type: LabelTypography.H_2,
     color: LabelColors.ONBACKGROUND_1
-  }, LabelStringSet.CHANNEL_SETTING__HEADER__TITLE), React.createElement(Icon, {
-    type: IconTypes.CLOSE,
-    className: "sendbird-channel-settings__close-icon",
-    height: "24px",
-    width: "24px",
+  }, LabelStringSet.CHANNEL_SETTING__HEADER__TITLE), React.createElement("div", {
+    className: "sendbird-channel-settings__header-icon"
+  }, React.createElement(IconButton, {
+    width: "32px",
+    height: "32px",
     onClick: function onClick() {
       logger.info('ChannelSettings: Click close');
       onCloseClick();
     }
-  })), React.createElement("div", {
+  }, React.createElement(Icon, {
+    type: IconTypes.CLOSE,
+    className: "sendbird-channel-settings__close-icon",
+    height: "24px",
+    width: "24px"
+  })))), React.createElement("div", {
     className: "sendbird-channel-settings__scroll-area"
   }, renderChannelProfile ? renderChannelProfile({
     channel: channel
@@ -13316,7 +14004,9 @@ function ChannelSettings(props) {
   }), React.createElement(Label, {
     type: LabelTypography.SUBTITLE_1,
     color: LabelColors.ONBACKGROUND_1
-  }, "".concat(LabelStringSet.CHANNEL_SETTING__MEMBERS__TITLE, " (").concat(channel.memberCount, ")")), React.createElement(Icon, {
+  }, "".concat(LabelStringSet.CHANNEL_SETTING__MEMBERS__TITLE), React.createElement(Badge, {
+    count: kFormatter$1(channel.memberCount)
+  })), React.createElement(Icon, {
     type: IconTypes.SHEVRON,
     className: ['sendbird-channel-settings__panel-icon-right', 'sendbird-channel-settings__panel-icon--chevron', showAccordion ? 'sendbird-channel-settings__panel-icon--open' : ''].join(' '),
     height: "24px",
@@ -13389,6 +14079,8 @@ ChannelSettings.propTypes = {
   onChannelModified: PropTypes.func,
   onBeforeUpdateChannel: PropTypes.func,
   renderChannelProfile: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
+  disableUserProfile: PropTypes.bool,
+  renderUserProfile: PropTypes.func,
   channelUrl: PropTypes.string.isRequired,
   queries: PropTypes.shape({
     applicationUserListQuery: PropTypes.shape({
@@ -13426,6 +14118,8 @@ ChannelSettings.propTypes = {
 ChannelSettings.defaultProps = {
   onBeforeUpdateChannel: null,
   queries: {},
+  disableUserProfile: false,
+  renderUserProfile: null,
   renderChannelProfile: null,
   onCloseClick: function onCloseClick() {},
   onChannelModified: function onChannelModified() {}
@@ -13443,7 +14137,11 @@ function App(props) {
       _props$config = props.config,
       config = _props$config === void 0 ? {} : _props$config,
       useReaction = props.useReaction,
-      useMessageGrouping = props.useMessageGrouping;
+      useMessageGrouping = props.useMessageGrouping,
+      allowProfileEdit = props.allowProfileEdit,
+      disableUserProfile = props.disableUserProfile,
+      renderUserProfile = props.renderUserProfile,
+      onProfileEditSuccess = props.onProfileEditSuccess;
 
   var _useState = useState(null),
       _useState2 = _slicedToArray(_useState, 2),
@@ -13463,12 +14161,16 @@ function App(props) {
     nickname: nickname,
     profileUrl: profileUrl,
     userListQuery: userListQuery,
-    config: config
+    config: config,
+    disableUserProfile: disableUserProfile,
+    renderUserProfile: renderUserProfile
   }, React.createElement("div", {
     className: "sendbird-app__wrap"
   }, React.createElement("div", {
     className: "sendbird-app__channellist-wrap"
   }, React.createElement(ChannelList$1, {
+    allowProfileEdit: allowProfileEdit,
+    onProfileEditSuccess: onProfileEditSuccess,
     onChannelSelect: function onChannelSelect(channel) {
       if (channel && channel.url) {
         setCurrentChannelUrl(channel.url);
@@ -13477,22 +14179,26 @@ function App(props) {
       }
     }
   })), React.createElement("div", {
-    className: "sendbird-app__conversation-wrap"
+    className: "\n            ".concat(showSettings ? 'sendbird-app__conversation--settings-open' : '', "\n            sendbird-app__conversation-wrap\n          ")
   }, React.createElement(Conversation, {
     channelUrl: currentChannelUrl,
     onChatHeaderActionClick: function onChatHeaderActionClick() {
-      setShowSettings(true);
+      if (showSettings) {
+        setShowSettings(false);
+      } else {
+        setShowSettings(true);
+      }
     },
     useReaction: useReaction,
     useMessageGrouping: useMessageGrouping
-  }))), showSettings && React.createElement("div", {
+  })), showSettings && React.createElement("div", {
     className: "sendbird-app__settingspanel-wrap"
   }, React.createElement(ChannelSettings$1, {
     channelUrl: currentChannelUrl,
     onCloseClick: function onCloseClick() {
       setShowSettings(false);
     }
-  })));
+  }))));
 }
 App.propTypes = {
   appId: PropTypes.string.isRequired,
@@ -13502,6 +14208,10 @@ App.propTypes = {
   userListQuery: PropTypes.func,
   nickname: PropTypes.string,
   profileUrl: PropTypes.string,
+  allowProfileEdit: PropTypes.bool,
+  disableUserProfile: PropTypes.bool,
+  renderUserProfile: PropTypes.func,
+  onProfileEditSuccess: PropTypes.func,
   config: PropTypes.shape({
     // None Error Warning Info 'All/Debug'
     logLevel: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
@@ -13515,6 +14225,10 @@ App.defaultProps = {
   nickname: '',
   profileUrl: '',
   userListQuery: null,
+  allowProfileEdit: false,
+  onProfileEditSuccess: null,
+  disableUserProfile: false,
+  renderUserProfile: null,
   config: {},
   useReaction: true,
   useMessageGrouping: true
