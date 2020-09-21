@@ -1,6 +1,13 @@
 # Changelog
 
-## 1.2.4(Sept 17, 2020)
+## 1.2.5(Sept 21, 2020)
+
+- Features/Bugs:
+  * ChannelList
+    * disableUserProfile: boolean
+    * renderUserProfile: React.Component
+
+## 1.2.4(Sept 17, 2020) Deprecated
 
 - Features:
   User profile viewer on Channel and ChannelSettings

@@ -222,7 +222,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.2.4';
+var APP_VERSION_STRING = '1.2.5';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -812,6 +812,32 @@ Sendbird.defaultProps = {
   allowProfileEdit: false,
   userListQuery: null,
   config: {}
+};
+
+var UserProfileContext = React__default.createContext();
+
+var UserProfileProvider = function UserProfileProvider(props) {
+  var children = props.children,
+      className = props.className;
+  return React__default.createElement(UserProfileContext.Provider, {
+    value: props
+  }, React__default.createElement("div", {
+    className: className
+  }, children));
+};
+
+UserProfileProvider.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element), PropTypes.any]).isRequired,
+  // eslint-disable-next-line react/no-unused-prop-types
+  disableUserProfile: PropTypes.bool,
+  // eslint-disable-next-line react/no-unused-prop-types
+  renderUserProfile: PropTypes.func,
+  className: PropTypes.string
+};
+UserProfileProvider.defaultProps = {
+  className: null,
+  disableUserProfile: false,
+  renderUserProfile: null
 };
 
 var RESET_CHANNEL_LIST = 'RESET_CHANNEL_LIST';
@@ -3882,32 +3908,6 @@ function Types() {
 }
 var PlaceHolderTypes = Types();
 
-var UserProfileContext = React__default.createContext();
-
-var UserProfileProvider = function UserProfileProvider(props) {
-  var children = props.children,
-      className = props.className;
-  return React__default.createElement(UserProfileContext.Provider, {
-    value: props
-  }, React__default.createElement("div", {
-    className: className
-  }, children));
-};
-
-UserProfileProvider.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element), PropTypes.any]).isRequired,
-  // eslint-disable-next-line react/no-unused-prop-types
-  disableUserProfile: PropTypes.bool,
-  // eslint-disable-next-line react/no-unused-prop-types
-  renderUserProfile: PropTypes.func,
-  className: PropTypes.string
-};
-UserProfileProvider.defaultProps = {
-  className: null,
-  disableUserProfile: false,
-  renderUserProfile: null
-};
-
 function MutedAvatarOverlay(props) {
   var _a = props.height,
       height = _a === void 0 ? 24 : _a,
@@ -5837,6 +5837,8 @@ function ChannelList(props) {
       queries = _props$queries === void 0 ? {} : _props$queries,
       renderChannelPreview = props.renderChannelPreview,
       renderHeader = props.renderHeader,
+      renderUserProfile = props.renderUserProfile,
+      disableUserProfile = props.disableUserProfile,
       allowProfileEdit = props.allowProfileEdit,
       onProfileEditSuccess = props.onProfileEditSuccess,
       onThemeChange = props.onThemeChange,
@@ -5846,6 +5848,8 @@ function ChannelList(props) {
       config = _props$config2 === void 0 ? {} : _props$config2; // enable if it is true atleast once(both are flase by default)
 
   var enableEditProfile = allowProfileEdit || config.allowProfileEdit;
+  var userDefinedDisableUserProfile = disableUserProfile || config.disableUserProfile;
+  var userDefinedRenderProfile = renderUserProfile || config.renderUserProfile;
   var _sdkStore$sdk = sdkStore.sdk,
       sdk = _sdkStore$sdk === void 0 ? {} : _sdkStore$sdk;
   var userFilledChannelListQuery = queries.channelListQuery;
@@ -5941,8 +5945,10 @@ function ChannelList(props) {
       }
     });
   }, [currentChannel]);
-  return React__default.createElement("div", {
-    className: "sendbird-channel-list"
+  return React__default.createElement(UserProfileProvider, {
+    disableUserProfile: userDefinedDisableUserProfile,
+    renderUserProfile: userDefinedRenderProfile,
+    className: "sendbird-channel-settings"
   }, React__default.createElement("div", {
     className: "sendbird-channel-list__header"
   }, React__default.createElement(ChannelHeader, {
@@ -6149,6 +6155,8 @@ ChannelList.propTypes = {
   }),
   onBeforeCreateChannel: PropTypes.func,
   renderChannelPreview: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
+  disableUserProfile: PropTypes.bool,
+  renderUserProfile: PropTypes.func,
   allowProfileEdit: PropTypes.bool,
   onThemeChange: PropTypes.func,
   onProfileEditSuccess: PropTypes.func,
@@ -6159,6 +6167,8 @@ ChannelList.defaultProps = {
   onBeforeCreateChannel: null,
   renderChannelPreview: null,
   renderHeader: null,
+  disableUserProfile: false,
+  renderUserProfile: null,
   allowProfileEdit: false,
   onThemeChange: null,
   onProfileEditSuccess: null,
