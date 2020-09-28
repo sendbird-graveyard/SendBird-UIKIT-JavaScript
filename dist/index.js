@@ -1078,6 +1078,40 @@ function reducer$2(state, action) {
   }
 }
 
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+function __spreadArrays() {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+}
+
 /*
   ImageRenderer displays image with url or source
   it checks if the source exist with img tag first
@@ -1141,258 +1175,6 @@ ImageRenderer.defaultProps = {
   className: '',
   circle: false
 };
-
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
-var _ref =
-/*#__PURE__*/
-React__default.createElement("path", {
-  fill: "#A8A8A8",
-  d: "M0 0h56v56H0z"
-});
-
-var _ref2 =
-/*#__PURE__*/
-React__default.createElement("path", {
-  fill: "#FFF",
-  fillOpacity: 0.88,
-  d: "M34.667 31.333a8.334 8.334 0 018.325 7.972l.008.362V43a1.667 1.667 0 01-3.322.194L39.667 43v-3.333a5 5 0 00-4.707-4.992l-.293-.008H21.333a5 5 0 00-4.991 4.706l-.009.294V43a1.667 1.667 0 01-3.322.194L13 43v-3.333a8.333 8.333 0 017.972-8.326l.361-.008h13.334zm-6.667-20A8.333 8.333 0 1128 28a8.333 8.333 0 010-16.667zm0 3.334a5 5 0 100 10 5 5 0 000-10z"
-});
-
-function SvgIconAvatarLight(props) {
-  return React__default.createElement("svg", _extends({
-    viewBox: "0 0 56 56"
-  }, props), _ref, _ref2);
-}
-
-function _extends$1() { _extends$1 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$1.apply(this, arguments); }
-
-var _ref$1 =
-/*#__PURE__*/
-React__default.createElement("path", {
-  fill: "#393939",
-  d: "M0 0h56v56H0z"
-});
-
-var _ref2$1 =
-/*#__PURE__*/
-React__default.createElement("path", {
-  fillOpacity: 0.88,
-  d: "M34.667 31.333a8.334 8.334 0 018.325 7.972l.008.362V43a1.667 1.667 0 01-3.322.194L39.667 43v-3.333a5 5 0 00-4.707-4.992l-.293-.008H21.333a5 5 0 00-4.991 4.706l-.009.294V43a1.667 1.667 0 01-3.322.194L13 43v-3.333a8.333 8.333 0 017.972-8.326l.361-.008h13.334zm-6.667-20A8.333 8.333 0 1128 28a8.333 8.333 0 010-16.667zm0 3.334a5 5 0 100 10 5 5 0 000-10z"
-});
-
-function SvgIconAvatarDark(props) {
-  return React__default.createElement("svg", _extends$1({
-    viewBox: "0 0 56 56"
-  }, props), _ref$1, _ref2$1);
-}
-
-var defaultComponent = function defaultComponent(_ref) {
-  var width = _ref.width,
-      height = _ref.height;
-  return function () {
-    return document.querySelector('.sendbird-theme--dark') ? React__default.createElement(SvgIconAvatarDark, {
-      className: "sendbird-avatar-img",
-      style: {
-        height: height,
-        width: width
-      }
-    }) : React__default.createElement(SvgIconAvatarLight, {
-      className: "sendbird-avatar-img",
-      style: {
-        height: height,
-        width: width
-      }
-    });
-  };
-};
-
-var imageRendererClassName = 'sendbird-avatar-img';
-var AvatarInner = function AvatarInner(_ref2) {
-  var src = _ref2.src,
-      height = _ref2.height,
-      width = _ref2.width,
-      alt = _ref2.alt;
-
-  if (typeof src === 'string') {
-    return React__default.createElement(ImageRenderer, {
-      className: imageRendererClassName,
-      url: src,
-      height: height,
-      width: width,
-      alt: alt,
-      defaultComponent: defaultComponent({
-        height: height,
-        width: width
-      })
-    });
-  }
-
-  if (src && src.length) {
-    if (src.length === 1) {
-      return React__default.createElement(ImageRenderer, {
-        className: imageRendererClassName,
-        url: src[0],
-        height: height,
-        width: width,
-        alt: alt,
-        defaultComponent: defaultComponent({
-          height: height,
-          width: width
-        })
-      });
-    }
-
-    if (src.length === 2) {
-      return React__default.createElement("div", {
-        className: "sendbird-avatar--inner__two-child"
-      }, React__default.createElement(ImageRenderer, {
-        className: imageRendererClassName,
-        url: src[0],
-        height: height,
-        width: width,
-        alt: alt,
-        defaultComponent: defaultComponent({
-          height: height,
-          width: width
-        })
-      }), React__default.createElement(ImageRenderer, {
-        className: imageRendererClassName,
-        url: src[1],
-        height: height,
-        width: width,
-        alt: alt,
-        defaultComponent: defaultComponent({
-          height: height,
-          width: width
-        })
-      }));
-    }
-
-    if (src.length === 3) {
-      return React__default.createElement(React__default.Fragment, null, React__default.createElement("div", {
-        className: "sendbird-avatar--inner__three-child--upper"
-      }, React__default.createElement(ImageRenderer, {
-        className: imageRendererClassName,
-        url: src[0],
-        height: height,
-        width: width,
-        alt: alt,
-        defaultComponent: defaultComponent({
-          height: height,
-          width: width
-        })
-      })), React__default.createElement("div", {
-        className: "sendbird-avatar--inner__three-child--lower"
-      }, React__default.createElement(ImageRenderer, {
-        className: imageRendererClassName,
-        url: src[1],
-        height: height,
-        width: width,
-        alt: alt,
-        defaultComponent: defaultComponent({
-          height: height,
-          width: width
-        })
-      }), React__default.createElement(ImageRenderer, {
-        className: imageRendererClassName,
-        url: src[2],
-        height: height,
-        width: width,
-        alt: alt,
-        defaultComponent: defaultComponent({
-          height: height,
-          width: width
-        })
-      })));
-    }
-
-    return React__default.createElement("div", {
-      className: "sendbird-avatar--inner__four-child"
-    }, src.slice(0, 4).map(function (i) {
-      return React__default.createElement(ImageRenderer, {
-        className: imageRendererClassName,
-        url: i,
-        height: height,
-        width: width,
-        alt: alt,
-        key: uuidv4(),
-        defaultComponent: defaultComponent({
-          height: height,
-          width: width
-        })
-      });
-    }));
-  } // default img
-
-
-  return React__default.createElement(ImageRenderer, {
-    className: imageRendererClassName,
-    url: "",
-    height: height,
-    width: width,
-    alt: alt,
-    defaultComponent: defaultComponent({
-      height: height,
-      width: width
-    })
-  });
-};
-AvatarInner.propTypes = {
-  src: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  alt: PropTypes.string
-};
-AvatarInner.defaultProps = {
-  src: '',
-  alt: ''
-};
-
-function Avatar(_ref3, ref) {
-  var src = _ref3.src,
-      height = _ref3.height,
-      width = _ref3.width,
-      alt = _ref3.alt,
-      className = _ref3.className,
-      onClick = _ref3.onClick;
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  return React__default.createElement("div", {
-    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-avatar']).join(' '),
-    ref: ref,
-    style: {
-      height: height,
-      width: width
-    },
-    onClick: onClick,
-    role: "button",
-    tabIndex: "0",
-    onKeyDown: onClick
-  }, React__default.createElement(AvatarInner, {
-    src: src,
-    height: height,
-    width: width,
-    alt: alt
-  }));
-}
-
-Avatar.propTypes = {
-  src: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  alt: PropTypes.string,
-  onClick: PropTypes.func,
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
-};
-Avatar.defaultProps = {
-  height: '56px',
-  width: '56px',
-  onClick: function onClick() {},
-  alt: '',
-  src: '',
-  className: ''
-};
-var Avatar$1 = React__default.forwardRef(Avatar);
 
 var Type = {
   ADD: 'ADD',
@@ -1458,9 +1240,9 @@ var Type = {
   TOGGLE_OFF: 'TOGGLE_OFF'
 };
 
-function _extends$2() { _extends$2 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$2.apply(this, arguments); }
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
-var _ref$2 =
+var _ref =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-add_svg__fill",
@@ -1470,6 +1252,40 @@ React__default.createElement("path", {
 });
 
 function SvgIconAdd(props) {
+  return React__default.createElement("svg", _extends({
+    viewBox: "0 0 24 24"
+  }, props), _ref);
+}
+
+function _extends$1() { _extends$1 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$1.apply(this, arguments); }
+
+var _ref$1 =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-attach_svg__fill",
+  fillOpacity: 0.88,
+  fillRule: "evenodd",
+  d: "M19.021 9.943l-8.424 8.023c-1.795 1.71-4.723 1.71-6.518 0-1.77-1.685-1.77-4.398 0-6.084l8.424-8.023c1.079-1.027 2.845-1.027 3.924 0a2.461 2.461 0 010 3.614l-8.433 8.022a.984.984 0 01-1.33 0 .772.772 0 010-1.142l7.782-7.403a.917.917 0 00-1.264-1.328L5.4 13.025a2.605 2.605 0 000 3.798 2.816 2.816 0 003.858 0l8.433-8.022a4.294 4.294 0 000-6.27C15.905.83 13.025.83 11.24 2.531l-8.425 8.023c-2.528 2.408-2.528 6.332 0 8.74 2.504 2.384 6.544 2.384 9.047 0l8.425-8.023a.917.917 0 10-1.265-1.328z"
+});
+
+function SvgIconAttach(props) {
+  return React__default.createElement("svg", _extends$1({
+    viewBox: "0 0 22 22"
+  }, props), _ref$1);
+}
+
+function _extends$2() { _extends$2 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$2.apply(this, arguments); }
+
+var _ref$2 =
+/*#__PURE__*/
+React__default.createElement("path", {
+  className: "icon-arrow-left_svg__fill",
+  fill: "#7B53EF",
+  fillRule: "evenodd",
+  d: "M12.707 3.293a1 1 0 01.083 1.32l-.083.094L6.415 11H21a1 1 0 01.117 1.993L21 13H6.415l6.292 6.293a1 1 0 01.083 1.32l-.083.094a1 1 0 01-1.32.083l-.094-.083-8-8a1 1 0 01-.083-1.32l.083-.094 8-8a1 1 0 011.414 0z"
+});
+
+function SvgIconArrowLeft(props) {
   return React__default.createElement("svg", _extends$2({
     viewBox: "0 0 24 24"
   }, props), _ref$2);
@@ -1480,16 +1296,21 @@ function _extends$3() { _extends$3 = Object.assign || function (target) { for (v
 var _ref$3 =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-attach_svg__fill",
-  fillOpacity: 0.88,
-  fillRule: "evenodd",
-  d: "M19.021 9.943l-8.424 8.023c-1.795 1.71-4.723 1.71-6.518 0-1.77-1.685-1.77-4.398 0-6.084l8.424-8.023c1.079-1.027 2.845-1.027 3.924 0a2.461 2.461 0 010 3.614l-8.433 8.022a.984.984 0 01-1.33 0 .772.772 0 010-1.142l7.782-7.403a.917.917 0 00-1.264-1.328L5.4 13.025a2.605 2.605 0 000 3.798 2.816 2.816 0 003.858 0l8.433-8.022a4.294 4.294 0 000-6.27C15.905.83 13.025.83 11.24 2.531l-8.425 8.023c-2.528 2.408-2.528 6.332 0 8.74 2.504 2.384 6.544 2.384 9.047 0l8.425-8.023a.917.917 0 10-1.265-1.328z"
+  fill: "#393939",
+  d: "M0 0h56v56H0z"
 });
 
-function SvgIconAttach(props) {
+var _ref2 =
+/*#__PURE__*/
+React__default.createElement("path", {
+  fillOpacity: 0.88,
+  d: "M34.667 31.333a8.334 8.334 0 018.325 7.972l.008.362V43a1.667 1.667 0 01-3.322.194L39.667 43v-3.333a5 5 0 00-4.707-4.992l-.293-.008H21.333a5 5 0 00-4.991 4.706l-.009.294V43a1.667 1.667 0 01-3.322.194L13 43v-3.333a8.333 8.333 0 017.972-8.326l.361-.008h13.334zm-6.667-20A8.333 8.333 0 1128 28a8.333 8.333 0 010-16.667zm0 3.334a5 5 0 100 10 5 5 0 000-10z"
+});
+
+function SvgIconAvatarDark(props) {
   return React__default.createElement("svg", _extends$3({
-    viewBox: "0 0 22 22"
-  }, props), _ref$3);
+    viewBox: "0 0 56 56"
+  }, props), _ref$3, _ref2);
 }
 
 function _extends$4() { _extends$4 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$4.apply(this, arguments); }
@@ -1497,16 +1318,22 @@ function _extends$4() { _extends$4 = Object.assign || function (target) { for (v
 var _ref$4 =
 /*#__PURE__*/
 React__default.createElement("path", {
-  className: "icon-arrow-left_svg__fill",
-  fill: "#7B53EF",
-  fillRule: "evenodd",
-  d: "M12.707 3.293a1 1 0 01.083 1.32l-.083.094L6.415 11H21a1 1 0 01.117 1.993L21 13H6.415l6.292 6.293a1 1 0 01.083 1.32l-.083.094a1 1 0 01-1.32.083l-.094-.083-8-8a1 1 0 01-.083-1.32l.083-.094 8-8a1 1 0 011.414 0z"
+  fill: "#A8A8A8",
+  d: "M0 0h56v56H0z"
 });
 
-function SvgIconArrowLeft(props) {
+var _ref2$1 =
+/*#__PURE__*/
+React__default.createElement("path", {
+  fill: "#FFF",
+  fillOpacity: 0.88,
+  d: "M34.667 31.333a8.334 8.334 0 018.325 7.972l.008.362V43a1.667 1.667 0 01-3.322.194L39.667 43v-3.333a5 5 0 00-4.707-4.992l-.293-.008H21.333a5 5 0 00-4.991 4.706l-.009.294V43a1.667 1.667 0 01-3.322.194L13 43v-3.333a8.333 8.333 0 017.972-8.326l.361-.008h13.334zm-6.667-20A8.333 8.333 0 1128 28a8.333 8.333 0 010-16.667zm0 3.334a5 5 0 100 10 5 5 0 000-10z"
+});
+
+function SvgIconAvatarLight(props) {
   return React__default.createElement("svg", _extends$4({
-    viewBox: "0 0 24 24"
-  }, props), _ref$4);
+    viewBox: "0 0 56 56"
+  }, props), _ref$4, _ref2$1);
 }
 
 function _extends$5() { _extends$5 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$5.apply(this, arguments); }
@@ -2846,6 +2673,193 @@ Icon.defaultProps = {
 var IconTypes = Type;
 var IconColors = Colors;
 
+var imageRendererClassName = 'sendbird-avatar-img';
+
+var defaultComponent = function defaultComponent(_a) {
+  var width = _a.width,
+      height = _a.height;
+  return function () {
+    return document.querySelector('.sendbird-theme--dark') ? React__default.createElement(Icon, {
+      className: imageRendererClassName,
+      type: IconTypes.AVATAR_DARK,
+      width: width,
+      height: height
+    }) : React__default.createElement(Icon, {
+      className: imageRendererClassName,
+      type: IconTypes.AVATAR_LIGHT,
+      width: width,
+      height: height
+    });
+  };
+};
+
+var AvatarInner = function AvatarInner(_a) {
+  var _b = _a.src,
+      src = _b === void 0 ? '' : _b,
+      _c = _a.alt,
+      alt = _c === void 0 ? '' : _c,
+      height = _a.height,
+      width = _a.width;
+
+  if (typeof src === 'string') {
+    return React__default.createElement(ImageRenderer, {
+      className: imageRendererClassName,
+      url: src,
+      height: height,
+      width: width,
+      alt: alt,
+      defaultComponent: defaultComponent({
+        height: height,
+        width: width
+      })
+    });
+  }
+
+  if (src && src.length) {
+    if (src.length === 1) {
+      return React__default.createElement(ImageRenderer, {
+        className: imageRendererClassName,
+        url: src[0],
+        height: height,
+        width: width,
+        alt: alt,
+        defaultComponent: defaultComponent({
+          height: height,
+          width: width
+        })
+      });
+    }
+
+    if (src.length === 2) {
+      return React__default.createElement("div", {
+        className: "sendbird-avatar--inner__two-child"
+      }, React__default.createElement(ImageRenderer, {
+        className: imageRendererClassName,
+        url: src[0],
+        height: height,
+        width: width,
+        alt: alt,
+        defaultComponent: defaultComponent({
+          height: height,
+          width: width
+        })
+      }), React__default.createElement(ImageRenderer, {
+        className: imageRendererClassName,
+        url: src[1],
+        height: height,
+        width: width,
+        alt: alt,
+        defaultComponent: defaultComponent({
+          height: height,
+          width: width
+        })
+      }));
+    }
+
+    if (src.length === 3) {
+      return React__default.createElement(React__default.Fragment, null, React__default.createElement("div", {
+        className: "sendbird-avatar--inner__three-child--upper"
+      }, React__default.createElement(ImageRenderer, {
+        className: imageRendererClassName,
+        url: src[0],
+        height: height,
+        width: width,
+        alt: alt,
+        defaultComponent: defaultComponent({
+          height: height,
+          width: width
+        })
+      })), React__default.createElement("div", {
+        className: "sendbird-avatar--inner__three-child--lower"
+      }, React__default.createElement(ImageRenderer, {
+        className: imageRendererClassName,
+        url: src[1],
+        height: height,
+        width: width,
+        alt: alt,
+        defaultComponent: defaultComponent({
+          height: height,
+          width: width
+        })
+      }), React__default.createElement(ImageRenderer, {
+        className: imageRendererClassName,
+        url: src[2],
+        height: height,
+        width: width,
+        alt: alt,
+        defaultComponent: defaultComponent({
+          height: height,
+          width: width
+        })
+      })));
+    }
+
+    return React__default.createElement("div", {
+      className: "sendbird-avatar--inner__four-child"
+    }, src.slice(0, 4).map(function (i) {
+      return React__default.createElement(ImageRenderer, {
+        className: imageRendererClassName,
+        url: i,
+        height: height,
+        width: width,
+        alt: alt,
+        key: uuidv4(),
+        defaultComponent: defaultComponent({
+          height: height,
+          width: width
+        })
+      });
+    }));
+  } // default img
+
+
+  return React__default.createElement(ImageRenderer, {
+    className: imageRendererClassName,
+    url: "",
+    height: height,
+    width: width,
+    alt: alt,
+    defaultComponent: defaultComponent({
+      height: height,
+      width: width
+    })
+  });
+};
+
+function Avatar(_a, ref) {
+  var _b = _a.src,
+      src = _b === void 0 ? '' : _b,
+      _c = _a.alt,
+      alt = _c === void 0 ? '' : _c,
+      _d = _a.width,
+      width = _d === void 0 ? '56px' : _d,
+      _e = _a.height,
+      height = _e === void 0 ? '56px' : _e,
+      onClick = _a.onClick,
+      _f = _a.className,
+      className = _f === void 0 ? '' : _f;
+  var injectingClassName = Array.isArray(className) ? className : [className];
+  return React__default.createElement("div", {
+    className: __spreadArrays(injectingClassName, ['sendbird-avatar']).join(' '),
+    ref: ref,
+    style: {
+      height: height,
+      width: width
+    },
+    onClick: onClick,
+    role: "button",
+    tabIndex: 0,
+    onKeyDown: onClick
+  }, React__default.createElement(AvatarInner, {
+    src: src,
+    height: height,
+    width: width,
+    alt: alt
+  }));
+}
+
+var Avatar$1 = React__default.forwardRef(Avatar);
+
 var DEFAULT_URL_PREFIX = 'https://static.sendbird.com/sample/cover/cover_';
 var getChannelAvatarSource = function getChannelAvatarSource(channel, currentUserId) {
   if (channel && channel.coverUrl) {
@@ -4144,11 +4158,20 @@ var getSendFileMessage = function getSendFileMessage(store) {
                 channel: channel
               });
             });
-          }); // keep the file's local version in pendingMsg.localUrl
-          // because promise doesnt allow overriding of pendingMsg.url
-          // eslint-disable-next-line no-param-reassign
+          });
 
-          pendingMsg.localUrl = URL.createObjectURL(fileMessageParams.file); // eslint-disable-next-line no-param-reassign
+          if (fileMessageParams.file) {
+            // keep the file's local version in pendingMsg.localUrl
+            // because promise doesnt allow overriding of pendingMsg.url
+            // eslint-disable-next-line no-param-reassign
+            pendingMsg.localUrl = URL.createObjectURL(fileMessageParams.file);
+          }
+
+          if (fileMessageParams.fileUrl) {
+            // eslint-disable-next-line no-param-reassign
+            pendingMsg.localUrl = fileMessageParams.fileUrl;
+          } // eslint-disable-next-line no-param-reassign
+
 
           pendingMsg.requestState = 'pending';
           pubsub.publish(SEND_MESSAGE_START, {
@@ -6197,6 +6220,55 @@ var ON_REACTION_UPDATED = 'ON_REACTION_UPDATED';
 var SET_EMOJI_CONTAINER = 'SET_EMOJI_CONTAINER';
 var SET_READ_STATUS = 'SET_READ_STATUS';
 
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types
+var SUPPORTED_MIMES = {
+  IMAGE: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp' // not supported in IE
+  ],
+  VIDEO: ['video/mpeg', 'video/ogg', 'video/webm', 'video/mp4']
+};
+var isImage = function isImage(type) {
+  return SUPPORTED_MIMES.IMAGE.includes(type);
+};
+var isVideo = function isVideo(type) {
+  return SUPPORTED_MIMES.VIDEO.includes(type);
+};
+var unSupported = function unSupported(type) {
+  return !(isImage(type) || isVideo(type));
+};
+
+var MessageTypes = {
+  ADMIN: 'ADMIN',
+  USER: 'USER',
+  FILE: 'FILE',
+  THUMBNAIL: 'THUMBNAIL',
+  OG: 'OG'
+};
+var SendingMessageStatus = {
+  NONE: 'none',
+  SUCCEEDED: 'succeeded',
+  FAILED: 'failed',
+  PENDING: 'pending'
+};
+var getMessageType = function getMessageType(message) {
+  if (message.isUserMessage && message.isUserMessage() || message.messageType === 'user') {
+    return message.ogMetaData ? MessageTypes.OG : MessageTypes.USER;
+  }
+
+  if (message.isAdminMessage && message.isAdminMessage()) {
+    return MessageTypes.ADMIN;
+  }
+
+  if (message.isFileMessage && message.isFileMessage() || message.messageType === 'file') {
+    return isImage(message.type) || isVideo(message.type) ? MessageTypes.THUMBNAIL : MessageTypes.FILE;
+  }
+
+  return '';
+};
+
+var UNDEFINED = 'undefined';
+var SUCCEEDED = SendingMessageStatus.SUCCEEDED,
+    FAILED = SendingMessageStatus.FAILED,
+    PENDING = SendingMessageStatus.PENDING;
 var scrollIntoLast = function scrollIntoLast(selector) {
   var intialTry = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
   var MAX_TRIES = 10;
@@ -6289,15 +6361,15 @@ var pubSubHandler$1 = function pubSubHandler(channelUrl, pubSub, dispatcher) {
   return subscriber;
 };
 var getParsedStatus = function getParsedStatus(message, currentGroupChannel) {
-  if (message.requestState === 'failed') {
+  if (message.requestState === FAILED) {
     return MessageStatusType.FAILED;
   }
 
-  if (message.requestState === 'pending') {
+  if (message.requestState === PENDING) {
     return MessageStatusType.PENDING;
   }
 
-  if (message.requestState === 'succeeded') {
+  if (message.requestState === SUCCEEDED) {
     if (!currentGroupChannel) {
       return MessageStatusType.SENT;
     }
@@ -6406,6 +6478,25 @@ var isSameGroup = function isSameGroup(message, comparingMessage) {
 var compareMessagesForGrouping = function compareMessagesForGrouping(prevMessage, currMessage, nextMessage) {
   return [isSameGroup(prevMessage, currMessage), isSameGroup(currMessage, nextMessage)];
 };
+var passUnsuccessfullMessages = function passUnsuccessfullMessages(allMessages, newMessage) {
+  var _newMessage$sendingSt = newMessage.sendingStatus,
+      sendingStatus = _newMessage$sendingSt === void 0 ? UNDEFINED : _newMessage$sendingSt;
+
+  if (sendingStatus === SUCCEEDED || sendingStatus === PENDING) {
+    var lastIndexOfSucceededMessage = allMessages.map(function (message) {
+      return message.sendingStatus || (message.isAdminMessage && message.isAdminMessage() ? SUCCEEDED : UNDEFINED);
+    }).lastIndexOf(SUCCEEDED);
+
+    if (lastIndexOfSucceededMessage + 1 < allMessages.length) {
+      var messages = _toConsumableArray(allMessages);
+
+      messages.splice(lastIndexOfSucceededMessage + 1, 0, newMessage);
+      return messages;
+    }
+  }
+
+  return [].concat(_toConsumableArray(allMessages), [newMessage]);
+};
 
 var messagesInitialState = {
   initialized: false,
@@ -6439,6 +6530,9 @@ function compareIds (a, b) {
   return aString === bString;
 }
 
+var SUCCEEDED$1 = SendingMessageStatus.SUCCEEDED,
+    FAILED$1 = SendingMessageStatus.FAILED,
+    PENDING$1 = SendingMessageStatus.PENDING;
 function reducer$3(state, action) {
   switch (action.type) {
     case RESET_STATE:
@@ -6460,7 +6554,7 @@ function reducer$3(state, action) {
     case CLEAR_SENT_MESSAGES:
       return _objectSpread2({}, state, {
         allMessages: _toConsumableArray(state.allMessages.filter(function (m) {
-          return m.sendingStatus !== 'succeeded';
+          return m.sendingStatus !== SUCCEEDED$1;
         }))
       });
 
@@ -6499,11 +6593,19 @@ function reducer$3(state, action) {
       });
 
     case SEND_MESSAGEGE_SUCESS:
-      return _objectSpread2({}, state, {
-        allMessages: state.allMessages.map(function (m) {
+      {
+        var newMessages = state.allMessages.map(function (m) {
           return compareIds(m.reqId, action.payload.reqId) ? action.payload : m;
-        })
-      });
+        });
+
+        _toConsumableArray(newMessages).sort(function (a, b) {
+          return a.sendingStatus && b.sendingStatus && a.sendingStatus === SUCCEEDED$1 && (b.sendingStatus === PENDING$1 || b.sendingStatus === FAILED$1) ? -1 : 1;
+        });
+
+        return _objectSpread2({}, state, {
+          allMessages: newMessages
+        });
+      }
 
     case SEND_MESSAGEGE_FAILURE:
       {
@@ -6557,14 +6659,14 @@ function reducer$3(state, action) {
 
         if (message.isAdminMessage && message.isAdminMessage()) {
           return _objectSpread2({}, state, {
-            allMessages: [].concat(_toConsumableArray(state.allMessages), [message])
+            allMessages: passUnsuccessfullMessages(state.allMessages, message)
           });
         }
 
         return _objectSpread2({}, state, {
           unreadCount: unreadCount + 1,
           unreadSince: unreadCount === 0 ? Moment().format('LT MMM DD') : unreadSince,
-          allMessages: [].concat(_toConsumableArray(state.allMessages), [message])
+          allMessages: passUnsuccessfullMessages(state.allMessages, message)
         });
       }
 
@@ -8457,22 +8559,6 @@ var getMessageCreatedAt$3 = function getMessageCreatedAt(message) {
 };
 var getIsSentFromStatus$2 = function getIsSentFromStatus(status) {
   return status === MessageStatusType.SENT || status === MessageStatusType.DELIVERED || status === MessageStatusType.READ;
-};
-
-// https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types
-var SUPPORTED_MIMES = {
-  IMAGE: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp' // not supported in IE
-  ],
-  VIDEO: ['video/mpeg', 'video/ogg', 'video/webm', 'video/mp4']
-};
-var isImage = function isImage(type) {
-  return SUPPORTED_MIMES.IMAGE.includes(type);
-};
-var isVideo = function isVideo(type) {
-  return SUPPORTED_MIMES.VIDEO.includes(type);
-};
-var unSupported = function unSupported(type) {
-  return !(isImage(type) || isVideo(type));
 };
 
 var noop$3 = function noop() {};
@@ -10856,29 +10942,6 @@ IncomingOGMessage.propTypes = {
   chainBottom: PropTypes.bool.isRequired
 };
 
-var MessageTypes = {
-  ADMIN: 'ADMIN',
-  USER: 'USER',
-  FILE: 'FILE',
-  THUMBNAIL: 'THUMBNAIL',
-  OG: 'OG'
-};
-var getMessageType = function getMessageType(message) {
-  if (message.isUserMessage && message.isUserMessage() || message.messageType === 'user') {
-    return message.ogMetaData ? MessageTypes.OG : MessageTypes.USER;
-  }
-
-  if (message.isAdminMessage && message.isAdminMessage()) {
-    return MessageTypes.ADMIN;
-  }
-
-  if (message.isFileMessage && message.isFileMessage() || message.messageType === 'file') {
-    return isImage(message.type) || isVideo(message.type) ? MessageTypes.THUMBNAIL : MessageTypes.FILE;
-  }
-
-  return '';
-};
-
 function MessageHoc(_ref) {
   var _MessageTypes$ADMIN$M;
 
@@ -11192,6 +11255,7 @@ function (_Component) {
             className: "sendbird-msg--scroll-ref"
           }, renderChatItem({
             message: m,
+            channel: currentGroupChannel,
             onDeleteMessage: deleteMessage,
             onUpdateMessage: updateMessage,
             onResendMessage: resendMessage,
@@ -12172,40 +12236,6 @@ ChannelProfile.defaultProps = {
   disabled: false,
   onChannelInfoChange: function onChannelInfoChange() {}
 };
-
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */
-
-var __assign = function() {
-    __assign = Object.assign || function __assign(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-
-function __spreadArrays() {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-}
 
 function MembersModal(_a) {
   var hideModal = _a.hideModal,

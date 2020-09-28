@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.2.6(Sept 28, 2020)
+
+- Bugfixes:
+  * sendBirdSelectors.getSendFileMessage supports attaching
+    files that are uploaded to a remote server
+  * renderChatItem includes channel as a prop:
+    * The available props are:
+      {
+        message: BaseMessage,
+        onDeleteMessage: Fn,
+        onUpdateMessage: Fn,
+        channel: GroupChannel
+      }
+  * Place unsuccessful messages to the last on the allMessages
+
 ## 1.2.5(Sept 21, 2020)
 
 - Features/Bugs:
