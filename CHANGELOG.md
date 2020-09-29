@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.7(Sept 29, 2020)
+
+- Bugfixes:
+  * Fix ChannelList scroll by adding correct classname
+
 ## 1.2.6(Sept 28, 2020)
 
 - Bugfixes:

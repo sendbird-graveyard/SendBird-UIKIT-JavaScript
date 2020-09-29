@@ -215,7 +215,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.2.5';
+var APP_VERSION_STRING = '1.2.7';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -5964,7 +5964,7 @@ function ChannelList(props) {
   return React.createElement(UserProfileProvider, {
     disableUserProfile: userDefinedDisableUserProfile,
     renderUserProfile: userDefinedRenderProfile,
-    className: "sendbird-channel-settings"
+    className: "sendbird-channel-list"
   }, React.createElement("div", {
     className: "sendbird-channel-list__header"
   }, React.createElement(ChannelHeader, {
