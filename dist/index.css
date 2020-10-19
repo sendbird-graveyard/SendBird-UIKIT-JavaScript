@@ -1101,7 +1101,7 @@
 
 .sendbird-sort-by-row {
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   align-items: center; }
 
 .sendbird-user-list-item {
@@ -2798,7 +2798,7 @@
     cursor: pointer; }
   .sendbird-members-accordion .sendbird-members-accordion__footer {
     display: flex;
-    justify-content: start;
+    justify-content: flex-start;
     margin-top: 8px; }
     .sendbird-members-accordion .sendbird-members-accordion__footer .sendbird-members-accordion__footer__all-members {
       margin-right: 16px; }
@@ -2881,7 +2881,7 @@
     box-sizing: border-box; }
   .sendbird-accordion .sendbird-accordion__footer {
     display: flex;
-    justify-content: start;
+    justify-content: flex-start;
     margin-top: 8px; }
 
 .sendbird-accordion__panel-heder {

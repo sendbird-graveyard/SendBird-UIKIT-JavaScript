@@ -215,7 +215,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.2.7';
+var APP_VERSION_STRING = '1.2.8';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -5723,7 +5723,8 @@ function setupChannelList(_ref3) {
       setChannelSource = _ref3.setChannelSource,
       onChannelSelect = _ref3.onChannelSelect,
       userFilledChannelListQuery = _ref3.userFilledChannelListQuery,
-      logger = _ref3.logger;
+      logger = _ref3.logger,
+      sortChannelList = _ref3.sortChannelList;
   createEventHandler({
     sdk: sdk,
     channelListDispatcher: channelListDispatcher,
@@ -5767,10 +5768,17 @@ function setupChannelList(_ref3) {
 
 
       logger.info('ChannelList - highlight channel', channelList[0]);
-      onChannelSelect(channelList[0]);
+      var sorted = channelList;
+
+      if (sortChannelList && typeof sortChannelList === 'function') {
+        sorted = sortChannelList(channelList);
+        logger.info('ChannelList - channel list sorted', sorted);
+      }
+
+      onChannelSelect(sorted[0]);
       channelListDispatcher({
         type: INIT_CHANNELS_SUCCESS,
-        payload: channelList
+        payload: sorted
       });
 
       if (channelList && typeof channelList.forEach === 'function') {
@@ -5856,6 +5864,7 @@ function ChannelList(props) {
       renderUserProfile = props.renderUserProfile,
       disableUserProfile = props.disableUserProfile,
       allowProfileEdit = props.allowProfileEdit,
+      sortChannelList = props.sortChannelList,
       onProfileEditSuccess = props.onProfileEditSuccess,
       onThemeChange = props.onThemeChange,
       onBeforeCreateChannel = props.onBeforeCreateChannel,
@@ -5922,7 +5931,8 @@ function ChannelList(props) {
         setChannelSource: setChannelSource,
         onChannelSelect: onChannelSelect,
         userFilledChannelListQuery: userFilledChannelListQuery,
-        logger: logger
+        logger: logger,
+        sortChannelList: sortChannelList
       });
     } else {
       logger.info('ChannelList: Removing channelHandlers'); // remove previous channelHandlers
@@ -5946,8 +5956,23 @@ function ChannelList(props) {
         sdk.removeChannelHandler(sdkChannelHandlerId);
       }
     };
-  }, [sdkIntialized, userFilledChannelListQuery]);
+  }, [sdkIntialized, userFilledChannelListQuery, sortChannelList]);
   var allChannels = channelListStore.allChannels;
+  var sortedChannels = sortChannelList && typeof sortChannelList === 'function' ? sortChannelList(allChannels) : allChannels;
+
+  if (sortedChannels.length !== allChannels.length) {
+    var warning = "ChannelList: You have removed/added extra channels on sortChannelList\n      this could cause unexpected problems"; // eslint-disable-next-line no-console
+
+    console.warn(warning, {
+      before: allChannels,
+      after: sortedChannels
+    });
+    logger.warning(warning, {
+      before: allChannels,
+      after: sortedChannels
+    });
+  }
+
   useEffect(function () {
     if (!sdk || !sdk.GroupChannel) {
       return;
@@ -6049,7 +6074,7 @@ function ChannelList(props) {
     }
   }, sdkError && React.createElement(ChannelsPlaceholder, {
     type: PlaceHolderTypes.WRONG
-  }), React.createElement("div", null, allChannels && allChannels.map(function (channel, idx) {
+  }), React.createElement("div", null, sortedChannels && sortedChannels.map(function (channel, idx) {
     var _onLeaveChannel = function onLeaveChannel(c, cb) {
       logger.info('ChannelList: Leaving channel', c);
       c.leave().then(function (res) {
@@ -6174,6 +6199,7 @@ ChannelList.propTypes = {
   disableUserProfile: PropTypes.bool,
   renderUserProfile: PropTypes.func,
   allowProfileEdit: PropTypes.bool,
+  sortChannelList: PropTypes.func,
   onThemeChange: PropTypes.func,
   onProfileEditSuccess: PropTypes.func,
   renderHeader: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
@@ -6187,6 +6213,7 @@ ChannelList.defaultProps = {
   renderUserProfile: null,
   allowProfileEdit: false,
   onThemeChange: null,
+  sortChannelList: null,
   onProfileEditSuccess: null,
   queries: {},
   onChannelSelect: noop$1

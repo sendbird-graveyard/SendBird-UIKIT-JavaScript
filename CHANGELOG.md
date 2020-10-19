@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.2.8(Oct 19, 2020)
+
+- Features/Bugs:
+  * sortChannelList prop for ChannelListComponent
+  ```
+    sortChannelList={(channels: BaseChannel) => {
+      ...
+      return sortedChannels: BaseChannel
+    }}
+  ```
+- Bugfixes:
+  * CSS Flex: Rename all start to flex-start
+
 ## 1.2.7(Sept 29, 2020)
 
 - Bugfixes:
