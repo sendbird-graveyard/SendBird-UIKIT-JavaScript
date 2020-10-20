@@ -8,8 +8,12 @@ var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
 var Sb = _interopDefault(require('sendbird'));
-var Moment = _interopDefault(require('moment'));
+var isToday = _interopDefault(require('date-fns/isToday'));
+var format = _interopDefault(require('date-fns/format'));
+var isYesterday = _interopDefault(require('date-fns/isYesterday'));
 var reactDom = require('react-dom');
+var isSameDay = _interopDefault(require('date-fns/isSameDay'));
+var formatDistanceToNowStrict = _interopDefault(require('date-fns/formatDistanceToNowStrict'));
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -222,7 +226,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.2.8';
+var APP_VERSION_STRING = '1.3.0-rc.0';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -335,6 +339,1667 @@ var handleConnection = function handleConnection(_ref2, dispatchers) {
       }
     }
   });
+};
+
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+function __spreadArrays() {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+}
+
+/*!
+ * css-vars-ponyfill
+ * v2.3.2
+ * https://jhildenbiddle.github.io/css-vars-ponyfill/
+ * (c) 2018-2020 John Hildenbiddle <http://hildenbiddle.com>
+ * MIT license
+ */
+function _extends() {
+    _extends = Object.assign || function(target) {
+        for (var i = 1; i < arguments.length; i++) {
+            var source = arguments[i];
+            for (var key in source) {
+                if (Object.prototype.hasOwnProperty.call(source, key)) {
+                    target[key] = source[key];
+                }
+            }
+        }
+        return target;
+    };
+    return _extends.apply(this, arguments);
+}
+
+function _toConsumableArray$1(arr) {
+    return _arrayWithoutHoles$1(arr) || _iterableToArray$1(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread$1();
+}
+
+function _arrayWithoutHoles$1(arr) {
+    if (Array.isArray(arr)) return _arrayLikeToArray(arr);
+}
+
+function _iterableToArray$1(iter) {
+    if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
+}
+
+function _unsupportedIterableToArray(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(o);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _arrayLikeToArray(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+    for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+    return arr2;
+}
+
+function _nonIterableSpread$1() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+
+/*!
+ * get-css-data
+ * v1.8.0
+ * https://github.com/jhildenbiddle/get-css-data
+ * (c) 2018-2020 John Hildenbiddle <http://hildenbiddle.com>
+ * MIT license
+ */ function getUrls(urls) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var settings = {
+        mimeType: options.mimeType || null,
+        onBeforeSend: options.onBeforeSend || Function.prototype,
+        onSuccess: options.onSuccess || Function.prototype,
+        onError: options.onError || Function.prototype,
+        onComplete: options.onComplete || Function.prototype
+    };
+    var urlArray = Array.isArray(urls) ? urls : [ urls ];
+    var urlQueue = Array.apply(null, Array(urlArray.length)).map((function(x) {
+        return null;
+    }));
+    function isValidCss() {
+        var cssText = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+        var isHTML = cssText.trim().charAt(0) === "<";
+        return !isHTML;
+    }
+    function onError(xhr, urlIndex) {
+        settings.onError(xhr, urlArray[urlIndex], urlIndex);
+    }
+    function onSuccess(responseText, urlIndex) {
+        var returnVal = settings.onSuccess(responseText, urlArray[urlIndex], urlIndex);
+        responseText = returnVal === false ? "" : returnVal || responseText;
+        urlQueue[urlIndex] = responseText;
+        if (urlQueue.indexOf(null) === -1) {
+            settings.onComplete(urlQueue);
+        }
+    }
+    var parser = document.createElement("a");
+    urlArray.forEach((function(url, i) {
+        parser.setAttribute("href", url);
+        parser.href = String(parser.href);
+        var isIElte9 = Boolean(document.all && !window.atob);
+        var isIElte9CORS = isIElte9 && parser.host.split(":")[0] !== location.host.split(":")[0];
+        if (isIElte9CORS) {
+            var isSameProtocol = parser.protocol === location.protocol;
+            if (isSameProtocol) {
+                var xdr = new XDomainRequest;
+                xdr.open("GET", url);
+                xdr.timeout = 0;
+                xdr.onprogress = Function.prototype;
+                xdr.ontimeout = Function.prototype;
+                xdr.onload = function() {
+                    if (isValidCss(xdr.responseText)) {
+                        onSuccess(xdr.responseText, i);
+                    } else {
+                        onError(xdr, i);
+                    }
+                };
+                xdr.onerror = function(err) {
+                    onError(xdr, i);
+                };
+                setTimeout((function() {
+                    xdr.send();
+                }), 0);
+            } else {
+                console.warn("Internet Explorer 9 Cross-Origin (CORS) requests must use the same protocol (".concat(url, ")"));
+                onError(null, i);
+            }
+        } else {
+            var xhr = new XMLHttpRequest;
+            xhr.open("GET", url);
+            if (settings.mimeType && xhr.overrideMimeType) {
+                xhr.overrideMimeType(settings.mimeType);
+            }
+            settings.onBeforeSend(xhr, url, i);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200 && isValidCss(xhr.responseText)) {
+                        onSuccess(xhr.responseText, i);
+                    } else {
+                        onError(xhr, i);
+                    }
+                }
+            };
+            xhr.send();
+        }
+    }));
+}
+
+/**
+ * Gets CSS data from <style> and <link> nodes (including @imports), then
+ * returns data in order processed by DOM. Allows specifying nodes to
+ * include/exclude and filtering CSS data using RegEx.
+ *
+ * @preserve
+ * @param {object}   [options] The options object
+ * @param {object}   [options.rootElement=document] Root element to traverse for
+ *                   <link> and <style> nodes.
+ * @param {string}   [options.include] CSS selector matching <link> and <style>
+ *                   nodes to include
+ * @param {string}   [options.exclude] CSS selector matching <link> and <style>
+ *                   nodes to exclude
+ * @param {object}   [options.filter] Regular expression used to filter node CSS
+ *                   data. Each block of CSS data is tested against the filter,
+ *                   and only matching data is included.
+ * @param {boolean}  [options.skipDisabled=true] Determines if disabled
+ *                   stylesheets will be skipped while collecting CSS data.
+ * @param {boolean}  [options.useCSSOM=false] Determines if CSS data will be
+ *                   collected from a stylesheet's runtime values instead of its
+ *                   text content. This is required to get accurate CSS data
+ *                   when a stylesheet has been modified using the deleteRule()
+ *                   or insertRule() methods because these modifications will
+ *                   not be reflected in the stylesheet's text content.
+ * @param {function} [options.onBeforeSend] Callback before XHR is sent. Passes
+ *                   1) the XHR object, 2) source node reference, and 3) the
+ *                   source URL as arguments.
+ * @param {function} [options.onSuccess] Callback on each CSS node read. Passes
+ *                   1) CSS text, 2) source node reference, and 3) the source
+ *                   URL as arguments.
+ * @param {function} [options.onError] Callback on each error. Passes 1) the XHR
+ *                   object for inspection, 2) soure node reference, and 3) the
+ *                   source URL that failed (either a <link> href or an @import)
+ *                   as arguments
+ * @param {function} [options.onComplete] Callback after all nodes have been
+ *                   processed. Passes 1) concatenated CSS text, 2) an array of
+ *                   CSS text in DOM order, and 3) an array of nodes in DOM
+ *                   order as arguments.
+ *
+ * @example
+ *
+ *   getCssData({
+ *     rootElement : document,
+ *     include     : 'style,link[rel="stylesheet"]',
+ *     exclude     : '[href="skip.css"]',
+ *     filter      : /red/,
+ *     skipDisabled: true,
+ *     useCSSOM    : false,
+ *     onBeforeSend(xhr, node, url) {
+ *       // ...
+ *     }
+ *     onSuccess(cssText, node, url) {
+ *       // ...
+ *     }
+ *     onError(xhr, node, url) {
+ *       // ...
+ *     },
+ *     onComplete(cssText, cssArray, nodeArray) {
+ *       // ...
+ *     }
+ *   });
+ */ function getCssData(options) {
+    var regex = {
+        cssComments: /\/\*[\s\S]+?\*\//g,
+        cssImports: /(?:@import\s*)(?:url\(\s*)?(?:['"])([^'"]*)(?:['"])(?:\s*\))?(?:[^;]*;)/g
+    };
+    var settings = {
+        rootElement: options.rootElement || document,
+        include: options.include || 'style,link[rel="stylesheet"]',
+        exclude: options.exclude || null,
+        filter: options.filter || null,
+        skipDisabled: options.skipDisabled !== false,
+        useCSSOM: options.useCSSOM || false,
+        onBeforeSend: options.onBeforeSend || Function.prototype,
+        onSuccess: options.onSuccess || Function.prototype,
+        onError: options.onError || Function.prototype,
+        onComplete: options.onComplete || Function.prototype
+    };
+    var sourceNodes = Array.apply(null, settings.rootElement.querySelectorAll(settings.include)).filter((function(node) {
+        return !matchesSelector(node, settings.exclude);
+    }));
+    var cssArray = Array.apply(null, Array(sourceNodes.length)).map((function(x) {
+        return null;
+    }));
+    function handleComplete() {
+        var isComplete = cssArray.indexOf(null) === -1;
+        if (isComplete) {
+            var cssText = cssArray.join("");
+            settings.onComplete(cssText, cssArray, sourceNodes);
+        }
+    }
+    function handleSuccess(cssText, cssIndex, node, sourceUrl) {
+        var returnVal = settings.onSuccess(cssText, node, sourceUrl);
+        cssText = returnVal !== undefined && Boolean(returnVal) === false ? "" : returnVal || cssText;
+        resolveImports(cssText, node, sourceUrl, (function(resolvedCssText, errorData) {
+            if (cssArray[cssIndex] === null) {
+                errorData.forEach((function(data) {
+                    return settings.onError(data.xhr, node, data.url);
+                }));
+                if (!settings.filter || settings.filter.test(resolvedCssText)) {
+                    cssArray[cssIndex] = resolvedCssText;
+                } else {
+                    cssArray[cssIndex] = "";
+                }
+                handleComplete();
+            }
+        }));
+    }
+    function parseImportData(cssText, baseUrl) {
+        var ignoreRules = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+        var importData = {};
+        importData.rules = (cssText.replace(regex.cssComments, "").match(regex.cssImports) || []).filter((function(rule) {
+            return ignoreRules.indexOf(rule) === -1;
+        }));
+        importData.urls = importData.rules.map((function(rule) {
+            return rule.replace(regex.cssImports, "$1");
+        }));
+        importData.absoluteUrls = importData.urls.map((function(url) {
+            return getFullUrl(url, baseUrl);
+        }));
+        importData.absoluteRules = importData.rules.map((function(rule, i) {
+            var oldUrl = importData.urls[i];
+            var newUrl = getFullUrl(importData.absoluteUrls[i], baseUrl);
+            return rule.replace(oldUrl, newUrl);
+        }));
+        return importData;
+    }
+    function resolveImports(cssText, node, baseUrl, callbackFn) {
+        var __errorData = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
+        var __errorRules = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : [];
+        var importData = parseImportData(cssText, baseUrl, __errorRules);
+        if (importData.rules.length) {
+            getUrls(importData.absoluteUrls, {
+                onBeforeSend: function onBeforeSend(xhr, url, urlIndex) {
+                    settings.onBeforeSend(xhr, node, url);
+                },
+                onSuccess: function onSuccess(cssText, url, urlIndex) {
+                    var returnVal = settings.onSuccess(cssText, node, url);
+                    cssText = returnVal === false ? "" : returnVal || cssText;
+                    var responseImportData = parseImportData(cssText, url, __errorRules);
+                    responseImportData.rules.forEach((function(rule, i) {
+                        cssText = cssText.replace(rule, responseImportData.absoluteRules[i]);
+                    }));
+                    return cssText;
+                },
+                onError: function onError(xhr, url, urlIndex) {
+                    __errorData.push({
+                        xhr: xhr,
+                        url: url
+                    });
+                    __errorRules.push(importData.rules[urlIndex]);
+                    resolveImports(cssText, node, baseUrl, callbackFn, __errorData, __errorRules);
+                },
+                onComplete: function onComplete(responseArray) {
+                    responseArray.forEach((function(importText, i) {
+                        cssText = cssText.replace(importData.rules[i], importText);
+                    }));
+                    resolveImports(cssText, node, baseUrl, callbackFn, __errorData, __errorRules);
+                }
+            });
+        } else {
+            callbackFn(cssText, __errorData);
+        }
+    }
+    if (sourceNodes.length) {
+        sourceNodes.forEach((function(node, i) {
+            var linkHref = node.getAttribute("href");
+            var linkRel = node.getAttribute("rel");
+            var isLink = node.nodeName === "LINK" && linkHref && linkRel && linkRel.toLowerCase().indexOf("stylesheet") !== -1;
+            var isSkip = settings.skipDisabled === false ? false : node.disabled;
+            var isStyle = node.nodeName === "STYLE";
+            if (isLink && !isSkip) {
+                getUrls(linkHref, {
+                    mimeType: "text/css",
+                    onBeforeSend: function onBeforeSend(xhr, url, urlIndex) {
+                        settings.onBeforeSend(xhr, node, url);
+                    },
+                    onSuccess: function onSuccess(cssText, url, urlIndex) {
+                        var sourceUrl = getFullUrl(linkHref);
+                        handleSuccess(cssText, i, node, sourceUrl);
+                    },
+                    onError: function onError(xhr, url, urlIndex) {
+                        cssArray[i] = "";
+                        settings.onError(xhr, node, url);
+                        handleComplete();
+                    }
+                });
+            } else if (isStyle && !isSkip) {
+                var cssText = node.textContent;
+                if (settings.useCSSOM) {
+                    cssText = Array.apply(null, node.sheet.cssRules).map((function(rule) {
+                        return rule.cssText;
+                    })).join("");
+                }
+                handleSuccess(cssText, i, node, location.href);
+            } else {
+                cssArray[i] = "";
+                handleComplete();
+            }
+        }));
+    } else {
+        settings.onComplete("", []);
+    }
+}
+
+function getFullUrl(url, base) {
+    var d = document.implementation.createHTMLDocument("");
+    var b = d.createElement("base");
+    var a = d.createElement("a");
+    d.head.appendChild(b);
+    d.body.appendChild(a);
+    b.href = base || document.baseURI || (document.querySelector("base") || {}).href || location.href;
+    a.href = url;
+    return a.href;
+}
+
+function matchesSelector(elm, selector) {
+    var matches = elm.matches || elm.matchesSelector || elm.webkitMatchesSelector || elm.mozMatchesSelector || elm.msMatchesSelector || elm.oMatchesSelector;
+    return matches.call(elm, selector);
+}
+
+var balancedMatch = balanced;
+
+function balanced(a, b, str) {
+    if (a instanceof RegExp) a = maybeMatch(a, str);
+    if (b instanceof RegExp) b = maybeMatch(b, str);
+    var r = range(a, b, str);
+    return r && {
+        start: r[0],
+        end: r[1],
+        pre: str.slice(0, r[0]),
+        body: str.slice(r[0] + a.length, r[1]),
+        post: str.slice(r[1] + b.length)
+    };
+}
+
+function maybeMatch(reg, str) {
+    var m = str.match(reg);
+    return m ? m[0] : null;
+}
+
+balanced.range = range;
+
+function range(a, b, str) {
+    var begs, beg, left, right, result;
+    var ai = str.indexOf(a);
+    var bi = str.indexOf(b, ai + 1);
+    var i = ai;
+    if (ai >= 0 && bi > 0) {
+        begs = [];
+        left = str.length;
+        while (i >= 0 && !result) {
+            if (i == ai) {
+                begs.push(i);
+                ai = str.indexOf(a, i + 1);
+            } else if (begs.length == 1) {
+                result = [ begs.pop(), bi ];
+            } else {
+                beg = begs.pop();
+                if (beg < left) {
+                    left = beg;
+                    right = bi;
+                }
+                bi = str.indexOf(b, i + 1);
+            }
+            i = ai < bi && ai >= 0 ? ai : bi;
+        }
+        if (begs.length) {
+            result = [ left, right ];
+        }
+    }
+    return result;
+}
+
+function parseCss(css) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var defaults = {
+        preserveStatic: true,
+        removeComments: false
+    };
+    var settings = _extends({}, defaults, options);
+    var errors = [];
+    function error(msg) {
+        throw new Error("CSS parse error: ".concat(msg));
+    }
+    function match(re) {
+        var m = re.exec(css);
+        if (m) {
+            css = css.slice(m[0].length);
+            return m;
+        }
+    }
+    function open() {
+        return match(/^{\s*/);
+    }
+    function close() {
+        return match(/^}/);
+    }
+    function whitespace() {
+        match(/^\s*/);
+    }
+    function comment() {
+        whitespace();
+        if (css[0] !== "/" || css[1] !== "*") {
+            return;
+        }
+        var i = 2;
+        while (css[i] && (css[i] !== "*" || css[i + 1] !== "/")) {
+            i++;
+        }
+        if (!css[i]) {
+            return error("end of comment is missing");
+        }
+        var str = css.slice(2, i);
+        css = css.slice(i + 2);
+        return {
+            type: "comment",
+            comment: str
+        };
+    }
+    function comments() {
+        var cmnts = [];
+        var c;
+        while (c = comment()) {
+            cmnts.push(c);
+        }
+        return settings.removeComments ? [] : cmnts;
+    }
+    function selector() {
+        whitespace();
+        while (css[0] === "}") {
+            error("extra closing bracket");
+        }
+        var m = match(/^(("(?:\\"|[^"])*"|'(?:\\'|[^'])*'|[^{])+)/);
+        if (m) {
+            return m[0].trim().replace(/\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/+/g, "").replace(/"(?:\\"|[^"])*"|'(?:\\'|[^'])*'/g, (function(m) {
+                return m.replace(/,/g, "‌");
+            })).split(/\s*(?![^(]*\)),\s*/).map((function(s) {
+                return s.replace(/\u200C/g, ",");
+            }));
+        }
+    }
+    function declaration() {
+        if (css[0] === "@") {
+            return at_rule();
+        }
+        match(/^([;\s]*)+/);
+        var comment_regexp = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
+        var prop = match(/^(\*?[-#/*\\\w]+(\[[0-9a-z_-]+\])?)\s*/);
+        if (!prop) {
+            return;
+        }
+        prop = prop[0].trim();
+        if (!match(/^:\s*/)) {
+            return error("property missing ':'");
+        }
+        var val = match(/^((?:\/\*.*?\*\/|'(?:\\'|.)*?'|"(?:\\"|.)*?"|\((\s*'(?:\\'|.)*?'|"(?:\\"|.)*?"|[^)]*?)\s*\)|[^};])+)/);
+        var ret = {
+            type: "declaration",
+            property: prop.replace(comment_regexp, ""),
+            value: val ? val[0].replace(comment_regexp, "").trim() : ""
+        };
+        match(/^[;\s]*/);
+        return ret;
+    }
+    function declarations() {
+        if (!open()) {
+            return error("missing '{'");
+        }
+        var d;
+        var decls = comments();
+        while (d = declaration()) {
+            decls.push(d);
+            decls = decls.concat(comments());
+        }
+        if (!close()) {
+            return error("missing '}'");
+        }
+        return decls;
+    }
+    function keyframe() {
+        whitespace();
+        var vals = [];
+        var m;
+        while (m = match(/^((\d+\.\d+|\.\d+|\d+)%?|[a-z]+)\s*/)) {
+            vals.push(m[1]);
+            match(/^,\s*/);
+        }
+        if (vals.length) {
+            return {
+                type: "keyframe",
+                values: vals,
+                declarations: declarations()
+            };
+        }
+    }
+    function at_keyframes() {
+        var m = match(/^@([-\w]+)?keyframes\s*/);
+        if (!m) {
+            return;
+        }
+        var vendor = m[1];
+        m = match(/^([-\w]+)\s*/);
+        if (!m) {
+            return error("@keyframes missing name");
+        }
+        var name = m[1];
+        if (!open()) {
+            return error("@keyframes missing '{'");
+        }
+        var frame;
+        var frames = comments();
+        while (frame = keyframe()) {
+            frames.push(frame);
+            frames = frames.concat(comments());
+        }
+        if (!close()) {
+            return error("@keyframes missing '}'");
+        }
+        return {
+            type: "keyframes",
+            name: name,
+            vendor: vendor,
+            keyframes: frames
+        };
+    }
+    function at_page() {
+        var m = match(/^@page */);
+        if (m) {
+            var sel = selector() || [];
+            return {
+                type: "page",
+                selectors: sel,
+                declarations: declarations()
+            };
+        }
+    }
+    function at_page_margin_box() {
+        var m = match(/@(top|bottom|left|right)-(left|center|right|top|middle|bottom)-?(corner)?\s*/);
+        if (m) {
+            var name = "".concat(m[1], "-").concat(m[2]) + (m[3] ? "-".concat(m[3]) : "");
+            return {
+                type: "page-margin-box",
+                name: name,
+                declarations: declarations()
+            };
+        }
+    }
+    function at_fontface() {
+        var m = match(/^@font-face\s*/);
+        if (m) {
+            return {
+                type: "font-face",
+                declarations: declarations()
+            };
+        }
+    }
+    function at_supports() {
+        var m = match(/^@supports *([^{]+)/);
+        if (m) {
+            return {
+                type: "supports",
+                supports: m[1].trim(),
+                rules: rules()
+            };
+        }
+    }
+    function at_host() {
+        var m = match(/^@host\s*/);
+        if (m) {
+            return {
+                type: "host",
+                rules: rules()
+            };
+        }
+    }
+    function at_media() {
+        var m = match(/^@media([^{]+)*/);
+        if (m) {
+            return {
+                type: "media",
+                media: (m[1] || "").trim(),
+                rules: rules()
+            };
+        }
+    }
+    function at_custom_m() {
+        var m = match(/^@custom-media\s+(--[^\s]+)\s*([^{;]+);/);
+        if (m) {
+            return {
+                type: "custom-media",
+                name: m[1].trim(),
+                media: m[2].trim()
+            };
+        }
+    }
+    function at_document() {
+        var m = match(/^@([-\w]+)?document *([^{]+)/);
+        if (m) {
+            return {
+                type: "document",
+                document: m[2].trim(),
+                vendor: m[1] ? m[1].trim() : null,
+                rules: rules()
+            };
+        }
+    }
+    function at_x() {
+        var m = match(/^@(import|charset|namespace)\s*([^;]+);/);
+        if (m) {
+            return {
+                type: m[1],
+                name: m[2].trim()
+            };
+        }
+    }
+    function at_rule() {
+        whitespace();
+        if (css[0] === "@") {
+            var ret = at_x() || at_fontface() || at_media() || at_keyframes() || at_supports() || at_document() || at_custom_m() || at_host() || at_page() || at_page_margin_box();
+            if (ret && !settings.preserveStatic) {
+                var hasVarFunc = false;
+                if (ret.declarations) {
+                    hasVarFunc = ret.declarations.some((function(decl) {
+                        return /var\(/.test(decl.value);
+                    }));
+                } else {
+                    var arr = ret.keyframes || ret.rules || [];
+                    hasVarFunc = arr.some((function(obj) {
+                        return (obj.declarations || []).some((function(decl) {
+                            return /var\(/.test(decl.value);
+                        }));
+                    }));
+                }
+                return hasVarFunc ? ret : {};
+            }
+            return ret;
+        }
+    }
+    function rule() {
+        if (!settings.preserveStatic) {
+            var balancedMatch$1 = balancedMatch("{", "}", css);
+            if (balancedMatch$1) {
+                var hasVarDecl = /:(?:root|host)(?![.:#(])/.test(balancedMatch$1.pre) && /--\S*\s*:/.test(balancedMatch$1.body);
+                var hasVarFunc = /var\(/.test(balancedMatch$1.body);
+                if (!hasVarDecl && !hasVarFunc) {
+                    css = css.slice(balancedMatch$1.end + 1);
+                    return {};
+                }
+            }
+        }
+        var sel = selector() || [];
+        var decls = settings.preserveStatic ? declarations() : declarations().filter((function(decl) {
+            var hasVarDecl = sel.some((function(s) {
+                return /:(?:root|host)(?![.:#(])/.test(s);
+            })) && /^--\S/.test(decl.property);
+            var hasVarFunc = /var\(/.test(decl.value);
+            return hasVarDecl || hasVarFunc;
+        }));
+        if (!sel.length) {
+            error("selector missing");
+        }
+        return {
+            type: "rule",
+            selectors: sel,
+            declarations: decls
+        };
+    }
+    function rules(core) {
+        if (!core && !open()) {
+            return error("missing '{'");
+        }
+        var node;
+        var rules = comments();
+        while (css.length && (core || css[0] !== "}") && (node = at_rule() || rule())) {
+            if (node.type) {
+                rules.push(node);
+            }
+            rules = rules.concat(comments());
+        }
+        if (!core && !close()) {
+            return error("missing '}'");
+        }
+        return rules;
+    }
+    return {
+        type: "stylesheet",
+        stylesheet: {
+            rules: rules(true),
+            errors: errors
+        }
+    };
+}
+
+function parseVars(cssData) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var defaults = {
+        parseHost: false,
+        store: {},
+        onWarning: function onWarning() {}
+    };
+    var settings = _extends({}, defaults, options);
+    var reVarDeclSelectors = new RegExp(":".concat(settings.parseHost ? "host" : "root", "$"));
+    if (typeof cssData === "string") {
+        cssData = parseCss(cssData, settings);
+    }
+    cssData.stylesheet.rules.forEach((function(rule) {
+        if (rule.type !== "rule" || !rule.selectors.some((function(s) {
+            return reVarDeclSelectors.test(s);
+        }))) {
+            return;
+        }
+        rule.declarations.forEach((function(decl, i) {
+            var prop = decl.property;
+            var value = decl.value;
+            if (prop && prop.indexOf("--") === 0) {
+                settings.store[prop] = value;
+            }
+        }));
+    }));
+    return settings.store;
+}
+
+function stringifyCss(tree) {
+    var delim = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+    var cb = arguments.length > 2 ? arguments[2] : undefined;
+    var renderMethods = {
+        charset: function charset(node) {
+            return "@charset " + node.name + ";";
+        },
+        comment: function comment(node) {
+            return node.comment.indexOf("__CSSVARSPONYFILL") === 0 ? "/*" + node.comment + "*/" : "";
+        },
+        "custom-media": function customMedia(node) {
+            return "@custom-media " + node.name + " " + node.media + ";";
+        },
+        declaration: function declaration(node) {
+            return node.property + ":" + node.value + ";";
+        },
+        document: function document(node) {
+            return "@" + (node.vendor || "") + "document " + node.document + "{" + visit(node.rules) + "}";
+        },
+        "font-face": function fontFace(node) {
+            return "@font-face" + "{" + visit(node.declarations) + "}";
+        },
+        host: function host(node) {
+            return "@host" + "{" + visit(node.rules) + "}";
+        },
+        import: function _import(node) {
+            return "@import " + node.name + ";";
+        },
+        keyframe: function keyframe(node) {
+            return node.values.join(",") + "{" + visit(node.declarations) + "}";
+        },
+        keyframes: function keyframes(node) {
+            return "@" + (node.vendor || "") + "keyframes " + node.name + "{" + visit(node.keyframes) + "}";
+        },
+        media: function media(node) {
+            return "@media " + node.media + "{" + visit(node.rules) + "}";
+        },
+        namespace: function namespace(node) {
+            return "@namespace " + node.name + ";";
+        },
+        page: function page(node) {
+            return "@page " + (node.selectors.length ? node.selectors.join(", ") : "") + "{" + visit(node.declarations) + "}";
+        },
+        "page-margin-box": function pageMarginBox(node) {
+            return "@" + node.name + "{" + visit(node.declarations) + "}";
+        },
+        rule: function rule(node) {
+            var decls = node.declarations;
+            if (decls.length) {
+                return node.selectors.join(",") + "{" + visit(decls) + "}";
+            }
+        },
+        supports: function supports(node) {
+            return "@supports " + node.supports + "{" + visit(node.rules) + "}";
+        }
+    };
+    function visit(nodes) {
+        var buf = "";
+        for (var i = 0; i < nodes.length; i++) {
+            var n = nodes[i];
+            if (cb) {
+                cb(n);
+            }
+            var txt = renderMethods[n.type](n);
+            if (txt) {
+                buf += txt;
+                if (txt.length && n.selectors) {
+                    buf += delim;
+                }
+            }
+        }
+        return buf;
+    }
+    return visit(tree.stylesheet.rules);
+}
+
+function walkCss(node, fn) {
+    node.rules.forEach((function(rule) {
+        if (rule.rules) {
+            walkCss(rule, fn);
+            return;
+        }
+        if (rule.keyframes) {
+            rule.keyframes.forEach((function(keyframe) {
+                if (keyframe.type === "keyframe") {
+                    fn(keyframe.declarations, rule);
+                }
+            }));
+            return;
+        }
+        if (!rule.declarations) {
+            return;
+        }
+        fn(rule.declarations, node);
+    }));
+}
+
+var VAR_PROP_IDENTIFIER = "--";
+
+var VAR_FUNC_IDENTIFIER = "var";
+
+function transformCss(cssData) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var defaults = {
+        preserveStatic: true,
+        preserveVars: false,
+        variables: {},
+        onWarning: function onWarning() {}
+    };
+    var settings = _extends({}, defaults, options);
+    if (typeof cssData === "string") {
+        cssData = parseCss(cssData, settings);
+    }
+    walkCss(cssData.stylesheet, (function(declarations, node) {
+        for (var i = 0; i < declarations.length; i++) {
+            var decl = declarations[i];
+            var type = decl.type;
+            var prop = decl.property;
+            var value = decl.value;
+            if (type !== "declaration") {
+                continue;
+            }
+            if (!settings.preserveVars && prop && prop.indexOf(VAR_PROP_IDENTIFIER) === 0) {
+                declarations.splice(i, 1);
+                i--;
+                continue;
+            }
+            if (value.indexOf(VAR_FUNC_IDENTIFIER + "(") !== -1) {
+                var resolvedValue = resolveValue(value, settings);
+                if (resolvedValue !== decl.value) {
+                    resolvedValue = fixNestedCalc(resolvedValue);
+                    if (!settings.preserveVars) {
+                        decl.value = resolvedValue;
+                    } else {
+                        declarations.splice(i, 0, {
+                            type: type,
+                            property: prop,
+                            value: resolvedValue
+                        });
+                        i++;
+                    }
+                }
+            }
+        }
+    }));
+    return stringifyCss(cssData);
+}
+
+function fixNestedCalc(value) {
+    var reCalcVal = /calc\(([^)]+)\)/g;
+    (value.match(reCalcVal) || []).forEach((function(match) {
+        var newVal = "calc".concat(match.split("calc").join(""));
+        value = value.replace(match, newVal);
+    }));
+    return value;
+}
+
+function resolveValue(value) {
+    var settings = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var __recursiveFallback = arguments.length > 2 ? arguments[2] : undefined;
+    if (value.indexOf("var(") === -1) {
+        return value;
+    }
+    var valueData = balancedMatch("(", ")", value);
+    function resolveFunc(value) {
+        var name = value.split(",")[0].replace(/[\s\n\t]/g, "");
+        var fallback = (value.match(/(?:\s*,\s*){1}(.*)?/) || [])[1];
+        var match = Object.prototype.hasOwnProperty.call(settings.variables, name) ? String(settings.variables[name]) : undefined;
+        var replacement = match || (fallback ? String(fallback) : undefined);
+        var unresolvedFallback = __recursiveFallback || value;
+        if (!match) {
+            settings.onWarning('variable "'.concat(name, '" is undefined'));
+        }
+        if (replacement && replacement !== "undefined" && replacement.length > 0) {
+            return resolveValue(replacement, settings, unresolvedFallback);
+        } else {
+            return "var(".concat(unresolvedFallback, ")");
+        }
+    }
+    if (!valueData) {
+        if (value.indexOf("var(") !== -1) {
+            settings.onWarning('missing closing ")" in the value "'.concat(value, '"'));
+        }
+        return value;
+    } else if (valueData.pre.slice(-3) === "var") {
+        var isEmptyVarFunc = valueData.body.trim().length === 0;
+        if (isEmptyVarFunc) {
+            settings.onWarning("var() must contain a non-whitespace string");
+            return value;
+        } else {
+            return valueData.pre.slice(0, -3) + resolveFunc(valueData.body) + resolveValue(valueData.post, settings);
+        }
+    } else {
+        return valueData.pre + "(".concat(resolveValue(valueData.body, settings), ")") + resolveValue(valueData.post, settings);
+    }
+}
+
+var isBrowser = typeof window !== "undefined";
+
+var isNativeSupport = isBrowser && window.CSS && window.CSS.supports && window.CSS.supports("(--a: 0)");
+
+var counters = {
+    group: 0,
+    job: 0
+};
+
+var defaults = {
+    rootElement: isBrowser ? document : null,
+    shadowDOM: false,
+    include: "style,link[rel=stylesheet]",
+    exclude: "",
+    variables: {},
+    onlyLegacy: true,
+    preserveStatic: true,
+    preserveVars: false,
+    silent: false,
+    updateDOM: true,
+    updateURLs: true,
+    watch: null,
+    onBeforeSend: function onBeforeSend() {},
+    onError: function onError() {},
+    onWarning: function onWarning() {},
+    onSuccess: function onSuccess() {},
+    onComplete: function onComplete() {},
+    onFinally: function onFinally() {}
+};
+
+var regex = {
+    cssComments: /\/\*[\s\S]+?\*\//g,
+    cssKeyframes: /@(?:-\w*-)?keyframes/,
+    cssMediaQueries: /@media[^{]+\{([\s\S]+?})\s*}/g,
+    cssUrls: /url\((?!['"]?(?:data|http|\/\/):)['"]?([^'")]*)['"]?\)/g,
+    cssVarDeclRules: /(?::(?:root|host)(?![.:#(])[\s,]*[^{]*{\s*[^}]*})/g,
+    cssVarDecls: /(?:[\s;]*)(-{2}\w[\w-]*)(?:\s*:\s*)([^;]*);/g,
+    cssVarFunc: /var\(\s*--[\w-]/,
+    cssVars: /(?:(?::(?:root|host)(?![.:#(])[\s,]*[^{]*{\s*[^;]*;*\s*)|(?:var\(\s*))(--[^:)]+)(?:\s*[:)])/
+};
+
+var variableStore = {
+    dom: {},
+    job: {},
+    user: {}
+};
+
+var cssVarsIsRunning = false;
+
+var cssVarsObserver = null;
+
+var cssVarsSrcNodeCount = 0;
+
+var debounceTimer = null;
+
+var isShadowDOMReady = false;
+
+/**
+ * Fetches, parses, and transforms CSS custom properties from specified
+ * <style> and <link> elements into static values, then appends a new <style>
+ * element with static values to the DOM to provide CSS custom property
+ * compatibility for legacy browsers. Also provides a single interface for
+ * live updates of runtime values in both modern and legacy browsers.
+ *
+ * @preserve
+ * @param {object}   [options] Options object
+ * @param {object}   [options.rootElement=document] Root element to traverse for
+ *                   <link> and <style> nodes
+ * @param {boolean}  [options.shadowDOM=false] Determines if shadow DOM <link>
+ *                   and <style> nodes will be processed.
+ * @param {string}   [options.include="style,link[rel=stylesheet]"] CSS selector
+ *                   matching <link re="stylesheet"> and <style> nodes to
+ *                   process
+ * @param {string}   [options.exclude] CSS selector matching <link
+ *                   rel="stylehseet"> and <style> nodes to exclude from those
+ *                   matches by options.include
+ * @param {object}   [options.variables] A map of custom property name/value
+ *                   pairs. Property names can omit or include the leading
+ *                   double-hyphen (—), and values specified will override
+ *                   previous values
+ * @param {boolean}  [options.onlyLegacy=true] Determines if the ponyfill will
+ *                   only generate legacy-compatible CSS in browsers that lack
+ *                   native support (i.e., legacy browsers)
+ * @param {boolean}  [options.preserveStatic=true] Determines if CSS
+ *                   declarations that do not reference a custom property will
+ *                   be preserved in the transformed CSS
+ * @param {boolean}  [options.preserveVars=false] Determines if CSS custom
+ *                   property declarations will be preserved in the transformed
+ *                   CSS
+ * @param {boolean}  [options.silent=false] Determines if warning and error
+ *                   messages will be displayed on the console
+ * @param {boolean}  [options.updateDOM=true] Determines if the ponyfill will
+ *                   update the DOM after processing CSS custom properties
+ * @param {boolean}  [options.updateURLs=true] Determines if relative url()
+ *                   paths will be converted to absolute urls in external CSS
+ * @param {boolean}  [options.watch=false] Determines if a MutationObserver will
+ *                   be created that will execute the ponyfill when a <link> or
+ *                   <style> DOM mutation is observed
+ * @param {function} [options.onBeforeSend] Callback before XHR is sent. Passes
+ *                   1) the XHR object, 2) source node reference, and 3) the
+ *                   source URL as arguments
+ * @param {function} [options.onError] Callback after a CSS parsing error has
+ *                   occurred or an XHR request has failed. Passes 1) an error
+ *                   message, and 2) source node reference, 3) xhr, and 4 url as
+ *                   arguments.
+ * @param {function} [options.onWarning] Callback after each CSS parsing warning
+ *                   has occurred. Passes 1) a warning message as an argument.
+ * @param {function} [options.onSuccess] Callback after CSS data has been
+ *                   collected from each node and before CSS custom properties
+ *                   have been transformed. Allows modifying the CSS data before
+ *                   it is transformed by returning any string value (or false
+ *                   to skip). Passes 1) CSS text, 2) source node reference, and
+ *                   3) the source URL as arguments.
+ * @param {function} [options.onComplete] Callback after all CSS has been
+ *                   processed, legacy-compatible CSS has been generated, and
+ *                   (optionally) the DOM has been updated. Passes 1) a CSS
+ *                   string with CSS variable values resolved, 2) an array of
+ *                   output <style> node references that have been appended to
+ *                   the DOM, 3) an object containing all custom properies names
+ *                   and values, and 4) the ponyfill execution time in
+ *                   milliseconds.
+ * @param {function} [options.onFinally] Callback in modern and legacy browsers
+ *                   after the ponyfill has finished all tasks. Passes 1) a
+ *                   boolean indicating if the last ponyfill call resulted in a
+ *                   style change, 2) a boolean indicating if the current
+ *                   browser provides native support for CSS custom properties,
+ *                   and 3) the ponyfill execution time in milliseconds.
+ * @example
+ *
+ *   cssVars({
+ *     rootElement   : document,
+ *     shadowDOM     : false,
+ *     include       : 'style,link[rel="stylesheet"]',
+ *     exclude       : '',
+ *     variables     : {},
+ *     onlyLegacy    : true,
+ *     preserveStatic: true,
+ *     preserveVars  : false,
+ *     silent        : false,
+ *     updateDOM     : true,
+ *     updateURLs    : true,
+ *     watch         : false,
+ *     onBeforeSend(xhr, node, url) {},
+ *     onError(message, node, xhr, url) {},
+ *     onWarning(message) {},
+ *     onSuccess(cssText, node, url) {},
+ *     onComplete(cssText, styleNode, cssVariables, benchmark) {},
+ *     onFinally(hasChanged, hasNativeSupport, benchmark)
+ *   });
+ */ function cssVars() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var msgPrefix = "cssVars(): ";
+    var settings = _extends({}, defaults, options);
+    function handleError(message, sourceNode, xhr, url) {
+        if (!settings.silent && window.console) {
+            console.error("".concat(msgPrefix).concat(message, "\n"), sourceNode);
+        }
+        settings.onError(message, sourceNode, xhr, url);
+    }
+    function handleWarning(message) {
+        if (!settings.silent && window.console) {
+            console.warn("".concat(msgPrefix).concat(message));
+        }
+        settings.onWarning(message);
+    }
+    function handleFinally(hasChanged) {
+        settings.onFinally(Boolean(hasChanged), isNativeSupport, getTimeStamp() - settings.__benchmark);
+    }
+    if (!isBrowser) {
+        return;
+    }
+    if (settings.watch) {
+        settings.watch = defaults.watch;
+        addMutationObserver(settings);
+        cssVars(settings);
+        return;
+    } else if (settings.watch === false && cssVarsObserver) {
+        cssVarsObserver.disconnect();
+        cssVarsObserver = null;
+    }
+    if (!settings.__benchmark) {
+        if (cssVarsIsRunning === settings.rootElement) {
+            cssVarsDebounced(options);
+            return;
+        }
+        settings.__benchmark = getTimeStamp();
+        settings.exclude = [ cssVarsObserver ? '[data-cssvars]:not([data-cssvars=""])' : '[data-cssvars="out"]', settings.exclude ].filter((function(selector) {
+            return selector;
+        })).join(",");
+        settings.variables = fixVarNames(settings.variables);
+        if (!cssVarsObserver) {
+            var outNodes = Array.apply(null, settings.rootElement.querySelectorAll('[data-cssvars="out"]'));
+            outNodes.forEach((function(outNode) {
+                var dataGroup = outNode.getAttribute("data-cssvars-group");
+                var srcNode = dataGroup ? settings.rootElement.querySelector('[data-cssvars="src"][data-cssvars-group="'.concat(dataGroup, '"]')) : null;
+                if (!srcNode) {
+                    outNode.parentNode.removeChild(outNode);
+                }
+            }));
+            if (cssVarsSrcNodeCount) {
+                var srcNodes = settings.rootElement.querySelectorAll('[data-cssvars]:not([data-cssvars="out"])');
+                if (srcNodes.length < cssVarsSrcNodeCount) {
+                    cssVarsSrcNodeCount = srcNodes.length;
+                    variableStore.dom = {};
+                }
+            }
+        }
+    }
+    if (document.readyState !== "loading") {
+        if (isNativeSupport && settings.onlyLegacy) {
+            var hasVarChange = false;
+            if (settings.updateDOM) {
+                var targetElm = settings.rootElement.host || (settings.rootElement === document ? document.documentElement : settings.rootElement);
+                Object.keys(settings.variables).forEach((function(key) {
+                    var varValue = settings.variables[key];
+                    hasVarChange = hasVarChange || varValue !== getComputedStyle(targetElm).getPropertyValue(key);
+                    targetElm.style.setProperty(key, varValue);
+                }));
+            }
+            handleFinally(hasVarChange);
+        } else if (!isShadowDOMReady && (settings.shadowDOM || settings.rootElement.shadowRoot || settings.rootElement.host)) {
+            getCssData({
+                rootElement: defaults.rootElement,
+                include: defaults.include,
+                exclude: settings.exclude,
+                skipDisabled: false,
+                onSuccess: function onSuccess(cssText, node, url) {
+                    cssText = cssText.replace(regex.cssComments, "").replace(regex.cssMediaQueries, "");
+                    cssText = (cssText.match(regex.cssVarDeclRules) || []).join("");
+                    return cssText || false;
+                },
+                onComplete: function onComplete(cssText, cssArray, nodeArray) {
+                    parseVars(cssText, {
+                        store: variableStore.dom,
+                        onWarning: handleWarning
+                    });
+                    isShadowDOMReady = true;
+                    cssVars(settings);
+                }
+            });
+        } else {
+            cssVarsIsRunning = settings.rootElement;
+            getCssData({
+                rootElement: settings.rootElement,
+                include: settings.include,
+                exclude: settings.exclude,
+                skipDisabled: false,
+                onBeforeSend: settings.onBeforeSend,
+                onError: function onError(xhr, node, url) {
+                    var responseUrl = xhr.responseURL || getFullUrl$1(url, location.href);
+                    var statusText = xhr.statusText ? "(".concat(xhr.statusText, ")") : "Unspecified Error" + (xhr.status === 0 ? " (possibly CORS related)" : "");
+                    var errorMsg = "CSS XHR Error: ".concat(responseUrl, " ").concat(xhr.status, " ").concat(statusText);
+                    handleError(errorMsg, node, xhr, responseUrl);
+                },
+                onSuccess: function onSuccess(cssText, node, url) {
+                    var isLink = node.tagName === "LINK";
+                    var isStyleImport = node.tagName === "STYLE" && cssText !== node.textContent;
+                    var returnVal = settings.onSuccess(cssText, node, url);
+                    cssText = returnVal !== undefined && Boolean(returnVal) === false ? "" : returnVal || cssText;
+                    if (settings.updateURLs && (isLink || isStyleImport)) {
+                        cssText = fixRelativeCssUrls(cssText, url);
+                    }
+                    return cssText;
+                },
+                onComplete: function onComplete(cssText, cssArray) {
+                    var nodeArray = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+                    var currentVars = _extends({}, variableStore.dom, variableStore.user);
+                    var hasVarChange = false;
+                    variableStore.job = {};
+                    nodeArray.forEach((function(node, i) {
+                        var nodeCSS = cssArray[i];
+                        if (regex.cssVars.test(nodeCSS)) {
+                            try {
+                                var cssTree = parseCss(nodeCSS, {
+                                    preserveStatic: settings.preserveStatic,
+                                    removeComments: true
+                                });
+                                parseVars(cssTree, {
+                                    parseHost: Boolean(settings.rootElement.host),
+                                    store: variableStore.dom,
+                                    onWarning: handleWarning
+                                });
+                                node.__cssVars = {
+                                    tree: cssTree
+                                };
+                            } catch (err) {
+                                handleError(err.message, node);
+                            }
+                        }
+                    }));
+                    _extends(variableStore.job, variableStore.dom);
+                    if (settings.updateDOM) {
+                        _extends(variableStore.user, settings.variables);
+                        _extends(variableStore.job, variableStore.user);
+                    } else {
+                        _extends(variableStore.job, variableStore.user, settings.variables);
+                        _extends(currentVars, settings.variables);
+                    }
+                    hasVarChange = counters.job > 0 && Boolean(Object.keys(variableStore.job).length > Object.keys(currentVars).length || Boolean(Object.keys(currentVars).length && Object.keys(variableStore.job).some((function(key) {
+                        return variableStore.job[key] !== currentVars[key];
+                    }))));
+                    if (hasVarChange) {
+                        resetCssNodes(settings.rootElement);
+                        cssVars(settings);
+                    } else {
+                        var outCssArray = [];
+                        var outNodeArray = [];
+                        var hasKeyframesWithVars = false;
+                        if (settings.updateDOM) {
+                            counters.job++;
+                        }
+                        nodeArray.forEach((function(node, i) {
+                            var isSkip = !node.__cssVars;
+                            if (node.__cssVars) {
+                                try {
+                                    transformCss(node.__cssVars.tree, _extends({}, settings, {
+                                        variables: variableStore.job,
+                                        onWarning: handleWarning
+                                    }));
+                                    var outCss = stringifyCss(node.__cssVars.tree);
+                                    if (settings.updateDOM) {
+                                        var nodeCSS = cssArray[i];
+                                        var hasCSSVarFunc = regex.cssVarFunc.test(nodeCSS);
+                                        if (!node.getAttribute("data-cssvars")) {
+                                            node.setAttribute("data-cssvars", "src");
+                                        }
+                                        if (outCss.length && hasCSSVarFunc) {
+                                            var dataGroup = node.getAttribute("data-cssvars-group") || ++counters.group;
+                                            var outCssNoSpaces = outCss.replace(/\s/g, "");
+                                            var outNode = settings.rootElement.querySelector('[data-cssvars="out"][data-cssvars-group="'.concat(dataGroup, '"]')) || document.createElement("style");
+                                            hasKeyframesWithVars = hasKeyframesWithVars || regex.cssKeyframes.test(outCss);
+                                            if (settings.preserveStatic) {
+                                                node.sheet.disabled = true;
+                                            }
+                                            if (!outNode.hasAttribute("data-cssvars")) {
+                                                outNode.setAttribute("data-cssvars", "out");
+                                            }
+                                            if (outCssNoSpaces === node.textContent.replace(/\s/g, "")) {
+                                                isSkip = true;
+                                                if (outNode && outNode.parentNode) {
+                                                    node.removeAttribute("data-cssvars-group");
+                                                    outNode.parentNode.removeChild(outNode);
+                                                }
+                                            } else if (outCssNoSpaces !== outNode.textContent.replace(/\s/g, "")) {
+                                                [ node, outNode ].forEach((function(n) {
+                                                    n.setAttribute("data-cssvars-job", counters.job);
+                                                    n.setAttribute("data-cssvars-group", dataGroup);
+                                                }));
+                                                outNode.textContent = outCss;
+                                                outCssArray.push(outCss);
+                                                outNodeArray.push(outNode);
+                                                if (!outNode.parentNode) {
+                                                    node.parentNode.insertBefore(outNode, node.nextSibling);
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        if (node.textContent.replace(/\s/g, "") !== outCss) {
+                                            outCssArray.push(outCss);
+                                        }
+                                    }
+                                } catch (err) {
+                                    handleError(err.message, node);
+                                }
+                            }
+                            if (isSkip) {
+                                node.setAttribute("data-cssvars", "skip");
+                            }
+                            if (!node.hasAttribute("data-cssvars-job")) {
+                                node.setAttribute("data-cssvars-job", counters.job);
+                            }
+                        }));
+                        cssVarsSrcNodeCount = settings.rootElement.querySelectorAll('[data-cssvars]:not([data-cssvars="out"])').length;
+                        if (settings.shadowDOM) {
+                            var elms = [ settings.rootElement ].concat(_toConsumableArray$1(settings.rootElement.querySelectorAll("*")));
+                            for (var i = 0, elm; elm = elms[i]; ++i) {
+                                if (elm.shadowRoot && elm.shadowRoot.querySelector("style")) {
+                                    var shadowSettings = _extends({}, settings, {
+                                        rootElement: elm.shadowRoot
+                                    });
+                                    cssVars(shadowSettings);
+                                }
+                            }
+                        }
+                        if (settings.updateDOM && hasKeyframesWithVars) {
+                            fixKeyframes(settings.rootElement);
+                        }
+                        cssVarsIsRunning = false;
+                        settings.onComplete(outCssArray.join(""), outNodeArray, JSON.parse(JSON.stringify(variableStore.job)), getTimeStamp() - settings.__benchmark);
+                        handleFinally(outNodeArray.length);
+                    }
+                }
+            });
+        }
+    } else {
+        document.addEventListener("DOMContentLoaded", (function init(evt) {
+            cssVars(options);
+            document.removeEventListener("DOMContentLoaded", init);
+        }));
+    }
+}
+
+cssVars.reset = function() {
+    counters.job = 0;
+    counters.group = 0;
+    cssVarsIsRunning = false;
+    if (cssVarsObserver) {
+        cssVarsObserver.disconnect();
+        cssVarsObserver = null;
+    }
+    cssVarsSrcNodeCount = 0;
+    debounceTimer = null;
+    isShadowDOMReady = false;
+    for (var prop in variableStore) {
+        variableStore[prop] = {};
+    }
+};
+
+function addMutationObserver(settings) {
+    function isDisabled(node) {
+        var isDisabledAttr = node.hasAttribute("disabled");
+        var isDisabledSheet = (node.sheet || {}).disabled;
+        return isDisabledAttr || isDisabledSheet;
+    }
+    function isLink(node) {
+        var isStylesheet = node.tagName === "LINK" && (node.getAttribute("rel") || "").indexOf("stylesheet") !== -1;
+        return isStylesheet && !isDisabled(node);
+    }
+    function isStyle(node) {
+        return node.tagName === "STYLE" && !isDisabled(node);
+    }
+    function isValidAddMutation(mutationNodes) {
+        return Array.apply(null, mutationNodes).some((function(node) {
+            var isElm = node.nodeType === 1;
+            var hasAttr = isElm && node.hasAttribute("data-cssvars");
+            var isStyleWithVars = isStyle(node) && regex.cssVars.test(node.textContent);
+            var isValid = !hasAttr && (isLink(node) || isStyleWithVars);
+            return isValid;
+        }));
+    }
+    function isValidRemoveMutation(mutationNodes) {
+        return Array.apply(null, mutationNodes).some((function(node) {
+            var isElm = node.nodeType === 1;
+            var isOutNode = isElm && node.getAttribute("data-cssvars") === "out";
+            var isSrcNode = isElm && node.getAttribute("data-cssvars") === "src";
+            var isValid = isSrcNode;
+            if (isSrcNode || isOutNode) {
+                var dataGroup = node.getAttribute("data-cssvars-group");
+                var orphanNode = settings.rootElement.querySelector('[data-cssvars-group="'.concat(dataGroup, '"]'));
+                if (isSrcNode) {
+                    resetCssNodes(settings.rootElement);
+                    variableStore.dom = {};
+                }
+                if (orphanNode) {
+                    orphanNode.parentNode.removeChild(orphanNode);
+                }
+            }
+            return isValid;
+        }));
+    }
+    if (!window.MutationObserver) {
+        return;
+    }
+    if (cssVarsObserver) {
+        cssVarsObserver.disconnect();
+        cssVarsObserver = null;
+    }
+    cssVarsObserver = new MutationObserver((function(mutations) {
+        var hasValidMutation = mutations.some((function(mutation) {
+            var isValid = false;
+            if (mutation.type === "attributes") {
+                isValid = isLink(mutation.target);
+            } else if (mutation.type === "childList") {
+                isValid = isValidAddMutation(mutation.addedNodes) || isValidRemoveMutation(mutation.removedNodes);
+            }
+            return isValid;
+        }));
+        if (hasValidMutation) {
+            cssVars(settings);
+        }
+    }));
+    cssVarsObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: [ "disabled", "href" ],
+        childList: true,
+        subtree: true
+    });
+}
+
+function cssVarsDebounced(settings) {
+    var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout((function() {
+        settings.__benchmark = null;
+        cssVars(settings);
+    }), delay);
+}
+
+function fixKeyframes(rootElement) {
+    var animationNameProp = [ "animation-name", "-moz-animation-name", "-webkit-animation-name" ].filter((function(prop) {
+        return getComputedStyle(document.body)[prop];
+    }))[0];
+    if (animationNameProp) {
+        var allNodes = rootElement.getElementsByTagName("*");
+        var keyframeNodes = [];
+        var nameMarker = "__CSSVARSPONYFILL-KEYFRAMES__";
+        for (var i = 0, len = allNodes.length; i < len; i++) {
+            var node = allNodes[i];
+            var animationName = getComputedStyle(node)[animationNameProp];
+            if (animationName !== "none") {
+                node.style[animationNameProp] += nameMarker;
+                keyframeNodes.push(node);
+            }
+        }
+        void document.body.offsetHeight;
+        for (var _i = 0, _len = keyframeNodes.length; _i < _len; _i++) {
+            var nodeStyle = keyframeNodes[_i].style;
+            nodeStyle[animationNameProp] = nodeStyle[animationNameProp].replace(nameMarker, "");
+        }
+    }
+}
+
+function fixRelativeCssUrls(cssText, baseUrl) {
+    var cssUrls = cssText.replace(regex.cssComments, "").match(regex.cssUrls) || [];
+    cssUrls.forEach((function(cssUrl) {
+        var oldUrl = cssUrl.replace(regex.cssUrls, "$1");
+        var newUrl = getFullUrl$1(oldUrl, baseUrl);
+        cssText = cssText.replace(cssUrl, cssUrl.replace(oldUrl, newUrl));
+    }));
+    return cssText;
+}
+
+function fixVarNames() {
+    var varObj = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var reLeadingHyphens = /^-{2}/;
+    return Object.keys(varObj).reduce((function(obj, value) {
+        var key = reLeadingHyphens.test(value) ? value : "--".concat(value.replace(/^-+/, ""));
+        obj[key] = varObj[value];
+        return obj;
+    }), {});
+}
+
+function getFullUrl$1(url) {
+    var base = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : location.href;
+    var d = document.implementation.createHTMLDocument("");
+    var b = d.createElement("base");
+    var a = d.createElement("a");
+    d.head.appendChild(b);
+    d.body.appendChild(a);
+    b.href = base;
+    a.href = url;
+    return a.href;
+}
+
+function getTimeStamp() {
+    return isBrowser && (window.performance || {}).now ? window.performance.now() : (new Date).getTime();
+}
+
+function resetCssNodes(rootElement) {
+    var resetNodes = Array.apply(null, rootElement.querySelectorAll('[data-cssvars="skip"],[data-cssvars="src"]'));
+    resetNodes.forEach((function(node) {
+        return node.setAttribute("data-cssvars", "");
+    }));
+}
+
+var isEmpty = function isEmpty(obj) {
+  if (obj === null || obj === undefined) {
+    return true;
+  }
+
+  for (var prop in obj) {
+    if (obj.hasOwnProperty(prop)) {
+      return false;
+    }
+  }
+
+  return JSON.stringify(obj) === JSON.stringify({});
+};
+
+var useTheme = function useTheme(overrides) {
+  React.useLayoutEffect(function () {
+    if (!isEmpty(overrides)) {
+      cssVars({
+        variables: __assign({
+          '--sendbird-dark-primary-500': '#4d2aa6',
+          '--sendbird-dark-primary-400': '#6440C4',
+          '--sendbird-dark-primary-300': '#7B53EF',
+          '--sendbird-dark-primary-200': '#9E8CF5',
+          '--sendbird-dark-primary-100': '#E2DFFF',
+          '--sendbird-dark-secondary-500': '#007A7A',
+          '--sendbird-dark-secondary-400': '#189A8D',
+          '--sendbird-dark-secondary-300': '#2EBA9F',
+          '--sendbird-dark-secondary-200': '#6FD6BE',
+          '--sendbird-dark-secondary-100': '#AEF2DC',
+          '--sendbird-dark-information-100': '#b2d9ff',
+          '--sendbird-dark-error-500': '#A30E2D',
+          '--sendbird-dark-error-400': '#C11F41',
+          '--sendbird-dark-error-300': '#E53157',
+          '--sendbird-dark-error-200': '#FF6183',
+          '--sendbird-dark-error-100': '#FFABBD',
+          '--sendbird-dark-background-700': '#000000',
+          '--sendbird-dark-background-600': '#161616',
+          '--sendbird-dark-background-500': '#2C2C2C',
+          '--sendbird-dark-background-400': '#393939',
+          '--sendbird-dark-background-300': '#A8A8A8',
+          '--sendbird-dark-background-200': '#D9D9D9',
+          '--sendbird-dark-background-100': '#F0F0F0',
+          '--sendbird-dark-background-50': '#FFFFFF',
+          '--sendbird-dark-overlay': 'rgba(0, 0, 0, 0.32)',
+          '--sendbird-dark-onlight-01': 'rgba(0, 0, 0, 0.88)',
+          '--sendbird-dark-onlight-02': 'rgba(0, 0, 0, 0.50)',
+          '--sendbird-dark-onlight-03': 'rgba(0, 0, 0, 0.38)',
+          '--sendbird-dark-onlight-04': 'rgba(0, 0, 0, 0.12)',
+          '--sendbird-dark-ondark-01': 'rgba(255, 255, 255, 0.88)',
+          '--sendbird-dark-ondark-02': 'rgba(255, 255, 255, 0.50)',
+          '--sendbird-dark-ondark-03': 'rgba(255, 255, 255, 0.38)',
+          '--sendbird-dark-ondark-04': 'rgba(255, 255, 255, 0.12)',
+          '--sendbird-dark-shadow-01': '0 1px 5px 0 rgba(33, 34, 66, 0.04), 0 0 3px 0 rgba(0, 0, 0, 0.08), 0 2px 1px 0 rgba(0, 0, 0, 0.12)',
+          '--sendbird-dark-shadow-02': '0 3px 5px -3px rgba(33, 34, 66, 0.04), 0 3px 14px 2px rgba(0, 0, 0, 0.08), 0 8px 10px 1px rgba(0, 0, 0, 0.12)',
+          '--sendbird-dark-shadow-03': '0 6px 10px -5px rgba(0, 0, 0, 0.04), 0 6px 30px 5px rgba(0, 0, 0, 0.08), 0 16px 24px 2px rgba(0, 0, 0, 0.12)',
+          '--sendbird-dark-shadow-04': '0 9px 15px -7px rgba(0, 0, 0, 0.04), 0 9px 46px 8px rgba(0, 0, 0, 0.08), 0 24px 38px 3px rgba(0, 0, 0, 0.12)',
+          '--sendbird-dark-shadow-message-input': '0 1px 5px 0 rgba(33, 34, 66, 0.12), 0 0 1px 0 rgba(33, 34, 66, 0.16), 0 2px 1px 0 rgba(33, 34, 66, 0.08), 0 1px 5px 0 rgba(0, 0, 0, 0.12)',
+          '--sendbird-light-primary-500': '#4d2aa6',
+          '--sendbird-light-primary-400': '#6440C4',
+          '--sendbird-light-primary-300': '#7B53EF',
+          '--sendbird-light-primary-200': '#9E8CF5',
+          '--sendbird-light-primary-100': '#E2DFFF',
+          '--sendbird-light-secondary-500': '#007A7A',
+          '--sendbird-light-secondary-400': '#189A8D',
+          '--sendbird-light-secondary-300': '#2EBA9F',
+          '--sendbird-light-secondary-200': '#6FD6BE',
+          '--sendbird-light-secondary-100': '#AEF2DC',
+          '--sendbird-light-information-100': '#b2d9ff',
+          '--sendbird-light-error-500': '#A30E2D',
+          '--sendbird-light-error-400': '#C11F41',
+          '--sendbird-light-error-300': '#E53157',
+          '--sendbird-light-error-200': '#FF6183',
+          '--sendbird-light-error-100': '#FFABBD',
+          '--sendbird-light-background-700': '#000000',
+          '--sendbird-light-background-600': '#161616',
+          '--sendbird-light-background-500': '#2C2C2C',
+          '--sendbird-light-background-400': '#393939',
+          '--sendbird-light-background-300': '#A8A8A8',
+          '--sendbird-light-background-200': '#D9D9D9',
+          '--sendbird-light-background-100': '#F0F0F0',
+          '--sendbird-light-background-50': ' #FFFFFF',
+          '--sendbird-light-overlay': 'rgba(0, 0, 0, 0.32)',
+          '--sendbird-light-onlight-01': 'rgba(0, 0, 0, 0.88)',
+          '--sendbird-light-onlight-02': 'rgba(0, 0, 0, 0.50)',
+          '--sendbird-light-onlight-03': 'rgba(0, 0, 0, 0.38)',
+          '--sendbird-light-onlight-04': 'rgba(0, 0, 0, 0.12)',
+          '--sendbird-light-ondark-01': 'rgba(255, 255, 255, 0.88)',
+          '--sendbird-light-ondark-02': 'rgba(255, 255, 255, 0.50)',
+          '--sendbird-light-ondark-03': 'rgba(255, 255, 255, 0.38)',
+          '--sendbird-light-ondark-04': 'rgba(255, 255, 255, 0.12)',
+          '--sendbird-light-shadow-01': '0 1px 5px 0 rgba(33, 34, 66, 0.04), 0 0 3px 0 rgba(0, 0, 0, 0.08), 0 2px 1px 0 rgba(0, 0, 0, 0.12)',
+          '--sendbird-light-shadow-02': '0 3px 5px -3px rgba(33, 34, 66, 0.04), 0 3px 14px 2px rgba(0, 0, 0, 0.08), 0 8px 10px 1px rgba(0, 0, 0, 0.12)',
+          '--sendbird-light-shadow-03': '0 6px 10px -5px rgba(0, 0, 0, 0.04), 0 6px 30px 5px rgba(0, 0, 0, 0.08), 0 16px 24px 2px rgba(0, 0, 0, 0.12)',
+          '--sendbird-light-shadow-04': '0 9px 15px -7px rgba(0, 0, 0, 0.04), 0 9px 46px 8px rgba(0, 0, 0, 0.08), 0 24px 38px 3px rgba(0, 0, 0, 0.12)',
+          '--sendbird-light-shadow-message-input': '0 1px 5px 0 rgba(33, 34, 66, 0.12), 0 0 1px 0 rgba(33, 34, 66, 0.16), 0 2px 1px 0 rgba(33, 34, 66, 0.08), 0 1px 5px 0 rgba(0, 0, 0, 0.12)',
+          '--sendbird-light-theme-surface-2': '#EAEAEA'
+        }, overrides)
+      });
+    }
+  }, [overrides]);
 };
 
 var sdkInitialState = {
@@ -644,6 +2309,95 @@ function useAppendDomNode() {
   }, []);
 }
 
+var getStringSet = function getStringSet(lang) {
+  var stringSet = {
+    en: {
+      TRYING_TO_CONNECT: 'Trying to connect…',
+      USER_PROFILE__MESSAGE: 'Message',
+      USER_PROFILE__USER_ID: 'User ID',
+      EDIT_PROFILE__TITLE: 'My profile',
+      EDIT_PROFILE__IMAGE_LABEL: 'Profile image',
+      EDIT_PROFILE__IMAGE_UPLOAD: 'Upload',
+      EDIT_PROFILE__NICKNAME_LABEL: 'Nickname',
+      EDIT_PROFILE__NICKNAME_PLACEHOLDER: 'Enter your nickname',
+      EDIT_PROFILE__USERID_LABEL: 'User ID',
+      EDIT_PROFILE__THEME_LABEL: 'Dark theme',
+      CHANNEL_LIST__TITLE: 'Channels',
+      CHANNEL__MESSAGE_INPUT__PLACE_HOLDER: 'Enter message',
+      CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__DISABLED: 'Chat is unavailable in this channel',
+      CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__MUTED: 'Chat is unavailable because you are being muted',
+      CHANNEL__MESSAGE_LIST__NOTIFICATION__NEW_MESSAGE: 'new message(s) since',
+      CHANNEL__MESSAGE_LIST__NOTIFICATION__ON: 'on',
+      CHANNEL_SETTING__HEADER__TITLE: 'Channel information',
+      CHANNEL_SETTING__PROFILE__EDIT: 'Edit',
+      CHANNEL_SETTING__MEMBERS__TITLE: 'Members',
+      CHANNEL_SETTING__MEMBERS__SEE_ALL_MEMBERS: 'All members',
+      CHANNEL_SETTING__MEMBERS__INVITE_MEMBER: 'Invite users',
+      CHANNEL_SETTING__LEAVE_CHANNEL__TITLE: 'Leave channel',
+      CHANNEL_SETTING__OPERATORS__TITLE: 'Operators',
+      CHANNEL_SETTING__OPERATORS__TITLE_ALL: 'All operators',
+      CHANNEL_SETTING__OPERATORS__TITLE_ADD: 'Add operator',
+      CHANNEL_SETTING__MUTED_MEMBERS__TITLE: 'Muted members',
+      CHANNEL_SETTING__MUTED_MEMBERS__TITLE_ALL: 'All muted members',
+      CHANNEL_SETTING__BANNED_MEMBERS__TITLE: 'Banned members',
+      CHANNEL_SETTING__BANNED_MEMBERS__TITLE_ALL: 'All banned members',
+      CHANNEL_SETTING__FREEZE_CHANNEL: 'Freeze Channel',
+      BUTTON__CANCEL: 'Cancel',
+      BUTTON__DELETE: 'Delete',
+      BUTTON__SAVE: 'Save',
+      BUTTON__CREATE: 'Create',
+      BUTTON__INVITE: 'Invite',
+      BUTTON__CLOSE: 'Close',
+      BADGE__OVER: '+',
+      MODAL__DELETE_MESSAGE__TITLE: 'Delete this message?',
+      MODAL__CHANNEL_INFORMATION__TITLE: 'Edit channel information',
+      MODAL__CHANNEL_INFORMATION__CHANNEL_IMAGE: 'Channel image',
+      MODAL__CHANNEL_INFORMATION__UPLOAD: 'Upload',
+      MODAL__CHANNEL_INFORMATION__CHANNEL_NAME: 'Channel name',
+      MODAL__CHANNEL_INFORMATION__INPUT__PLACE_HOLDER: 'Enter name',
+      MODAL__INVITE_MEMBER__TITLE: 'Invite member',
+      MODAL__INVITE_MEMBER__SELECTEC: 'selected',
+      MODAL__CREATE_CHANNEL__TITLE: 'New channel',
+      MODAL__CREATE_CHANNEL__SELECTED: 'selected',
+      MODAL__USER_LIST__TITLE: 'members',
+      TYPING_INDICATOR__IS_TYPING: 'is typing...',
+      TYPING_INDICATOR__AND: 'and',
+      TYPING_INDICATOR__ARE_TYPING: 'are typing...',
+      TYPING_INDICATOR__MULTIPLE_TYPING: 'Several people are typing...',
+      MESSAGE_STATUS__SENDING_FAILED: 'Couldn\'t send message.',
+      MESSAGE_STATUS__TRY_AGAIN: 'Try again',
+      MESSAGE_STATUS__OR: 'or',
+      MESSAGE_STATUS__DELETE: 'delete',
+      PLACE_HOLDER__NO_CHANNEL: 'No channels',
+      CHANNEL_FROZEN: 'Channel frozen',
+      MUTED_PL: 'Channel frozen',
+      PLACE_HOLDER__WRONG: 'Something went wrong',
+      PLACE_HOLDER__RETRY_TO_CONNECT: 'Retry',
+      NO_TITLE: 'No title',
+      NO_NAME: '(No name)',
+      NO_MEMBERS: '(No members)',
+      TOOLTIP__AND_YOU: ', and you',
+      TOOLTIP__YOU: 'you',
+      TOOLTIP__UNKOWN_USER: '(no name)',
+      UNKNOWN__UNKNOWN_MESSAGE_TYPE: '(Unknown message type)',
+      UNKNOWN__CANNOT_READ_MESSAGE: 'Cannot read this message.',
+      MESSAGE_EDITED: '(edited)'
+    }
+  };
+  return stringSet && stringSet[lang] ? stringSet[lang] : {};
+};
+
+var LocalizationContext = React__default.createContext({
+  stringSet: getStringSet('en')
+});
+
+var LocalizationProvider = function LocalizationProvider(props) {
+  var children = props.children;
+  return React__default.createElement(LocalizationContext.Provider, {
+    value: props
+  }, children);
+};
+
 function Sendbird(props) {
   var userId = props.userId,
       appId = props.appId,
@@ -657,7 +2411,9 @@ function Sendbird(props) {
       profileUrl = props.profileUrl,
       userListQuery = props.userListQuery,
       _props$config = props.config,
-      config = _props$config === void 0 ? {} : _props$config;
+      config = _props$config === void 0 ? {} : _props$config,
+      colorSet = props.colorSet,
+      stringSet = props.stringSet;
   var _config$logLevel = config.logLevel,
       logLevel = _config$logLevel === void 0 ? '' : _config$logLevel;
 
@@ -681,6 +2437,7 @@ function Sendbird(props) {
       userStore = _useReducer4[0],
       userDispatcher = _useReducer4[1];
 
+  useTheme(colorSet);
   React.useEffect(function () {
     setPubSub(pubSubFactory());
   }, []);
@@ -739,6 +2496,13 @@ function Sendbird(props) {
     };
   }, [currenttheme]);
   var isOnline = useConnectionStatus(sdkStore.sdk, logger);
+  var localeStringSet = React__default.useMemo(function () {
+    if (!stringSet) {
+      return getStringSet('en');
+    }
+
+    return _objectSpread2({}, getStringSet('en'), {}, stringSet);
+  }, [stringSet]);
   return React__default.createElement(SendbirdSdkContext.Provider, {
     value: {
       stores: {
@@ -779,7 +2543,9 @@ function Sendbird(props) {
         pubSub: pubSub
       }
     }
-  }, children);
+  }, React__default.createElement(LocalizationProvider, {
+    stringSet: localeStringSet
+  }, children));
 }
 Sendbird.propTypes = {
   userId: PropTypes.string.isRequired,
@@ -800,7 +2566,9 @@ Sendbird.propTypes = {
       subscribe: PropTypes.func,
       publish: PropTypes.func
     })
-  })
+  }),
+  stringSet: PropTypes.objectOf(PropTypes.string),
+  colorSet: PropTypes.objectOf(PropTypes.string)
 };
 Sendbird.defaultProps = {
   accessToken: '',
@@ -811,7 +2579,9 @@ Sendbird.defaultProps = {
   renderUserProfile: null,
   allowProfileEdit: false,
   userListQuery: null,
-  config: {}
+  config: {},
+  stringSet: null,
+  colorSet: null
 };
 
 var UserProfileContext = React__default.createContext();
@@ -1078,40 +2848,6 @@ function reducer$2(state, action) {
   }
 }
 
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */
-
-var __assign = function() {
-    __assign = Object.assign || function __assign(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-
-function __spreadArrays() {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-}
-
 /*
   ImageRenderer displays image with url or source
   it checks if the source exist with img tag first
@@ -1240,7 +2976,7 @@ var Type = {
   TOGGLE_OFF: 'TOGGLE_OFF'
 };
 
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+function _extends$1() { _extends$1 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$1.apply(this, arguments); }
 
 var _ref =
 /*#__PURE__*/
@@ -1252,12 +2988,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconAdd(props) {
-  return React__default.createElement("svg", _extends({
+  return React__default.createElement("svg", _extends$1({
     viewBox: "0 0 24 24"
   }, props), _ref);
 }
 
-function _extends$1() { _extends$1 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$1.apply(this, arguments); }
+function _extends$2() { _extends$2 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$2.apply(this, arguments); }
 
 var _ref$1 =
 /*#__PURE__*/
@@ -1269,12 +3005,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconAttach(props) {
-  return React__default.createElement("svg", _extends$1({
+  return React__default.createElement("svg", _extends$2({
     viewBox: "0 0 22 22"
   }, props), _ref$1);
 }
 
-function _extends$2() { _extends$2 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$2.apply(this, arguments); }
+function _extends$3() { _extends$3 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$3.apply(this, arguments); }
 
 var _ref$2 =
 /*#__PURE__*/
@@ -1286,12 +3022,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconArrowLeft(props) {
-  return React__default.createElement("svg", _extends$2({
+  return React__default.createElement("svg", _extends$3({
     viewBox: "0 0 24 24"
   }, props), _ref$2);
 }
 
-function _extends$3() { _extends$3 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$3.apply(this, arguments); }
+function _extends$4() { _extends$4 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$4.apply(this, arguments); }
 
 var _ref$3 =
 /*#__PURE__*/
@@ -1308,12 +3044,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconAvatarDark(props) {
-  return React__default.createElement("svg", _extends$3({
+  return React__default.createElement("svg", _extends$4({
     viewBox: "0 0 56 56"
   }, props), _ref$3, _ref2);
 }
 
-function _extends$4() { _extends$4 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$4.apply(this, arguments); }
+function _extends$5() { _extends$5 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$5.apply(this, arguments); }
 
 var _ref$4 =
 /*#__PURE__*/
@@ -1331,12 +3067,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconAvatarLight(props) {
-  return React__default.createElement("svg", _extends$4({
+  return React__default.createElement("svg", _extends$5({
     viewBox: "0 0 56 56"
   }, props), _ref$4, _ref2$1);
 }
 
-function _extends$5() { _extends$5 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$5.apply(this, arguments); }
+function _extends$6() { _extends$6 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$6.apply(this, arguments); }
 
 var _ref$5 =
 /*#__PURE__*/
@@ -1356,12 +3092,12 @@ React__default.createElement("g", {
 }));
 
 function SvgIconBroadcastLrgDark(props) {
-  return React__default.createElement("svg", _extends$5({
+  return React__default.createElement("svg", _extends$6({
     viewBox: "0 0 56 56"
   }, props), _ref$5);
 }
 
-function _extends$6() { _extends$6 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$6.apply(this, arguments); }
+function _extends$7() { _extends$7 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$7.apply(this, arguments); }
 
 var _ref$6 =
 /*#__PURE__*/
@@ -1381,12 +3117,12 @@ React__default.createElement("g", {
 }));
 
 function SvgIconBroadcastLrgLight(props) {
-  return React__default.createElement("svg", _extends$6({
+  return React__default.createElement("svg", _extends$7({
     viewBox: "0 0 56 56"
   }, props), _ref$6);
 }
 
-function _extends$7() { _extends$7 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$7.apply(this, arguments); }
+function _extends$8() { _extends$8 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$8.apply(this, arguments); }
 
 var _ref$7 =
 /*#__PURE__*/
@@ -1398,12 +3134,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconBroadcastDark(props) {
-  return React__default.createElement("svg", _extends$7({
+  return React__default.createElement("svg", _extends$8({
     viewBox: "0 0 16 16"
   }, props), _ref$7);
 }
 
-function _extends$8() { _extends$8 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$8.apply(this, arguments); }
+function _extends$9() { _extends$9 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$9.apply(this, arguments); }
 
 var _ref$8 =
 /*#__PURE__*/
@@ -1415,12 +3151,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconBroadcastLight(props) {
-  return React__default.createElement("svg", _extends$8({
+  return React__default.createElement("svg", _extends$9({
     viewBox: "0 0 16 16"
   }, props), _ref$8);
 }
 
-function _extends$9() { _extends$9 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$9.apply(this, arguments); }
+function _extends$a() { _extends$a = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$a.apply(this, arguments); }
 
 var _ref$9 =
 /*#__PURE__*/
@@ -1432,12 +3168,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconBroadcast(props) {
-  return React__default.createElement("svg", _extends$9({
+  return React__default.createElement("svg", _extends$a({
     viewBox: "0 0 16 16"
   }, props), _ref$9);
 }
 
-function _extends$a() { _extends$a = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$a.apply(this, arguments); }
+function _extends$b() { _extends$b = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$b.apply(this, arguments); }
 
 var _ref$a =
 /*#__PURE__*/
@@ -1449,12 +3185,12 @@ React__default.createElement("path", {
 });
 
 function SvgFrozenDark(props) {
-  return React__default.createElement("svg", _extends$a({
+  return React__default.createElement("svg", _extends$b({
     viewBox: "0 0 16 16"
   }, props), _ref$a);
 }
 
-function _extends$b() { _extends$b = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$b.apply(this, arguments); }
+function _extends$c() { _extends$c = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$c.apply(this, arguments); }
 
 var _ref$b =
 /*#__PURE__*/
@@ -1466,12 +3202,12 @@ React__default.createElement("path", {
 });
 
 function SvgFrozenLight(props) {
-  return React__default.createElement("svg", _extends$b({
+  return React__default.createElement("svg", _extends$c({
     viewBox: "0 0 16 16"
   }, props), _ref$b);
 }
 
-function _extends$c() { _extends$c = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$c.apply(this, arguments); }
+function _extends$d() { _extends$d = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$d.apply(this, arguments); }
 
 var _ref$c =
 /*#__PURE__*/
@@ -1483,12 +3219,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconCamera(props) {
-  return React__default.createElement("svg", _extends$c({
+  return React__default.createElement("svg", _extends$d({
     viewBox: "0 0 24 24"
   }, props), _ref$c);
 }
 
-function _extends$d() { _extends$d = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$d.apply(this, arguments); }
+function _extends$e() { _extends$e = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$e.apply(this, arguments); }
 
 var _ref$d =
 /*#__PURE__*/
@@ -1499,12 +3235,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconMore(props) {
-  return React__default.createElement("svg", _extends$d({
+  return React__default.createElement("svg", _extends$e({
     viewBox: "0 0 24 24"
   }, props), _ref$d);
 }
 
-function _extends$e() { _extends$e = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$e.apply(this, arguments); }
+function _extends$f() { _extends$f = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$f.apply(this, arguments); }
 
 var _ref$e =
 /*#__PURE__*/
@@ -1516,12 +3252,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconMute(props) {
-  return React__default.createElement("svg", _extends$e({
+  return React__default.createElement("svg", _extends$f({
     viewBox: "0 0 24 24"
   }, props), _ref$e);
 }
 
-function _extends$f() { _extends$f = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$f.apply(this, arguments); }
+function _extends$g() { _extends$g = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$g.apply(this, arguments); }
 
 var _ref$f =
 /*#__PURE__*/
@@ -1533,12 +3269,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconNoThumbnail(props) {
-  return React__default.createElement("svg", _extends$f({
+  return React__default.createElement("svg", _extends$g({
     viewBox: "0 0 56 56"
   }, props), _ref$f);
 }
 
-function _extends$g() { _extends$g = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$g.apply(this, arguments); }
+function _extends$h() { _extends$h = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$h.apply(this, arguments); }
 
 var _ref$g =
 /*#__PURE__*/
@@ -1553,12 +3289,12 @@ React__default.createElement("g", {
 }));
 
 function SvgIconCheckbox(props) {
-  return React__default.createElement("svg", _extends$g({
+  return React__default.createElement("svg", _extends$h({
     viewBox: "0 0 24 24"
   }, props), _ref$g);
 }
 
-function _extends$h() { _extends$h = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$h.apply(this, arguments); }
+function _extends$i() { _extends$i = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$i.apply(this, arguments); }
 
 var _ref$h =
 /*#__PURE__*/
@@ -1573,12 +3309,12 @@ React__default.createElement("g", {
 }));
 
 function SvgIconCheckboxOff(props) {
-  return React__default.createElement("svg", _extends$h({
+  return React__default.createElement("svg", _extends$i({
     viewBox: "0 0 24 24"
   }, props), _ref$h);
 }
 
-function _extends$i() { _extends$i = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$i.apply(this, arguments); }
+function _extends$j() { _extends$j = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$j.apply(this, arguments); }
 
 var _ref$i =
 /*#__PURE__*/
@@ -1590,12 +3326,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconClose(props) {
-  return React__default.createElement("svg", _extends$i({
+  return React__default.createElement("svg", _extends$j({
     viewBox: "0 0 24 24"
   }, props), _ref$i);
 }
 
-function _extends$j() { _extends$j = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$j.apply(this, arguments); }
+function _extends$k() { _extends$k = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$k.apply(this, arguments); }
 
 var _ref$j =
 /*#__PURE__*/
@@ -1607,12 +3343,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconCopy(props) {
-  return React__default.createElement("svg", _extends$j({
+  return React__default.createElement("svg", _extends$k({
     viewBox: "0 0 24 24"
   }, props), _ref$j);
 }
 
-function _extends$k() { _extends$k = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$k.apply(this, arguments); }
+function _extends$l() { _extends$l = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$l.apply(this, arguments); }
 
 var _ref$k =
 /*#__PURE__*/
@@ -1624,12 +3360,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconChat(props) {
-  return React__default.createElement("svg", _extends$k({
+  return React__default.createElement("svg", _extends$l({
     viewBox: "0 0 24 24"
   }, props), _ref$k);
 }
 
-function _extends$l() { _extends$l = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$l.apply(this, arguments); }
+function _extends$m() { _extends$m = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$m.apply(this, arguments); }
 
 var _ref$l =
 /*#__PURE__*/
@@ -1641,12 +3377,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconSupergroup(props) {
-  return React__default.createElement("svg", _extends$l({
+  return React__default.createElement("svg", _extends$m({
     viewBox: "0 0 28 28"
   }, props), _ref$l);
 }
 
-function _extends$m() { _extends$m = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$m.apply(this, arguments); }
+function _extends$n() { _extends$n = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$n.apply(this, arguments); }
 
 var _ref$m =
 /*#__PURE__*/
@@ -1658,12 +3394,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconCreate(props) {
-  return React__default.createElement("svg", _extends$m({
+  return React__default.createElement("svg", _extends$n({
     viewBox: "0 0 24 24"
   }, props), _ref$m);
 }
 
-function _extends$n() { _extends$n = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$n.apply(this, arguments); }
+function _extends$o() { _extends$o = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$o.apply(this, arguments); }
 
 var _ref$n =
 /*#__PURE__*/
@@ -1675,12 +3411,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconDelete(props) {
-  return React__default.createElement("svg", _extends$n({
+  return React__default.createElement("svg", _extends$o({
     viewBox: "0 0 24 24"
   }, props), _ref$n);
 }
 
-function _extends$o() { _extends$o = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$o.apply(this, arguments); }
+function _extends$p() { _extends$p = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$p.apply(this, arguments); }
 
 var _ref$o =
 /*#__PURE__*/
@@ -1692,12 +3428,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconDummy(props) {
-  return React__default.createElement("svg", _extends$o({
+  return React__default.createElement("svg", _extends$p({
     viewBox: "0 0 24 24"
   }, props), _ref$o);
 }
 
-function _extends$p() { _extends$p = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$p.apply(this, arguments); }
+function _extends$q() { _extends$q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$q.apply(this, arguments); }
 
 var _ref$p =
 /*#__PURE__*/
@@ -1709,12 +3445,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconEdit(props) {
-  return React__default.createElement("svg", _extends$p({
+  return React__default.createElement("svg", _extends$q({
     viewBox: "0 0 26 26"
   }, props), _ref$p);
 }
 
-function _extends$q() { _extends$q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$q.apply(this, arguments); }
+function _extends$r() { _extends$r = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$r.apply(this, arguments); }
 
 var _ref$q =
 /*#__PURE__*/
@@ -1726,12 +3462,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconError(props) {
-  return React__default.createElement("svg", _extends$q({
+  return React__default.createElement("svg", _extends$r({
     viewBox: "0 0 16 16"
   }, props), _ref$q);
 }
 
-function _extends$r() { _extends$r = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$r.apply(this, arguments); }
+function _extends$s() { _extends$s = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$s.apply(this, arguments); }
 
 var _ref$r =
 /*#__PURE__*/
@@ -1749,12 +3485,12 @@ React__default.createElement("g", {
 }));
 
 function SvgIconErrorFilled(props) {
-  return React__default.createElement("svg", _extends$r({
+  return React__default.createElement("svg", _extends$s({
     viewBox: "0 0 24 24"
   }, props), _ref$r);
 }
 
-function _extends$s() { _extends$s = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$s.apply(this, arguments); }
+function _extends$t() { _extends$t = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$t.apply(this, arguments); }
 
 var _ref$s =
 /*#__PURE__*/
@@ -1776,12 +3512,12 @@ React__default.createElement("g", {
 }));
 
 function SvgEmojiFail(props) {
-  return React__default.createElement("svg", _extends$s({
+  return React__default.createElement("svg", _extends$t({
     viewBox: "0 0 28 28"
   }, props), _ref$s);
 }
 
-function _extends$t() { _extends$t = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$t.apply(this, arguments); }
+function _extends$u() { _extends$u = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$u.apply(this, arguments); }
 
 var _ref$t =
 /*#__PURE__*/
@@ -1793,12 +3529,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconReactionsAdd(props) {
-  return React__default.createElement("svg", _extends$t({
+  return React__default.createElement("svg", _extends$u({
     viewBox: "0 0 22 22"
   }, props), _ref$t);
 }
 
-function _extends$u() { _extends$u = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$u.apply(this, arguments); }
+function _extends$v() { _extends$v = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$v.apply(this, arguments); }
 
 var _ref$u =
 /*#__PURE__*/
@@ -1810,12 +3546,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconEmojiReactionsAdd(props) {
-  return React__default.createElement("svg", _extends$u({
+  return React__default.createElement("svg", _extends$v({
     viewBox: "0 0 20 20"
   }, props), _ref$u);
 }
 
-function _extends$v() { _extends$v = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$v.apply(this, arguments); }
+function _extends$w() { _extends$w = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$w.apply(this, arguments); }
 
 var _ref$v =
 /*#__PURE__*/
@@ -1827,12 +3563,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconDelivered(props) {
-  return React__default.createElement("svg", _extends$v({
+  return React__default.createElement("svg", _extends$w({
     viewBox: "0 0 24 24"
   }, props), _ref$v);
 }
 
-function _extends$w() { _extends$w = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$w.apply(this, arguments); }
+function _extends$x() { _extends$x = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$x.apply(this, arguments); }
 
 var _ref$w =
 /*#__PURE__*/
@@ -1843,12 +3579,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconDisconnected(props) {
-  return React__default.createElement("svg", _extends$w({
+  return React__default.createElement("svg", _extends$x({
     viewBox: "0 0 24 24"
   }, props), _ref$w);
 }
 
-function _extends$x() { _extends$x = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$x.apply(this, arguments); }
+function _extends$y() { _extends$y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$y.apply(this, arguments); }
 
 var _ref$x =
 /*#__PURE__*/
@@ -1860,12 +3596,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconDocument(props) {
-  return React__default.createElement("svg", _extends$x({
+  return React__default.createElement("svg", _extends$y({
     viewBox: "0 0 24 24"
   }, props), _ref$x);
 }
 
-function _extends$y() { _extends$y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$y.apply(this, arguments); }
+function _extends$z() { _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$z.apply(this, arguments); }
 
 var _ref$y =
 /*#__PURE__*/
@@ -1877,12 +3613,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconDownload(props) {
-  return React__default.createElement("svg", _extends$y({
+  return React__default.createElement("svg", _extends$z({
     viewBox: "0 0 24 24"
   }, props), _ref$y);
 }
 
-function _extends$z() { _extends$z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$z.apply(this, arguments); }
+function _extends$A() { _extends$A = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$A.apply(this, arguments); }
 
 var _ref$z =
 /*#__PURE__*/
@@ -1900,12 +3636,12 @@ React__default.createElement("g", {
 }));
 
 function SvgIconFileAudio(props) {
-  return React__default.createElement("svg", _extends$z({
+  return React__default.createElement("svg", _extends$A({
     viewBox: "0 0 28 28"
   }, props), _ref$z);
 }
 
-function _extends$A() { _extends$A = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$A.apply(this, arguments); }
+function _extends$B() { _extends$B = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$B.apply(this, arguments); }
 
 var _ref$A =
 /*#__PURE__*/
@@ -1926,12 +3662,12 @@ React__default.createElement("g", {
 }));
 
 function SvgIconFileDocument(props) {
-  return React__default.createElement("svg", _extends$A({
+  return React__default.createElement("svg", _extends$B({
     viewBox: "0 0 28 28"
   }, props), _ref$A);
 }
 
-function _extends$B() { _extends$B = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$B.apply(this, arguments); }
+function _extends$C() { _extends$C = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$C.apply(this, arguments); }
 
 var _ref$B =
 /*#__PURE__*/
@@ -1952,12 +3688,12 @@ React__default.createElement("g", {
 }));
 
 function SvgIconGif(props) {
-  return React__default.createElement("svg", _extends$B({
+  return React__default.createElement("svg", _extends$C({
     viewBox: "0 0 56 56"
   }, props), _ref$B);
 }
 
-function _extends$C() { _extends$C = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$C.apply(this, arguments); }
+function _extends$D() { _extends$D = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$D.apply(this, arguments); }
 
 var _ref$C =
 /*#__PURE__*/
@@ -1969,12 +3705,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconInfo(props) {
-  return React__default.createElement("svg", _extends$C({
+  return React__default.createElement("svg", _extends$D({
     viewBox: "0 0 24 24"
   }, props), _ref$C);
 }
 
-function _extends$D() { _extends$D = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$D.apply(this, arguments); }
+function _extends$E() { _extends$E = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$E.apply(this, arguments); }
 
 var _ref$D =
 /*#__PURE__*/
@@ -1986,12 +3722,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconLeave(props) {
-  return React__default.createElement("svg", _extends$D({
+  return React__default.createElement("svg", _extends$E({
     viewBox: "0 0 24 24"
   }, props), _ref$D);
 }
 
-function _extends$E() { _extends$E = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$E.apply(this, arguments); }
+function _extends$F() { _extends$F = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$F.apply(this, arguments); }
 
 var _ref$E =
 /*#__PURE__*/
@@ -2003,12 +3739,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconMembers(props) {
-  return React__default.createElement("svg", _extends$E({
+  return React__default.createElement("svg", _extends$F({
     viewBox: "0 0 24 24"
   }, props), _ref$E);
 }
 
-function _extends$F() { _extends$F = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$F.apply(this, arguments); }
+function _extends$G() { _extends$G = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$G.apply(this, arguments); }
 
 var _ref$F =
 /*#__PURE__*/
@@ -2020,12 +3756,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconNotifications(props) {
-  return React__default.createElement("svg", _extends$F({
+  return React__default.createElement("svg", _extends$G({
     viewBox: "0 0 24 24"
   }, props), _ref$F);
 }
 
-function _extends$G() { _extends$G = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$G.apply(this, arguments); }
+function _extends$H() { _extends$H = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$H.apply(this, arguments); }
 
 var _ref$G =
 /*#__PURE__*/
@@ -2037,12 +3773,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconPhoto(props) {
-  return React__default.createElement("svg", _extends$G({
+  return React__default.createElement("svg", _extends$H({
     viewBox: "0 0 24 24"
   }, props), _ref$G);
 }
 
-function _extends$H() { _extends$H = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$H.apply(this, arguments); }
+function _extends$I() { _extends$I = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$I.apply(this, arguments); }
 
 var _ref$H =
 /*#__PURE__*/
@@ -2063,12 +3799,12 @@ React__default.createElement("g", {
 }));
 
 function SvgIconPlay(props) {
-  return React__default.createElement("svg", _extends$H({
+  return React__default.createElement("svg", _extends$I({
     viewBox: "0 0 56 56"
   }, props), _ref$H);
 }
 
-function _extends$I() { _extends$I = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$I.apply(this, arguments); }
+function _extends$J() { _extends$J = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$J.apply(this, arguments); }
 
 var _ref$I =
 /*#__PURE__*/
@@ -2080,12 +3816,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconPlus(props) {
-  return React__default.createElement("svg", _extends$I({
+  return React__default.createElement("svg", _extends$J({
     viewBox: "0 0 24 24"
   }, props), _ref$I);
 }
 
-function _extends$J() { _extends$J = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$J.apply(this, arguments); }
+function _extends$K() { _extends$K = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$K.apply(this, arguments); }
 
 var _ref$J =
 /*#__PURE__*/
@@ -2097,12 +3833,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconRead(props) {
-  return React__default.createElement("svg", _extends$J({
+  return React__default.createElement("svg", _extends$K({
     viewBox: "0 0 24 24"
   }, props), _ref$J);
 }
 
-function _extends$K() { _extends$K = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$K.apply(this, arguments); }
+function _extends$L() { _extends$L = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$L.apply(this, arguments); }
 
 var _ref$K =
 /*#__PURE__*/
@@ -2114,13 +3850,13 @@ React__default.createElement("path", {
 });
 
 function SvgIconRefresh(props) {
-  return React__default.createElement("svg", _extends$K({
+  return React__default.createElement("svg", _extends$L({
     width: 20,
     height: 20
   }, props), _ref$K);
 }
 
-function _extends$L() { _extends$L = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$L.apply(this, arguments); }
+function _extends$M() { _extends$M = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$M.apply(this, arguments); }
 
 var _ref$L =
 /*#__PURE__*/
@@ -2131,12 +3867,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconSend(props) {
-  return React__default.createElement("svg", _extends$L({
+  return React__default.createElement("svg", _extends$M({
     viewBox: "0 0 22 22"
   }, props), _ref$L);
 }
 
-function _extends$M() { _extends$M = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$M.apply(this, arguments); }
+function _extends$N() { _extends$N = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$N.apply(this, arguments); }
 
 var _ref$M =
 /*#__PURE__*/
@@ -2148,12 +3884,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconSent(props) {
-  return React__default.createElement("svg", _extends$M({
+  return React__default.createElement("svg", _extends$N({
     viewBox: "0 0 24 24"
   }, props), _ref$M);
 }
 
-function _extends$N() { _extends$N = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$N.apply(this, arguments); }
+function _extends$O() { _extends$O = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$O.apply(this, arguments); }
 
 var _ref$N =
 /*#__PURE__*/
@@ -2165,12 +3901,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconShevron(props) {
-  return React__default.createElement("svg", _extends$N({
+  return React__default.createElement("svg", _extends$O({
     viewBox: "0 0 24 24"
   }, props), _ref$N);
 }
 
-function _extends$O() { _extends$O = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$O.apply(this, arguments); }
+function _extends$P() { _extends$P = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$P.apply(this, arguments); }
 
 var _ref$O =
 /*#__PURE__*/
@@ -2182,12 +3918,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconShevronDown(props) {
-  return React__default.createElement("svg", _extends$O({
+  return React__default.createElement("svg", _extends$P({
     viewBox: "0 0 24 24"
   }, props), _ref$O);
 }
 
-function _extends$P() { _extends$P = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$P.apply(this, arguments); }
+function _extends$Q() { _extends$Q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$Q.apply(this, arguments); }
 
 var _ref$P =
 /*#__PURE__*/
@@ -2199,12 +3935,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconSpinnerSmall(props) {
-  return React__default.createElement("svg", _extends$P({
+  return React__default.createElement("svg", _extends$Q({
     viewBox: "0 0 24 24"
   }, props), _ref$P);
 }
 
-function _extends$Q() { _extends$Q = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$Q.apply(this, arguments); }
+function _extends$R() { _extends$R = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$R.apply(this, arguments); }
 
 var _ref$Q =
 /*#__PURE__*/
@@ -2216,12 +3952,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconSpinnerLarge(props) {
-  return React__default.createElement("svg", _extends$Q({
+  return React__default.createElement("svg", _extends$R({
     viewBox: "0 0 48 48"
   }, props), _ref$Q);
 }
 
-function _extends$R() { _extends$R = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$R.apply(this, arguments); }
+function _extends$S() { _extends$S = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$S.apply(this, arguments); }
 
 var _ref$R =
 /*#__PURE__*/
@@ -2233,12 +3969,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconUser(props) {
-  return React__default.createElement("svg", _extends$R({
+  return React__default.createElement("svg", _extends$S({
     viewBox: "0 0 24 24"
   }, props), _ref$R);
 }
 
-function _extends$S() { _extends$S = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$S.apply(this, arguments); }
+function _extends$T() { _extends$T = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$T.apply(this, arguments); }
 
 var _ref$S =
 /*#__PURE__*/
@@ -2259,12 +3995,12 @@ React__default.createElement("g", {
 }));
 
 function SvgIconOperator(props) {
-  return React__default.createElement("svg", _extends$S({
+  return React__default.createElement("svg", _extends$T({
     viewBox: "0 0 24 24"
   }, props), _ref$S);
 }
 
-function _extends$T() { _extends$T = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$T.apply(this, arguments); }
+function _extends$U() { _extends$U = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$U.apply(this, arguments); }
 
 var _ref$T =
 /*#__PURE__*/
@@ -2276,12 +4012,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconBanned(props) {
-  return React__default.createElement("svg", _extends$T({
+  return React__default.createElement("svg", _extends$U({
     viewBox: "0 0 24 24"
   }, props), _ref$T);
 }
 
-function _extends$U() { _extends$U = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$U.apply(this, arguments); }
+function _extends$V() { _extends$V = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$V.apply(this, arguments); }
 
 var _ref$U =
 /*#__PURE__*/
@@ -2293,12 +4029,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconMuted(props) {
-  return React__default.createElement("svg", _extends$U({
+  return React__default.createElement("svg", _extends$V({
     viewBox: "0 0 24 24"
   }, props), _ref$U);
 }
 
-function _extends$V() { _extends$V = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$V.apply(this, arguments); }
+function _extends$W() { _extends$W = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$W.apply(this, arguments); }
 
 var _ref$V =
 /*#__PURE__*/
@@ -2311,12 +4047,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconMutedForeground(props) {
-  return React__default.createElement("svg", _extends$V({
+  return React__default.createElement("svg", _extends$W({
     viewBox: "0 0 16 16"
   }, props), _ref$V);
 }
 
-function _extends$W() { _extends$W = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$W.apply(this, arguments); }
+function _extends$X() { _extends$X = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$X.apply(this, arguments); }
 
 var _ref$W =
 /*#__PURE__*/
@@ -2328,12 +4064,12 @@ React__default.createElement("path", {
 });
 
 function SvgIconFreeze(props) {
-  return React__default.createElement("svg", _extends$W({
+  return React__default.createElement("svg", _extends$X({
     viewBox: "0 0 24 24"
   }, props), _ref$W);
 }
 
-function _extends$X() { _extends$X = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$X.apply(this, arguments); }
+function _extends$Y() { _extends$Y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$Y.apply(this, arguments); }
 
 var _ref$X =
 /*#__PURE__*/
@@ -2359,12 +4095,12 @@ React__default.createElement("g", {
 }));
 
 function SvgIconToggleon(props) {
-  return React__default.createElement("svg", _extends$X({
+  return React__default.createElement("svg", _extends$Y({
     viewBox: "0 0 44 24"
   }, props), _ref$X);
 }
 
-function _extends$Y() { _extends$Y = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$Y.apply(this, arguments); }
+function _extends$Z() { _extends$Z = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$Z.apply(this, arguments); }
 
 var _ref$Y =
 /*#__PURE__*/
@@ -2393,7 +4129,7 @@ React__default.createElement("g", {
 }));
 
 function SvgIconToggleoff(props) {
-  return React__default.createElement("svg", _extends$Y({
+  return React__default.createElement("svg", _extends$Z({
     viewBox: "0 0 44 24"
   }, props), _ref$Y);
 }
@@ -3014,84 +4750,6 @@ function changeColorToClassName$1(color) {
   }
 }
 
-var getStringSet = function getStringSet(lang) {
-  var stringSet = {
-    en: {
-      TRYING_TO_CONNECT: 'Trying to connect…',
-      USER_PROFILE__MESSAGE: 'Message',
-      USER_PROFILE__USER_ID: 'User ID',
-      EDIT_PROFILE__TITLE: 'My profile',
-      EDIT_PROFILE__IMAGE_LABEL: 'Profile image',
-      EDIT_PROFILE__IMAGE_UPLOAD: 'Upload',
-      EDIT_PROFILE__NICKNAME_LABEL: 'Nickname',
-      EDIT_PROFILE__NICKNAME_PLACEHOLDER: 'Enter your nickname',
-      EDIT_PROFILE__USERID_LABEL: 'User ID',
-      EDIT_PROFILE__THEME_LABEL: 'Dark theme',
-      CHANNEL_LIST__TITLE: 'Channels',
-      CHANNEL__MESSAGE_INPUT__PLACE_HOLDER: 'Enter message',
-      CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__DISABLED: 'Chat is unavailable in this channel',
-      CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__MUTED: 'Chat is unavailable because you are being muted',
-      CHANNEL__MESSAGE_LIST__NOTIFICATION__NEW_MESSAGE: 'new message(s) since',
-      CHANNEL__MESSAGE_LIST__NOTIFICATION__ON: 'on',
-      CHANNEL_SETTING__HEADER__TITLE: 'Channel information',
-      CHANNEL_SETTING__PROFILE__EDIT: 'Edit',
-      CHANNEL_SETTING__MEMBERS__TITLE: 'Members',
-      CHANNEL_SETTING__MEMBERS__SEE_ALL_MEMBERS: 'All members',
-      CHANNEL_SETTING__MEMBERS__INVITE_MEMBER: 'Invite users',
-      CHANNEL_SETTING__LEAVE_CHANNEL__TITLE: 'Leave channel',
-      CHANNEL_SETTING__OPERATORS__TITLE: 'Operators',
-      CHANNEL_SETTING__OPERATORS__TITLE_ALL: 'All operators',
-      CHANNEL_SETTING__OPERATORS__TITLE_ADD: 'Add operator',
-      CHANNEL_SETTING__MUTED_MEMBERS__TITLE: 'Muted members',
-      CHANNEL_SETTING__MUTED_MEMBERS__TITLE_ALL: 'All muted members',
-      CHANNEL_SETTING__BANNED_MEMBERS__TITLE: 'Banned members',
-      CHANNEL_SETTING__BANNED_MEMBERS__TITLE_ALL: 'All banned members',
-      CHANNEL_SETTING__FREEZE_CHANNEL: 'Freeze Channel',
-      BUTTON__CANCEL: 'Cancel',
-      BUTTON__DELETE: 'Delete',
-      BUTTON__SAVE: 'Save',
-      BUTTON__CREATE: 'Create',
-      BUTTON__INVITE: 'Invite',
-      BUTTON__CLOSE: 'Close',
-      BADGE__OVER: '+',
-      MODAL__DELETE_MESSAGE__TITLE: 'Delete this message?',
-      MODAL__CHANNEL_INFORMATION__TITLE: 'Edit channel information',
-      MODAL__CHANNEL_INFORMATION__CHANNEL_IMAGE: 'Channel image',
-      MODAL__CHANNEL_INFORMATION__UPLOAD: 'Upload',
-      MODAL__CHANNEL_INFORMATION__CHANNEL_NAME: 'Channel name',
-      MODAL__CHANNEL_INFORMATION__INPUT__PLACE_HOLDER: 'Enter name',
-      MODAL__INVITE_MEMBER__TITLE: 'Invite member',
-      MODAL__INVITE_MEMBER__SELECTEC: 'selected',
-      MODAL__CREATE_CHANNEL__TITLE: 'New channel',
-      MODAL__CREATE_CHANNEL__SELECTED: 'selected',
-      MODAL__USER_LIST__TITLE: 'members',
-      TYPING_INDICATOR__IS_TYPING: 'is typing...',
-      TYPING_INDICATOR__AND: 'and',
-      TYPING_INDICATOR__ARE_TYPING: 'are typing...',
-      TYPING_INDICATOR__MULTIPLE_TYPING: 'Several people are typing...',
-      MESSAGE_STATUS__SENDING_FAILED: 'Couldn\'t send message.',
-      MESSAGE_STATUS__TRY_AGAIN: 'Try again',
-      MESSAGE_STATUS__OR: 'or',
-      MESSAGE_STATUS__DELETE: 'delete',
-      PLACE_HOLDER__NO_CHANNEL: 'No channels',
-      CHANNEL_FROZEN: 'Channel frozen',
-      MUTED_PL: 'Channel frozen',
-      PLACE_HOLDER__WRONG: 'Something went wrong',
-      PLACE_HOLDER__RETRY_TO_CONNECT: 'Retry',
-      NO_TITLE: 'No title',
-      NO_NAME: '(No name)',
-      NO_MEMBERS: '(No members)',
-      TOOLTIP__AND_YOU: ', and you',
-      TOOLTIP__YOU: 'you',
-      TOOLTIP__UNKOWN_USER: '(no name)',
-      UNKNOWN__UNKNOWN_MESSAGE_TYPE: '(Unknown message type)',
-      UNKNOWN__CANNOT_READ_MESSAGE: 'Cannot read this message.',
-      MESSAGE_EDITED: '(edited)'
-    }
-  };
-  return stringSet && stringSet[lang] ? stringSet[lang] : {};
-};
-
 var CLASS_NAME = 'sendbird-label';
 function Label(_ref) {
   var type = _ref.type,
@@ -3132,6 +4790,10 @@ function Badge(_ref) {
   var count = _ref.count,
       maxLevel = _ref.maxLevel,
       className = _ref.className;
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   var maximumNumber = parseInt('9'.repeat(maxLevel > 6 ? 6 : maxLevel), 10);
   var injectingClassName = Array.isArray(className) ? className : [className];
   return React__default.createElement("div", {
@@ -3141,7 +4803,7 @@ function Badge(_ref) {
   }, React__default.createElement(Label, {
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONCONTENT_1
-  }, count > maximumNumber ? "".concat(maximumNumber).concat(LabelStringSet.BADGE__OVER) : count)));
+  }, count > maximumNumber ? "".concat(maximumNumber).concat(stringSet.BADGE__OVER) : count)));
 }
 Badge.propTypes = {
   count: PropTypes.number.isRequired,
@@ -3178,9 +4840,10 @@ var getIsSentFromStatus = function getIsSentFromStatus(status) {
 var getChannelTitle = function getChannelTitle() {
   var channel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var currentUserId = arguments.length > 1 ? arguments[1] : undefined;
+  var stringSet = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : LabelStringSet;
 
   if (!channel || !channel.name && !channel.members) {
-    return LabelStringSet.NO_TITLE;
+    return stringSet.NO_TITLE;
   }
 
   if (channel.name && channel.name !== 'Group Channel') {
@@ -3188,7 +4851,7 @@ var getChannelTitle = function getChannelTitle() {
   }
 
   if (channel.members.length === 1) {
-    return LabelStringSet.NO_MEMBERS;
+    return stringSet.NO_MEMBERS;
   }
 
   return channel.members.filter(function (_ref) {
@@ -3196,7 +4859,7 @@ var getChannelTitle = function getChannelTitle() {
     return userId !== currentUserId;
   }).map(function (_ref2) {
     var nickname = _ref2.nickname;
-    return nickname || LabelStringSet.NO_NAME;
+    return nickname || stringSet.NO_NAME;
   }).join(', ');
 };
 var getLastMessageCreatedAt = function getLastMessageCreatedAt(channel) {
@@ -3204,22 +4867,17 @@ var getLastMessageCreatedAt = function getLastMessageCreatedAt(channel) {
     return '';
   }
 
-  var moment = Moment(channel.lastMessage.createdAt);
+  var date = channel.lastMessage.createdAt;
 
-  switch (moment.calendar().split(' ')[0]) {
-    case 'Today':
-      {
-        return moment.format('LT');
-      }
-
-    case 'Yesterday':
-      {
-        return 'Yesterday';
-      }
-
-    default:
-      return moment.format('ll').split(',')[0];
+  if (isToday(date)) {
+    return format(date, 'p');
   }
+
+  if (isYesterday(date)) {
+    return 'Yesterday';
+  }
+
+  return format(date, 'MMM dd');
 };
 var getTotalMembers = function getTotalMembers(channel) {
   return channel && channel.memberCount ? channel.memberCount : 0;
@@ -3256,6 +4914,10 @@ function ChannelPreview(_ref) {
   var userId = currentUser.userId;
   var isBroadcast = channel.isBroadcast,
       isFrozen = channel.isFrozen;
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   return React__default.createElement("div", {
     role: "link",
     tabIndex: tabIndex,
@@ -3284,7 +4946,7 @@ function ChannelPreview(_ref) {
     className: "sendbird-channel-preview__content__upper__header__channel-name",
     type: LabelTypography.SUBTITLE_2,
     color: LabelColors.ONBACKGROUND_1
-  }, getChannelTitle(channel, userId)), React__default.createElement(Label, {
+  }, getChannelTitle(channel, userId, stringSet)), React__default.createElement(Label, {
     className: "sendbird-channel-preview__content__upper__header__total-members",
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
@@ -3412,6 +5074,10 @@ function ChannelHeader(_ref) {
       onEdit = _ref.onEdit,
       renderHeader = _ref.renderHeader,
       allowProfileEdit = _ref.allowProfileEdit;
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   return React__default.createElement("div", {
     className: "\n        ".concat(allowProfileEdit && 'sendbird-channel-header--allow-edit', "\n        sendbird-channel-header\n      ")
   }, renderHeader ? renderHeader() : React__default.createElement("div", {
@@ -3433,7 +5099,7 @@ function ChannelHeader(_ref) {
     className: "sendbird-channel-header__title--name",
     type: LabelTypography.SUBTITLE_2,
     color: LabelColors.ONBACKGROUND_1
-  }, user.nickname || LabelStringSet.NO_NAME), React__default.createElement(Label, {
+  }, user.nickname || stringSet.NO_NAME), React__default.createElement(Label, {
     className: "sendbird-channel-header__title--user-id",
     type: LabelTypography.BODY_2,
     color: LabelColors.ONBACKGROUND_2
@@ -3571,6 +5237,10 @@ var ModalFooter = function ModalFooter(_ref3) {
       disabled = _ref3$disabled === void 0 ? false : _ref3$disabled,
       submitText = _ref3.submitText,
       type = _ref3.type;
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   return React__default.createElement("div", {
     className: "sendbird-modal-footer"
   }, React__default.createElement(Button, {
@@ -3579,7 +5249,7 @@ var ModalFooter = function ModalFooter(_ref3) {
   }, React__default.createElement(Label, {
     type: LabelTypography.BUTTON_1,
     color: LabelColors.ONBACKGROUND_1
-  }, LabelStringSet.BUTTON__CANCEL)), React__default.createElement(Button, {
+  }, stringSet.BUTTON__CANCEL)), React__default.createElement(Button, {
     type: type,
     disabled: disabled,
     onClick: onSubmit
@@ -3776,7 +5446,7 @@ TextButton.defaultProps = {
 
 var noop = function noop() {};
 var getMessageCreatedAt = function getMessageCreatedAt(message) {
-  return Moment(message.createdAt).format('LT');
+  return format(message.createdAt, 'p');
 };
 var getSenderName = function getSenderName(message) {
   return message.sender && (message.sender.friendName || message.sender.nickname || message.sender.userId);
@@ -3798,6 +5468,7 @@ function EditUserProfile(_a) {
   var hiddenInputRef = React.useRef(null);
   var inputRef = React.useRef(null);
   var formRef = React.useRef(null);
+  var stringSet = React.useContext(LocalizationContext).stringSet;
 
   var _e = React.useState(null),
       currentImg = _e[0],
@@ -3808,8 +5479,8 @@ function EditUserProfile(_a) {
       setNewFile = _f[1];
 
   return React__default.createElement(Modal, {
-    titleText: LabelStringSet.EDIT_PROFILE__TITLE,
-    submitText: LabelStringSet.BUTTON__SAVE,
+    titleText: stringSet.EDIT_PROFILE__TITLE,
+    submitText: stringSet.BUTTON__SAVE,
     onCancel: onCancel,
     onSubmit: function onSubmit() {
       if (user.nickname !== '' && !inputRef.current.value) {
@@ -3834,7 +5505,7 @@ function EditUserProfile(_a) {
     }
   }, React__default.createElement("section", {
     className: "sendbird__edit-user-profile__img"
-  }, React__default.createElement(InputLabel, null, LabelStringSet.EDIT_PROFILE__IMAGE_LABEL), React__default.createElement("div", {
+  }, React__default.createElement(InputLabel, null, stringSet.EDIT_PROFILE__IMAGE_LABEL), React__default.createElement("div", {
     className: "sendbird__edit-user__avatar"
   }, React__default.createElement(Avatar$1, {
     height: "80px",
@@ -3861,23 +5532,23 @@ function EditUserProfile(_a) {
   }, React__default.createElement(Label, {
     type: LabelTypography.BUTTON_1,
     color: LabelColors.PRIMARY
-  }, LabelStringSet.EDIT_PROFILE__IMAGE_UPLOAD))), React__default.createElement("section", {
+  }, stringSet.EDIT_PROFILE__IMAGE_UPLOAD))), React__default.createElement("section", {
     className: "sendbird__edit-user__name"
-  }, React__default.createElement(InputLabel, null, LabelStringSet.EDIT_PROFILE__NICKNAME_LABEL), React__default.createElement(Input, {
+  }, React__default.createElement(InputLabel, null, stringSet.EDIT_PROFILE__NICKNAME_LABEL), React__default.createElement(Input, {
     required: user.nickname !== '',
     name: "sendbird__edit-user__name",
     ref: inputRef,
     value: user.nickname,
-    placeHolder: LabelStringSet.EDIT_PROFILE__NICKNAME_PLACEHOLDER
+    placeHolder: stringSet.EDIT_PROFILE__NICKNAME_PLACEHOLDER
   })), React__default.createElement("section", {
     className: "sendbird__edit-user__userid"
-  }, React__default.createElement(InputLabel, null, LabelStringSet.EDIT_PROFILE__USERID_LABEL), React__default.createElement(Input, {
+  }, React__default.createElement(InputLabel, null, stringSet.EDIT_PROFILE__USERID_LABEL), React__default.createElement(Input, {
     disabled: true,
     name: "sendbird__edit-user__userid",
     value: user.userId
   })), React__default.createElement("section", {
     className: "sendbird__edit-user__theme"
-  }, React__default.createElement(InputLabel, null, LabelStringSet.EDIT_PROFILE__THEME_LABEL), React__default.createElement("div", {
+  }, React__default.createElement(InputLabel, null, stringSet.EDIT_PROFILE__THEME_LABEL), React__default.createElement("div", {
     className: "sendbird__edit-user__theme-icon"
   }, theme === 'dark' ? React__default.createElement(Icon, {
     onClick: function onClick() {
@@ -4401,6 +6072,7 @@ function UserProfile(_a) {
       logger = _a.logger,
       createChannel = _a.createChannel,
       onSuccess = _a.onSuccess;
+  var stringSet = React.useContext(LocalizationContext).stringSet;
   return React__default.createElement("div", {
     className: "sendbird__user-profile"
   }, React__default.createElement("section", {
@@ -4414,7 +6086,7 @@ function UserProfile(_a) {
   }, React__default.createElement(Label, {
     type: LabelTypography.H_2,
     color: LabelColors.ONBACKGROUND_1
-  }, user.nickname || LabelStringSet.NO_NAME)), user.userId !== currentUserId && React__default.createElement("section", {
+  }, user.nickname || stringSet.NO_NAME)), user.userId !== currentUserId && React__default.createElement("section", {
     className: "sendbird__user-profile-message"
   }, React__default.createElement(Button, {
     type: Type$1.SECONDARY,
@@ -4427,7 +6099,7 @@ function UserProfile(_a) {
         logger.info('UserProfile, channel create', groupChannel);
       });
     }
-  }, LabelStringSet.USER_PROFILE__MESSAGE)), React__default.createElement("div", {
+  }, stringSet.USER_PROFILE__MESSAGE)), React__default.createElement("div", {
     className: "sendbird__user-profile-seperator"
   }), React__default.createElement("section", {
     className: "sendbird__user-profile-userId"
@@ -4435,7 +6107,7 @@ function UserProfile(_a) {
     className: "sendbird__user-profile-userId--label",
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
-  }, LabelStringSet.USER_PROFILE__USER_ID), React__default.createElement(Label, {
+  }, stringSet.USER_PROFILE__USER_ID), React__default.createElement(Label, {
     className: "sendbird__user-profile-userId--value",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
@@ -4831,6 +6503,7 @@ EmojiListItems.defaultProps = {
   spaceFromTrigger: {}
 };
 
+var ENTER = 13;
 var MenuItems$1 = MenuItems;
 var EmojiListItems$1 = EmojiListItems;
 var MenuItem = function MenuItem(_ref) {
@@ -4843,7 +6516,7 @@ var MenuItem = function MenuItem(_ref) {
     className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-dropdown__menu-item']).join(' '),
     onClick: onClick,
     onKeyPress: function onKeyPress(e) {
-      if (e.keyCode === 13) {
+      if (e.keyCode === ENTER) {
         onClick(e);
       }
     },
@@ -4906,6 +6579,9 @@ function UserListItem(_ref) {
       disableUserProfile = _useContext.disableUserProfile,
       renderUserProfile = _useContext.renderUserProfile;
 
+  var _useContext2 = React.useContext(LocalizationContext),
+      stringSet = _useContext2.stringSet;
+
   return React__default.createElement("div", {
     ref: parentRef,
     className: [COMPONENT_NAME].concat(_toConsumableArray(injectingClassNames)).join(' ')
@@ -4953,7 +6629,7 @@ function UserListItem(_ref) {
     className: "".concat(COMPONENT_NAME, "__title"),
     type: LabelTypography.SUBTITLE_1,
     color: LabelColors.ONBACKGROUND_1
-  }, user.nickname || LabelStringSet.NO_NAME, currentUser === user.userId && ' (You)'), // if there is now nickname, display userId
+  }, user.nickname || stringSet.NO_NAME, currentUser === user.userId && ' (You)'), // if there is now nickname, display userId
   !user.nickname && React__default.createElement(Label, {
     className: "".concat(COMPONENT_NAME, "__subtitle"),
     type: LabelTypography.CAPTION_3,
@@ -5029,6 +6705,9 @@ var InviteMembers = function InviteMembers(props) {
       selectedUsers = _useState4[0],
       setSelectedUsers = _useState4[1];
 
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   var _useState5 = React.useState({}),
       _useState6 = _slicedToArray(_useState5, 2),
       usersDataSource = _useState6[0],
@@ -5072,7 +6751,7 @@ var InviteMembers = function InviteMembers(props) {
   }, React__default.createElement("div", null, React__default.createElement(Label, {
     color: selectedCount > 0 ? LabelColors.PRIMARY : LabelColors.ONBACKGROUND_3,
     type: LabelTypography.CAPTION_1
-  }, "".concat(selectedCount, " ").concat(LabelStringSet.MODAL__INVITE_MEMBER__SELECTEC)), React__default.createElement("div", {
+  }, "".concat(selectedCount, " ").concat(stringSet.MODAL__INVITE_MEMBER__SELECTEC)), React__default.createElement("div", {
     className: "sendbird-create-channel--scroll",
     onScroll: function onScroll(e) {
       var hasNext = usersDataSource.hasNext;
@@ -5262,6 +6941,9 @@ function AddChannel(_ref) {
       type = _useState6[0],
       setType = _useState6[1];
 
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   if (!sdk || !sdk.createApplicationUserListQuery) {
     return null;
   }
@@ -5342,8 +7024,8 @@ function AddChannel(_ref) {
     color: LabelColors.ONBACKGROUND_1
   }, "Broadcast")))), showModal && step === 1 && React__default.createElement(InviteMembers, {
     swapParams: sdk && sdk.getErrorFirstCallback && sdk.getErrorFirstCallback(),
-    titleText: LabelStringSet.MODAL__CREATE_CHANNEL__TITLE,
-    submitText: LabelStringSet.BUTTON__CREATE,
+    titleText: stringSet.MODAL__CREATE_CHANNEL__TITLE,
+    submitText: stringSet.BUTTON__CREATE,
     closeModal: function closeModal() {
       setStep(0);
       setShowModal(false);
@@ -5411,6 +7093,9 @@ function ChannelPreviewAction(_ref) {
       showModal = _useState2[0],
       setShowModal = _useState2[1];
 
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   return React__default.createElement("div", {
     role: "button",
     style: {
@@ -5451,7 +7136,7 @@ function ChannelPreviewAction(_ref) {
           setShowModal(true);
           closeDropdown();
         }
-      }, LabelStringSet.CHANNEL_SETTING__LEAVE_CHANNEL__TITLE));
+      }, stringSet.CHANNEL_SETTING__LEAVE_CHANNEL__TITLE));
     }
   }), showModal && React__default.createElement(LeaveChannel, {
     onCloseModal: function onCloseModal() {
@@ -5503,6 +7188,10 @@ function PlaceHolder(_ref) {
   var className = _ref.className,
       type = _ref.type,
       retryToConnect = _ref.retryToConnect;
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   var injectingClassName = Array.isArray(className) ? className : [className];
   return React__default.createElement("div", {
     className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-place-holder']).join(' ')
@@ -5531,7 +7220,7 @@ function PlaceHolder(_ref) {
     className: "sendbird-place-holder__body__text",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_2
-  }, type === PlaceHolderTypes.NO_CHANNELS ? LabelStringSet.PLACE_HOLDER__NO_CHANNEL : LabelStringSet.PLACE_HOLDER__WRONG), retryToConnect ? React__default.createElement("div", {
+  }, type === PlaceHolderTypes.NO_CHANNELS ? stringSet.PLACE_HOLDER__NO_CHANNEL : stringSet.PLACE_HOLDER__WRONG), retryToConnect ? React__default.createElement("div", {
     className: "sendbird-place-holder__body__reconnect",
     role: "button",
     tabIndex: 0,
@@ -5547,7 +7236,7 @@ function PlaceHolder(_ref) {
     className: "sendbird-place-holder__body__reconnect__text",
     type: LabelTypography.BUTTON_1,
     color: LabelColors.PRIMARY
-  }, LabelStringSet.PLACE_HOLDER__RETRY_TO_CONNECT)) : null) : null);
+  }, stringSet.PLACE_HOLDER__RETRY_TO_CONNECT)) : null) : null);
 }
 PlaceHolder.propTypes = {
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
@@ -6493,7 +8182,7 @@ var getNicknamesMapFromMembers = function getNicknamesMapFromMembers() {
   return nicknamesMap;
 };
 var getMessageCreatedAt$1 = function getMessageCreatedAt(message) {
-  return Moment(message.createdAt).format('LT');
+  return format(message.createdAt, 'p');
 };
 var isSameGroup = function isSameGroup(message, comparingMessage) {
   if (!message || !comparingMessage || !message.sender || !comparingMessage.sender || !message.createdAt || !comparingMessage.createdAt || !message.sender.userId || !comparingMessage.sender.userId) {
@@ -6541,14 +8230,14 @@ var messagesInitialState = {
   isInvalid: false
 };
 
-var isEmpty = function isEmpty(val) {
+var isEmpty$1 = function isEmpty(val) {
   return val === null || val === undefined;
 }; // Some Ids return string and number inconsistently
 // only use to comapre IDs
 
 
 function compareIds (a, b) {
-  if (isEmpty(a) || isEmpty(b)) {
+  if (isEmpty$1(a) || isEmpty$1(b)) {
     return false;
   }
 
@@ -6692,7 +8381,7 @@ function reducer$3(state, action) {
 
         return _objectSpread2({}, state, {
           unreadCount: unreadCount + 1,
-          unreadSince: unreadCount === 0 ? Moment().format('LT MMM DD') : unreadSince,
+          unreadSince: unreadCount === 0 ? format(new Date(), 'p MMM dd') : unreadSince,
           allMessages: passUnsuccessfullMessages(state.allMessages, message)
         });
       }
@@ -7632,8 +9321,7 @@ function MessageStatus(_ref) {
   var message = _ref.message,
       status = _ref.status,
       className = _ref.className;
-  var injectingClassName = Array.isArray(className) ? className : [className]; // const canResend = message && typeof message.isResendable === 'function'
-  // && message.isResendable();
+  var injectingClassName = Array.isArray(className) ? className : [className];
 
   var label = function label() {
     switch (status) {
@@ -7704,16 +9392,12 @@ function MessageStatus(_ref) {
 MessageStatus.propTypes = {
   message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])),
   status: PropTypes.string,
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]) // onDelete: PropTypes.func,
-  // onResend: PropTypes.func,
-
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
 };
 MessageStatus.defaultProps = {
   message: null,
   status: '',
-  className: '' // onDelete: () => {},
-  // onResend: () => {},
-
+  className: ''
 };
 
 var ReactionBadge = React__default.forwardRef(function (props, ref) {
@@ -7858,6 +9542,10 @@ function EmojiReactions(_ref) {
   var _message$reactions = message.reactions,
       reactions = _message$reactions === void 0 ? [] : _message$reactions;
   var messageReactions = reactions;
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   return React__default.createElement("div", {
     className: injectingClassName.join(' ')
   }, React__default.createElement("div", {
@@ -7871,9 +9559,9 @@ function EmojiReactions(_ref) {
     var nicknames = userIds.filter(function (currentUserId) {
       return currentUserId !== userId;
     }).map(function (currentUserId) {
-      return membersMap.get(currentUserId) || LabelStringSet.TOOLTIP__UNKOWN_USER;
+      return membersMap.get(currentUserId) || stringSet.TOOLTIP__UNKOWN_USER;
     });
-    var stringSetForMe = nicknames.length > 0 ? LabelStringSet.TOOLTIP__AND_YOU : LabelStringSet.TOOLTIP__YOU;
+    var stringSetForMe = nicknames.length > 0 ? stringSet.TOOLTIP__AND_YOU : stringSet.TOOLTIP__YOU;
     return React__default.createElement(TooltipWrapper, {
       className: "sendbird-emoji-reactions__emoji-reaction",
       key: reaction.key,
@@ -7969,7 +9657,7 @@ var copyToClipboard = function copyToClipboard(text) {
   return false;
 };
 var getMessageCreatedAt$2 = function getMessageCreatedAt(message) {
-  return Moment(message.createdAt).format('LT');
+  return format(message.createdAt, 'p');
 };
 var getSenderName$1 = function getSenderName(message) {
   return message.sender && (message.sender.friendName || message.sender.nickname || message.sender.userId);
@@ -7987,6 +9675,10 @@ function useMemoizedMessageText(_ref) {
   var message = _ref.message,
       updatedAt = _ref.updatedAt,
       className = _ref.className;
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   return React.useMemo(function () {
     return function () {
       var splitMessage = message.split(/\r/);
@@ -8000,7 +9692,7 @@ function useMemoizedMessageText(_ref) {
           className: className,
           type: WORD_TYPOGRAPHY,
           color: EDITED_COLOR
-        }, " ".concat(LabelStringSet.MESSAGE_EDITED, " ")));
+        }, " ".concat(stringSet.MESSAGE_EDITED, " ")));
       }
 
       return matchedMessage;
@@ -8142,6 +9834,7 @@ function OutgoingUserMessage(_ref) {
       disabled = _ref.disabled,
       showRemove = _ref.showRemove,
       status = _ref.status,
+      resendMessage = _ref.resendMessage,
       useReaction = _ref.useReaction,
       emojiAllMap = _ref.emojiAllMap,
       membersMap = _ref.membersMap,
@@ -8239,7 +9932,12 @@ function OutgoingUserMessage(_ref) {
           showEdit(true);
           closeDropdown();
         }
-      }, "Edit"), React__default.createElement(MenuItem, {
+      }, "Edit"), message && message.isResendable && message.isResendable() && React__default.createElement(MenuItem, {
+        onClick: function onClick() {
+          resendMessage(message);
+          closeDropdown();
+        }
+      }, "Resend"), React__default.createElement(MenuItem, {
         onClick: function onClick() {
           if (disabled) {
             return;
@@ -8529,7 +10227,7 @@ OutgoingUserMessage.propTypes = {
   showEdit: PropTypes.func,
   showRemove: PropTypes.func,
   disabled: PropTypes.bool,
-  // resendMessage: PropTypes.func,
+  resendMessage: PropTypes.func,
   status: PropTypes.string.isRequired,
   useReaction: PropTypes.bool.isRequired,
   emojiAllMap: PropTypes.instanceOf(Map),
@@ -8542,7 +10240,7 @@ OutgoingUserMessage.propTypes = {
 };
 OutgoingUserMessage.defaultProps = {
   message: {},
-  // resendMessage: noop,
+  resendMessage: noop$2,
   showEdit: noop$2,
   showRemove: noop$2,
   disabled: false,
@@ -8582,7 +10280,7 @@ AdminMessage.defaultProps = {
 };
 
 var getMessageCreatedAt$3 = function getMessageCreatedAt(message) {
-  return Moment(message.createdAt).format('LT');
+  return format(message.createdAt, 'p');
 };
 var getIsSentFromStatus$2 = function getIsSentFromStatus(status) {
   return status === MessageStatusType.SENT || status === MessageStatusType.DELIVERED || status === MessageStatusType.READ;
@@ -8603,6 +10301,7 @@ function ThumbnailMessage(_ref) {
       onClick = _ref.onClick,
       showRemove = _ref.showRemove,
       status = _ref.status,
+      resendMessage = _ref.resendMessage,
       useReaction = _ref.useReaction,
       emojiAllMap = _ref.emojiAllMap,
       membersMap = _ref.membersMap,
@@ -8621,8 +10320,8 @@ function ThumbnailMessage(_ref) {
     membersMap: membersMap,
     chainBottom: chainBottom,
     useReaction: useReaction,
-    emojiAllMap: emojiAllMap // resendMessage={resendMessage}
-    ,
+    emojiAllMap: emojiAllMap,
+    resendMessage: resendMessage,
     toggleReaction: toggleReaction,
     memoizedEmojiListItems: memoizedEmojiListItems
   }) : React__default.createElement(IncomingThumbnailMessage, {
@@ -8647,6 +10346,7 @@ function OutgoingThumbnailMessage(_ref2) {
       onClick = _ref2.onClick,
       showRemove = _ref2.showRemove,
       status = _ref2.status,
+      resendMessage = _ref2.resendMessage,
       useReaction = _ref2.useReaction,
       emojiAllMap = _ref2.emojiAllMap,
       membersMap = _ref2.membersMap,
@@ -8728,7 +10428,12 @@ function OutgoingThumbnailMessage(_ref2) {
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
         openLeft: true
-      }, React__default.createElement(MenuItem, {
+      }, message && message.isResendable && message.isResendable() && React__default.createElement(MenuItem, {
+        onClick: function onClick() {
+          resendMessage(message);
+          closeDropdown();
+        }
+      }, "Resend"), React__default.createElement(MenuItem, {
         onClick: function onClick() {
           if (disabled) {
             return;
@@ -8773,10 +10478,7 @@ function OutgoingThumbnailMessage(_ref2) {
   })), !chainBottom && !(mousehover || moreActive) && React__default.createElement(MessageStatus, {
     message: message,
     status: status,
-    className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-left-padding__status") // onDelete={() => { showRemove(true); }}
-    // onResend={() => resendMessage(message)}
-    // duplicated and should replace to more
-
+    className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-left-padding__status")
   })), React__default.createElement("div", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "__body")
   }, React__default.createElement("div", {
@@ -9018,7 +10720,7 @@ ThumbnailMessage.propTypes = {
     localUrl: PropTypes.string
   }).isRequired,
   userId: PropTypes.string,
-  // resendMessage: PropTypes.func,
+  resendMessage: PropTypes.func,
   status: PropTypes.string,
   isByMe: PropTypes.bool,
   disabled: PropTypes.bool,
@@ -9035,7 +10737,7 @@ ThumbnailMessage.propTypes = {
 ThumbnailMessage.defaultProps = {
   isByMe: false,
   disabled: false,
-  // resendMessage: noop,
+  resendMessage: noop$3,
   onClick: noop$3,
   showRemove: noop$3,
   status: '',
@@ -9057,7 +10759,7 @@ OutgoingThumbnailMessage.propTypes = {
   }).isRequired,
   userId: PropTypes.string.isRequired,
   disabled: PropTypes.bool.isRequired,
-  // resendMessage: PropTypes.func,
+  resendMessage: PropTypes.func.isRequired,
   status: PropTypes.string,
   onClick: PropTypes.func.isRequired,
   showRemove: PropTypes.func.isRequired,
@@ -9119,6 +10821,7 @@ function OutgoingFileMessage(_ref) {
       status = _ref.status,
       showRemove = _ref.showRemove,
       disabled = _ref.disabled,
+      resendMessage = _ref.resendMessage,
       useReaction = _ref.useReaction,
       emojiAllMap = _ref.emojiAllMap,
       membersMap = _ref.membersMap,
@@ -9203,7 +10906,12 @@ function OutgoingFileMessage(_ref) {
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
         openLeft: true
-      }, React__default.createElement(MenuItem, {
+      }, message && message.isResendable && message.isResendable() && React__default.createElement(MenuItem, {
+        onClick: function onClick() {
+          resendMessage(message);
+          closeDropdown();
+        }
+      }, "Resend"), React__default.createElement(MenuItem, {
         onClick: function onClick() {
           if (disabled) {
             return;
@@ -9249,10 +10957,7 @@ function OutgoingFileMessage(_ref) {
     className: "sendbird-file-message__status"
   }, React__default.createElement(MessageStatus, {
     message: message,
-    status: status // onDelete={() => { showRemove(true); }}
-    // onResend={() => resendMessage(message)}
-    // duplicated and should replace to more
-
+    status: status
   }))), React__default.createElement("div", {
     className: "sendbird-file-message__tooltip"
   }, React__default.createElement("div", {
@@ -9447,7 +11152,7 @@ OutgoingFileMessage.propTypes = {
   userId: PropTypes.string,
   status: PropTypes.string,
   showRemove: PropTypes.func,
-  // resendMessage: PropTypes.func,
+  resendMessage: PropTypes.func,
   useReaction: PropTypes.bool.isRequired,
   disabled: PropTypes.bool,
   emojiAllMap: PropTypes.instanceOf(Map),
@@ -9460,7 +11165,7 @@ OutgoingFileMessage.propTypes = {
 OutgoingFileMessage.defaultProps = {
   status: '',
   showRemove: noop$4,
-  // resendMessage: noop,
+  resendMessage: noop$4,
   message: {},
   userId: '',
   disabled: false,
@@ -9632,6 +11337,10 @@ var MessageInput = React__default.forwardRef(function (props, ref) {
       onSendMessage = props.onSendMessage,
       onCancelEdit = props.onCancelEdit,
       onStartTyping = props.onStartTyping;
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   var fileInputRef = React.useRef(null);
 
   var _useState = React.useState(value),
@@ -9716,7 +11425,7 @@ var MessageInput = React__default.forwardRef(function (props, ref) {
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_3,
     className: "sendbird-message-input--placeholder"
-  }, placeholder || LabelStringSet.CHANNEL__MESSAGE_INPUT__PLACE_HOLDER), !isEdit && !inputValue && React__default.createElement(IconButton, {
+  }, placeholder || stringSet.CHANNEL__MESSAGE_INPUT__PLACE_HOLDER), !isEdit && !inputValue && React__default.createElement(IconButton, {
     className: "sendbird-message-input--attach",
     height: "32px",
     width: "32px",
@@ -9750,7 +11459,7 @@ var MessageInput = React__default.forwardRef(function (props, ref) {
     type: Type$1.SECONDARY,
     size: Size.SMALL,
     onClick: onCancelEdit
-  }, LabelStringSet.BUTTON__CANCEL), React__default.createElement(Button, {
+  }, stringSet.BUTTON__CANCEL), React__default.createElement(Button, {
     className: "sendbird-message-input--edit-action__save",
     type: Type$1.PRIMARY,
     size: Size.SMALL,
@@ -9762,7 +11471,7 @@ var MessageInput = React__default.forwardRef(function (props, ref) {
         });
       }
     }
-  }, LabelStringSet.BUTTON__SAVE)));
+  }, stringSet.BUTTON__SAVE)));
 });
 MessageInput.propTypes = {
   placeholder: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
@@ -9923,11 +11632,15 @@ FileViewer.defaultProps = {
 var RemoveMessage = function RemoveMessage(props) {
   var onCloseModal = props.onCloseModal,
       onDeleteMessage = props.onDeleteMessage;
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   return React__default.createElement(Modal, {
     onCancel: onCloseModal,
     onSubmit: onDeleteMessage,
     submitText: "Delete",
-    titleText: LabelStringSet.MODAL__DELETE_MESSAGE__TITLE
+    titleText: stringSet.MODAL__DELETE_MESSAGE__TITLE
   });
 };
 
@@ -9937,7 +11650,7 @@ RemoveMessage.propTypes = {
 };
 
 var getMessageCreatedAt$4 = function getMessageCreatedAt(message) {
-  return Moment(message.createdAt).format('LT');
+  return format(message.createdAt, 'p');
 };
 
 var CLASS_NAME$4 = 'sendbird-unknown-message';
@@ -10006,6 +11719,9 @@ function OutgoingUnknownMessage(_ref2) {
       _useState4 = _slicedToArray(_useState3, 2),
       moreActive = _useState4[0],
       setMoreActive = _useState4[1];
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
 
   var handleMoreIconClick = function handleMoreIconClick() {
     setMoreActive(true);
@@ -10082,11 +11798,11 @@ function OutgoingUnknownMessage(_ref2) {
     className: "".concat(className, "__body__text-balloon__header"),
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, LabelStringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React__default.createElement(Label, {
+  }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React__default.createElement(Label, {
     className: "".concat(className, "__body__text-balloon__description"),
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_2
-  }, LabelStringSet.UNKNOWN__CANNOT_READ_MESSAGE)))));
+  }, stringSet.UNKNOWN__CANNOT_READ_MESSAGE)))));
 }
 
 function IncomingUnknownMessage(_ref3) {
@@ -10096,6 +11812,9 @@ function IncomingUnknownMessage(_ref3) {
   var className = 'sendbird-incoming-unknown-message';
   var sender = message.sender;
   var avatarRef = React.useRef(null);
+
+  var _useContext2 = React.useContext(LocalizationContext),
+      stringSet = _useContext2.stringSet;
 
   var _React$useContext = React__default.useContext(UserProfileContext),
       disableUserProfile = _React$useContext.disableUserProfile,
@@ -10152,17 +11871,17 @@ function IncomingUnknownMessage(_ref3) {
     className: "".concat(className, "__body__sender-name"),
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
-  }, sender.nickname || LabelStringSet.NO_NAME), React__default.createElement("div", {
+  }, sender.nickname || stringSet.NO_NAME), React__default.createElement("div", {
     className: "".concat(className, "__body__text-balloon")
   }, React__default.createElement(Label, {
     className: "".concat(className, "__body__text-balloon__header"),
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, LabelStringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React__default.createElement(Label, {
+  }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React__default.createElement(Label, {
     className: "".concat(className, "__body__text-balloon__description"),
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_2
-  }, LabelStringSet.UNKNOWN__CANNOT_READ_MESSAGE))), React__default.createElement("div", {
+  }, stringSet.UNKNOWN__CANNOT_READ_MESSAGE))), React__default.createElement("div", {
     className: "".concat(className, "--right-padding")
   }, !chainBottom && React__default.createElement(Label, {
     className: "".concat(className, "__sent-at"),
@@ -10242,7 +11961,7 @@ var getSenderName$2 = function getSenderName(message) {
   return message.sender && (message.sender.friendName || message.sender.nickname || message.sender.userId);
 };
 var getMessageCreatedAt$5 = function getMessageCreatedAt(message) {
-  return Moment(message.createdAt).format('LT');
+  return format(message.createdAt, 'p');
 };
 var checkOGIsEnalbed = function checkOGIsEnalbed(message) {
   var ogMetaData = message.ogMetaData;
@@ -10298,6 +12017,10 @@ function useMemoizedMessageText$1(_ref) {
   var message = _ref.message,
       updatedAt = _ref.updatedAt,
       className = _ref.className;
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   return React.useMemo(function () {
     return function () {
       var splitMessage = message.split(' ');
@@ -10322,7 +12045,7 @@ function useMemoizedMessageText$1(_ref) {
           className: className,
           type: WORD_TYPOGRAPHY$1,
           color: EDITED_COLOR$1
-        }, LabelStringSet.MESSAGE_EDITED));
+        }, stringSet.MESSAGE_EDITED));
       } // return (<>{matchedMessage}</>);
 
 
@@ -10413,6 +12136,7 @@ function OutgoingOGMessage(props) {
       chainBottom = props.chainBottom,
       emojiAllMap = props.emojiAllMap,
       useReaction = props.useReaction,
+      resendMessage = props.resendMessage,
       toggleReaction = props.toggleReaction,
       memoizedMessageText = props.memoizedMessageText,
       memoizedEmojiListItems = props.memoizedEmojiListItems;
@@ -10508,7 +12232,12 @@ function OutgoingOGMessage(props) {
           showEdit(true);
           closeDropdown();
         }
-      }, "Edit"), React__default.createElement(MenuItem, {
+      }, "Edit"), message && message.isResendable && message.isResendable() && React__default.createElement(MenuItem, {
+        onClick: function onClick() {
+          resendMessage(message);
+          closeDropdown();
+        }
+      }, "Resend"), React__default.createElement(MenuItem, {
         onClick: function onClick() {
           if (disabled) {
             return;
@@ -10549,10 +12278,7 @@ function OutgoingOGMessage(props) {
     className: "".concat(OUTGOING_OG_MESSAGE, "__message-status")
   }, React__default.createElement(MessageStatus, {
     message: message,
-    status: status // onDelete={() => { showRemove(true); }}
-    // onResend={() => resendMessage(message)}
-    // duplicated and should replace to more
-
+    status: status
   }))), React__default.createElement("div", {
     className: "".concat(OUTGOING_OG_MESSAGE, "--body")
   }, React__default.createElement("div", {
@@ -10922,7 +12648,9 @@ OutgoingOGMessage.propTypes = {
       })
     }),
     reactions: PropTypes.array,
-    updatedAt: PropTypes.number
+    updatedAt: PropTypes.number,
+    isResendable: PropTypes.func,
+    errorCode: PropTypes.number
   }).isRequired,
   disabled: PropTypes.bool.isRequired,
   openLink: PropTypes.func.isRequired,
@@ -10931,7 +12659,7 @@ OutgoingOGMessage.propTypes = {
   membersMap: PropTypes.instanceOf(Map).isRequired,
   emojiAllMap: PropTypes.instanceOf(Map).isRequired,
   useReaction: PropTypes.bool.isRequired,
-  // resendMessage: PropTypes.func.isRequired,
+  resendMessage: PropTypes.func.isRequired,
   toggleReaction: PropTypes.func.isRequired,
   memoizedMessageText: PropTypes.func.isRequired,
   memoizedEmojiListItems: PropTypes.func.isRequired,
@@ -11028,7 +12756,7 @@ function MessageHoc(_ref) {
   }, hasSeperator && React__default.createElement(DateSeparator, null, React__default.createElement(Label, {
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
-  }, Moment(message.createdAt).format('LL'))), (_MessageTypes$ADMIN$M = {}, _defineProperty(_MessageTypes$ADMIN$M, MessageTypes.ADMIN, React__default.createElement(AdminMessage, {
+  }, format(message.createdAt, 'MMMM dd, yyyy'))), (_MessageTypes$ADMIN$M = {}, _defineProperty(_MessageTypes$ADMIN$M, MessageTypes.ADMIN, React__default.createElement(AdminMessage, {
     message: message
   })), _defineProperty(_MessageTypes$ADMIN$M, MessageTypes.FILE, React__default.createElement(MessageSwitch, {
     message: message,
@@ -11274,7 +13002,7 @@ function (_Component) {
         var previousMessageCreatedAt = previousMessage && previousMessage.createdAt;
         var currentCreatedAt = m.createdAt; // https://stackoverflow.com/a/41855608
 
-        var hasSeperator = !(previousMessageCreatedAt && Moment(currentCreatedAt).isSame(Moment(previousMessageCreatedAt), 'day'));
+        var hasSeperator = !(previousMessageCreatedAt && isSameDay(currentCreatedAt, previousMessageCreatedAt));
 
         if (renderChatItem) {
           return React__default.createElement("div", {
@@ -11371,8 +13099,12 @@ function Notification(_ref) {
   var count = _ref.count,
       time = _ref.time,
       onClick = _ref.onClick;
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   var timeArray = time.split(' ');
-  timeArray.splice(-2, 0, LabelStringSet.CHANNEL__MESSAGE_LIST__NOTIFICATION__ON);
+  timeArray.splice(-2, 0, stringSet.CHANNEL__MESSAGE_LIST__NOTIFICATION__ON);
   return (// eslint-disable-next-line
     React__default.createElement("div", {
       className: "sendbird-notification",
@@ -11381,7 +13113,7 @@ function Notification(_ref) {
       className: "sendbird-notification__text",
       color: LabelColors.ONCONTENT_1,
       type: LabelTypography.CAPTION_2
-    }, "".concat(count, " "), LabelStringSet.CHANNEL__MESSAGE_LIST__NOTIFICATION__NEW_MESSAGE, " ".concat(timeArray.join(' '))), React__default.createElement(Icon, {
+    }, "".concat(count, " "), stringSet.CHANNEL__MESSAGE_LIST__NOTIFICATION__NEW_MESSAGE, " ".concat(timeArray.join(' '))), React__default.createElement(Icon, {
       width: "24px",
       height: "24px",
       type: IconTypes.SHEVRON_DOWN,
@@ -11400,34 +13132,40 @@ Notification.defaultProps = {
 };
 
 var FrozenNotification = function FrozenNotification() {
+  var stringSet = React.useContext(LocalizationContext).stringSet;
   return React__default.createElement("div", {
     className: "sendbird-notification sendbird-notification--frozen"
   }, React__default.createElement(Label, {
     className: "sendbird-notification__text",
     type: LabelTypography.CAPTION_2
-  }, LabelStringSet.CHANNEL_FROZEN));
+  }, stringSet.CHANNEL_FROZEN));
 };
 
-var generateTypingIndicatorString = function generateTypingIndicatorString(members) {
+var TypingIndicatorText = function TypingIndicatorText(_ref) {
+  var members = _ref.members;
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   if (!members || members.length === 0) {
     return '';
   }
 
   if (members && members.length === 1) {
-    return "".concat(members[0].nickname, " ").concat(LabelStringSet.TYPING_INDICATOR__IS_TYPING);
+    return "".concat(members[0].nickname, " ").concat(stringSet.TYPING_INDICATOR__IS_TYPING);
   }
 
   if (members && members.length === 2) {
-    return "".concat(members[0].nickname, " ").concat(LabelStringSet.TYPING_INDICATOR__AND, " ").concat(members[1].nickname, " ").concat(LabelStringSet.TYPING_INDICATOR__ARE_TYPING);
+    return "".concat(members[0].nickname, " ").concat(stringSet.TYPING_INDICATOR__AND, " ").concat(members[1].nickname, " ").concat(stringSet.TYPING_INDICATOR__ARE_TYPING);
   }
 
-  return LabelStringSet.TYPING_INDICATOR__MULTIPLE_TYPING;
+  return stringSet.TYPING_INDICATOR__MULTIPLE_TYPING;
 };
 
-function TypingIndicator(_ref) {
-  var channelUrl = _ref.channelUrl,
-      sb = _ref.sb,
-      logger = _ref.logger;
+function TypingIndicator(_ref2) {
+  var channelUrl = _ref2.channelUrl,
+      sb = _ref2.sb,
+      logger = _ref2.logger;
 
   var _useState = React.useState(uuidv4()),
       _useState2 = _slicedToArray(_useState, 2),
@@ -11469,7 +13207,9 @@ function TypingIndicator(_ref) {
   return React__default.createElement(Label, {
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
-  }, generateTypingIndicatorString(typingMembers));
+  }, React__default.createElement(TypingIndicatorText, {
+    members: typingMembers
+  }));
 }
 
 TypingIndicator.propTypes = {
@@ -11494,6 +13234,7 @@ var MessageInputWrapper = function MessageInputWrapper(_a, ref) {
       renderMessageInput = _a.renderMessageInput,
       isOnline = _a.isOnline,
       initialized = _a.initialized;
+  var stringSet = React.useContext(LocalizationContext).stringSet;
   var disabled = !initialized || isDisabledBecauseFrozen(channel) || isDisabledBecauseMuted(channel) || !isOnline;
   var isOperator$1 = isOperator(channel);
   var isBroadcast = channel.isBroadcast; // custom message
@@ -11513,7 +13254,7 @@ var MessageInputWrapper = function MessageInputWrapper(_a, ref) {
 
 
   return React__default.createElement(MessageInput, {
-    placeholder: isDisabledBecauseFrozen(channel) && LabelStringSet.CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__DISABLED || isDisabledBecauseMuted(channel) && LabelStringSet.CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__MUTED,
+    placeholder: isDisabledBecauseFrozen(channel) && stringSet.CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__DISABLED || isDisabledBecauseMuted(channel) && stringSet.CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__MUTED,
     ref: ref,
     disabled: disabled,
     onStartTyping: function onStartTyping() {
@@ -11527,12 +13268,15 @@ var MessageInputWrapper = function MessageInputWrapper(_a, ref) {
 var MessageInputWrapper$1 = React__default.forwardRef(MessageInputWrapper);
 
 function ConnectionStatus() {
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   return React__default.createElement("div", {
     className: "sendbird-conversation__connection-status"
   }, React__default.createElement(Label, {
     type: LabelTypography.BODY_2,
     color: LabelColors.ONBACKGROUND_2
-  }, LabelStringSet.TRYING_TO_CONNECT), React__default.createElement(Icon, {
+  }, stringSet.TRYING_TO_CONNECT), React__default.createElement(Icon, {
     type: IconTypes.DISCONNECTED,
     fillColor: IconColors.SENT,
     height: "14px",
@@ -11541,7 +13285,9 @@ function ConnectionStatus() {
 }
 
 var prettyDate = function prettyDate(date) {
-  return Moment(date, 'x').fromNow();
+  return formatDistanceToNowStrict(date, {
+    addSuffix: true
+  });
 };
 var getOthersLastSeenAt = function getOthersLastSeenAt(channel) {
   if (!channel || !channel.getReadStatus || !channel.members || channel.members.length !== 2) {
@@ -11561,9 +13307,10 @@ var getOthersLastSeenAt = function getOthersLastSeenAt(channel) {
 var getChannelTitle$1 = function getChannelTitle() {
   var channel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var currentUserId = arguments.length > 1 ? arguments[1] : undefined;
+  var stringSet = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : LabelStringSet;
 
   if (!channel || !channel.name && !channel.members) {
-    return LabelStringSet.NO_TITLE;
+    return stringSet.NO_TITLE;
   }
 
   if (channel.name && channel.name !== 'Group Channel') {
@@ -11571,7 +13318,7 @@ var getChannelTitle$1 = function getChannelTitle() {
   }
 
   if (channel.members.length === 1) {
-    return LabelStringSet.NO_MEMBERS;
+    return stringSet.NO_MEMBERS;
   }
 
   return channel.members.filter(function (_ref) {
@@ -11579,7 +13326,7 @@ var getChannelTitle$1 = function getChannelTitle() {
     return userId !== currentUserId;
   }).map(function (_ref2) {
     var nickname = _ref2.nickname;
-    return nickname || LabelStringSet.NO_NAME;
+    return nickname || stringSet.NO_NAME;
   }).join(', ');
 };
 
@@ -11619,6 +13366,10 @@ function ChatHeader(props) {
       onActionClick = props.onActionClick,
       theme = props.theme;
   var userId = currentUser.userId;
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   return React__default.createElement("div", {
     className: "sendbird-chat-header"
   }, React__default.createElement("div", {
@@ -11633,7 +13384,7 @@ function ChatHeader(props) {
     className: "sendbird-chat-header__title",
     type: LabelTypography.H_2,
     color: LabelColors.ONBACKGROUND_1
-  }, title || getChannelTitle$1(currentGroupChannel, userId)), typeof isActive === 'string' && isActive === 'true' || typeof isActive === 'boolean' && isActive ? React__default.createElement("div", {
+  }, title || getChannelTitle$1(currentGroupChannel, userId, stringSet)), typeof isActive === 'string' && isActive === 'true' || typeof isActive === 'boolean' && isActive ? React__default.createElement("div", {
     className: "sendbird-chat-header__active"
   }) : null, React__default.createElement(Label, {
     className: "sendbird-chat-header__subtitle",
@@ -12115,10 +13866,13 @@ var EditDetails = function EditDetails(props) {
       newFile = _useState4[0],
       setNewFile = _useState4[1];
 
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   var title = channel.name;
   return React__default.createElement(Modal, {
-    titleText: LabelStringSet.MODAL__CHANNEL_INFORMATION__TITLE,
-    submitText: LabelStringSet.BUTTON__SAVE,
+    titleText: stringSet.MODAL__CHANNEL_INFORMATION__TITLE,
+    submitText: stringSet.BUTTON__SAVE,
     onCancel: onCancel,
     onSubmit: function onSubmit() {
       if (title !== '' && !inputRef.current.value) {
@@ -12143,7 +13897,7 @@ var EditDetails = function EditDetails(props) {
     }
   }, React__default.createElement("div", {
     className: "channel-profile-form__img-section"
-  }, React__default.createElement(InputLabel, null, LabelStringSet.MODAL__CHANNEL_INFORMATION__CHANNEL_IMAGE), React__default.createElement("div", {
+  }, React__default.createElement(InputLabel, null, stringSet.MODAL__CHANNEL_INFORMATION__CHANNEL_IMAGE), React__default.createElement("div", {
     className: "channel-profile-form__avatar"
   }, currentImg ? React__default.createElement(Avatar$1, {
     height: "80px",
@@ -12176,14 +13930,14 @@ var EditDetails = function EditDetails(props) {
   }, React__default.createElement(Label, {
     type: LabelTypography.BUTTON_1,
     color: LabelColors.PRIMARY
-  }, LabelStringSet.MODAL__CHANNEL_INFORMATION__UPLOAD))), React__default.createElement("div", {
+  }, stringSet.MODAL__CHANNEL_INFORMATION__UPLOAD))), React__default.createElement("div", {
     className: "channel-profile-form__name-section"
-  }, React__default.createElement(InputLabel, null, LabelStringSet.MODAL__CHANNEL_INFORMATION__CHANNEL_NAME), React__default.createElement(Input, {
+  }, React__default.createElement(InputLabel, null, stringSet.MODAL__CHANNEL_INFORMATION__CHANNEL_NAME), React__default.createElement(Input, {
     required: title !== '',
     name: "channel-profile-form__name",
     ref: inputRef,
     value: title,
-    placeHolder: LabelStringSet.MODAL__CHANNEL_INFORMATION__INPUT__PLACE_HOLDER
+    placeHolder: stringSet.MODAL__CHANNEL_INFORMATION__INPUT__PLACE_HOLDER
   }))));
 };
 
@@ -12209,6 +13963,9 @@ var ChannelProfile = function ChannelProfile(props) {
       _useState2 = _slicedToArray(_useState, 2),
       showModal = _useState2[0],
       setShowModal = _useState2[1];
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
 
   return React__default.createElement("div", {
     className: "sendbird-channel-profile"
@@ -12238,7 +13995,7 @@ var ChannelProfile = function ChannelProfile(props) {
   }, React__default.createElement(Label, {
     type: LabelTypography.BUTTON_1,
     color: disabled ? LabelColors.ONBACKGROUND_2 : LabelColors.PRIMARY
-  }, LabelStringSet.CHANNEL_SETTING__PROFILE__EDIT)), showModal && React__default.createElement(EditDetails, {
+  }, stringSet.CHANNEL_SETTING__PROFILE__EDIT)), showModal && React__default.createElement(EditDetails, {
     onCancel: function onCancel() {
       return setShowModal(false);
     },
@@ -12433,6 +14190,9 @@ var UserListItem$1 = function UserListItem(_ref) {
       disableUserProfile = _useContext.disableUserProfile,
       renderUserProfile = _useContext.renderUserProfile;
 
+  var _useContext2 = React.useContext(LocalizationContext),
+      stringSet = _useContext2.stringSet;
+
   return React__default.createElement("div", {
     className: "sendbird-members-accordion__member"
   }, React__default.createElement("div", {
@@ -12476,7 +14236,7 @@ var UserListItem$1 = function UserListItem(_ref) {
   })), React__default.createElement(Label, {
     type: LabelTypography.SUBTITLE_2,
     color: LabelColors.ONBACKGROUND_1
-  }, member.nickname || LabelStringSet.NO_NAME, currentUser === member.userId && ' (You)'));
+  }, member.nickname || stringSet.NO_NAME, currentUser === member.userId && ' (You)'));
 };
 
 UserListItem$1.propTypes = {
@@ -12507,6 +14267,9 @@ var MemebersAccordion = function MemebersAccordion(_ref2) {
       showAddUserModal = _useState4[0],
       setShowAddUserModal = _useState4[1];
 
+  var _useContext3 = React.useContext(LocalizationContext),
+      stringSet = _useContext3.stringSet;
+
   return React__default.createElement("div", {
     className: "sendbird-members-accordion"
   }, React__default.createElement("div", {
@@ -12526,7 +14289,7 @@ var MemebersAccordion = function MemebersAccordion(_ref2) {
     onClick: function onClick() {
       return setShowMoreModal(true);
     }
-  }, LabelStringSet.CHANNEL_SETTING__MEMBERS__SEE_ALL_MEMBERS), members.length >= SHOWN_MEMBER_MAX && showMoreModal && React__default.createElement(MembersModal, {
+  }, stringSet.CHANNEL_SETTING__MEMBERS__SEE_ALL_MEMBERS), members.length >= SHOWN_MEMBER_MAX && showMoreModal && React__default.createElement(MembersModal, {
     currentUser: currentUser,
     hideModal: function hideModal() {
       setShowMoreModal(false);
@@ -12544,10 +14307,10 @@ var MemebersAccordion = function MemebersAccordion(_ref2) {
 
       setShowAddUserModal(true);
     }
-  }, LabelStringSet.CHANNEL_SETTING__MEMBERS__INVITE_MEMBER), showAddUserModal && React__default.createElement(InviteMembers, {
+  }, stringSet.CHANNEL_SETTING__MEMBERS__INVITE_MEMBER), showAddUserModal && React__default.createElement(InviteMembers, {
     swapParams: swapParams,
-    titleText: LabelStringSet.MODAL__INVITE_MEMBER__TITLE,
-    submitText: LabelStringSet.BUTTON__INVITE,
+    titleText: stringSet.MODAL__INVITE_MEMBER__TITLE,
+    submitText: stringSet.BUTTON__INVITE,
     closeModal: function closeModal() {
       return setShowAddUserModal(false);
     },
@@ -12667,6 +14430,7 @@ var UserListItem$2 = function UserListItem(_a) {
   var actionRef = React.useRef(null);
   var parentRef = React.useRef(null);
   var avatarRef = React.useRef(null);
+  var stringSet = React.useContext(LocalizationContext).stringSet;
 
   var _b = React.useContext(UserProfileContext),
       disableUserProfile = _b.disableUserProfile,
@@ -12717,7 +14481,7 @@ var UserListItem$2 = function UserListItem(_a) {
     className: COMPONENT_NAME$1 + "__title",
     type: LabelTypography.SUBTITLE_1,
     color: LabelColors.ONBACKGROUND_1
-  }, user.nickname || LabelStringSet.NO_NAME, currentUser === user.userId && " (You)"), !user.nickname && React__default.createElement(Label, {
+  }, user.nickname || stringSet.NO_NAME, currentUser === user.userId && " (You)"), !user.nickname && React__default.createElement(Label, {
     className: COMPONENT_NAME$1 + "__subtitle",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
@@ -12851,6 +14615,7 @@ function AddOperatorsModal(_a) {
       memberQuery = _d[0],
       setMemberQuery = _d[1];
 
+  var stringSet = React.useContext(LocalizationContext).stringSet;
   React.useEffect(function () {
     var memberListQuery = channel.createMemberListQuery();
     memberListQuery.limit = 20;
@@ -12883,7 +14648,7 @@ function AddOperatorsModal(_a) {
   }, React__default.createElement(Label, {
     color: selectedCount > 0 ? LabelColors.PRIMARY : LabelColors.ONBACKGROUND_3,
     type: LabelTypography.CAPTION_1
-  }, selectedCount + " " + LabelStringSet.MODAL__INVITE_MEMBER__SELECTEC), React__default.createElement("div", {
+  }, selectedCount + " " + stringSet.MODAL__INVITE_MEMBER__SELECTEC), React__default.createElement("div", {
     className: "sendbird-more-members__popup-scroll",
     onScroll: function onScroll(e) {
       var hasNext = memberQuery.hasNext;
@@ -12941,6 +14706,7 @@ var OperatorList = function OperatorList(_a) {
       hasNext = _e[0],
       setHasNext = _e[1];
 
+  var stringSet = React.useContext(LocalizationContext).stringSet;
   React.useEffect(function () {
     if (!channel) {
       setOperators([]);
@@ -13031,13 +14797,13 @@ var OperatorList = function OperatorList(_a) {
     onClick: function onClick() {
       setShowMore(true);
     }
-  }, LabelStringSet.CHANNEL_SETTING__OPERATORS__TITLE_ALL), React__default.createElement(Button, {
+  }, stringSet.CHANNEL_SETTING__OPERATORS__TITLE_ALL), React__default.createElement(Button, {
     type: Type$1.SECONDARY,
     size: Size.SMALL,
     onClick: function onClick() {
       setShowAdd(true);
     }
-  }, LabelStringSet.CHANNEL_SETTING__OPERATORS__TITLE_ADD)), showMore && React__default.createElement(OperatorsModal, {
+  }, stringSet.CHANNEL_SETTING__OPERATORS__TITLE_ADD)), showMore && React__default.createElement(OperatorsModal, {
     currentUser: sdk.currentUser.userId,
     hideModal: function hideModal() {
       setShowMore(false);
@@ -13762,6 +15528,7 @@ function index(_a) {
   React.useEffect(function () {
     setFrozen(channel.isFrozen);
   }, [channel]);
+  var stringSet = React.useContext(LocalizationContext).stringSet;
   return React__default.createElement(AccordionGroup$1, {
     className: "sendbird-channel-settings__operator"
   }, React__default.createElement(Accordion, {
@@ -13776,7 +15543,7 @@ function index(_a) {
       }), React__default.createElement(Label, {
         type: LabelTypography.SUBTITLE_1,
         color: LabelColors.ONBACKGROUND_1
-      }, LabelStringSet.CHANNEL_SETTING__OPERATORS__TITLE));
+      }, stringSet.CHANNEL_SETTING__OPERATORS__TITLE));
     },
     renderContent: function renderContent() {
       return React__default.createElement(React__default.Fragment, null, React__default.createElement(OperatorList$1, {
@@ -13795,7 +15562,7 @@ function index(_a) {
       }), React__default.createElement(Label, {
         type: LabelTypography.SUBTITLE_1,
         color: LabelColors.ONBACKGROUND_1
-      }, LabelStringSet.CHANNEL_SETTING__MEMBERS__TITLE), React__default.createElement(Badge, {
+      }, stringSet.CHANNEL_SETTING__MEMBERS__TITLE), React__default.createElement(Badge, {
         count: kFormatter(channel.memberCount)
       }));
     },
@@ -13818,7 +15585,7 @@ function index(_a) {
       }), React__default.createElement(Label, {
         type: LabelTypography.SUBTITLE_1,
         color: LabelColors.ONBACKGROUND_1
-      }, LabelStringSet.CHANNEL_SETTING__MUTED_MEMBERS__TITLE));
+      }, stringSet.CHANNEL_SETTING__MUTED_MEMBERS__TITLE));
     },
     renderContent: function renderContent() {
       return React__default.createElement(React__default.Fragment, null, React__default.createElement(MutedMemberList$1, {
@@ -13837,7 +15604,7 @@ function index(_a) {
       }), React__default.createElement(Label, {
         type: LabelTypography.SUBTITLE_1,
         color: LabelColors.ONBACKGROUND_1
-      }, LabelStringSet.CHANNEL_SETTING__BANNED_MEMBERS__TITLE));
+      }, stringSet.CHANNEL_SETTING__BANNED_MEMBERS__TITLE));
     },
     renderContent: function renderContent() {
       return React__default.createElement(React__default.Fragment, null, React__default.createElement(BannedMemberList$1, {
@@ -13855,7 +15622,7 @@ function index(_a) {
   }), React__default.createElement(Label, {
     type: LabelTypography.SUBTITLE_1,
     color: LabelColors.ONBACKGROUND_1
-  }, LabelStringSet.CHANNEL_SETTING__FREEZE_CHANNEL), React__default.createElement("div", {
+  }, stringSet.CHANNEL_SETTING__FREEZE_CHANNEL), React__default.createElement("div", {
     className: "sendbird-channel-settings__frozen-icon"
   }, frozen ? React__default.createElement(Icon, {
     onClick: function onClick() {
@@ -13904,6 +15671,10 @@ function ChannelSettings(props) {
   var userDefinedDisableUserProfile = disableUserProfile || config.disableUserProfile;
   var userDefinedRenderProfile = renderUserProfile || config.renderUserProfile;
   var userFilledApplicationUserListQuery = queries.applicationUserListQuery;
+
+  var _useContext = React.useContext(LocalizationContext),
+      stringSet = _useContext.stringSet;
+
   var sdk = sdkStore.sdk,
       initialized = sdkStore.initialized; // hack to kepp track of channel updates by triggering useEffect
 
@@ -13965,7 +15736,7 @@ function ChannelSettings(props) {
     }, React__default.createElement(Label, {
       type: LabelTypography.H_2,
       color: LabelColors.ONBACKGROUND_1
-    }, LabelStringSet.CHANNEL_SETTING__HEADER__TITLE), React__default.createElement(Icon, {
+    }, stringSet.CHANNEL_SETTING__HEADER__TITLE), React__default.createElement(Icon, {
       type: IconTypes.CLOSE,
       className: "sendbird-channel-settings__close-icon",
       height: "24px",
@@ -13988,7 +15759,7 @@ function ChannelSettings(props) {
   }, React__default.createElement(Label, {
     type: LabelTypography.H_2,
     color: LabelColors.ONBACKGROUND_1
-  }, LabelStringSet.CHANNEL_SETTING__HEADER__TITLE), React__default.createElement("div", {
+  }, stringSet.CHANNEL_SETTING__HEADER__TITLE), React__default.createElement("div", {
     className: "sendbird-channel-settings__header-icon"
   }, React__default.createElement(IconButton, {
     width: "32px",
@@ -14078,7 +15849,7 @@ function ChannelSettings(props) {
   }), React__default.createElement(Label, {
     type: LabelTypography.SUBTITLE_1,
     color: LabelColors.ONBACKGROUND_1
-  }, "".concat(LabelStringSet.CHANNEL_SETTING__MEMBERS__TITLE), React__default.createElement(Badge, {
+  }, "".concat(stringSet.CHANNEL_SETTING__MEMBERS__TITLE), React__default.createElement(Badge, {
     count: kFormatter$1(channel.memberCount)
   })), React__default.createElement(Icon, {
     type: IconTypes.SHEVRON,
@@ -14134,7 +15905,7 @@ function ChannelSettings(props) {
   }), React__default.createElement(Label, {
     type: LabelTypography.SUBTITLE_1,
     color: LabelColors.ONBACKGROUND_1
-  }, LabelStringSet.CHANNEL_SETTING__LEAVE_CHANNEL__TITLE)), showLeaveChannelModal && React__default.createElement(LeaveChannel, {
+  }, stringSet.CHANNEL_SETTING__LEAVE_CHANNEL__TITLE)), showLeaveChannelModal && React__default.createElement(LeaveChannel, {
     onCloseModal: function onCloseModal() {
       return setShowLeaveChannelModal(false);
     },
@@ -14212,6 +15983,8 @@ function App(props) {
       config = _props$config === void 0 ? {} : _props$config,
       useReaction = props.useReaction,
       useMessageGrouping = props.useMessageGrouping,
+      colorSet = props.colorSet,
+      stringSet = props.stringSet,
       allowProfileEdit = props.allowProfileEdit,
       disableUserProfile = props.disableUserProfile,
       renderUserProfile = props.renderUserProfile,
@@ -14228,6 +16001,7 @@ function App(props) {
       setShowSettings = _useState4[1];
 
   return React__default.createElement(Sendbird, {
+    stringSet: stringSet,
     appId: appId,
     userId: userId,
     accessToken: accessToken,
@@ -14236,6 +16010,7 @@ function App(props) {
     profileUrl: profileUrl,
     userListQuery: userListQuery,
     config: config,
+    colorSet: colorSet,
     disableUserProfile: disableUserProfile,
     renderUserProfile: renderUserProfile
   }, React__default.createElement("div", {
@@ -14291,7 +16066,9 @@ App.propTypes = {
     logLevel: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
   }),
   useReaction: PropTypes.bool,
-  useMessageGrouping: PropTypes.bool
+  useMessageGrouping: PropTypes.bool,
+  stringSet: PropTypes.objectOf(PropTypes.string),
+  colorSet: PropTypes.objectOf(PropTypes.string)
 };
 App.defaultProps = {
   accessToken: '',
@@ -14305,7 +16082,9 @@ App.defaultProps = {
   renderUserProfile: null,
   config: {},
   useReaction: true,
-  useMessageGrouping: true
+  useMessageGrouping: true,
+  stringSet: null,
+  colorSet: null
 };
 
 exports.App = App;
@@ -14316,6 +16095,7 @@ exports.SendBirdProvider = Sendbird;
 exports.getAllEmojisFromEmojiContainer = getAllEmojisFromEmojiContainer$1;
 exports.getEmojiCategoriesFromEmojiContainer = getEmojiCategoriesFromEmojiContainer$1;
 exports.getEmojisFromEmojiContainer = getEmojisFromEmojiContainer$1;
+exports.getStringSet = getStringSet;
 exports.sendBirdSelectors = selectors;
 exports.withSendBird = withSendbirdContext;
 //# sourceMappingURL=index.js.map

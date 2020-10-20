@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.0-rc.0(Oct 20, 2020)
+
+- Features:
+  * String set customization
+  * Use date-fns instead of momentjs
+  * Add type definition files for typescript support
+  * Theme customization using CSS-Variables
+
 ## 1.2.8(Oct 19, 2020)
 
 - Features/Bugs:
