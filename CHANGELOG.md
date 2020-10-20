@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0-rc.1(Oct 20, 2020)
+
+- Bugfixes:
+  * Add date-fns as dependency
+
 ## 1.3.0-rc.0(Oct 20, 2020)
 
 - Features:
