@@ -205,6 +205,16 @@
 .sendbird-theme--dark .sendbird-color--primary [class*='fill'] {
   fill: var(--sendbird-dark-primary-200); }
 
+.sendbird-theme--light .sendbird-color--primary [class*='stroke'] {
+  stroke: var(--sendbird-light-primary-300);
+  stroke-width: 2px;
+  stroke-linejoin: round; }
+
+.sendbird-theme--dark .sendbird-color--primary [class*='stroke'] {
+  stroke: var(--sendbird-dark-primary-200);
+  stroke-width: 2px;
+  stroke-linejoin: round; }
+
 .sendbird-theme--light .sendbird-color--secondary [class*='fill'] {
   fill: var(--sendbird-light-onlight-01); }
 
@@ -508,7 +518,7 @@
       display: block;
       max-width: 200px;
       white-space: nowrap;
-      overflow-x: hidden;
+      overflow: hidden;
       text-overflow: ellipsis; }
   .sendbird-channel-header .sendbird-channel-header__right-icon {
     position: absolute;
@@ -1090,12 +1100,6 @@
   border-width: 0 2px 2px 0;
   transform: rotate(45deg); }
 
-.sendbird-theme--light .sendbird__user-profile {
-  background-color: var(--sendbird-light-background-50); }
-
-.sendbird-theme--dark .sendbird__user-profile {
-  background-color: var(--sendbird-light-background-500); }
-
 .sendbird__user-profile {
   width: 320px;
   border-radius: 4px;
@@ -1103,9 +1107,11 @@
   box-sizing: border-box;
   text-align: center; }
   .sendbird-theme--light .sendbird__user-profile {
-    box-shadow: var(--sendbird-light-shadow-02); }
+    box-shadow: var(--sendbird-light-shadow-02);
+    background-color: var(--sendbird-light-background-50); }
   .sendbird-theme--dark .sendbird__user-profile {
-    box-shadow: var(--sendbird-dark-shadow-02); }
+    box-shadow: var(--sendbird-dark-shadow-02);
+    background-color: var(--sendbird-dark-background-500); }
   .sendbird__user-profile .sendbird__user-profile-avatar {
     margin: 8px 0px; }
   .sendbird__user-profile .sendbird__user-profile-name {

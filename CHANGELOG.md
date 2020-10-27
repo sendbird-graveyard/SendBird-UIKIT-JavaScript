@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.0-rc.4](Oct 27, 2020)
+
+- Bugfixes:
+  * Yarn support
+  * Cosmetic fixes
+
 ## [1.3.0-rc.1 - 1.3.0-rc.3]
 
 - Bugfixes:

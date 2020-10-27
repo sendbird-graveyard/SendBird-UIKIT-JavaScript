@@ -227,7 +227,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.3.0-rc.3';
+var APP_VERSION_STRING = '1.3.0-rc.4';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -2209,7 +2209,6 @@ var _ref$E =
 /*#__PURE__*/
 React__default.createElement("path", {
   className: "icon-members_svg__fill",
-  fill: "#7B53EF",
   fillRule: "evenodd",
   d: "M13 14a5 5 0 014.995 4.783L18 19v2a1 1 0 01-1.993.117L16 21v-2a3 3 0 00-2.824-2.995L13 16H5a3 3 0 00-2.995 2.824L2 19v2a1 1 0 01-1.993.117L0 21v-2a5 5 0 014.783-4.995L5 14h8zm7.25.162a5 5 0 013.745 4.611L24 19v2a1 1 0 01-1.993.117L22 21v-2a3 3 0 00-2.25-2.902 1 1 0 11.5-1.936zM9 2a5 5 0 110 10A5 5 0 019 2zm7.248.161a5 5 0 010 9.688 1 1 0 01-.496-1.938 3 3 0 000-5.812 1 1 0 11.496-1.938zM9 4a3 3 0 100 6 3 3 0 000-6z"
 });
@@ -2455,19 +2454,16 @@ function _extends$S() { _extends$S = Object.assign || function (target) { for (v
 var _ref$S =
 /*#__PURE__*/
 React__default.createElement("g", {
-  className: "icon-operator_svg__fill",
   fill: "none",
   fillRule: "evenodd"
 }, React__default.createElement("path", {
-  stroke: "#7B53EF",
-  strokeLinejoin: "round",
-  strokeWidth: 2,
+  className: "icon-operator_svg__stroke",
   d: "M2 6l5 4 5-7 5 7 5-4-3 14H5z"
 }), React__default.createElement("circle", {
+  className: "icon-operator_svg__fill",
   cx: 12,
   cy: 14,
-  r: 2,
-  fill: "#7B53EF"
+  r: 2
 }));
 
 function SvgIconOperator(props) {
@@ -14013,6 +14009,7 @@ function index(_a) {
     renderTitle: function renderTitle() {
       return React__default.createElement(React__default.Fragment, null, React__default.createElement(Icon, {
         type: IconTypes.ICON_OPERATOR,
+        fillColor: IconColors.PRIMARY,
         width: 24,
         height: 24,
         className: "sendbird-channel-settings__accordion-icon"
@@ -14032,6 +14029,7 @@ function index(_a) {
     renderTitle: function renderTitle() {
       return React__default.createElement(React__default.Fragment, null, React__default.createElement(Icon, {
         type: IconTypes.MEMBERS,
+        fillColor: IconColors.PRIMARY,
         width: 24,
         height: 24,
         className: "sendbird-channel-settings__accordion-icon"
@@ -14055,6 +14053,7 @@ function index(_a) {
     renderTitle: function renderTitle() {
       return React__default.createElement(React__default.Fragment, null, React__default.createElement(Icon, {
         type: IconTypes.ICON_MUTED,
+        fillColor: IconColors.PRIMARY,
         width: 24,
         height: 24,
         className: "sendbird-channel-settings__accordion-icon"
@@ -14074,6 +14073,7 @@ function index(_a) {
     renderTitle: function renderTitle() {
       return React__default.createElement(React__default.Fragment, null, React__default.createElement(Icon, {
         type: IconTypes.ICON_BANNED,
+        fillColor: IconColors.PRIMARY,
         width: 24,
         height: 24,
         className: "sendbird-channel-settings__accordion-icon"
@@ -14092,6 +14092,7 @@ function index(_a) {
     className: "sendbird-channel-settings__freeze"
   }, React__default.createElement(Icon, {
     type: IconTypes.FROZEN_LIGHT,
+    fillColor: IconColors.PRIMARY,
     width: 24,
     height: 24,
     className: "sendbird-channel-settings__accordion-icon"
