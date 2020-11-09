@@ -9,15 +9,60 @@ import Sendbird from 'sendbird';
 export as namespace SendbirdUIKit;
 export const App: React.FunctionComponent<AppProps>
 export const SendBirdProvider: React.FunctionComponent<SendBirdProviderProps>
-export const sendBirdSelectors: sendBirdSelectors;
+export const sendBirdSelectors: sendBirdSelectorsInterface;
 export const ChannelSettings: React.FunctionComponent<ChannelSettingsProps>
 export const ChannelList: React.FunctionComponent<ChannelListProps>
 export const Channel: React.FunctionComponent<ChannelProps>
-export function withSendBird(
+export function withSendBird (
   ChildComp: React.Component | React.ElementType,
   mapStoreToProps?: (store: SendBirdState) => unknown
-): (props: unknown) => React.ReactNode;
-
+): React.ComponentType<unknown>;
+export type SendBirdState  = {
+  config: SendBirdStateConfig;
+  stores: SendBirdStateStore;
+}
+export namespace SendBirdSelectors {
+  type GetSdk = Sendbird.SendBirdInstance | undefined;
+  type GetConnect = (
+    userId: string,
+    accessToken?: string
+  ) => Promise<Sendbird.User>;
+  type GetDisconnect = () => Promise<void>;
+  type GetUpdateUserInfo = (
+    nickName: string,
+    profileUrl?: string
+  ) => Promise<Sendbird.User>;
+  type GetSendUserMessage = (
+    channelUrl: string,
+    userMessageParams: Sendbird.UserMessageParams
+  ) => Promise<Sendbird.UserMessage>;
+  type GetSendFileMessage = (
+    channelUrl: string,
+    fileMessageParams: Sendbird.FileMessageParams
+  ) => Promise<Sendbird.FileMessage>;
+  type GetUpdateUserMessage = (
+    channelUrl: string,
+    messageId: string|number,
+    params: Sendbird.UserMessageParams
+  ) => Promise<Sendbird.UserMessage>;
+  type GetDeleteMessage = (
+    channelUrl: string,
+    message: SendBird.AdminMessage | SendBird.UserMessage | SendBird.FileMessage
+  ) => Promise<void>;
+  type GetResendUserMessage = (
+    channelUrl: string,
+    failedMessage: Sendbird.UserMessage
+  ) => Promise<Sendbird.UserMessage>;
+  type GetResendFileMessage = (
+    channelUrl: string,
+    failedMessage: Sendbird.FileMessage
+  ) => Promise<Sendbird.FileMessage>;
+  type GetFreezeChannel = (channelUrl: string) => Promise<Sendbird.GroupChannel>;
+  type GetUnFreezeChannel = (channelUrl: string) => Promise<Sendbird.GroupChannel>;
+  type GetCreateChannel = (channelParams: Sendbird.GroupChannelParams) => Promise<Sendbird.GroupChannel>;
+  type GetLeaveChannel = (channelUrl: string) => Promise<Sendbird.GroupChannel>;
+}
+export function getStringSet(lang?: string): {[label: string]: string}
 
 // to be used with Conversation.renderMessageInput
 interface RenderMessageInputProps {
@@ -52,10 +97,6 @@ interface SendBirdStateStore {
   sdkStore: SdkStore;
   userStore: UserStore;
 }
-interface SendBirdState {
-  config: SendBirdStateConfig;
-  store: SendBirdStateStore;
-}
 interface RenderUserProfileProps {
   user: Sendbird.Member | Sendbird.User;
   currentUserId: string;
@@ -66,7 +107,7 @@ interface UserListQuery {
   next(callback: unknown): void;
 }
 interface SendBirdProviderConfig {
-  logLevel?: 'debug' | 'warning' | 'error' | 'info' | 'all' | [string];
+  logLevel?: 'debug' | 'warning' | 'error' | 'info' | 'all' | string[];
 }
 interface RenderChannelProfileProps {
   channel: Sendbird.GroupChannel;
@@ -78,9 +119,9 @@ interface RenderUserProfileProps {
 }
 interface ApplicationUserListQuery {
   limit?: number;
-  userIdsFilter?: [string];
+  userIdsFilter?: string[];
   metaDataKeyFilter?: string;
-  metaDataValuesFilter?: [string];
+  metaDataValuesFilter?: string[];
 }
 interface ChannelSettingsQueries {
   applicationUserListQuery?: ApplicationUserListQuery;
@@ -89,14 +130,14 @@ interface GroupChannelListQuery {
   limit?: number;
   includeEmpty?: boolean;
   order?: 'latest_last_message' | 'chronological' | 'channel_name_alphabetical' | 'metadata_value_alphabetical';
-  userIdsExactFilter?: [string];
-  userIdsIncludeFilter?: [string];
+  userIdsExactFilter?: string[];
+  userIdsIncludeFilter?: string[];
   userIdsIncludeFilterQueryType?: 'AND' | 'OR';
   nicknameContainsFilter?: string;
   channelNameContainsFilter?: string;
-  customTypesFilter?: [string];
+  customTypesFilter?: string[];
   customTypeStartsWithFilter?: string;
-  channelUrlsFilter?: [string];
+  channelUrlsFilter?: string[];
   superChannelFilter?: 'all' | 'super' | 'nonsuper';
   publicChannelFilter?: 'all' | 'public' | 'private';
   metadataOrderKeyFilter?: string;
@@ -112,7 +153,7 @@ interface MessageListParams {
   shouldReverse?: boolean;
   messageType?: string;
   customType?: string;
-  senderUserIds?: [string];
+  senderUserIds?: string[];
   includeMetaArray?: boolean;
   includeReactions?: boolean;
   includeReplies?: boolean;
@@ -145,7 +186,7 @@ interface RenderChatItemProps {
     onDeleteCb: () => void,
   );
   onUpdateMessage(
-    messageId: string,
+    messageId: string | number,
     text: string,
     onUpdateCb: (
       err: Sendbird.SendBirdError,
@@ -161,7 +202,6 @@ interface RenderChatHeaderProps {
   channel: Sendbird.GroupChannel;
   user: Sendbird.User;
 }
-
 interface SendBirdProviderProps {
   userId: string;
   appId: string;
@@ -175,13 +215,13 @@ interface SendBirdProviderProps {
   allowProfileEdit?: boolean;
   userListQuery?(): UserListQuery;
   config?: SendBirdProviderConfig;
+  stringSet?: Record<string, string>;
   colorSet?: Record<string, string>;
 }
-
 interface ChannelListProps {
   disableUserProfile?: boolean;
   allowProfileEdit?: boolean;
-  onBeforeCreateChannel?(users: [string]): Sendbird.GroupChannelParams;
+  onBeforeCreateChannel?(users: string[]): Sendbird.GroupChannelParams;
   onThemeChange?(theme: string): void;
   onProfileEditSuccess?(user: Sendbird.User): void;
   onChannelSelect?(channel: Sendbird.GroupChannel): void;
@@ -190,7 +230,6 @@ interface ChannelListProps {
   renderHeader?: (props: void) => React.ReactNode;
   queries?: ChannelListQueries;
 }
-
 interface ChannelProps {
   channelUrl: string;
   disableUserProfile?: boolean,
@@ -206,50 +245,22 @@ interface ChannelProps {
   renderUserProfile?: (props: RenderUserProfileProps) => React.ReactNode;
   queries?: ChannelQueries;
 }
-
-interface sendBirdSelectors {
-  getSdk: (store: SendBirdState) => Sendbird.SendBirdInstance;
-  getConnect: (store: SendBirdState)
-    => (userId: string, accessToken?: string)
-    => Promise<Sendbird.User>;
-  getDisconnect: (store: SendBirdState) => () => Promise<void>;
-  getUpdateUserInfo: (store: SendBirdState)
-    => (nickName: string, profileUrl?: string)
-    => Promise<Sendbird.User>;
-  getSendUserMessage: (store: SendBirdState)
-    => (channelUrl: string, userMessageParams: Sendbird.UserMessageParams)
-    => Promise<Sendbird.UserMessage>; // promise chain here
-  getSendFileMessage: (store: SendBirdState)
-    => (channelUrl: string, fileMessageParams: Sendbird.FileMessageParams)
-    => Promise<Sendbird.FileMessage>; // promise chain here
-  getUpdateUserMessage: (store: SendBirdState)
-    => (channelUrl: string, messageId: string, params: Sendbird.UserMessageParams)
-    => Promise<Sendbird.UserMessage>;
-  getDeleteMessage: (store: SendBirdState)
-    => (
-      channelUrl: string,
-      message: SendBird.AdminMessage | SendBird.UserMessage | SendBird.FileMessage
-    ) => Promise<void>;
-  getResendUserMessage: (store: SendBirdState)
-    => (channelUrl: string, failedMessage: Sendbird.UserMessage)
-    => Promise<Sendbird.UserMessage>;
-  getResendFileMessage: (store: SendBirdState)
-    => (channelUrl: string, failedMessage: Sendbird.FileMessage)
-    => Promise<Sendbird.FileMessage>;
-  getFreezeChannel: (store: SendBirdState)
-    => (channelUrl: string)
-    => Promise<Sendbird.GroupChannel>;
-  getUnFreezeChannel: (store: SendBirdState)
-    => (channelUrl: string)
-    => Promise<Sendbird.GroupChannel>;
-  getCreateChannel: (store: SendBirdState)
-    => (channelParams: Sendbird.GroupChannelParams)
-    => Promise<Sendbird.GroupChannel>;
-  getLeaveChannel: (store: SendBirdState)
-    => (channelUrl: string)
-    => Promise<Sendbird.GroupChannel>;
+interface sendBirdSelectorsInterface {
+  getSdk: (store: SendBirdState) => SendBirdSelectors.GetSdk;
+  getConnect: (store: SendBirdState) => SendBirdSelectors.GetConnect
+  getDisconnect: (store: SendBirdState) => SendBirdSelectors.GetDisconnect;
+  getUpdateUserInfo: (store: SendBirdState) => SendBirdSelectors.GetUpdateUserInfo;
+  getSendUserMessage: (store: SendBirdState) => SendBirdSelectors.GetSendUserMessage;
+  getSendFileMessage: (store: SendBirdState) => SendBirdSelectors.GetSendFileMessage;
+  getUpdateUserMessage: (store: SendBirdState) => SendBirdSelectors.GetUpdateUserMessage;
+  getDeleteMessage: (store: SendBirdState) => SendBirdSelectors.GetDeleteMessage;
+  getResendUserMessage: (store: SendBirdState) => SendBirdSelectors.GetResendUserMessage;
+  getResendFileMessage: (store: SendBirdState) => SendBirdSelectors.GetResendFileMessage;
+  getFreezeChannel: (store: SendBirdState) => SendBirdSelectors.GetFreezeChannel;
+  getUnFreezeChannel: (store: SendBirdState) => SendBirdSelectors.GetUnFreezeChannel;
+  getCreateChannel: (store: SendBirdState) => SendBirdSelectors.GetCreateChannel;
+  getLeaveChannel: (store: SendBirdState) => SendBirdSelectors.GetLeaveChannel;
 }
-
 interface ChannelSettingsProps {
   channelUrl: string;
   disableUserProfile?: boolean;
@@ -260,12 +271,11 @@ interface ChannelSettingsProps {
   renderUserProfile?: (props: RenderUserProfileProps) => React.ReactNode;
   queries?: ChannelSettingsQueries;
 }
-
 interface AppProps {
   appId: string;
   userId: string;
   accessToken?: string;
-  theme?: string;
+  theme?: 'light' | 'dark';
   userListQuery?(): UserListQuery;
   nickname?: string;
   profileUrl?: string;
@@ -276,4 +286,6 @@ interface AppProps {
   config?: SendBirdProviderConfig;
   useReaction?: boolean;
   useMessageGrouping?: boolean;
+  stringSet?: Record<string, string>;
+  colorSet?: Record<string, string>;
 }

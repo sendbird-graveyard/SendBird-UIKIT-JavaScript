@@ -227,7 +227,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.3.0-rc.4';
+var APP_VERSION_STRING = '1.3.0';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -785,7 +785,8 @@ function useAppendDomNode() {
   }, []);
 }
 
-var getStringSet = function getStringSet(lang) {
+var getStringSet = function getStringSet() {
+  var lang = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'en';
   var stringSet = {
     en: {
       TRYING_TO_CONNECT: 'Trying to connect…',
@@ -860,7 +861,7 @@ var getStringSet = function getStringSet(lang) {
       MESSAGE_EDITED: '(edited)'
     }
   };
-  return stringSet && stringSet[lang] ? stringSet[lang] : {};
+  return stringSet[lang];
 };
 
 var LocalizationContext = React__default.createContext({
@@ -1060,7 +1061,10 @@ Sendbird.defaultProps = {
   colorSet: null
 };
 
-var UserProfileContext = React__default.createContext();
+var UserProfileContext = React__default.createContext({
+  disableUserProfile: true,
+  renderUserProfile: null
+});
 
 var UserProfileProvider = function UserProfileProvider(props) {
   var children = props.children,
