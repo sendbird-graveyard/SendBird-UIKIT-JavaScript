@@ -10,6 +10,7 @@
   1. [Before getting started](#before-getting-started)
   1. [Getting started](#getting-started)
   1. [Implementation guide](#implementation-guide)
+  1. [UIKit at a glance](#uikit-at-a-glance)  
 
 <br />
 
@@ -163,7 +164,7 @@ const App = () => {
 
 <br />
 
-## UIKit for React at a glance
+## UIKit at a glance
 
 Here is a list of components included in the UIKit.  
 
