@@ -94,9 +94,9 @@ import { App as SendBirdApp } from "sendbird-uikit";
 import "sendbird-uikit/dist/index.css";
 
 const App = () => (
-        <Route id={'/chat'}>
-                <App appId={appId} userId={userId} />
-        </Route>
+    <Route id={'/chat'}>
+        <App appId={appId} userId={userId} />
+    </Route>
 )
 ```
 
@@ -104,35 +104,35 @@ To use smart components, add the following pattern:
 
 ```javascript
 import {
-        SendBirdProvider,
-        ChannelList,
-        ChannelSettings,
-        Channel,
+    SendBirdProvider,
+    ChannelList,
+    ChannelSettings,
+    Channel,
 } from "sendbird-uikit";
 import "sendbird-uikit/dist/index.css";
 
 const App = () => (
-        <SendBirdProvider>
+    <SendBirdProvider>
         ... other components
         <Route id={'/chat'}>
-                <LeftPane>
-                        <ChannelList onChannelSelect={channel => setCurrentChannel(channel.url)}/>
-                </LeftPane>
-                <CenterPane>
-                        <Switch case={currentChannel}>
-                                <Route id={channelUrl1}>
-                                        <Channel channelUrl={channelUrl1} />
-                                </Route>
-                                <Route id={channelUrl2}>
-                                        <Channel channelUrl={channelUrl2} />
-                                </Route>
-                        </Switch>
-                </CenterPane>
-                <RightPane>
-                        <ChannelSettings channelUrl={currentChannel} />
-                </RightPane>
+            <LeftPane>
+                <ChannelList onChannelSelect={channel => setCurrentChannel(channel.url)}/>
+            </LeftPane>
+            <CenterPane>
+                <Switch case={currentChannel}>
+                    <Route id={channelUrl1}>
+                        <Channel channelUrl={channelUrl1} />
+                    </Route>
+                    <Route id={channelUrl2}>
+                        <Channel channelUrl={channelUrl2} />
+                    </Route>
+                </Switch>
+            </CenterPane>
+            <RightPane>
+                <ChannelSettings channelUrl={currentChannel} />
+            </RightPane>
         </Route>
-        </SendBirdProvider>
+    </SendBirdProvider>
 )
 ```
 
@@ -140,33 +140,33 @@ To show a list of channels or change channels based on routes, implement as belo
 
 ```javascript
 import {
-        SendBirdProvider,
-        ChannelList,
-        Channel,
+    SendBirdProvider,
+    ChannelList,
+    Channel,
 } from "sendbird-uikit";
 import "sendbird-uikit/dist/index.css";
 
 const App = () => {
-        <SendBirdProvider appId={appId} userId={userId} ...>
-                <Router>
-                        <Route>
-                                <Sidebar>
-                                        <Channel />
-                                </Sidebar>
-                                <Route id={yourApp/channelUrl1}>
-                                        <MainPanel>
-                                                <Channel channelUrl={yourApp/channelUrl1} />
-                                        </MainPanel>
-                                </Route>
-                                <Route id={yourApp/channelUrl2}>
-                                        <MainPanel>
-                                                <Channel channelUrl={yourApp/channelUrl2} />
-                                        </MainPanel>
-                                </Route>
-                        </Route>
-                        ...
-                </Router>
-        </SendBirdProvider>
+    <SendBirdProvider appId={appId} userId={userId} ...>
+        <Router>
+            <Route>
+                <Sidebar>
+                    <Channel />
+                </Sidebar>
+                <Route id={yourApp/channelUrl1}>
+                    <MainPanel>
+                        <Channel channelUrl={yourApp/channelUrl1} />
+                    </MainPanel>
+                </Route>
+                <Route id={yourApp/channelUrl2}>
+                    <MainPanel>
+                        <Channel channelUrl={yourApp/channelUrl2} />
+                    </MainPanel>
+                </Route>
+            </Route>
+            ...
+        </Router>
+    </SendBirdProvider>
 }
 ```
 
