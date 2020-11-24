@@ -47,6 +47,8 @@ The minimum requirements for Sendbird UIKit for React are:
 - `React DOM 16.8.0+`
 - `Sendbird Chat SDK for JavaScript 3.0.115+`
 - `moment 2.24.0+`
+- `css-vars-ponyfill 2.3.2`
+- `date-fns 2.16.1`
 
 <br />
 
