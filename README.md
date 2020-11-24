@@ -62,7 +62,7 @@ Our sample app has all the core features of Sendbird UIKit for React. Download t
 
 - https://github.com/sendbird/Sendbird-JavaScript/tree/master/uikit-samples
 
-### Install UIKit for React with npm
+### Install UIKit for React with npm or yarn
 
 Enter the following on the command line with `npm` to install Sendbird UIKit.
 
@@ -70,6 +70,12 @@ Enter the following on the command line with `npm` to install Sendbird UIKit.
 
 ```bash
 npm install sendbird-uikit --save
+```
+
+or with `yarn`.
+
+```bash
+yarn add sendbird-uikit
 ```
 
 ### Implement UIKit to your web app
