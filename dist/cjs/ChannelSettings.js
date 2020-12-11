@@ -6,14 +6,14 @@ var LocalizationContext = require('./LocalizationContext-7c9df62c.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
-var index$1 = require('./index-710314fd.js');
+var index$1 = require('./index-49d966e1.js');
 var utils = require('./utils-6aedec02.js');
-var index$1$1 = require('./index-64dcc5d9.js');
-var LeaveChannel = require('./LeaveChannel-cb2a36b0.js');
+var index$1$1 = require('./index-994f886d.js');
+var LeaveChannel = require('./LeaveChannel-4cf3cd9c.js');
 require('date-fns/format');
 require('react-dom');
-var index$2 = require('./index-6ca9e95e.js');
-var index$3 = require('./index-c4d028d8.js');
+var index$2 = require('./index-21269166.js');
+var index$3 = require('./index-63161cb1.js');
 
 var EditDetails = function EditDetails(props) {
   var _onSubmit = props.onSubmit,

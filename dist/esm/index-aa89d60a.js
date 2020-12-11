@@ -1,7 +1,7 @@
 import { b as _slicedToArray, e as LocalizationContext, c as _toConsumableArray } from './LocalizationContext-619bafba.js';
 import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
-import { b as Label, c as LabelTypography, d as LabelColors, I as Icon, g as IconColors, a as IconTypes, n as UserProfileContext, C as ContextMenu, A as Avatar, h as MenuItems, o as UserProfile } from './index-0c67ae90.js';
+import { b as Label, c as LabelTypography, d as LabelColors, I as Icon, g as IconColors, a as IconTypes, n as UserProfileContext, C as ContextMenu, A as Avatar, h as MenuItems, o as UserProfile } from './index-ec3bf9fe.js';
 
 var InputLabel = function InputLabel(_ref) {
   var children = _ref.children;
@@ -248,4 +248,4 @@ UserListItem.defaultProps = {
 };
 
 export { InputLabel as I, MutedAvatarOverlay as M, UserListItem as U, Input as a };
-//# sourceMappingURL=index-73379213.js.map
+//# sourceMappingURL=index-aa89d60a.js.map

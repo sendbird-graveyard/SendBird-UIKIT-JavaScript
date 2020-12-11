@@ -1,7 +1,7 @@
 import { c as _toConsumableArray, e as LocalizationContext, b as _slicedToArray } from './LocalizationContext-619bafba.js';
 import React, { useContext, useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { b as Label, c as LabelTypography, d as LabelColors, u as Colors, v as changeColorToClassName, e as IconButton, I as Icon, a as IconTypes, g as IconColors, B as Button, T as Type, w as Size, A as Avatar, x as MODAL_ROOT, y as changeColorToClassName$1 } from './index-0c67ae90.js';
+import { b as Label, c as LabelTypography, d as LabelColors, u as Colors, v as changeColorToClassName, e as IconButton, I as Icon, a as IconTypes, g as IconColors, B as Button, T as Type, w as Size, A as Avatar, x as MODAL_ROOT, y as changeColorToClassName$1 } from './index-ec3bf9fe.js';
 import { createPortal } from 'react-dom';
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types
@@ -196,7 +196,7 @@ var MessageInput = React.forwardRef(function (props, ref) {
     fillColor: IconColors.PRIMARY,
     width: "20px",
     height: "20px"
-  })), !isEdit && !inputValue && !(inputValue.trim().length > 0) && React.createElement(IconButton, {
+  })), !isEdit && (!inputValue || !(inputValue.trim().length > 0)) && React.createElement(IconButton, {
     className: "sendbird-message-input--attach",
     height: "32px",
     width: "32px",
@@ -428,4 +428,4 @@ LinkLabel.defaultProps = {
 };
 
 export { DateSeparator as D, FileViewer as F, LinkLabel as L, MessageInput as M, isVideo as a, compareIds as c, isImage as i, unSupported as u };
-//# sourceMappingURL=index-1cf7b066.js.map
+//# sourceMappingURL=index-19f570c9.js.map

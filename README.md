@@ -4,13 +4,18 @@
 ![Languages](https://img.shields.io/badge/language-JAVASCRIPT-orange.svg)
 [![npm](https://img.shields.io/npm/v/sendbird.svg?style=popout&colorB=red)](https://www.npmjs.com/package/sendbird)
 
+## Note
+
+v2.0.0-alpha.x is still under QA. Please donot use it for production
+Try it only if you want to test OpenChannel
+
 ## Table of contents
 
   1. [Introduction](#introduction)
   1. [Before getting started](#before-getting-started)
   1. [Getting started](#getting-started)
-  1. [UIKit at a glance](#uikit-at-a-glance)  
-  1. [Appendix](#appendix)  
+  1. [UIKit at a glance](#uikit-at-a-glance)
+  1. [Appendix](#appendix)
 
 <br />
 

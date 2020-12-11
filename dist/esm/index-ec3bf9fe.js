@@ -1,14 +1,9 @@
-'use strict';
+import { b as _slicedToArray, c as _toConsumableArray, d as __spreadArrays, u as uuidv4, g as getStringSet, a as _objectSpread2, e as LocalizationContext, w as withSendbirdContext, f as _inherits, h as _createClass, i as _classCallCheck, j as _possibleConstructorReturn, k as _getPrototypeOf, l as _defineProperty, m as _assertThisInitialized } from './LocalizationContext-619bafba.js';
+import React, { useState, useEffect, useContext, Component } from 'react';
+import PropTypes from 'prop-types';
+import { createPortal } from 'react-dom';
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var LocalizationContext = require('./LocalizationContext-7c9df62c.js');
-var React = require('react');
-var React__default = _interopDefault(React);
-var PropTypes = _interopDefault(require('prop-types'));
-var reactDom = require('react-dom');
-
-var UserProfileContext = React__default.createContext({
+var UserProfileContext = React.createContext({
   disableUserProfile: true,
   isOpenChannel: false,
   renderUserProfile: null
@@ -17,9 +12,9 @@ var UserProfileContext = React__default.createContext({
 var UserProfileProvider = function UserProfileProvider(props) {
   var children = props.children,
       className = props.className;
-  return React__default.createElement(UserProfileContext.Provider, {
+  return React.createElement(UserProfileContext.Provider, {
     value: props
-  }, React__default.createElement("div", {
+  }, React.createElement("div", {
     className: className
   }, children));
 };
@@ -59,15 +54,15 @@ function ImageRenderer(_ref) {
   var injectingClassName = Array.isArray(className) ? className : [className];
   injectingClassName.unshift('sendbird-image-renderer');
 
-  var _useState = React.useState(null),
-      _useState2 = LocalizationContext._slicedToArray(_useState, 2),
+  var _useState = useState(null),
+      _useState2 = _slicedToArray(_useState, 2),
       realElement = _useState2[0],
       setRealElement = _useState2[1];
 
-  React.useEffect(function () {
+  useEffect(function () {
     setRealElement(null);
   }, [url]);
-  return realElement || React__default.createElement("img", {
+  return realElement || React.createElement("img", {
     className: "sendbird-image-renderer--hidden-placeholder ".concat(injectingClassName.join(' ')),
     src: url,
     alt: alt,
@@ -75,7 +70,7 @@ function ImageRenderer(_ref) {
       setRealElement(typeof defaultComponent === 'function' ? defaultComponent() : defaultComponent);
     },
     onLoad: function onLoad() {
-      setRealElement(React__default.createElement("div", {
+      setRealElement(React.createElement("div", {
         className: injectingClassName.join(' '),
         style: {
           width: width,
@@ -177,7 +172,7 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
 
 var _ref =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-add_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -185,7 +180,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconAdd(props) {
-  return React__default.createElement("svg", _extends({
+  return React.createElement("svg", _extends({
     viewBox: "0 0 24 24"
   }, props), _ref);
 }
@@ -194,7 +189,7 @@ function _extends$1() { _extends$1 = Object.assign || function (target) { for (v
 
 var _ref$1 =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-attach_svg__fill",
   fillOpacity: 0.88,
   fillRule: "evenodd",
@@ -202,7 +197,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconAttach(props) {
-  return React__default.createElement("svg", _extends$1({
+  return React.createElement("svg", _extends$1({
     viewBox: "0 0 22 22"
   }, props), _ref$1);
 }
@@ -211,7 +206,7 @@ function _extends$2() { _extends$2 = Object.assign || function (target) { for (v
 
 var _ref$2 =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-arrow-left_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -219,7 +214,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconArrowLeft(props) {
-  return React__default.createElement("svg", _extends$2({
+  return React.createElement("svg", _extends$2({
     viewBox: "0 0 24 24"
   }, props), _ref$2);
 }
@@ -228,20 +223,20 @@ function _extends$3() { _extends$3 = Object.assign || function (target) { for (v
 
 var _ref$3 =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   fill: "#393939",
   d: "M0 0h56v56H0z"
 });
 
 var _ref2 =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   fillOpacity: 0.88,
   d: "M34.667 31.333a8.334 8.334 0 018.325 7.972l.008.362V43a1.667 1.667 0 01-3.322.194L39.667 43v-3.333a5 5 0 00-4.707-4.992l-.293-.008H21.333a5 5 0 00-4.991 4.706l-.009.294V43a1.667 1.667 0 01-3.322.194L13 43v-3.333a8.333 8.333 0 017.972-8.326l.361-.008h13.334zm-6.667-20A8.333 8.333 0 1128 28a8.333 8.333 0 010-16.667zm0 3.334a5 5 0 100 10 5 5 0 000-10z"
 });
 
 function SvgIconAvatarDark(props) {
-  return React__default.createElement("svg", _extends$3({
+  return React.createElement("svg", _extends$3({
     viewBox: "0 0 56 56"
   }, props), _ref$3, _ref2);
 }
@@ -250,21 +245,21 @@ function _extends$4() { _extends$4 = Object.assign || function (target) { for (v
 
 var _ref$4 =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   fill: "#A8A8A8",
   d: "M0 0h56v56H0z"
 });
 
 var _ref2$1 =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   fill: "#FFF",
   fillOpacity: 0.88,
   d: "M34.667 31.333a8.334 8.334 0 018.325 7.972l.008.362V43a1.667 1.667 0 01-3.322.194L39.667 43v-3.333a5 5 0 00-4.707-4.992l-.293-.008H21.333a5 5 0 00-4.991 4.706l-.009.294V43a1.667 1.667 0 01-3.322.194L13 43v-3.333a8.333 8.333 0 017.972-8.326l.361-.008h13.334zm-6.667-20A8.333 8.333 0 1128 28a8.333 8.333 0 010-16.667zm0 3.334a5 5 0 100 10 5 5 0 000-10z"
 });
 
 function SvgIconAvatarLight(props) {
-  return React__default.createElement("svg", _extends$4({
+  return React.createElement("svg", _extends$4({
     viewBox: "0 0 56 56"
   }, props), _ref$4, _ref2$1);
 }
@@ -273,22 +268,22 @@ function _extends$5() { _extends$5 = Object.assign || function (target) { for (v
 
 var _ref$5 =
 /*#__PURE__*/
-React__default.createElement("g", {
+React.createElement("g", {
   fill: "none",
   fillRule: "evenodd"
-}, React__default.createElement("circle", {
+}, React.createElement("circle", {
   cx: 16,
   cy: 16,
   r: 16,
   className: "avatar-no-image-light_svg__fill"
-}), React__default.createElement("path", {
+}), React.createElement("path", {
   d: "M19.043 8.381l.089.004a.762.762 0 01.677.753l-.004.089-.415 3.725h2.705a.762.762 0 01.089 1.519l-.089.005H19.22l-.338 3.048h3.213a.762.762 0 01.089 1.518l-.089.005h-3.382l-.432 3.894a.762.762 0 01-1.519-.079l.004-.09.414-3.725h-3.038l-.433 3.894a.76.76 0 01-1.519-.079l.005-.09.414-3.725H9.905a.76.76 0 01-.089-1.518l.089-.005h2.872l.339-3.048H9.905a.762.762 0 01-.089-1.519l.089-.005h3.381l.433-3.893a.76.76 0 01.752-.678l.09.004a.763.763 0 01.677.753l-.005.089-.414 3.725h3.038l.433-3.893a.762.762 0 01.753-.678zm-1.694 9.143l.34-3.048h-3.04l-.338 3.048h3.038z",
   fill: "#FFF",
   fillOpacity: 0.88
 }));
 
 function SvgAvatarNoImageLight(props) {
-  return React__default.createElement("svg", _extends$5({
+  return React.createElement("svg", _extends$5({
     viewBox: "0 0 32 32"
   }, props), _ref$5);
 }
@@ -297,23 +292,23 @@ function _extends$6() { _extends$6 = Object.assign || function (target) { for (v
 
 var _ref$6 =
 /*#__PURE__*/
-React__default.createElement("g", {
+React.createElement("g", {
   className: "icon-broadcast-lrg-dark_svg__fill",
   fill: "none",
   fillRule: "evenodd"
-}, React__default.createElement("circle", {
+}, React.createElement("circle", {
   cx: 28,
   cy: 28,
   r: 28,
   fill: "#6FD6BE"
-}), React__default.createElement("path", {
+}), React.createElement("path", {
   fill: "#000",
   fillOpacity: 0.88,
   d: "M41.273 16.083c.04.128.06.262.06.397v23.04a1.333 1.333 0 01-1.731 1.273l-8.975-2.805A5.335 5.335 0 0120 37.333v-2.666h-2.667a4 4 0 01-3.995-3.8l-.005-.2v-5.334a4 4 0 014-4H20l19.602-6.125a1.332 1.332 0 011.67.875zM22.667 35.627v1.706a2.667 2.667 0 005.326.199l.007-.239-5.333-1.666zm16-17.334l-16 4.999v9.415l16 4.998V18.293zM20 24h-2.667c-.683 0-1.247.515-1.324 1.178l-.009.155v5.334c0 .736.597 1.333 1.333 1.333H20v-8z"
 }));
 
 function SvgIconBroadcastLrgDark(props) {
-  return React__default.createElement("svg", _extends$6({
+  return React.createElement("svg", _extends$6({
     viewBox: "0 0 56 56"
   }, props), _ref$6);
 }
@@ -322,23 +317,23 @@ function _extends$7() { _extends$7 = Object.assign || function (target) { for (v
 
 var _ref$7 =
 /*#__PURE__*/
-React__default.createElement("g", {
+React.createElement("g", {
   className: "icon-broadcast-lrg-light_svg__fill",
   fill: "none",
   fillRule: "evenodd"
-}, React__default.createElement("circle", {
+}, React.createElement("circle", {
   cx: 28,
   cy: 28,
   r: 28,
   fill: "#2EBA9F"
-}), React__default.createElement("path", {
+}), React.createElement("path", {
   fill: "#FFF",
   fillOpacity: 0.88,
   d: "M41.273 16.083c.04.128.06.262.06.397v23.04a1.333 1.333 0 01-1.731 1.273l-8.975-2.805A5.335 5.335 0 0120 37.333v-2.666h-2.667a4 4 0 01-3.995-3.8l-.005-.2v-5.334a4 4 0 014-4H20l19.602-6.125a1.332 1.332 0 011.67.875zM22.667 35.627v1.706a2.667 2.667 0 005.326.199l.007-.239-5.333-1.666zm16-17.334l-16 4.999v9.415l16 4.998V18.293zM20 24h-2.667c-.683 0-1.247.515-1.324 1.178l-.009.155v5.334c0 .736.597 1.333 1.333 1.333H20v-8z"
 }));
 
 function SvgIconBroadcastLrgLight(props) {
-  return React__default.createElement("svg", _extends$7({
+  return React.createElement("svg", _extends$7({
     viewBox: "0 0 56 56"
   }, props), _ref$7);
 }
@@ -347,7 +342,7 @@ function _extends$8() { _extends$8 = Object.assign || function (target) { for (v
 
 var _ref$8 =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-broadcast-dark_svg__fill",
   fill: "#6FD6BE",
   fillRule: "evenodd",
@@ -355,7 +350,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconBroadcastDark(props) {
-  return React__default.createElement("svg", _extends$8({
+  return React.createElement("svg", _extends$8({
     viewBox: "0 0 16 16"
   }, props), _ref$8);
 }
@@ -364,7 +359,7 @@ function _extends$9() { _extends$9 = Object.assign || function (target) { for (v
 
 var _ref$9 =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-broadcast-light_svg__fill",
   fill: "#2EBA9F",
   fillRule: "evenodd",
@@ -372,7 +367,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconBroadcastLight(props) {
-  return React__default.createElement("svg", _extends$9({
+  return React.createElement("svg", _extends$9({
     viewBox: "0 0 16 16"
   }, props), _ref$9);
 }
@@ -381,7 +376,7 @@ function _extends$a() { _extends$a = Object.assign || function (target) { for (v
 
 var _ref$a =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-broadcast_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -389,7 +384,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconBroadcast(props) {
-  return React__default.createElement("svg", _extends$a({
+  return React.createElement("svg", _extends$a({
     viewBox: "0 0 16 16"
   }, props), _ref$a);
 }
@@ -398,7 +393,7 @@ function _extends$b() { _extends$b = Object.assign || function (target) { for (v
 
 var _ref$b =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "frozen-dark_svg__fill",
   fill: "#9E8CF5",
   fillRule: "evenodd",
@@ -406,7 +401,7 @@ React__default.createElement("path", {
 });
 
 function SvgFrozenDark(props) {
-  return React__default.createElement("svg", _extends$b({
+  return React.createElement("svg", _extends$b({
     viewBox: "0 0 16 16"
   }, props), _ref$b);
 }
@@ -415,7 +410,7 @@ function _extends$c() { _extends$c = Object.assign || function (target) { for (v
 
 var _ref$c =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "frozen-light_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -423,7 +418,7 @@ React__default.createElement("path", {
 });
 
 function SvgFrozenLight(props) {
-  return React__default.createElement("svg", _extends$c({
+  return React.createElement("svg", _extends$c({
     viewBox: "0 0 16 16"
   }, props), _ref$c);
 }
@@ -432,7 +427,7 @@ function _extends$d() { _extends$d = Object.assign || function (target) { for (v
 
 var _ref$d =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-camera_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -440,7 +435,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconCamera(props) {
-  return React__default.createElement("svg", _extends$d({
+  return React.createElement("svg", _extends$d({
     viewBox: "0 0 24 24"
   }, props), _ref$d);
 }
@@ -449,14 +444,14 @@ function _extends$e() { _extends$e = Object.assign || function (target) { for (v
 
 var _ref$e =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-more_svg__fill",
   fillRule: "evenodd",
   d: "M12 17a2 2 0 110 4 2 2 0 010-4zm0-6.5a2 2 0 110 4 2 2 0 010-4zM12 4a2 2 0 110 4 2 2 0 010-4z"
 });
 
 function SvgIconMore(props) {
-  return React__default.createElement("svg", _extends$e({
+  return React.createElement("svg", _extends$e({
     viewBox: "0 0 24 24"
   }, props), _ref$e);
 }
@@ -465,7 +460,7 @@ function _extends$f() { _extends$f = Object.assign || function (target) { for (v
 
 var _ref$f =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-mute_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -473,7 +468,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconMute(props) {
-  return React__default.createElement("svg", _extends$f({
+  return React.createElement("svg", _extends$f({
     viewBox: "0 0 24 24"
   }, props), _ref$f);
 }
@@ -482,7 +477,7 @@ function _extends$g() { _extends$g = Object.assign || function (target) { for (v
 
 var _ref$g =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-no-thumbnail_svg__fill",
   fillOpacity: 0.5,
   fillRule: "evenodd",
@@ -490,7 +485,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconNoThumbnail(props) {
-  return React__default.createElement("svg", _extends$g({
+  return React.createElement("svg", _extends$g({
     viewBox: "0 0 56 56"
   }, props), _ref$g);
 }
@@ -499,18 +494,18 @@ function _extends$h() { _extends$h = Object.assign || function (target) { for (v
 
 var _ref$h =
 /*#__PURE__*/
-React__default.createElement("g", {
+React.createElement("g", {
   className: "icon-checkbox_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd"
-}, React__default.createElement("path", {
+}, React.createElement("path", {
   d: "M18 1H6a5 5 0 00-5 5v12a5 5 0 005 5h12a5 5 0 005-5V6a5 5 0 00-5-5zm0 2a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V6a3 3 0 013-3h12z"
-}), React__default.createElement("path", {
+}), React.createElement("path", {
   d: "M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
 }));
 
 function SvgIconCheckbox(props) {
-  return React__default.createElement("svg", _extends$h({
+  return React.createElement("svg", _extends$h({
     viewBox: "0 0 24 24"
   }, props), _ref$h);
 }
@@ -519,18 +514,18 @@ function _extends$i() { _extends$i = Object.assign || function (target) { for (v
 
 var _ref$i =
 /*#__PURE__*/
-React__default.createElement("g", {
+React.createElement("g", {
   className: "icon-checkbox-off_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd"
-}, React__default.createElement("path", {
+}, React.createElement("path", {
   d: "M18 1H6a5 5 0 00-5 5v12a5 5 0 005 5h12a5 5 0 005-5V6a5 5 0 00-5-5zm0 2a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V6a3 3 0 013-3h12z"
-}), React__default.createElement("path", {
+}), React.createElement("path", {
   d: "M19 19H5V5h14v14zm0-16H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
 }));
 
 function SvgIconCheckboxOff(props) {
-  return React__default.createElement("svg", _extends$i({
+  return React.createElement("svg", _extends$i({
     viewBox: "0 0 24 24"
   }, props), _ref$i);
 }
@@ -539,7 +534,7 @@ function _extends$j() { _extends$j = Object.assign || function (target) { for (v
 
 var _ref$j =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-close_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -547,7 +542,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconClose(props) {
-  return React__default.createElement("svg", _extends$j({
+  return React.createElement("svg", _extends$j({
     viewBox: "0 0 24 24"
   }, props), _ref$j);
 }
@@ -556,7 +551,7 @@ function _extends$k() { _extends$k = Object.assign || function (target) { for (v
 
 var _ref$k =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-copy_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -564,7 +559,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconCopy(props) {
-  return React__default.createElement("svg", _extends$k({
+  return React.createElement("svg", _extends$k({
     viewBox: "0 0 24 24"
   }, props), _ref$k);
 }
@@ -573,7 +568,7 @@ function _extends$l() { _extends$l = Object.assign || function (target) { for (v
 
 var _ref$l =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-chat_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -581,7 +576,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconChat(props) {
-  return React__default.createElement("svg", _extends$l({
+  return React.createElement("svg", _extends$l({
     viewBox: "0 0 24 24"
   }, props), _ref$l);
 }
@@ -590,7 +585,7 @@ function _extends$m() { _extends$m = Object.assign || function (target) { for (v
 
 var _ref$m =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-supergroup_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -598,7 +593,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconSupergroup(props) {
-  return React__default.createElement("svg", _extends$m({
+  return React.createElement("svg", _extends$m({
     viewBox: "0 0 28 28"
   }, props), _ref$m);
 }
@@ -607,7 +602,7 @@ function _extends$n() { _extends$n = Object.assign || function (target) { for (v
 
 var _ref$n =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-create_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -615,7 +610,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconCreate(props) {
-  return React__default.createElement("svg", _extends$n({
+  return React.createElement("svg", _extends$n({
     viewBox: "0 0 24 24"
   }, props), _ref$n);
 }
@@ -624,7 +619,7 @@ function _extends$o() { _extends$o = Object.assign || function (target) { for (v
 
 var _ref$o =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-delete_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -632,7 +627,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconDelete(props) {
-  return React__default.createElement("svg", _extends$o({
+  return React.createElement("svg", _extends$o({
     viewBox: "0 0 24 24"
   }, props), _ref$o);
 }
@@ -641,7 +636,7 @@ function _extends$p() { _extends$p = Object.assign || function (target) { for (v
 
 var _ref$p =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-dummy_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -649,7 +644,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconDummy(props) {
-  return React__default.createElement("svg", _extends$p({
+  return React.createElement("svg", _extends$p({
     viewBox: "0 0 24 24"
   }, props), _ref$p);
 }
@@ -658,7 +653,7 @@ function _extends$q() { _extends$q = Object.assign || function (target) { for (v
 
 var _ref$q =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-edit_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -666,7 +661,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconEdit(props) {
-  return React__default.createElement("svg", _extends$q({
+  return React.createElement("svg", _extends$q({
     viewBox: "0 0 26 26"
   }, props), _ref$q);
 }
@@ -675,7 +670,7 @@ function _extends$r() { _extends$r = Object.assign || function (target) { for (v
 
 var _ref$r =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-error_svg__fill",
   fill: "#E53157",
   fillRule: "evenodd",
@@ -683,7 +678,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconError(props) {
-  return React__default.createElement("svg", _extends$r({
+  return React.createElement("svg", _extends$r({
     viewBox: "0 0 16 16"
   }, props), _ref$r);
 }
@@ -692,21 +687,21 @@ function _extends$s() { _extends$s = Object.assign || function (target) { for (v
 
 var _ref$s =
 /*#__PURE__*/
-React__default.createElement("g", {
+React.createElement("g", {
   fill: "none",
   fillRule: "evenodd"
-}, React__default.createElement("path", {
+}, React.createElement("path", {
   className: "icon-error-filled_svg__fill",
   fill: "#E53157",
   d: "M10.281 4.18L1.77 17.85a1.87 1.87 0 00-.005 1.924c.353.597 1.01.968 1.724.976h17.024a2.024 2.024 0 001.724-.976 1.87 1.87 0 00-.005-1.924L13.719 4.18A2.028 2.028 0 0012 3.25a2.03 2.03 0 00-1.719.93z"
-}), React__default.createElement("path", {
+}), React.createElement("path", {
   fill: "#FFF",
   fillRule: "nonzero",
   d: "M11.125 12.875V8.5c0-1.167 1.75-1.167 1.75 0v4.375c0 1.167-1.75 1.167-1.75 0zm0 3.5c0-1.167 1.75-1.167 1.75 0s-1.75 1.167-1.75 0z"
 }));
 
 function SvgIconErrorFilled(props) {
-  return React__default.createElement("svg", _extends$s({
+  return React.createElement("svg", _extends$s({
     viewBox: "0 0 24 24"
   }, props), _ref$s);
 }
@@ -715,25 +710,25 @@ function _extends$t() { _extends$t = Object.assign || function (target) { for (v
 
 var _ref$t =
 /*#__PURE__*/
-React__default.createElement("g", {
+React.createElement("g", {
   className: "emoji-fail_svg__fill",
   fill: "none",
   fillRule: "evenodd"
-}, React__default.createElement("rect", {
+}, React.createElement("rect", {
   width: 26.526,
   height: 26.526,
   x: 0.737,
   y: 0.737,
   fill: "#FFF",
   rx: 4
-}), React__default.createElement("path", {
+}), React.createElement("path", {
   fill: "#000",
   fillOpacity: 0.12,
   d: "M14 23.456a9.457 9.457 0 11.001-18.913A9.457 9.457 0 0114 23.456zm0-1.72a7.736 7.736 0 100-15.473 7.737 7.737 0 000 15.474zm.714-6.005a.86.86 0 11-1.72 0v-.867a.86.86 0 01.588-.816 5.248 5.248 0 001.084-.544c.592-.395.907-.815.907-1.22a1.72 1.72 0 00-3.341-.574.86.86 0 11-1.622-.57 3.438 3.438 0 016.682 1.145c0 1.1-.651 1.969-1.672 2.65a6.81 6.81 0 01-.906.508v.288zm-1.72 2.425a.86.86 0 011.72 0v.142a.86.86 0 11-1.72 0V18.156z"
 }));
 
 function SvgEmojiFail(props) {
-  return React__default.createElement("svg", _extends$t({
+  return React.createElement("svg", _extends$t({
     viewBox: "0 0 28 28"
   }, props), _ref$t);
 }
@@ -742,7 +737,7 @@ function _extends$u() { _extends$u = Object.assign || function (target) { for (v
 
 var _ref$u =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-reactions-add_svg__fill",
   fillOpacity: 0.88,
   fillRule: "evenodd",
@@ -750,7 +745,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconReactionsAdd(props) {
-  return React__default.createElement("svg", _extends$u({
+  return React.createElement("svg", _extends$u({
     viewBox: "0 0 22 22"
   }, props), _ref$u);
 }
@@ -759,7 +754,7 @@ function _extends$v() { _extends$v = Object.assign || function (target) { for (v
 
 var _ref$v =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-emoji-reactions-add_svg__fill",
   fillOpacity: 0.38,
   fillRule: "evenodd",
@@ -767,7 +762,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconEmojiReactionsAdd(props) {
-  return React__default.createElement("svg", _extends$v({
+  return React.createElement("svg", _extends$v({
     viewBox: "0 0 20 20"
   }, props), _ref$v);
 }
@@ -776,7 +771,7 @@ function _extends$w() { _extends$w = Object.assign || function (target) { for (v
 
 var _ref$w =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-delivered_svg__fill",
   fillOpacity: 0.38,
   fillRule: "evenodd",
@@ -784,7 +779,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconDelivered(props) {
-  return React__default.createElement("svg", _extends$w({
+  return React.createElement("svg", _extends$w({
     viewBox: "0 0 24 24"
   }, props), _ref$w);
 }
@@ -793,14 +788,14 @@ function _extends$x() { _extends$x = Object.assign || function (target) { for (v
 
 var _ref$x =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-disconnected_svg__fill",
   fillRule: "evenodd",
   d: "M3.55 2.276l.093.081L10.9 9.615a.895.895 0 01.148.147l10.594 10.595a.91.91 0 01-1.193 1.367l-.093-.081-5.015-5.015a.913.913 0 01-.705-.15 4.545 4.545 0 00-5.265 0 .91.91 0 01-1.053-1.483 6.358 6.358 0 014.24-1.151l-2.529-2.53c-1.4.316-2.706.96-3.81 1.883a.91.91 0 01-1.167-1.394 10.854 10.854 0 013.504-1.962L6.445 7.728a13.518 13.518 0 00-3.461 2.226.909.909 0 01-1.204-1.362 15.38 15.38 0 013.299-2.229l-2.722-2.72A.91.91 0 013.55 2.276zm13.14 8.052c.812.397 1.572.894 2.262 1.479a.908.908 0 11-1.177 1.386 9.015 9.015 0 00-1.883-1.23.91.91 0 01.798-1.635zm5.53-1.737a.91.91 0 01-1.203 1.363A13.642 13.642 0 0010.9 6.588a.91.91 0 01-.146-1.813A15.457 15.457 0 0122.22 8.591z"
 });
 
 function SvgIconDisconnected(props) {
-  return React__default.createElement("svg", _extends$x({
+  return React.createElement("svg", _extends$x({
     viewBox: "0 0 24 24"
   }, props), _ref$x);
 }
@@ -809,7 +804,7 @@ function _extends$y() { _extends$y = Object.assign || function (target) { for (v
 
 var _ref$y =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-document_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -817,7 +812,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconDocument(props) {
-  return React__default.createElement("svg", _extends$y({
+  return React.createElement("svg", _extends$y({
     viewBox: "0 0 24 24"
   }, props), _ref$y);
 }
@@ -826,7 +821,7 @@ function _extends$z() { _extends$z = Object.assign || function (target) { for (v
 
 var _ref$z =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-download_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -834,7 +829,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconDownload(props) {
-  return React__default.createElement("svg", _extends$z({
+  return React.createElement("svg", _extends$z({
     viewBox: "0 0 24 24"
   }, props), _ref$z);
 }
@@ -843,21 +838,21 @@ function _extends$A() { _extends$A = Object.assign || function (target) { for (v
 
 var _ref$A =
 /*#__PURE__*/
-React__default.createElement("g", {
+React.createElement("g", {
   fill: "none",
   fillRule: "evenodd"
-}, React__default.createElement("rect", {
+}, React.createElement("rect", {
   fill: "#FFF",
   fillRule: "nonzero",
   rx: 10
-}), React__default.createElement("path", {
+}), React.createElement("path", {
   className: "icon-file-audio_svg__fill",
   fill: "#7B53EF",
   d: "M18.815 9.185c2.913 2.934 2.913 7.696 0 10.63a.617.617 0 01-.894-.013.67.67 0 01.012-.925 6.215 6.215 0 000-8.754.67.67 0 01-.012-.925.617.617 0 01.894-.013zm-5.291 0a.646.646 0 011.044.517v9.596c0 .544-.62.85-1.044.516l-3.31-2.702H7.646A.65.65 0 017 16.458v-3.916a.65.65 0 01.647-.654h2.566zm2.886 2.42a4.113 4.113 0 010 5.783.617.617 0 01-.893-.012.67.67 0 01.012-.925 2.772 2.772 0 000-3.908.67.67 0 01-.012-.925.617.617 0 01.893-.013z"
 }));
 
 function SvgIconFileAudio(props) {
-  return React__default.createElement("svg", _extends$A({
+  return React.createElement("svg", _extends$A({
     viewBox: "0 0 28 28"
   }, props), _ref$A);
 }
@@ -866,24 +861,24 @@ function _extends$B() { _extends$B = Object.assign || function (target) { for (v
 
 var _ref$B =
 /*#__PURE__*/
-React__default.createElement("g", {
+React.createElement("g", {
   fill: "none",
   fillRule: "evenodd"
-}, React__default.createElement("rect", {
+}, React.createElement("rect", {
   fill: "#FFF",
   fillRule: "nonzero",
   rx: 10
-}), React__default.createElement("path", {
+}), React.createElement("path", {
   className: "icon-file-document_svg__fill",
   fill: "#7B53EF",
   d: "M16.317 5.667H9.05C7.907 5.667 7 6.58 7 7.687v12.625c0 1.107.907 2.021 2.05 2.021h9.9c1.143 0 2.05-.914 2.05-2.02v-9.97a.673.673 0 00-.198-.473l-3.95-3.984a.753.753 0 00-.535-.22z"
-}), React__default.createElement("path", {
+}), React.createElement("path", {
   fill: "#FFF",
   d: "M17.025 16.667c.354 0 .642.302.642.675 0 .372-.288.675-.642.675h-6.383c-.355 0-.642-.303-.642-.675 0-.373.287-.675.642-.675zm0-2.667c.354 0 .642.302.642.675 0 .373-.288.675-.642.675h-6.383c-.355 0-.642-.302-.642-.675 0-.373.287-.675.642-.675zm-3.357-2.667c.369 0 .668.303.668.675 0 .373-.3.675-.668.675h-3a.672.672 0 01-.668-.675c0-.372.3-.675.668-.675z"
 }));
 
 function SvgIconFileDocument(props) {
-  return React__default.createElement("svg", _extends$B({
+  return React.createElement("svg", _extends$B({
     viewBox: "0 0 28 28"
   }, props), _ref$B);
 }
@@ -892,16 +887,16 @@ function _extends$C() { _extends$C = Object.assign || function (target) { for (v
 
 var _ref$C =
 /*#__PURE__*/
-React__default.createElement("g", {
+React.createElement("g", {
   fill: "none",
   fillRule: "evenodd"
-}, React__default.createElement("circle", {
+}, React.createElement("circle", {
   cx: 28,
   cy: 28,
   r: 28,
   fill: "#FFF",
   fillOpacity: 0.88
-}), React__default.createElement("path", {
+}), React.createElement("path", {
   className: "icon-gif_svg__fill",
   fill: "#000",
   fillOpacity: 0.55,
@@ -909,7 +904,7 @@ React__default.createElement("g", {
 }));
 
 function SvgIconGif(props) {
-  return React__default.createElement("svg", _extends$C({
+  return React.createElement("svg", _extends$C({
     viewBox: "0 0 56 56"
   }, props), _ref$C);
 }
@@ -918,7 +913,7 @@ function _extends$D() { _extends$D = Object.assign || function (target) { for (v
 
 var _ref$D =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-info_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -926,7 +921,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconInfo(props) {
-  return React__default.createElement("svg", _extends$D({
+  return React.createElement("svg", _extends$D({
     viewBox: "0 0 24 24"
   }, props), _ref$D);
 }
@@ -935,7 +930,7 @@ function _extends$E() { _extends$E = Object.assign || function (target) { for (v
 
 var _ref$E =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-leave_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -943,7 +938,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconLeave(props) {
-  return React__default.createElement("svg", _extends$E({
+  return React.createElement("svg", _extends$E({
     viewBox: "0 0 24 24"
   }, props), _ref$E);
 }
@@ -952,14 +947,14 @@ function _extends$F() { _extends$F = Object.assign || function (target) { for (v
 
 var _ref$F =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-members_svg__fill",
   fillRule: "evenodd",
   d: "M13 14a5 5 0 014.995 4.783L18 19v2a1 1 0 01-1.993.117L16 21v-2a3 3 0 00-2.824-2.995L13 16H5a3 3 0 00-2.995 2.824L2 19v2a1 1 0 01-1.993.117L0 21v-2a5 5 0 014.783-4.995L5 14h8zm7.25.162a5 5 0 013.745 4.611L24 19v2a1 1 0 01-1.993.117L22 21v-2a3 3 0 00-2.25-2.902 1 1 0 11.5-1.936zM9 2a5 5 0 110 10A5 5 0 019 2zm7.248.161a5 5 0 010 9.688 1 1 0 01-.496-1.938 3 3 0 000-5.812 1 1 0 11.496-1.938zM9 4a3 3 0 100 6 3 3 0 000-6z"
 });
 
 function SvgIconMembers(props) {
-  return React__default.createElement("svg", _extends$F({
+  return React.createElement("svg", _extends$F({
     viewBox: "0 0 24 24"
   }, props), _ref$F);
 }
@@ -968,7 +963,7 @@ function _extends$G() { _extends$G = Object.assign || function (target) { for (v
 
 var _ref$G =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-notifications_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -976,7 +971,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconNotifications(props) {
-  return React__default.createElement("svg", _extends$G({
+  return React.createElement("svg", _extends$G({
     viewBox: "0 0 24 24"
   }, props), _ref$G);
 }
@@ -985,14 +980,14 @@ function _extends$H() { _extends$H = Object.assign || function (target) { for (v
 
 var _ref$H =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-photo_svg__fill",
   fillRule: "evenodd",
   d: "M19 2a3 3 0 013 3v14a3 3 0 01-3 3H4.941v-.002l-.117-.003A3 3 0 012 19V5a3 3 0 013-3zm-3 9.415L7.414 20H19a1 1 0 00.993-.883L20 19v-3.585l-4-4zM19 4H5a1 1 0 00-1 1v14a1 1 0 00.65.937L15.292 9.293a1 1 0 011.32-.083l.094.083L20 12.585V5a1 1 0 00-.883-.993L19 4zM8.5 6a2.5 2.5 0 110 5 2.5 2.5 0 010-5zm0 2a.5.5 0 100 1 .5.5 0 000-1z"
 });
 
 function SvgIconPhoto(props) {
-  return React__default.createElement("svg", _extends$H({
+  return React.createElement("svg", _extends$H({
     viewBox: "0 0 24 24"
   }, props), _ref$H);
 }
@@ -1001,16 +996,16 @@ function _extends$I() { _extends$I = Object.assign || function (target) { for (v
 
 var _ref$I =
 /*#__PURE__*/
-React__default.createElement("g", {
+React.createElement("g", {
   fill: "none",
   fillRule: "evenodd"
-}, React__default.createElement("circle", {
+}, React.createElement("circle", {
   cx: 28,
   cy: 28,
   r: 28,
   fill: "#FFF",
   fillOpacity: 0.88
-}), React__default.createElement("path", {
+}), React.createElement("path", {
   className: "icon-play_svg__fill",
   fill: "#000",
   fillOpacity: 0.55,
@@ -1018,7 +1013,7 @@ React__default.createElement("g", {
 }));
 
 function SvgIconPlay(props) {
-  return React__default.createElement("svg", _extends$I({
+  return React.createElement("svg", _extends$I({
     viewBox: "0 0 56 56"
   }, props), _ref$I);
 }
@@ -1027,7 +1022,7 @@ function _extends$J() { _extends$J = Object.assign || function (target) { for (v
 
 var _ref$J =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-plus_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -1035,7 +1030,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconPlus(props) {
-  return React__default.createElement("svg", _extends$J({
+  return React.createElement("svg", _extends$J({
     viewBox: "0 0 24 24"
   }, props), _ref$J);
 }
@@ -1044,7 +1039,7 @@ function _extends$K() { _extends$K = Object.assign || function (target) { for (v
 
 var _ref$K =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-read_svg__fill",
   fill: "#2EBA9F",
   fillRule: "evenodd",
@@ -1052,7 +1047,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconRead(props) {
-  return React__default.createElement("svg", _extends$K({
+  return React.createElement("svg", _extends$K({
     viewBox: "0 0 24 24"
   }, props), _ref$K);
 }
@@ -1061,7 +1056,7 @@ function _extends$L() { _extends$L = Object.assign || function (target) { for (v
 
 var _ref$L =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-refresh_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -1069,7 +1064,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconRefresh(props) {
-  return React__default.createElement("svg", _extends$L({
+  return React.createElement("svg", _extends$L({
     width: 20,
     height: 20
   }, props), _ref$L);
@@ -1079,14 +1074,14 @@ function _extends$M() { _extends$M = Object.assign || function (target) { for (v
 
 var _ref$M =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-send_svg__fill",
   fillRule: "evenodd",
   d: "M20.554 10.117L2.52 1.024C1.613.619.605 1.428 1.008 2.337l2.115 5.685a2 2 0 001.545 1.275l10.345 1.73-10.345 1.728a2 2 0 00-1.545 1.275l-2.115 5.685c-.302.91.605 1.718 1.511 1.213l18.035-9.094c.706-.303.706-1.313 0-1.717z"
 });
 
 function SvgIconSend(props) {
-  return React__default.createElement("svg", _extends$M({
+  return React.createElement("svg", _extends$M({
     viewBox: "0 0 22 22"
   }, props), _ref$M);
 }
@@ -1095,7 +1090,7 @@ function _extends$N() { _extends$N = Object.assign || function (target) { for (v
 
 var _ref$N =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-sent_svg__fill",
   fillOpacity: 0.38,
   fillRule: "evenodd",
@@ -1103,7 +1098,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconSent(props) {
-  return React__default.createElement("svg", _extends$N({
+  return React.createElement("svg", _extends$N({
     viewBox: "0 0 24 24"
   }, props), _ref$N);
 }
@@ -1112,7 +1107,7 @@ function _extends$O() { _extends$O = Object.assign || function (target) { for (v
 
 var _ref$O =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-shevron_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -1120,7 +1115,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconShevron(props) {
-  return React__default.createElement("svg", _extends$O({
+  return React.createElement("svg", _extends$O({
     viewBox: "0 0 24 24"
   }, props), _ref$O);
 }
@@ -1129,7 +1124,7 @@ function _extends$P() { _extends$P = Object.assign || function (target) { for (v
 
 var _ref$P =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-shevron-down_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -1137,7 +1132,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconShevronDown(props) {
-  return React__default.createElement("svg", _extends$P({
+  return React.createElement("svg", _extends$P({
     viewBox: "0 0 24 24"
   }, props), _ref$P);
 }
@@ -1146,7 +1141,7 @@ function _extends$Q() { _extends$Q = Object.assign || function (target) { for (v
 
 var _ref$Q =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-spinner-small_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -1154,7 +1149,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconSpinnerSmall(props) {
-  return React__default.createElement("svg", _extends$Q({
+  return React.createElement("svg", _extends$Q({
     viewBox: "0 0 24 24"
   }, props), _ref$Q);
 }
@@ -1163,7 +1158,7 @@ function _extends$R() { _extends$R = Object.assign || function (target) { for (v
 
 var _ref$R =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-spinner-large_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -1171,7 +1166,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconSpinnerLarge(props) {
-  return React__default.createElement("svg", _extends$R({
+  return React.createElement("svg", _extends$R({
     viewBox: "0 0 48 48"
   }, props), _ref$R);
 }
@@ -1180,7 +1175,7 @@ function _extends$S() { _extends$S = Object.assign || function (target) { for (v
 
 var _ref$S =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-user_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -1188,7 +1183,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconUser(props) {
-  return React__default.createElement("svg", _extends$S({
+  return React.createElement("svg", _extends$S({
     viewBox: "0 0 24 24"
   }, props), _ref$S);
 }
@@ -1197,13 +1192,13 @@ function _extends$T() { _extends$T = Object.assign || function (target) { for (v
 
 var _ref$T =
 /*#__PURE__*/
-React__default.createElement("g", {
+React.createElement("g", {
   fill: "none",
   fillRule: "evenodd"
-}, React__default.createElement("path", {
+}, React.createElement("path", {
   className: "icon-operator_svg__stroke",
   d: "M2 6l5 4 5-7 5 7 5-4-3 14H5z"
-}), React__default.createElement("circle", {
+}), React.createElement("circle", {
   className: "icon-operator_svg__fill",
   cx: 12,
   cy: 14,
@@ -1211,7 +1206,7 @@ React__default.createElement("g", {
 }));
 
 function SvgIconOperator(props) {
-  return React__default.createElement("svg", _extends$T({
+  return React.createElement("svg", _extends$T({
     viewBox: "0 0 24 24"
   }, props), _ref$T);
 }
@@ -1220,7 +1215,7 @@ function _extends$U() { _extends$U = Object.assign || function (target) { for (v
 
 var _ref$U =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-banned_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -1228,7 +1223,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconBanned(props) {
-  return React__default.createElement("svg", _extends$U({
+  return React.createElement("svg", _extends$U({
     viewBox: "0 0 24 24"
   }, props), _ref$U);
 }
@@ -1237,7 +1232,7 @@ function _extends$V() { _extends$V = Object.assign || function (target) { for (v
 
 var _ref$V =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-muted_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -1245,7 +1240,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconMuted(props) {
-  return React__default.createElement("svg", _extends$V({
+  return React.createElement("svg", _extends$V({
     viewBox: "0 0 24 24"
   }, props), _ref$V);
 }
@@ -1254,7 +1249,7 @@ function _extends$W() { _extends$W = Object.assign || function (target) { for (v
 
 var _ref$W =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-muted-foreground_svg__fill",
   fill: "#FFF",
   fillOpacity: 0.88,
@@ -1263,7 +1258,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconMutedForeground(props) {
-  return React__default.createElement("svg", _extends$W({
+  return React.createElement("svg", _extends$W({
     viewBox: "0 0 16 16"
   }, props), _ref$W);
 }
@@ -1272,7 +1267,7 @@ function _extends$X() { _extends$X = Object.assign || function (target) { for (v
 
 var _ref$X =
 /*#__PURE__*/
-React__default.createElement("path", {
+React.createElement("path", {
   className: "icon-freeze_svg__fill",
   fill: "#7B53EF",
   fillRule: "evenodd",
@@ -1280,7 +1275,7 @@ React__default.createElement("path", {
 });
 
 function SvgIconFreeze(props) {
-  return React__default.createElement("svg", _extends$X({
+  return React.createElement("svg", _extends$X({
     viewBox: "0 0 24 24"
   }, props), _ref$X);
 }
@@ -1289,29 +1284,29 @@ function _extends$Y() { _extends$Y = Object.assign || function (target) { for (v
 
 var _ref$Y =
 /*#__PURE__*/
-React__default.createElement("g", {
+React.createElement("g", {
   className: "icon-toggleon_svg__fill",
   fill: "none",
   fillRule: "evenodd"
-}, React__default.createElement("rect", {
+}, React.createElement("rect", {
   width: 40,
   height: 20,
   x: 2,
   y: 2,
   fill: "#7B53EF",
   rx: 10
-}), React__default.createElement("circle", {
+}), React.createElement("circle", {
   cx: 32,
   cy: 12,
   r: 6,
   fill: "#FFF"
-}), React__default.createElement("path", {
+}), React.createElement("path", {
   fill: "#7B53EF",
   d: "M32 0H12C5.373 0 0 5.373 0 12s5.373 12 12 12h20c6.627 0 12-5.373 12-12S38.627 0 32 0zm0 2c5.523 0 10 4.477 10 10s-4.477 10-10 10H12C6.477 22 2 17.523 2 12S6.477 2 12 2h20z"
 }));
 
 function SvgIconToggleon(props) {
-  return React__default.createElement("svg", _extends$Y({
+  return React.createElement("svg", _extends$Y({
     viewBox: "0 0 44 24"
   }, props), _ref$Y);
 }
@@ -1320,32 +1315,32 @@ function _extends$Z() { _extends$Z = Object.assign || function (target) { for (v
 
 var _ref$Z =
 /*#__PURE__*/
-React__default.createElement("g", {
+React.createElement("g", {
   className: "icon-toggleoff_svg__fill",
   fill: "none",
   fillRule: "evenodd"
-}, React__default.createElement("rect", {
+}, React.createElement("rect", {
   width: 40,
   height: 20,
   x: 2,
   y: 2,
   fill: "#A8A8A8",
   rx: 10
-}), React__default.createElement("circle", {
+}), React.createElement("circle", {
   cx: 12,
   cy: 12,
   r: 6,
   fill: "#FFF"
-}), React__default.createElement("path", {
+}), React.createElement("path", {
   fill: "#A8A8A8",
   d: "M32 2c5.523 0 10 4.477 10 10s-4.477 10-10 10H12C6.477 22 2 17.523 2 12S6.477 2 12 2h20zm0 1H12a9 9 0 00-.265 17.996L12 21h20a9 9 0 00.265-17.996L32 3z"
-}), React__default.createElement("path", {
+}), React.createElement("path", {
   fill: "#FFF",
   d: "M32 0H12C5.373 0 0 5.373 0 12s5.373 12 12 12h20c6.627 0 12-5.373 12-12S38.627 0 32 0zm0 2c5.523 0 10 4.477 10 10s-4.477 10-10 10H12C6.477 22 2 17.523 2 12S6.477 2 12 2h20z"
 }));
 
 function SvgIconToggleoff(props) {
-  return React__default.createElement("svg", _extends$Z({
+  return React.createElement("svg", _extends$Z({
     viewBox: "0 0 44 24"
   }, props), _ref$Z);
 }
@@ -1404,190 +1399,190 @@ function changeColorToClassName(color) {
 function changeTypeToIconComponent(type) {
   switch (type) {
     case Type.ADD:
-      return React__default.createElement(SvgIconAdd, null);
+      return React.createElement(SvgIconAdd, null);
 
     case Type.ARROW_LEFT:
-      return React__default.createElement(SvgIconArrowLeft, null);
+      return React.createElement(SvgIconArrowLeft, null);
 
     case Type.CAMERA:
-      return React__default.createElement(SvgIconCamera, null);
+      return React.createElement(SvgIconCamera, null);
 
     case Type.ATTACH:
-      return React__default.createElement(SvgIconAttach, null);
+      return React.createElement(SvgIconAttach, null);
 
     case Type.AVATAR_DARK:
-      return React__default.createElement(SvgIconAvatarDark, null);
+      return React.createElement(SvgIconAvatarDark, null);
 
     case Type.AVATAR_LIGHT:
-      return React__default.createElement(SvgIconAvatarLight, null);
+      return React.createElement(SvgIconAvatarLight, null);
 
     case Type.AVATAR_NO_IMAGE:
-      return React__default.createElement(SvgAvatarNoImageLight, null);
+      return React.createElement(SvgAvatarNoImageLight, null);
 
     case Type.BROADCAST_LARGE_DARK:
-      return React__default.createElement(SvgIconBroadcastLrgDark, null);
+      return React.createElement(SvgIconBroadcastLrgDark, null);
 
     case Type.BROADCAST_LARGE_LIGHT:
-      return React__default.createElement(SvgIconBroadcastLrgLight, null);
+      return React.createElement(SvgIconBroadcastLrgLight, null);
 
     case Type.BROADCAST_DARK:
-      return React__default.createElement(SvgIconBroadcastDark, null);
+      return React.createElement(SvgIconBroadcastDark, null);
 
     case Type.BROADCAST_LIGHT:
-      return React__default.createElement(SvgIconBroadcastLight, null);
+      return React.createElement(SvgIconBroadcastLight, null);
 
     case Type.BROADCAST:
-      return React__default.createElement(SvgIconBroadcast, null);
+      return React.createElement(SvgIconBroadcast, null);
 
     case Type.FROZEN_DARK:
-      return React__default.createElement(SvgFrozenDark, null);
+      return React.createElement(SvgFrozenDark, null);
 
     case Type.FROZEN_LIGHT:
-      return React__default.createElement(SvgFrozenLight, null);
+      return React.createElement(SvgFrozenLight, null);
 
     case Type.MORE:
-      return React__default.createElement(SvgIconMore, null);
+      return React.createElement(SvgIconMore, null);
 
     case Type.MUTE:
-      return React__default.createElement(SvgIconMute, null);
+      return React.createElement(SvgIconMute, null);
 
     case Type.NO_THUMBNAIL:
-      return React__default.createElement(SvgIconNoThumbnail, null);
+      return React.createElement(SvgIconNoThumbnail, null);
 
     case Type.CHECKBOX:
-      return React__default.createElement(SvgIconCheckbox, null);
+      return React.createElement(SvgIconCheckbox, null);
 
     case Type.CHECKBOX_OFF:
-      return React__default.createElement(SvgIconCheckboxOff, null);
+      return React.createElement(SvgIconCheckboxOff, null);
 
     case Type.CLOSE:
-      return React__default.createElement(SvgIconClose, null);
+      return React.createElement(SvgIconClose, null);
 
     case Type.COPY:
-      return React__default.createElement(SvgIconCopy, null);
+      return React.createElement(SvgIconCopy, null);
 
     case Type.CHAT:
-      return React__default.createElement(SvgIconChat, null);
+      return React.createElement(SvgIconChat, null);
 
     case Type.SUPER_GROUP:
-      return React__default.createElement(SvgIconSupergroup, null);
+      return React.createElement(SvgIconSupergroup, null);
 
     case Type.CREATE:
-      return React__default.createElement(SvgIconCreate, null);
+      return React.createElement(SvgIconCreate, null);
 
     case Type.DELETE:
-      return React__default.createElement(SvgIconDelete, null);
+      return React.createElement(SvgIconDelete, null);
 
     case Type.DISCONNECTED:
-      return React__default.createElement(SvgIconDisconnected, null);
+      return React.createElement(SvgIconDisconnected, null);
 
     case Type.DUMMY:
-      return React__default.createElement(SvgIconDummy, null);
+      return React.createElement(SvgIconDummy, null);
 
     case Type.EDIT:
-      return React__default.createElement(SvgIconEdit, null);
+      return React.createElement(SvgIconEdit, null);
 
     case Type.ERROR:
-      return React__default.createElement(SvgIconError, null);
+      return React.createElement(SvgIconError, null);
 
     case Type.ERROR_FILLED:
-      return React__default.createElement(SvgIconErrorFilled, null);
+      return React.createElement(SvgIconErrorFilled, null);
 
     case Type.EMOJI_FAILED:
-      return React__default.createElement(SvgEmojiFail, null);
+      return React.createElement(SvgEmojiFail, null);
 
     case Type.EMOJI_REACTIONS_ADD:
-      return React__default.createElement(SvgIconReactionsAdd, null);
+      return React.createElement(SvgIconReactionsAdd, null);
 
     case Type.EMOJI_REACTIONS_ADD_GRAY:
-      return React__default.createElement(SvgIconEmojiReactionsAdd, null);
+      return React.createElement(SvgIconEmojiReactionsAdd, null);
 
     case Type.DELIVERED:
-      return React__default.createElement(SvgIconDelivered, null);
+      return React.createElement(SvgIconDelivered, null);
 
     case Type.DOCUMENT:
-      return React__default.createElement(SvgIconDocument, null);
+      return React.createElement(SvgIconDocument, null);
 
     case Type.DOWNLOAD:
-      return React__default.createElement(SvgIconDownload, null);
+      return React.createElement(SvgIconDownload, null);
 
     case Type.FILE_AUDIO:
-      return React__default.createElement(SvgIconFileAudio, null);
+      return React.createElement(SvgIconFileAudio, null);
 
     case Type.FILE_DOCUMENT:
-      return React__default.createElement(SvgIconFileDocument, null);
+      return React.createElement(SvgIconFileDocument, null);
 
     case Type.GIF:
-      return React__default.createElement(SvgIconGif, null);
+      return React.createElement(SvgIconGif, null);
 
     case Type.INFO:
-      return React__default.createElement(SvgIconInfo, null);
+      return React.createElement(SvgIconInfo, null);
 
     case Type.LEAVE:
-      return React__default.createElement(SvgIconLeave, null);
+      return React.createElement(SvgIconLeave, null);
 
     case Type.MEMBERS:
-      return React__default.createElement(SvgIconMembers, null);
+      return React.createElement(SvgIconMembers, null);
 
     case Type.NOTIFICATIONS:
-      return React__default.createElement(SvgIconNotifications, null);
+      return React.createElement(SvgIconNotifications, null);
 
     case Type.PHOTO:
-      return React__default.createElement(SvgIconPhoto, null);
+      return React.createElement(SvgIconPhoto, null);
 
     case Type.PLAY:
-      return React__default.createElement(SvgIconPlay, null);
+      return React.createElement(SvgIconPlay, null);
 
     case Type.PLUS:
-      return React__default.createElement(SvgIconPlus, null);
+      return React.createElement(SvgIconPlus, null);
 
     case Type.READ:
-      return React__default.createElement(SvgIconRead, null);
+      return React.createElement(SvgIconRead, null);
 
     case Type.REFRESH:
-      return React__default.createElement(SvgIconRefresh, null);
+      return React.createElement(SvgIconRefresh, null);
 
     case Type.SEND:
-      return React__default.createElement(SvgIconSend, null);
+      return React.createElement(SvgIconSend, null);
 
     case Type.SENT:
-      return React__default.createElement(SvgIconSent, null);
+      return React.createElement(SvgIconSent, null);
 
     case Type.SHEVRON:
-      return React__default.createElement(SvgIconShevron, null);
+      return React.createElement(SvgIconShevron, null);
 
     case Type.SHEVRON_DOWN:
-      return React__default.createElement(SvgIconShevronDown, null);
+      return React.createElement(SvgIconShevronDown, null);
 
     case Type.SPINNER:
-      return React__default.createElement(SvgIconSpinnerSmall, null);
+      return React.createElement(SvgIconSpinnerSmall, null);
 
     case Type.SPINNER_LARGE:
-      return React__default.createElement(SvgIconSpinnerLarge, null);
+      return React.createElement(SvgIconSpinnerLarge, null);
 
     case Type.USER:
-      return React__default.createElement(SvgIconUser, null);
+      return React.createElement(SvgIconUser, null);
 
     case Type.ICON_OPERATOR:
-      return React__default.createElement(SvgIconOperator, null);
+      return React.createElement(SvgIconOperator, null);
 
     case Type.ICON_BANNED:
-      return React__default.createElement(SvgIconBanned, null);
+      return React.createElement(SvgIconBanned, null);
 
     case Type.ICON_MUTED:
-      return React__default.createElement(SvgIconMuted, null);
+      return React.createElement(SvgIconMuted, null);
 
     case Type.ICON_MUTED_FG:
-      return React__default.createElement(SvgIconMutedForeground, null);
+      return React.createElement(SvgIconMutedForeground, null);
 
     case Type.ICON_FREEZE:
-      return React__default.createElement(SvgIconFreeze, null);
+      return React.createElement(SvgIconFreeze, null);
 
     case Type.TOGGLE_ON:
-      return React__default.createElement(SvgIconToggleon, null);
+      return React.createElement(SvgIconToggleon, null);
 
     case Type.TOGGLE_OFF:
-      return React__default.createElement(SvgIconToggleoff, null);
+      return React.createElement(SvgIconToggleoff, null);
 
     default:
       return null;
@@ -1609,12 +1604,12 @@ function Icon(_ref) {
     minHeight: typeof height === 'string' ? height : "".concat(height, "px")
   };
   var injectingClassName = Array.isArray(className) ? className : [className];
-  return React__default.createElement("div", {
+  return React.createElement("div", {
     onClick: onClick,
     onKeyDown: onClick,
     role: "button",
     tabIndex: "0",
-    className: [].concat(LocalizationContext._toConsumableArray(injectingClassName), ['sendbird-icon', changeColorToClassName(fillColor)]).join(' '),
+    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-icon', changeColorToClassName(fillColor)]).join(' '),
     style: iconStyle
   }, children || changeTypeToIconComponent(type));
 }
@@ -1644,12 +1639,12 @@ var defaultComponent = function defaultComponent(_a) {
   var width = _a.width,
       height = _a.height;
   return function () {
-    return document.querySelector('.sendbird-theme--dark') ? React__default.createElement(Icon, {
+    return document.querySelector('.sendbird-theme--dark') ? React.createElement(Icon, {
       className: imageRendererClassName,
       type: IconTypes.AVATAR_DARK,
       width: width,
       height: height
-    }) : React__default.createElement(Icon, {
+    }) : React.createElement(Icon, {
       className: imageRendererClassName,
       type: IconTypes.AVATAR_LIGHT,
       width: width,
@@ -1667,7 +1662,7 @@ var AvatarInner = function AvatarInner(_a) {
       width = _a.width;
 
   if (typeof src === 'string') {
-    return React__default.createElement(ImageRenderer, {
+    return React.createElement(ImageRenderer, {
       className: imageRendererClassName,
       url: src,
       height: height,
@@ -1682,7 +1677,7 @@ var AvatarInner = function AvatarInner(_a) {
 
   if (src && src.length) {
     if (src.length === 1) {
-      return React__default.createElement(ImageRenderer, {
+      return React.createElement(ImageRenderer, {
         className: imageRendererClassName,
         url: src[0],
         height: height,
@@ -1696,9 +1691,9 @@ var AvatarInner = function AvatarInner(_a) {
     }
 
     if (src.length === 2) {
-      return React__default.createElement("div", {
+      return React.createElement("div", {
         className: "sendbird-avatar--inner__two-child"
-      }, React__default.createElement(ImageRenderer, {
+      }, React.createElement(ImageRenderer, {
         className: imageRendererClassName,
         url: src[0],
         height: height,
@@ -1708,7 +1703,7 @@ var AvatarInner = function AvatarInner(_a) {
           height: height,
           width: width
         })
-      }), React__default.createElement(ImageRenderer, {
+      }), React.createElement(ImageRenderer, {
         className: imageRendererClassName,
         url: src[1],
         height: height,
@@ -1722,9 +1717,9 @@ var AvatarInner = function AvatarInner(_a) {
     }
 
     if (src.length === 3) {
-      return React__default.createElement(React__default.Fragment, null, React__default.createElement("div", {
+      return React.createElement(React.Fragment, null, React.createElement("div", {
         className: "sendbird-avatar--inner__three-child--upper"
-      }, React__default.createElement(ImageRenderer, {
+      }, React.createElement(ImageRenderer, {
         className: imageRendererClassName,
         url: src[0],
         height: height,
@@ -1734,9 +1729,9 @@ var AvatarInner = function AvatarInner(_a) {
           height: height,
           width: width
         })
-      })), React__default.createElement("div", {
+      })), React.createElement("div", {
         className: "sendbird-avatar--inner__three-child--lower"
-      }, React__default.createElement(ImageRenderer, {
+      }, React.createElement(ImageRenderer, {
         className: imageRendererClassName,
         url: src[1],
         height: height,
@@ -1746,7 +1741,7 @@ var AvatarInner = function AvatarInner(_a) {
           height: height,
           width: width
         })
-      }), React__default.createElement(ImageRenderer, {
+      }), React.createElement(ImageRenderer, {
         className: imageRendererClassName,
         url: src[2],
         height: height,
@@ -1759,16 +1754,16 @@ var AvatarInner = function AvatarInner(_a) {
       })));
     }
 
-    return React__default.createElement("div", {
+    return React.createElement("div", {
       className: "sendbird-avatar--inner__four-child"
     }, src.slice(0, 4).map(function (i) {
-      return React__default.createElement(ImageRenderer, {
+      return React.createElement(ImageRenderer, {
         className: imageRendererClassName,
         url: i,
         height: height,
         width: width,
         alt: alt,
-        key: LocalizationContext.uuidv4(),
+        key: uuidv4(),
         defaultComponent: defaultComponent({
           height: height,
           width: width
@@ -1778,7 +1773,7 @@ var AvatarInner = function AvatarInner(_a) {
   } // default img
 
 
-  return React__default.createElement(ImageRenderer, {
+  return React.createElement(ImageRenderer, {
     className: imageRendererClassName,
     url: "",
     height: height,
@@ -1804,8 +1799,8 @@ function Avatar(_a, ref) {
       _f = _a.className,
       className = _f === void 0 ? '' : _f;
   var injectingClassName = Array.isArray(className) ? className : [className];
-  return React__default.createElement("div", {
-    className: LocalizationContext.__spreadArrays(injectingClassName, ['sendbird-avatar']).join(' '),
+  return React.createElement("div", {
+    className: __spreadArrays(injectingClassName, ['sendbird-avatar']).join(' '),
     ref: ref,
     style: {
       height: height,
@@ -1815,7 +1810,7 @@ function Avatar(_a, ref) {
     role: "button",
     tabIndex: 0,
     onKeyDown: onClick
-  }, React__default.createElement(AvatarInner, {
+  }, React.createElement(AvatarInner, {
     src: src,
     height: height,
     width: width,
@@ -1823,7 +1818,7 @@ function Avatar(_a, ref) {
   }));
 }
 
-var Avatar$1 = React__default.forwardRef(Avatar);
+var Avatar$1 = React.forwardRef(Avatar);
 
 var Typography = {
   H_1: 'H_1',
@@ -1926,7 +1921,7 @@ function Label(_ref) {
       color = _ref.color,
       children = _ref.children,
       className = _ref.className;
-  var injectingClassName = Array.isArray(className) ? [CLASS_NAME].concat(LocalizationContext._toConsumableArray(className)) : [CLASS_NAME, className];
+  var injectingClassName = Array.isArray(className) ? [CLASS_NAME].concat(_toConsumableArray(className)) : [CLASS_NAME, className];
 
   if (type) {
     injectingClassName.push(changeTypographyToClassName(type));
@@ -1936,13 +1931,13 @@ function Label(_ref) {
     injectingClassName.push(changeColorToClassName$1(color));
   }
 
-  return React__default.createElement("span", {
+  return React.createElement("span", {
     className: injectingClassName.join(' ')
   }, children);
 }
 Label.propTypes = {
-  type: PropTypes.oneOf([].concat(LocalizationContext._toConsumableArray(Object.keys(Typography)), [''])),
-  color: PropTypes.oneOf([].concat(LocalizationContext._toConsumableArray(Object.keys(Colors$1)), [''])),
+  type: PropTypes.oneOf([].concat(_toConsumableArray(Object.keys(Typography)), [''])),
+  color: PropTypes.oneOf([].concat(_toConsumableArray(Object.keys(Colors$1)), [''])),
   children: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.element, PropTypes.any]),
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
 };
@@ -1954,10 +1949,10 @@ Label.defaultProps = {
 };
 var LabelTypography = Typography;
 var LabelColors = Colors$1;
-var LabelStringSet = LocalizationContext.getStringSet('en');
+var LabelStringSet = getStringSet('en');
 
 var CLASS_NAME$1 = 'sendbird-iconbutton';
-var IconButton = React__default.forwardRef(function (props, ref) {
+var IconButton = React.forwardRef(function (props, ref) {
   var children = props.children,
       className = props.className,
       _props$disabled = props.disabled,
@@ -1969,20 +1964,20 @@ var IconButton = React__default.forwardRef(function (props, ref) {
       _onBlur = props.onBlur,
       style = props.style;
 
-  var _useState = React.useState(''),
-      _useState2 = LocalizationContext._slicedToArray(_useState, 2),
+  var _useState = useState(''),
+      _useState2 = _slicedToArray(_useState, 2),
       pressed = _useState2[0],
       setPressed = _useState2[1];
 
   var injectingClassName = Array.isArray(className) ? className : [className];
   injectingClassName.unshift(CLASS_NAME$1);
   return (// eslint-disable-next-line react/button-has-type
-    React__default.createElement("button", {
+    React.createElement("button", {
       className: "".concat(injectingClassName.join(' '), " ").concat(pressed),
       disabled: disabled,
       ref: ref,
       type: type,
-      style: LocalizationContext._objectSpread2({}, style, {
+      style: _objectSpread2({}, style, {
         height: height,
         width: width
       }),
@@ -2000,7 +1995,7 @@ var IconButton = React__default.forwardRef(function (props, ref) {
 
         _onBlur(e);
       }
-    }, React__default.createElement("span", {
+    }, React.createElement("span", {
       className: "sendbird-iconbutton__inner"
     }, children))
   );
@@ -2079,13 +2074,13 @@ function Button(_ref) {
       disabled = _ref.disabled,
       onClick = _ref.onClick,
       className = _ref.className;
-  var injectingClassNames = ['sendbird-button', disabled ? 'sendbird-button__disabled' : '', changeTypeToClassName(type), changeSizeToClassName(size)].concat(LocalizationContext._toConsumableArray(Array.isArray(className) ? className : [className])).join(' ');
-  return React__default.createElement("button", {
+  var injectingClassNames = ['sendbird-button', disabled ? 'sendbird-button__disabled' : '', changeTypeToClassName(type), changeSizeToClassName(size)].concat(_toConsumableArray(Array.isArray(className) ? className : [className])).join(' ');
+  return React.createElement("button", {
     type: "button",
     className: injectingClassNames,
     onClick: onClick,
     disabled: disabled
-  }, React__default.createElement(Label, {
+  }, React.createElement(Label, {
     className: "sendbird-button__text",
     type: LabelTypography.BUTTON_1,
     color: LabelColors.ONCONTENT_1
@@ -2110,9 +2105,9 @@ Button.defaultProps = {
 
 var ModalHeader = function ModalHeader(_ref) {
   var titleText = _ref.titleText;
-  return React__default.createElement("div", {
+  return React.createElement("div", {
     className: "sendbird-modal-header"
-  }, React__default.createElement(Label, {
+  }, React.createElement(Label, {
     type: LabelTypography.H_1,
     color: LabelColors.ONBACKGROUND_1
   }, titleText));
@@ -2122,7 +2117,7 @@ ModalHeader.propTypes = {
 };
 var ModalBody = function ModalBody(_ref2) {
   var children = _ref2.children;
-  return React__default.createElement("div", {
+  return React.createElement("div", {
     className: "sendbird-modal-body"
   }, children);
 };
@@ -2140,18 +2135,18 @@ var ModalFooter = function ModalFooter(_ref3) {
       submitText = _ref3.submitText,
       type = _ref3.type;
 
-  var _useContext = React.useContext(LocalizationContext.LocalizationContext),
+  var _useContext = useContext(LocalizationContext),
       stringSet = _useContext.stringSet;
 
-  return React__default.createElement("div", {
+  return React.createElement("div", {
     className: "sendbird-modal-footer"
-  }, React__default.createElement(Button, {
+  }, React.createElement(Button, {
     type: Type$1.SECONDARY,
     onClick: onCancel
-  }, React__default.createElement(Label, {
+  }, React.createElement(Label, {
     type: LabelTypography.BUTTON_1,
     color: LabelColors.ONBACKGROUND_1
-  }, stringSet.BUTTON__CANCEL)), React__default.createElement(Button, {
+  }, stringSet.BUTTON__CANCEL)), React.createElement(Button, {
     type: type,
     disabled: disabled,
     onClick: onSubmit
@@ -2178,30 +2173,30 @@ function Modal(props) {
       titleText = props.titleText,
       hideFooter = props.hideFooter,
       type = props.type;
-  return reactDom.createPortal(React__default.createElement("div", {
+  return createPortal(React.createElement("div", {
     className: "sendbird-modal"
-  }, React__default.createElement("div", {
+  }, React.createElement("div", {
     className: "sendbird-modal-content"
-  }, React__default.createElement(ModalHeader, {
+  }, React.createElement(ModalHeader, {
     titleText: titleText
-  }), React__default.createElement(ModalBody, null, children), !hideFooter && React__default.createElement(ModalFooter, {
+  }), React.createElement(ModalBody, null, children), !hideFooter && React.createElement(ModalFooter, {
     disabled: disabled,
     onCancel: onCancel,
     onSubmit: onSubmit,
     submitText: submitText,
     type: type
-  }), React__default.createElement("div", {
+  }), React.createElement("div", {
     className: "sendbird-modal-close"
-  }, React__default.createElement(IconButton, {
+  }, React.createElement(IconButton, {
     width: "32px",
     height: "32px",
     onClick: onCancel
-  }, React__default.createElement(Icon, {
+  }, React.createElement(Icon, {
     type: IconTypes.CLOSE,
     fillColor: IconColors.SECONDARY,
     width: "24px",
     height: "24px"
-  })))), React__default.createElement("div", {
+  })))), React.createElement("div", {
     className: "sendbird-modal-backdrop"
   })), document.getElementById(MODAL_ROOT));
 }
@@ -2266,10 +2261,10 @@ function TextButton(_ref) {
       onClick = _ref.onClick,
       notUnderline = _ref.notUnderline;
   var injectingClassName = Array.isArray(className) ? className : [className];
-  return React__default.createElement("div", {
+  return React.createElement("div", {
     role: "button",
     tabIndex: 0,
-    className: [].concat(LocalizationContext._toConsumableArray(injectingClassName), [changeColorToClassName$2(color), notUnderline ? 'sendbird-textbutton--not-underline' : 'sendbird-textbutton', disabled ? 'sendbird-textbutton--disabled' : '']).join(' '),
+    className: [].concat(_toConsumableArray(injectingClassName), [changeColorToClassName$2(color), notUnderline ? 'sendbird-textbutton--not-underline' : 'sendbird-textbutton', disabled ? 'sendbird-textbutton--disabled' : '']).join(' '),
     onClick: onClick,
     onKeyPress: onClick
   }, children);
@@ -2691,6 +2686,315 @@ var getUnFreezeChannel = function getUnFreezeChannel(store) {
     });
   };
 };
+
+var getCreateOpenChannel = function getCreateOpenChannel(store) {
+  return function (params) {
+    var sdk = getSdk(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.OpenChannel.createChannel(params).then(function (channel) {
+        resolve(channel);
+      }).catch(reject);
+    });
+  };
+};
+
+var enterOpenChannel = function enterOpenChannel(store) {
+  return function (channelUrl) {
+    var sdk = getSdk(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.OpenChannel.getChannel(channelUrl, function (openChannel, error) {
+        if (error) {
+          reject(new Error(error));
+          return;
+        }
+
+        openChannel.enter(function (response, enterError) {
+          if (error) {
+            reject(new Error(enterError));
+            return;
+          }
+
+          resolve(response);
+        });
+      });
+    });
+  };
+};
+
+var exitOpenChannel = function exitOpenChannel(store) {
+  return function (channelUrl) {
+    var sdk = getSdk(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.OpenChannel.getChannel(channelUrl, function (openChannel, error) {
+        if (error) {
+          reject(new Error(error));
+          return;
+        }
+
+        openChannel.exit(function (response, exitError) {
+          if (error) {
+            reject(new Error(exitError));
+            return;
+          }
+
+          resolve(response);
+        });
+      });
+    });
+  };
+};
+
+var getOpenChannelSendUserMessage = function getOpenChannelSendUserMessage(store) {
+  return function (channelUrl, userMessageParams) {
+    var sdk = getSdk(store);
+    var pubsub = getPubSub(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.OpenChannel.getChannel(channelUrl).then(function (channel) {
+        var promisify = function promisify() {
+          var pendingMsg = null;
+          var pendingPromise = new Promise(function (resolve_, reject_) {
+            pendingMsg = channel.sendUserMessage(userMessageParams, function (res, err) {
+              var swapParams = sdk.getErrorFirstCallback();
+              var message = res;
+              var error = err;
+
+              if (swapParams) {
+                message = err;
+                error = res;
+              }
+
+              if (error) {
+                reject_(error);
+                return;
+              }
+
+              resolve_(message);
+              pubsub.publish(SEND_USER_MESSAGE, {
+                message: message,
+                channel: channel
+              });
+            });
+            pubsub.publish(SEND_MESSAGE_START, {
+              message: pendingMsg,
+              channel: channel
+            });
+          });
+
+          pendingPromise.get = function () {
+            return pendingMsg;
+          };
+
+          return pendingPromise;
+        };
+
+        resolve(promisify());
+      }).catch(reject);
+    });
+  };
+};
+
+var getOpenChannelSendFileMessage = function getOpenChannelSendFileMessage(store) {
+  return function (channelUrl, fileMessageParams) {
+    var sdk = getSdk(store);
+    var pubsub = getPubSub(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.OpenChannel.getChannel(channelUrl).then(function (channel) {
+        var promisify = function promisify() {
+          var pendingMsg = null;
+          var pendingPromise = new Promise(function (resolve_, reject_) {
+            pendingMsg = channel.sendFileMessage(fileMessageParams, function (res, err) {
+              var swapParams = sdk.getErrorFirstCallback();
+              var message = res;
+              var error = err;
+
+              if (swapParams) {
+                message = err;
+                error = res;
+              }
+
+              if (error) {
+                reject_(error);
+                return;
+              }
+
+              resolve_(message);
+              pubsub.publish(SEND_FILE_MESSAGE, {
+                message: message,
+                channel: channel
+              });
+            });
+          });
+
+          if (fileMessageParams.file) {
+            // keep the file's local version in pendingMsg.localUrl
+            // because promise doesnt allow overriding of pendingMsg.url
+            // eslint-disable-next-line no-param-reassign
+            pendingMsg.localUrl = URL.createObjectURL(fileMessageParams.file);
+          }
+
+          if (fileMessageParams.fileUrl) {
+            // eslint-disable-next-line no-param-reassign
+            pendingMsg.localUrl = fileMessageParams.fileUrl;
+          } // eslint-disable-next-line no-param-reassign
+
+
+          pendingMsg.requestState = 'pending';
+          pubsub.publish(SEND_MESSAGE_START, {
+            message: pendingMsg,
+            channel: channel
+          });
+
+          pendingPromise.get = function () {
+            return pendingMsg;
+          };
+
+          return pendingPromise;
+        };
+
+        resolve(promisify());
+      }).catch(reject);
+    });
+  };
+};
+
+var getOpenChannelUpdateUserMessage = function getOpenChannelUpdateUserMessage(store) {
+  return function (channelUrl, messageId, params) {
+    var sdk = getSdk(store);
+    var pubsub = getPubSub(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.OpenChannel.getChannel(channelUrl).then(function (channel) {
+        channel.updateUserMessage(messageId, params, function (res, err) {
+          var swapParams = sdk.getErrorFirstCallback();
+          var message = res;
+          var error = err;
+
+          if (swapParams) {
+            message = err;
+            error = res;
+          }
+
+          if (error) {
+            reject(error);
+            return;
+          }
+
+          resolve(message);
+          pubsub.publish(UPDATE_USER_MESSAGE, {
+            message: message,
+            channel: channel,
+            // workaround for updating channelPreview on message-edit
+            // https://sendbird.atlassian.net/browse/UIKIT-268
+            fromSelector: true
+          });
+        });
+      }).catch(reject);
+    });
+  };
+};
+
+var getOpenChannelDeleteMessage = function getOpenChannelDeleteMessage(store) {
+  return function (channelUrl, message) {
+    var sdk = getSdk(store);
+    var pubsub = getPubSub(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.GroupChannel.getChannel(channelUrl).then(function (channel) {
+        var messageId = message.messageId;
+        channel.deleteMessage(message, function (res, err) {
+          var swapParams = sdk.getErrorFirstCallback();
+          var error = err;
+
+          if (swapParams) {
+            error = res;
+          }
+
+          if (error) {
+            reject(error);
+            return;
+          }
+
+          resolve(message);
+          pubsub.publish(DELETE_MESSAGE, {
+            messageId: messageId,
+            channel: channel
+          });
+        });
+      }).catch(reject);
+    });
+  };
+};
+
+var getOpenChannelResendUserMessage = function getOpenChannelResendUserMessage(store) {
+  return function (channelUrl, failedMessage) {
+    var sdk = getSdk(store);
+    var pubsub = getPubSub(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.OpenChannel.getChannel(channelUrl).then(function (channel) {
+        channel.resendUserMessage(failedMessage).then(function (message) {
+          resolve(message);
+          pubsub.publish(SEND_USER_MESSAGE, {
+            message: message,
+            channel: channel
+          });
+        }).catch(reject);
+      }).catch(reject);
+    });
+  };
+};
+
+var getOpenChannelResendFileMessage = function getOpenChannelResendFileMessage(store) {
+  return function (channelUrl, failedMessage) {
+    var sdk = getSdk(store);
+    var pubsub = getPubSub(store);
+    return new Promise(function (resolve, reject) {
+      if (!sdk) {
+        reject(new Error('Sdk not found'));
+      }
+
+      sdk.OpenChannel.getChannel(channelUrl).then(function (channel) {
+        channel.resendFileMessage(failedMessage).then(function (message) {
+          resolve(message);
+          pubsub.publish(SEND_FILE_MESSAGE, {
+            message: message,
+            channel: channel
+          });
+        }).catch(reject);
+      }).catch(reject);
+    });
+  };
+};
+
 var selectors = {
   getSdk: getSdk,
   getConnect: getConnect,
@@ -2705,7 +3009,16 @@ var selectors = {
   getFreezeChannel: getFreezeChannel,
   getUnFreezeChannel: getUnFreezeChannel,
   getCreateChannel: getCreateChannel,
-  getLeaveChannel: getLeaveChannel
+  getLeaveChannel: getLeaveChannel,
+  getCreateOpenChannel: getCreateOpenChannel,
+  enterOpenChannel: enterOpenChannel,
+  exitOpenChannel: exitOpenChannel,
+  getOpenChannelSendUserMessage: getOpenChannelSendUserMessage,
+  getOpenChannelSendFileMessage: getOpenChannelSendFileMessage,
+  getOpenChannelUpdateUserMessage: getOpenChannelUpdateUserMessage,
+  getOpenChannelDeleteMessage: getOpenChannelDeleteMessage,
+  getOpenChannelResendUserMessage: getOpenChannelResendUserMessage,
+  getOpenChannelResendFileMessage: getOpenChannelResendFileMessage
 };
 
 function UserProfile(_a) {
@@ -2717,23 +3030,23 @@ function UserProfile(_a) {
       disableMessaging = _b === void 0 ? false : _b,
       createChannel = _a.createChannel,
       onSuccess = _a.onSuccess;
-  var stringSet = React.useContext(LocalizationContext.LocalizationContext).stringSet;
-  return React__default.createElement("div", {
+  var stringSet = useContext(LocalizationContext).stringSet;
+  return React.createElement("div", {
     className: "sendbird__user-profile"
-  }, React__default.createElement("section", {
+  }, React.createElement("section", {
     className: "sendbird__user-profile-avatar"
-  }, React__default.createElement(Avatar$1, {
+  }, React.createElement(Avatar$1, {
     height: "80px",
     width: "80px",
     src: user.profileUrl
-  })), React__default.createElement("section", {
+  })), React.createElement("section", {
     className: "sendbird__user-profile-name"
-  }, React__default.createElement(Label, {
+  }, React.createElement(Label, {
     type: LabelTypography.H_2,
     color: LabelColors.ONBACKGROUND_1
-  }, user.nickname || stringSet.NO_NAME)), user.userId !== currentUserId && !disableMessaging && React__default.createElement("section", {
+  }, user.nickname || stringSet.NO_NAME)), user.userId !== currentUserId && !disableMessaging && React.createElement("section", {
     className: "sendbird__user-profile-message"
-  }, React__default.createElement(Button, {
+  }, React.createElement(Button, {
     type: Type$1.SECONDARY,
     onClick: function onClick() {
       var params = new sdk.GroupChannelParams();
@@ -2744,15 +3057,15 @@ function UserProfile(_a) {
         logger.info('UserProfile, channel create', groupChannel);
       });
     }
-  }, stringSet.USER_PROFILE__MESSAGE)), React__default.createElement("div", {
+  }, stringSet.USER_PROFILE__MESSAGE)), React.createElement("div", {
     className: "sendbird__user-profile-seperator"
-  }), React__default.createElement("section", {
+  }), React.createElement("section", {
     className: "sendbird__user-profile-userId"
-  }, React__default.createElement(Label, {
+  }, React.createElement(Label, {
     className: "sendbird__user-profile-userId--label",
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
-  }, stringSet.USER_PROFILE__USER_ID), React__default.createElement(Label, {
+  }, stringSet.USER_PROFILE__USER_ID), React.createElement(Label, {
     className: "sendbird__user-profile-userId--value",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
@@ -2768,21 +3081,21 @@ var mapStoreToProps = function mapStoreToProps(store) {
   };
 };
 
-var ConnectedUserProfile = LocalizationContext.withSendbirdContext(UserProfile, mapStoreToProps);
+var ConnectedUserProfile = withSendbirdContext(UserProfile, mapStoreToProps);
 
 var MenuItems =
 /*#__PURE__*/
 function (_Component) {
-  LocalizationContext._inherits(MenuItems, _Component);
+  _inherits(MenuItems, _Component);
 
   function MenuItems(props) {
     var _this;
 
-    LocalizationContext._classCallCheck(this, MenuItems);
+    _classCallCheck(this, MenuItems);
 
-    _this = LocalizationContext._possibleConstructorReturn(this, LocalizationContext._getPrototypeOf(MenuItems).call(this, props));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(MenuItems).call(this, props));
 
-    LocalizationContext._defineProperty(LocalizationContext._assertThisInitialized(_this), "showParent", function () {
+    _defineProperty(_assertThisInitialized(_this), "showParent", function () {
       var _this$props$parentCon = _this.props.parentContainRef,
           parentContainRef = _this$props$parentCon === void 0 ? {} : _this$props$parentCon;
       var current = parentContainRef.current;
@@ -2792,7 +3105,7 @@ function (_Component) {
       }
     });
 
-    LocalizationContext._defineProperty(LocalizationContext._assertThisInitialized(_this), "hideParent", function () {
+    _defineProperty(_assertThisInitialized(_this), "hideParent", function () {
       var _this$props$parentCon2 = _this.props.parentContainRef,
           parentContainRef = _this$props$parentCon2 === void 0 ? {} : _this$props$parentCon2;
       var current = parentContainRef.current;
@@ -2802,10 +3115,10 @@ function (_Component) {
       }
     });
 
-    LocalizationContext._defineProperty(LocalizationContext._assertThisInitialized(_this), "setupEvents", function () {
+    _defineProperty(_assertThisInitialized(_this), "setupEvents", function () {
       var closeDropdown = _this.props.closeDropdown;
 
-      var _assertThisInitialize = LocalizationContext._assertThisInitialized(_this),
+      var _assertThisInitialize = _assertThisInitialized(_this),
           menuRef = _assertThisInitialize.menuRef;
 
       var handleClickOutside = function handleClickOutside(event) {
@@ -2821,12 +3134,12 @@ function (_Component) {
       document.addEventListener('mousedown', handleClickOutside);
     });
 
-    LocalizationContext._defineProperty(LocalizationContext._assertThisInitialized(_this), "cleanUpEvents", function () {
+    _defineProperty(_assertThisInitialized(_this), "cleanUpEvents", function () {
       var handleClickOutside = _this.state.handleClickOutside;
       document.removeEventListener('mousedown', handleClickOutside);
     });
 
-    LocalizationContext._defineProperty(LocalizationContext._assertThisInitialized(_this), "getMenuPosition", function () {
+    _defineProperty(_assertThisInitialized(_this), "getMenuPosition", function () {
       var _this$props = _this.props,
           parentRef = _this$props.parentRef,
           openLeft = _this$props.openLeft;
@@ -2873,7 +3186,7 @@ function (_Component) {
       });
     });
 
-    _this.menuRef = React__default.createRef();
+    _this.menuRef = React.createRef();
     _this.state = {
       menuStyle: {},
       handleClickOutside: function handleClickOutside() {}
@@ -2881,7 +3194,7 @@ function (_Component) {
     return _this;
   }
 
-  LocalizationContext._createClass(MenuItems, [{
+  _createClass(MenuItems, [{
     key: "componentDidMount",
     value: function componentDidMount() {
       this.setupEvents();
@@ -2901,12 +3214,12 @@ function (_Component) {
       var _this$props2 = this.props,
           children = _this$props2.children,
           style = _this$props2.style;
-      return reactDom.createPortal(React__default.createElement(React__default.Fragment, null, React__default.createElement("div", {
+      return createPortal(React.createElement(React.Fragment, null, React.createElement("div", {
         className: "sendbird-dropdown__menu-backdrop"
-      }), React__default.createElement("ul", {
+      }), React.createElement("ul", {
         className: "sendbird-dropdown__menu",
         ref: this.menuRef,
-        style: LocalizationContext._objectSpread2({
+        style: _objectSpread2({
           display: 'inline-block',
           position: 'fixed',
           left: "".concat(Math.round(menuStyle.left), "px"),
@@ -2917,7 +3230,7 @@ function (_Component) {
   }]);
 
   return MenuItems;
-}(React.Component);
+}(Component);
 MenuItems.propTypes = {
   closeDropdown: PropTypes.func.isRequired,
   children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
@@ -2950,7 +3263,7 @@ function SortByRow(_ref) {
     var result = [];
 
     for (var i = 0; i < children.length; i += maxItemCount) {
-      result.push(React__default.createElement("div", {
+      result.push(React.createElement("div", {
         className: injectingClassName.join(' '),
         style: {
           width: itemWidth * maxItemCount,
@@ -2963,7 +3276,7 @@ function SortByRow(_ref) {
     return result;
   }
 
-  return React__default.createElement("div", {
+  return React.createElement("div", {
     className: injectingClassName.join(' '),
     style: {
       width: itemWidth * children.length,
@@ -2985,16 +3298,16 @@ SortByRow.defaultProps = {
 var EmojiListItems =
 /*#__PURE__*/
 function (_Component) {
-  LocalizationContext._inherits(EmojiListItems, _Component);
+  _inherits(EmojiListItems, _Component);
 
   function EmojiListItems(props) {
     var _this;
 
-    LocalizationContext._classCallCheck(this, EmojiListItems);
+    _classCallCheck(this, EmojiListItems);
 
-    _this = LocalizationContext._possibleConstructorReturn(this, LocalizationContext._getPrototypeOf(EmojiListItems).call(this, props));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(EmojiListItems).call(this, props));
 
-    LocalizationContext._defineProperty(LocalizationContext._assertThisInitialized(_this), "showParent", function () {
+    _defineProperty(_assertThisInitialized(_this), "showParent", function () {
       var _this$props$parentCon = _this.props.parentContainRef,
           parentContainRef = _this$props$parentCon === void 0 ? {} : _this$props$parentCon;
       var current = parentContainRef.current;
@@ -3004,7 +3317,7 @@ function (_Component) {
       }
     });
 
-    LocalizationContext._defineProperty(LocalizationContext._assertThisInitialized(_this), "hideParent", function () {
+    _defineProperty(_assertThisInitialized(_this), "hideParent", function () {
       var _this$props$parentCon2 = _this.props.parentContainRef,
           parentContainRef = _this$props$parentCon2 === void 0 ? {} : _this$props$parentCon2;
       var current = parentContainRef.current;
@@ -3014,10 +3327,10 @@ function (_Component) {
       }
     });
 
-    LocalizationContext._defineProperty(LocalizationContext._assertThisInitialized(_this), "setupEvents", function () {
+    _defineProperty(_assertThisInitialized(_this), "setupEvents", function () {
       var closeDropdown = _this.props.closeDropdown;
 
-      var _assertThisInitialize = LocalizationContext._assertThisInitialized(_this),
+      var _assertThisInitialize = _assertThisInitialized(_this),
           reactionRef = _assertThisInitialize.reactionRef;
 
       var handleClickOutside = function handleClickOutside(event) {
@@ -3033,12 +3346,12 @@ function (_Component) {
       document.addEventListener('mousedown', handleClickOutside);
     });
 
-    LocalizationContext._defineProperty(LocalizationContext._assertThisInitialized(_this), "cleanUpEvents", function () {
+    _defineProperty(_assertThisInitialized(_this), "cleanUpEvents", function () {
       var handleClickOutside = _this.state.handleClickOutside;
       document.removeEventListener('mousedown', handleClickOutside);
     });
 
-    LocalizationContext._defineProperty(LocalizationContext._assertThisInitialized(_this), "getBarPosition", function () {
+    _defineProperty(_assertThisInitialized(_this), "getBarPosition", function () {
       var _this$props = _this.props,
           parentRef = _this$props.parentRef,
           spaceFromTrigger = _this$props.spaceFromTrigger;
@@ -3082,7 +3395,7 @@ function (_Component) {
       });
     });
 
-    _this.reactionRef = React__default.createRef();
+    _this.reactionRef = React.createRef();
     _this.state = {
       reactionStyle: {},
       handleClickOutside: function handleClickOutside() {}
@@ -3090,7 +3403,7 @@ function (_Component) {
     return _this;
   }
 
-  LocalizationContext._createClass(EmojiListItems, [{
+  _createClass(EmojiListItems, [{
     key: "componentDidMount",
     value: function componentDidMount() {
       this.setupEvents();
@@ -3108,9 +3421,9 @@ function (_Component) {
     value: function render() {
       var reactionStyle = this.state.reactionStyle;
       var children = this.props.children;
-      return reactDom.createPortal(React__default.createElement(React__default.Fragment, null, React__default.createElement("div", {
+      return createPortal(React.createElement(React.Fragment, null, React.createElement("div", {
         className: "sendbird-dropdown__menu-backdrop"
-      }), React__default.createElement("ul", {
+      }), React.createElement("ul", {
         className: "sendbird-dropdown__reaction-bar",
         ref: this.reactionRef,
         style: {
@@ -3119,7 +3432,7 @@ function (_Component) {
           left: "".concat(Math.round(reactionStyle.left), "px"),
           top: "".concat(Math.round(reactionStyle.top), "px")
         }
-      }, React__default.createElement(SortByRow, {
+      }, React.createElement(SortByRow, {
         className: "sendbird-dropdown__reaction-bar__row",
         maxItemCount: 8,
         itemWidth: 44,
@@ -3129,7 +3442,7 @@ function (_Component) {
   }]);
 
   return EmojiListItems;
-}(React.Component);
+}(Component);
 EmojiListItems.propTypes = {
   closeDropdown: PropTypes.func.isRequired,
   children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
@@ -3156,9 +3469,9 @@ var MenuItem = function MenuItem(_ref) {
       onClick = _ref.onClick,
       className = _ref.className;
   var injectingClassName = Array.isArray(className) ? className : [className];
-  return React__default.createElement("li", {
+  return React.createElement("li", {
     tabIndex: 0,
-    className: [].concat(LocalizationContext._toConsumableArray(injectingClassName), ['sendbird-dropdown__menu-item']).join(' '),
+    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-dropdown__menu-item']).join(' '),
     onClick: onClick,
     onKeyPress: function onKeyPress(e) {
       if (e.keyCode === ENTER) {
@@ -3166,7 +3479,7 @@ var MenuItem = function MenuItem(_ref) {
       }
     },
     role: "menuitem"
-  }, React__default.createElement(Label, {
+  }, React.createElement(Label, {
     type: LabelTypography.SUBTITLE_2,
     color: LabelColors.ONBACKGROUND_1,
     className: "sendbird-dropdown__menu-item__text"
@@ -3184,12 +3497,12 @@ function ContextMenu(_ref2) {
   var menuTrigger = _ref2.menuTrigger,
       menuItems = _ref2.menuItems;
 
-  var _useState = React.useState(false),
-      _useState2 = LocalizationContext._slicedToArray(_useState, 2),
+  var _useState = useState(false),
+      _useState2 = _slicedToArray(_useState, 2),
       showMenu = _useState2[0],
       setShowMenu = _useState2[1];
 
-  return React__default.createElement("div", {
+  return React.createElement("div", {
     className: "sendbird-context-menu",
     style: {
       display: 'inline'
@@ -3211,8 +3524,8 @@ function Loader(_ref) {
       width = _ref.width,
       height = _ref.height;
   var injectingClassName = Array.isArray(className) ? className : [className];
-  return React__default.createElement("div", {
-    className: [].concat(LocalizationContext._toConsumableArray(injectingClassName), ['sendbird-loader']).join(' '),
+  return React.createElement("div", {
+    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-loader']).join(' '),
     style: {
       width: typeof width === 'string' ? width : "".concat(width, "px"),
       height: typeof height === 'string' ? height : "".concat(height, "px")
@@ -3226,7 +3539,7 @@ Loader.propTypes = {
   height: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 };
 Loader.defaultProps = {
-  children: React__default.createElement(Icon, {
+  children: React.createElement(Icon, {
     type: IconTypes.SPINNER,
     width: "26px",
     height: "26px"
@@ -3242,50 +3555,50 @@ function PlaceHolder(_ref) {
       type = _ref.type,
       retryToConnect = _ref.retryToConnect;
 
-  var _useContext = React.useContext(LocalizationContext.LocalizationContext),
+  var _useContext = useContext(LocalizationContext),
       stringSet = _useContext.stringSet;
 
   var injectingClassName = Array.isArray(className) ? className : [className];
-  return React__default.createElement("div", {
-    className: [].concat(LocalizationContext._toConsumableArray(injectingClassName), ['sendbird-place-holder']).join(' ')
-  }, type === PlaceHolderTypes$1.LOADING ? React__default.createElement(Loader, {
+  return React.createElement("div", {
+    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-place-holder']).join(' ')
+  }, type === PlaceHolderTypes$1.LOADING ? React.createElement(Loader, {
     width: "48px",
     height: "48px"
-  }, React__default.createElement(Icon, {
+  }, React.createElement(Icon, {
     type: IconTypes.SPINNER_LARGE,
     width: "48px",
     height: "48px"
-  })) : null, type === PlaceHolderTypes$1.NO_CHANNELS || type === PlaceHolderTypes$1.WRONG ? React__default.createElement("div", {
+  })) : null, type === PlaceHolderTypes$1.NO_CHANNELS || type === PlaceHolderTypes$1.WRONG ? React.createElement("div", {
     className: "sendbird-place-holder__body"
-  }, type === PlaceHolderTypes$1.NO_CHANNELS && React__default.createElement(Icon, {
+  }, type === PlaceHolderTypes$1.NO_CHANNELS && React.createElement(Icon, {
     className: "sendbird-place-holder__body__icon",
     type: IconTypes.CHAT,
     fillColor: IconColors.ON_BACKGROUND_3,
     width: "64px",
     height: "64px"
-  }), type === PlaceHolderTypes$1.WRONG && React__default.createElement(Icon, {
+  }), type === PlaceHolderTypes$1.WRONG && React.createElement(Icon, {
     className: "sendbird-place-holder__body__icon",
     type: IconTypes.ERROR,
     fillColor: IconColors.ON_BACKGROUND_3,
     width: "64px",
     height: "64px"
-  }), React__default.createElement(Label, {
+  }), React.createElement(Label, {
     className: "sendbird-place-holder__body__text",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_2
-  }, type === PlaceHolderTypes$1.NO_CHANNELS ? stringSet.PLACE_HOLDER__NO_CHANNEL : stringSet.PLACE_HOLDER__WRONG), retryToConnect ? React__default.createElement("div", {
+  }, type === PlaceHolderTypes$1.NO_CHANNELS ? stringSet.PLACE_HOLDER__NO_CHANNEL : stringSet.PLACE_HOLDER__WRONG), retryToConnect ? React.createElement("div", {
     className: "sendbird-place-holder__body__reconnect",
     role: "button",
     tabIndex: 0,
     onClick: retryToConnect,
     onKeyPress: retryToConnect
-  }, React__default.createElement(Icon, {
+  }, React.createElement(Icon, {
     className: "sendbird-place-holder__body__reconnect__icon",
     type: IconTypes.REFRESH,
     fillColor: IconColors.PRIMARY,
     width: "20px",
     height: "20px"
-  }), React__default.createElement(Label, {
+  }), React.createElement(Label, {
     className: "sendbird-place-holder__body__reconnect__text",
     type: LabelTypography.BUTTON_1,
     color: LabelColors.PRIMARY
@@ -3301,43 +3614,5 @@ PlaceHolder.defaultProps = {
   retryToConnect: null
 };
 
-exports.Avatar = Avatar$1;
-exports.Button = Button;
-exports.CREATE_CHANNEL = CREATE_CHANNEL;
-exports.Colors = Colors$2;
-exports.ContextMenu = ContextMenu;
-exports.DELETE_MESSAGE = DELETE_MESSAGE;
-exports.EmojiListItems = EmojiListItems$1;
-exports.Icon = Icon;
-exports.IconButton = IconButton;
-exports.IconColors = IconColors;
-exports.IconTypes = IconTypes;
-exports.ImageRenderer = ImageRenderer;
-exports.LEAVE_CHANNEL = LEAVE_CHANNEL;
-exports.Label = Label;
-exports.LabelColors = LabelColors;
-exports.LabelStringSet = LabelStringSet;
-exports.LabelTypography = LabelTypography;
-exports.Loader = Loader;
-exports.MODAL_ROOT = MODAL_ROOT;
-exports.MenuItem = MenuItem;
-exports.MenuItems = MenuItems$1;
-exports.Modal = Modal;
-exports.PlaceHolder = PlaceHolder;
-exports.PlaceHolderTypes = PlaceHolderTypes;
-exports.PlaceHolderTypes$1 = PlaceHolderTypes$1;
-exports.SEND_FILE_MESSAGE = SEND_FILE_MESSAGE;
-exports.SEND_MESSAGE_START = SEND_MESSAGE_START;
-exports.SEND_USER_MESSAGE = SEND_USER_MESSAGE;
-exports.Size = Size;
-exports.TextButton = TextButton;
-exports.Type = Type$1;
-exports.UPDATE_USER_MESSAGE = UPDATE_USER_MESSAGE;
-exports.UserProfile = ConnectedUserProfile;
-exports.UserProfileContext = UserProfileContext;
-exports.UserProfileProvider = UserProfileProvider;
-exports.changeColorToClassName = changeColorToClassName$2;
-exports.changeColorToClassName$1 = changeColorToClassName$1;
-exports.getSdk = getSdk;
-exports.selectors = selectors;
-//# sourceMappingURL=index-710314fd.js.map
+export { Avatar$1 as A, Button as B, ContextMenu as C, DELETE_MESSAGE as D, EmojiListItems$1 as E, selectors as F, Icon as I, LabelStringSet as L, Modal as M, PlaceHolder as P, SEND_MESSAGE_START as S, Type$1 as T, UPDATE_USER_MESSAGE as U, IconTypes as a, Label as b, LabelTypography as c, LabelColors as d, IconButton as e, TextButton as f, IconColors as g, MenuItems$1 as h, MenuItem as i, CREATE_CHANNEL as j, LEAVE_CHANNEL as k, UserProfileProvider as l, PlaceHolderTypes as m, UserProfileContext as n, ConnectedUserProfile as o, SEND_USER_MESSAGE as p, SEND_FILE_MESSAGE as q, ImageRenderer as r, Loader as s, PlaceHolderTypes$1 as t, Colors$2 as u, changeColorToClassName$2 as v, Size as w, MODAL_ROOT as x, changeColorToClassName$1 as y, getSdk as z };
+//# sourceMappingURL=index-ec3bf9fe.js.map

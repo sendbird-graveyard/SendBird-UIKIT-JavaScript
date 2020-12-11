@@ -4,7 +4,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var React = require('react');
 var React__default = _interopDefault(React);
-var index = require('./index-710314fd.js');
+var index = require('./index-49d966e1.js');
 var utils = require('./utils-6aedec02.js');
 
 function ChannelAvatar(_a) {
@@ -45,4 +45,4 @@ function ChannelAvatar(_a) {
 }
 
 exports.ChannelAvatar = ChannelAvatar;
-//# sourceMappingURL=index-64dcc5d9.js.map
+//# sourceMappingURL=index-994f886d.js.map

@@ -1,14 +1,14 @@
 import { b as _slicedToArray, e as LocalizationContext, d as __spreadArrays, _ as __assign, w as withSendbirdContext, u as uuidv4 } from './LocalizationContext-619bafba.js';
 import React, { useRef, useState, useContext, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { M as Modal, T as Type, A as Avatar, f as TextButton, b as Label, c as LabelTypography, d as LabelColors, C as ContextMenu, e as IconButton, I as Icon, a as IconTypes, g as IconColors, h as MenuItems, i as MenuItem, n as UserProfileContext, o as UserProfile, B as Button, w as Size, z as getSdk, P as PlaceHolder, m as PlaceHolderTypes, l as UserProfileProvider } from './index-0c67ae90.js';
+import { M as Modal, T as Type, A as Avatar, f as TextButton, b as Label, c as LabelTypography, d as LabelColors, C as ContextMenu, e as IconButton, I as Icon, a as IconTypes, g as IconColors, h as MenuItems, i as MenuItem, n as UserProfileContext, o as UserProfile, B as Button, w as Size, z as getSdk, P as PlaceHolder, m as PlaceHolderTypes, l as UserProfileProvider } from './index-ec3bf9fe.js';
 import { n as noop } from './utils-53ba1773.js';
-import { C as ChannelAvatar } from './index-a199094e.js';
-import { I as InviteMembers$1, B as Badge, c as createDefaultUserListQuery, L as LeaveChannelModal } from './LeaveChannel-fcc0bfc3.js';
+import { C as ChannelAvatar } from './index-aebda3d2.js';
+import { I as InviteMembers$1, B as Badge, c as createDefaultUserListQuery, L as LeaveChannelModal } from './LeaveChannel-da8b5d0b.js';
 import 'date-fns/format';
 import 'react-dom';
-import { I as InputLabel, a as Input, U as UserListItem$2, M as MutedAvatarOverlay } from './index-73379213.js';
-import { A as AccordionGroup, a as Accordion } from './index-7bc4a9f7.js';
+import { I as InputLabel, a as Input, U as UserListItem$2, M as MutedAvatarOverlay } from './index-aa89d60a.js';
+import { A as AccordionGroup, a as Accordion } from './index-8abf69b8.js';
 
 var EditDetails = function EditDetails(props) {
   var _onSubmit = props.onSubmit,

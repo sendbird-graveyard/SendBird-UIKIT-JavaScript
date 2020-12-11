@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { I as Icon, a as IconTypes, A as Avatar } from './index-0c67ae90.js';
+import { I as Icon, a as IconTypes, A as Avatar } from './index-ec3bf9fe.js';
 import { u as useDefaultAvatar, g as getChannelAvatarSource } from './utils-53ba1773.js';
 
 function ChannelAvatar(_a) {
@@ -40,4 +40,4 @@ function ChannelAvatar(_a) {
 }
 
 export { ChannelAvatar as C };
-//# sourceMappingURL=index-a199094e.js.map
+//# sourceMappingURL=index-aebda3d2.js.map

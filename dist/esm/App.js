@@ -5,25 +5,25 @@ import PropTypes from 'prop-types';
 import 'sendbird';
 import './actionTypes-a85c0eaa.js';
 import 'css-vars-ponyfill';
-import './index-0c67ae90.js';
+import './index-ec3bf9fe.js';
 import ChannelList from './ChannelList.js';
 import './utils-53ba1773.js';
-import './index-a199094e.js';
-import './LeaveChannel-fcc0bfc3.js';
+import './index-aebda3d2.js';
+import './LeaveChannel-da8b5d0b.js';
 import 'date-fns/isToday';
 import 'date-fns/format';
 import 'date-fns/isYesterday';
 import './type-0296584d.js';
 import './utils-cfdeb084.js';
 import 'react-dom';
-import './index-73379213.js';
+import './index-aa89d60a.js';
 import Conversation from './Channel.js';
-import './index-1cf7b066.js';
+import './index-19f570c9.js';
 import 'date-fns/isSameDay';
 import './utils-d7f59026.js';
 import 'date-fns/formatDistanceToNowStrict';
 import ChannelSettings from './ChannelSettings.js';
-import './index-7bc4a9f7.js';
+import './index-8abf69b8.js';
 
 function App(props) {
   var appId = props.appId,

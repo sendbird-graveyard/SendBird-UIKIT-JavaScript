@@ -6,14 +6,14 @@ var LocalizationContext = require('./LocalizationContext-7c9df62c.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 require('prop-types');
-var index$1 = require('./index-710314fd.js');
+var index$1 = require('./index-49d966e1.js');
 var utils = require('./utils-6aedec02.js');
 require('date-fns/format');
 require('./type-c7a3bee7.js');
 require('react-dom');
-var index$2 = require('./index-6ca9e95e.js');
+var index$2 = require('./index-21269166.js');
 var utils$2 = require('./utils-c8e36c68.js');
-var index$3 = require('./index-c4d028d8.js');
+var index$3 = require('./index-63161cb1.js');
 
 function ChannelAvatar(_a) {
   var channel = _a.channel,

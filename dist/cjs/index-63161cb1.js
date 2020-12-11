@@ -4,7 +4,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var React = require('react');
 var React__default = _interopDefault(React);
-var index$1 = require('./index-710314fd.js');
+var index$1 = require('./index-49d966e1.js');
 var utils = require('./utils-6aedec02.js');
 
 var Context = React__default.createContext({
@@ -89,4 +89,4 @@ var AccordionGroup$1 = AccordionGroup;
 
 exports.Accordion = Accordion;
 exports.AccordionGroup = AccordionGroup$1;
-//# sourceMappingURL=index-c4d028d8.js.map
+//# sourceMappingURL=index-63161cb1.js.map

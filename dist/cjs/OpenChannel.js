@@ -8,10 +8,10 @@ var LocalizationContext = require('./LocalizationContext-7c9df62c.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 require('prop-types');
-var index$1 = require('./index-710314fd.js');
+var index$1 = require('./index-49d966e1.js');
 var format = _interopDefault(require('date-fns/format'));
 require('react-dom');
-var index$2$1 = require('./index-95b18747.js');
+var index$2$1 = require('./index-6e58a4a2.js');
 var isSameDay = _interopDefault(require('date-fns/isSameDay'));
 
 var getMessageCreatedAt = function getMessageCreatedAt(message) {
@@ -1198,6 +1198,8 @@ function MessageHoc(_a) {
       disabled = _a.disabled,
       editDisabled = _a.editDisabled,
       hasSeperator = _a.hasSeperator,
+      channel = _a.channel,
+      renderCustomMessage = _a.renderCustomMessage,
       deleteMessage = _a.deleteMessage,
       updateMessage = _a.updateMessage,
       resendMessage = _a.resendMessage,
@@ -1209,6 +1211,14 @@ function MessageHoc(_a) {
   if (message.messageType !== 'admin') {
     sender = message.sender;
   }
+
+  var RenderedMessage = React.useMemo(function () {
+    if (renderCustomMessage) {
+      return renderCustomMessage(message, channel);
+    }
+
+    return null;
+  }, [message, renderCustomMessage]);
 
   var _c = React.useState(false),
       showEdit = _c[0],
@@ -1228,6 +1238,14 @@ function MessageHoc(_a) {
   if (sender && message.messageType !== 'admin') {
     // pending and failed messages are by me
     isByMe = userId === sender.userId || message.requestState === SendingMessageStatus.PENDING || message.requestState === SendingMessageStatus.FAILED;
+  }
+
+  if (RenderedMessage) {
+    return React__default.createElement("div", {
+      className: "sendbird-msg-hoc sendbird-msg--scroll-ref"
+    }, React__default.createElement(RenderedMessage, {
+      message: message
+    }));
   }
 
   if (message.messageType === 'user' && showEdit) {
@@ -1352,6 +1370,7 @@ function OpenchannelConversationScroll(_a) {
       hasMore = _a.hasMore,
       onScroll = _a.onScroll,
       scrollDownPromise = _a.scrollDownPromise,
+      renderCustomMessage = _a.renderCustomMessage,
       showScrollDownButton = _a.showScrollDownButton,
       updateMessage = _a.updateMessage,
       deleteMessage = _a.deleteMessage,
@@ -1429,6 +1448,8 @@ function OpenchannelConversationScroll(_a) {
         chainBottom = _a[1];
 
     return React__default.createElement(MessageHoc, {
+      renderCustomMessage: renderCustomMessage,
+      channel: openchannel,
       key: message.messageId,
       message: message,
       status: status,
@@ -1892,6 +1913,7 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
       _a = props.queries,
       queries = _a === void 0 ? {} : _a,
       disableUserProfile = props.disableUserProfile,
+      renderCustomMessage = props.renderCustomMessage,
       renderUserProfile = props.renderUserProfile,
       renderChannelTitle = props.renderChannelTitle,
       renderMessageInput = props.renderMessageInput,
@@ -1902,7 +1924,8 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
       userStore = stores.userStore;
   var userId = config.userId,
       isOnline = config.isOnline,
-      logger = config.logger;
+      logger = config.logger,
+      pubSub = config.pubSub;
   var sdk = sdkStore.sdk;
   var user = userStore.user; // hook variables
 
@@ -1982,6 +2005,86 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
       //   });
       // });
     }
+  }, [channelUrl, sdkInit]); // handles API calls from withSendbird
+
+  React.useEffect(function () {
+    var subscriber = new Map();
+
+    if (!pubSub || !pubSub.subscribe) {
+      return;
+    }
+
+    subscriber.set(index$1.SEND_USER_MESSAGE, pubSub.subscribe(index$1.SEND_USER_MESSAGE, function (msg) {
+      var channel = msg.channel,
+          message = msg.message;
+      scrollIntoLast('.sendbird-msg--scroll-ref');
+
+      if (channel && channelUrl === channel.url) {
+        messagesDispatcher({
+          type: SENDING_MESSAGE_SUCCEEDED,
+          payload: message
+        });
+      }
+    }));
+    subscriber.set(index$1.SEND_MESSAGE_START, pubSub.subscribe(index$1.SEND_MESSAGE_START, function (msg) {
+      var channel = msg.channel,
+          message = msg.message;
+
+      if (channel && channelUrl === channel.url) {
+        messagesDispatcher({
+          type: SENDING_MESSAGE_START,
+          payload: message
+        });
+      }
+    }));
+    subscriber.set(index$1.SEND_FILE_MESSAGE, pubSub.subscribe(index$1.SEND_FILE_MESSAGE, function (msg) {
+      var channel = msg.channel,
+          message = msg.message;
+      scrollIntoLast('.sendbird-msg--scroll-ref');
+
+      if (channel && channelUrl === channel.url) {
+        messagesDispatcher({
+          type: SENDING_MESSAGE_SUCCEEDED,
+          payload: message
+        });
+      }
+    }));
+    subscriber.set(index$1.UPDATE_USER_MESSAGE, pubSub.subscribe(index$1.UPDATE_USER_MESSAGE, function (msg) {
+      var channel = msg.channel,
+          message = msg.message,
+          fromSelector = msg.fromSelector;
+
+      if (fromSelector && channel && channelUrl === channel.url) {
+        messagesDispatcher({
+          type: ON_MESSAGE_UPDATED,
+          payload: {
+            channel: channel,
+            message: message
+          }
+        });
+      }
+    }));
+    subscriber.set(index$1.DELETE_MESSAGE, pubSub.subscribe(index$1.DELETE_MESSAGE, function (msg) {
+      var channel = msg.channel,
+          messageId = msg.messageId;
+
+      if (channel && channelUrl === channel.url) {
+        messagesDispatcher({
+          type: ON_MESSAGE_DELETED,
+          payload: messageId
+        });
+      }
+    }));
+    return function () {
+      if (subscriber) {
+        subscriber.forEach(function (s) {
+          try {
+            s.remove();
+          } catch (_a) {//
+          }
+        });
+      }
+    };
   }, [channelUrl, sdkInit]); // useHandleChannelEvents
 
   React.useEffect(function () {
@@ -2711,6 +2814,7 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
     coverImage: currentOpenChannel.coverUrl,
     onActionClick: onChatHeaderActionClick
   }), currentOpenChannel.isFrozen && React__default.createElement(FrozenNotification, null), React__default.createElement(OpenchannelConversationScroll, {
+    renderCustomMessage: renderCustomMessage,
     openchannel: currentOpenChannel,
     user: user,
     useMessageGrouping: useMessageGrouping,

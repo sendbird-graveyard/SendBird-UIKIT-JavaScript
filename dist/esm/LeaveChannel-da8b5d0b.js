@@ -1,8 +1,8 @@
 import { e as LocalizationContext, c as _toConsumableArray, b as _slicedToArray, a as _objectSpread2, l as _defineProperty } from './LocalizationContext-619bafba.js';
 import React, { useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { b as Label, c as LabelTypography, d as LabelColors, M as Modal, T as Type } from './index-0c67ae90.js';
-import { U as UserListItem } from './index-73379213.js';
+import { b as Label, c as LabelTypography, d as LabelColors, M as Modal, T as Type } from './index-ec3bf9fe.js';
+import { U as UserListItem } from './index-aa89d60a.js';
 
 function Badge(_ref) {
   var count = _ref.count,
@@ -287,4 +287,4 @@ LeaveChannel.propTypes = {
 };
 
 export { Badge as B, InviteMembers as I, LeaveChannel as L, isSuperGroupChannelEnabled as a, createChannel as b, createDefaultUserListQuery as c, isBroadcastChannelEnabled as i };
-//# sourceMappingURL=LeaveChannel-fcc0bfc3.js.map
+//# sourceMappingURL=LeaveChannel-da8b5d0b.js.map

@@ -89,6 +89,7 @@ export interface OpenChannelProps {
     messageListParams?: Sendbird.MessageListParams,
   };
   disableUserProfile?: boolean;
+  renderCustomMessage?: RenderCustomMessage;
   renderUserProfile?(): JSX.Element;
   renderChannelTitle?(renderProps: RenderOpenChannelTitleProps): JSX.Element;
   renderMessageInput?(renderProps: RenderMessageInputProps): JSX.Element;
@@ -285,6 +286,7 @@ interface ChannelProps {
   onBeforeSendFileMessage?(file: File): Sendbird.FileMessageParams;
   onBeforeUpdateUserMessage?(text: string): Sendbird.UserMessageParams;
   onChatHeaderActionClick?(event: React.MouseEvent<HTMLElement>): void;
+  renderCustomMessage?: RenderCustomMessage;
   renderChatItem?: (props: RenderChatItemProps) => React.ReactNode;
   renderMessageInput?: (props: RenderMessageInputProps) => React.ReactNode;
   renderChatHeader?: (props: RenderChatHeaderProps) => React.ReactNode;
@@ -347,3 +349,10 @@ interface ClientMessage {
   localUrl?: string;
   _sender: Sendbird.User;
 }
+
+type RenderCustomMessage  = (
+  message: EveryMessage,
+  channel: Sendbird.OpenChannel | Sendbird.GroupChannel,
+) => RenderCustomMessageProps;
+
+type RenderCustomMessageProps = ({ message: EveryMessage }) => React.ReactElement;

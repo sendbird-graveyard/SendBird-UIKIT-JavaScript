@@ -6,7 +6,7 @@ var LocalizationContext = require('./LocalizationContext-7c9df62c.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
-var index = require('./index-710314fd.js');
+var index = require('./index-49d966e1.js');
 var reactDom = require('react-dom');
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types
@@ -201,7 +201,7 @@ var MessageInput = React__default.forwardRef(function (props, ref) {
     fillColor: index.IconColors.PRIMARY,
     width: "20px",
     height: "20px"
-  })), !isEdit && !inputValue && !(inputValue.trim().length > 0) && React__default.createElement(index.IconButton, {
+  })), !isEdit && (!inputValue || !(inputValue.trim().length > 0)) && React__default.createElement(index.IconButton, {
     className: "sendbird-message-input--attach",
     height: "32px",
     width: "32px",
@@ -440,4 +440,4 @@ exports.compareIds = compareIds;
 exports.isImage = isImage;
 exports.isVideo = isVideo;
 exports.unSupported = unSupported;
-//# sourceMappingURL=index-95b18747.js.map
+//# sourceMappingURL=index-6e58a4a2.js.map

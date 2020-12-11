@@ -1,14 +1,14 @@
 import { c as _toConsumableArray, a as _objectSpread2, u as uuidv4$1, l as _defineProperty, b as _slicedToArray, e as LocalizationContext, f as _inherits, h as _createClass, i as _classCallCheck, j as _possibleConstructorReturn, k as _getPrototypeOf, m as _assertThisInitialized, w as withSendbirdContext } from './LocalizationContext-619bafba.js';
 import React, { useEffect, useCallback, useRef, useMemo, useState, useContext, Component, useReducer } from 'react';
 import PropTypes from 'prop-types';
-import { p as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, q as SEND_FILE_MESSAGE, U as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, E as EmojiListItems, r as ImageRenderer, I as Icon, a as IconTypes, s as Loader, g as IconColors, b as Label, c as LabelTypography, d as LabelColors, C as ContextMenu, e as IconButton, h as MenuItems, i as MenuItem, n as UserProfileContext, A as Avatar, o as UserProfile, f as TextButton, M as Modal, L as LabelStringSet, P as PlaceHolder, t as PlaceHolderTypes, l as UserProfileProvider } from './index-0c67ae90.js';
+import { p as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, q as SEND_FILE_MESSAGE, U as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, E as EmojiListItems, r as ImageRenderer, I as Icon, a as IconTypes, s as Loader, g as IconColors, b as Label, c as LabelTypography, d as LabelColors, C as ContextMenu, e as IconButton, h as MenuItems, i as MenuItem, n as UserProfileContext, A as Avatar, o as UserProfile, f as TextButton, M as Modal, L as LabelStringSet, P as PlaceHolder, t as PlaceHolderTypes, l as UserProfileProvider } from './index-ec3bf9fe.js';
 import { a as getMessageCreatedAt$4, b as getSenderName$2, c as getSenderProfileUrl$2 } from './utils-53ba1773.js';
-import { C as ChannelAvatar } from './index-a199094e.js';
+import { C as ChannelAvatar } from './index-aebda3d2.js';
 import format from 'date-fns/format';
 import { M as MessageStatusType } from './type-0296584d.js';
 import { t as truncate, g as getIsSentFromStatus$3 } from './utils-cfdeb084.js';
 import 'react-dom';
-import { i as isImage, a as isVideo, c as compareIds, u as unSupported, L as LinkLabel, M as MessageInput, D as DateSeparator, F as FileViewer } from './index-1cf7b066.js';
+import { i as isImage, a as isVideo, c as compareIds, u as unSupported, L as LinkLabel, D as DateSeparator, M as MessageInput, F as FileViewer } from './index-19f570c9.js';
 import isSameDay from 'date-fns/isSameDay';
 import { c as copyToClipboard$1, g as getSenderProfileUrl$1, a as getSenderName$1, b as getMessageCreatedAt$5, d as getIsSentFromStatus$2 } from './utils-d7f59026.js';
 import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict';
@@ -4379,7 +4379,9 @@ function MessageHoc(_ref) {
       emojiAllMap = _ref.emojiAllMap,
       membersMap = _ref.membersMap,
       toggleReaction = _ref.toggleReaction,
-      memoizedEmojiListItems = _ref.memoizedEmojiListItems;
+      memoizedEmojiListItems = _ref.memoizedEmojiListItems,
+      renderCustomMessage = _ref.renderCustomMessage,
+      currentGroupChannel = _ref.currentGroupChannel;
   var _message$sender = message.sender,
       sender = _message$sender === void 0 ? {} : _message$sender;
 
@@ -4399,7 +4401,25 @@ function MessageHoc(_ref) {
       setShowFileViewer = _useState6[1];
 
   var editMessageInputRef = useRef(null);
+  var RenderedMessage = useMemo(function () {
+    if (renderCustomMessage) {
+      return renderCustomMessage(message, currentGroupChannel);
+    }
+
+    return null;
+  }, [message, message.message, renderCustomMessage]);
   var isByMe = userId === sender.userId || message.requestState === 'pending' || message.requestState === 'failed';
+
+  if (RenderedMessage) {
+    return React.createElement("div", {
+      className: "sendbird-msg-hoc sendbird-msg--scroll-ref"
+    }, hasSeperator && React.createElement(DateSeparator, null, React.createElement(Label, {
+      type: LabelTypography.CAPTION_2,
+      color: LabelColors.ONBACKGROUND_2
+    }, format(message.createdAt, 'MMMM dd, yyyy'))), React.createElement(RenderedMessage, {
+      message: message
+    }));
+  }
 
   if (showEdit) {
     return React.createElement(MessageInput, {
@@ -4531,6 +4551,8 @@ MessageHoc.propTypes = {
     }),
     ogMetaData: PropTypes.shape({})
   }),
+  renderCustomMessage: PropTypes.func,
+  currentGroupChannel: PropTypes.shape,
   hasSeperator: PropTypes.bool,
   disabled: PropTypes.bool,
   editDisabled: PropTypes.bool,
@@ -4549,6 +4571,8 @@ MessageHoc.propTypes = {
 MessageHoc.defaultProps = {
   userId: '',
   editDisabled: false,
+  renderCustomMessage: null,
+  currentGroupChannel: {},
   message: {},
   hasSeperator: false,
   disabled: false,
@@ -4638,6 +4662,7 @@ function (_Component) {
           deleteMessage = _this$props2.deleteMessage,
           updateMessage = _this$props2.updateMessage,
           resendMessage = _this$props2.resendMessage,
+          renderCustomMessage = _this$props2.renderCustomMessage,
           renderChatItem = _this$props2.renderChatItem,
           emojiContainer = _this$props2.emojiContainer,
           toggleReaction = _this$props2.toggleReaction,
@@ -4683,11 +4708,13 @@ function (_Component) {
         }
 
         return React.createElement(MessageHoc, {
+          renderCustomMessage: renderCustomMessage,
           key: m.messageId || m.reqId,
           userId: userId,
           status: readStatus[m.messageId] || getParsedStatus(m, currentGroupChannel) // show status for pending/failed messages
           ,
           message: m,
+          currentGroupChannel: currentGroupChannel,
           disabled: disabled,
           membersMap: membersMap,
           chainTop: chainTop,
@@ -4732,6 +4759,7 @@ ConversationScroll.propTypes = {
     members: PropTypes.arrayOf(PropTypes.shape({}))
   }).isRequired,
   renderChatItem: PropTypes.element,
+  renderCustomMessage: PropTypes.func,
   useReaction: PropTypes.bool,
   emojiContainer: PropTypes.shape({}),
   emojiAllMap: PropTypes.instanceOf(Map),
@@ -4746,6 +4774,7 @@ ConversationScroll.defaultProps = {
   disabled: false,
   initialized: false,
   userId: '',
+  renderCustomMessage: null,
   renderChatItem: null,
   onScroll: null,
   useReaction: true,
@@ -5122,6 +5151,7 @@ var ConversationPanel = function ConversationPanel(props) {
       useReaction = props.useReaction,
       renderChatItem = props.renderChatItem,
       renderChatHeader = props.renderChatHeader,
+      renderCustomMessage = props.renderCustomMessage,
       renderUserProfile = props.renderUserProfile,
       disableUserProfile = props.disableUserProfile,
       renderMessageInput = props.renderMessageInput,
@@ -5385,6 +5415,7 @@ var ConversationPanel = function ConversationPanel(props) {
     toggleReaction: toggleReaction,
     emojiContainer: emojiContainer,
     renderChatItem: renderChatItem,
+    renderCustomMessage: renderCustomMessage,
     useMessageGrouping: useMessageGrouping,
     messagesDispatcher: messagesDispatcher,
     currentGroupChannel: currentGroupChannel,
@@ -5482,6 +5513,7 @@ ConversationPanel.propTypes = {
   // onBeforeSendFileMessage(File)
   onBeforeUpdateUserMessage: PropTypes.func,
   renderChatItem: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
+  renderCustomMessage: PropTypes.func,
   renderMessageInput: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   renderChatHeader: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   onChatHeaderActionClick: PropTypes.func,
@@ -5497,6 +5529,7 @@ ConversationPanel.defaultProps = {
   onBeforeSendFileMessage: null,
   onBeforeUpdateUserMessage: null,
   renderChatItem: null,
+  renderCustomMessage: null,
   renderMessageInput: null,
   renderChatHeader: null,
   useReaction: true,

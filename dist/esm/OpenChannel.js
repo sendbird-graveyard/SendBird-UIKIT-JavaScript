@@ -1,10 +1,10 @@
 import { e as LocalizationContext, n as uuidv4, d as __spreadArrays, _ as __assign, w as withSendbirdContext } from './LocalizationContext-619bafba.js';
 import React, { useContext, useRef, useState, useMemo, useEffect, useReducer, useCallback } from 'react';
 import 'prop-types';
-import { b as Label, c as LabelTypography, L as LabelStringSet, A as Avatar, I as Icon, a as IconTypes, g as IconColors, d as LabelColors, e as IconButton, n as UserProfileContext, C as ContextMenu, h as MenuItems, o as UserProfile, i as MenuItem, r as ImageRenderer, f as TextButton, M as Modal, P as PlaceHolder, t as PlaceHolderTypes, l as UserProfileProvider } from './index-0c67ae90.js';
+import { b as Label, c as LabelTypography, L as LabelStringSet, A as Avatar, I as Icon, a as IconTypes, g as IconColors, d as LabelColors, e as IconButton, n as UserProfileContext, C as ContextMenu, h as MenuItems, o as UserProfile, i as MenuItem, r as ImageRenderer, f as TextButton, M as Modal, p as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, q as SEND_FILE_MESSAGE, U as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, P as PlaceHolder, t as PlaceHolderTypes, l as UserProfileProvider } from './index-ec3bf9fe.js';
 import format from 'date-fns/format';
 import 'react-dom';
-import { M as MessageInput, L as LinkLabel, i as isImage, a as isVideo, D as DateSeparator, F as FileViewer, c as compareIds } from './index-1cf7b066.js';
+import { M as MessageInput, L as LinkLabel, i as isImage, a as isVideo, D as DateSeparator, F as FileViewer, c as compareIds } from './index-19f570c9.js';
 import isSameDay from 'date-fns/isSameDay';
 
 var getMessageCreatedAt = function getMessageCreatedAt(message) {
@@ -1191,6 +1191,8 @@ function MessageHoc(_a) {
       disabled = _a.disabled,
       editDisabled = _a.editDisabled,
       hasSeperator = _a.hasSeperator,
+      channel = _a.channel,
+      renderCustomMessage = _a.renderCustomMessage,
       deleteMessage = _a.deleteMessage,
       updateMessage = _a.updateMessage,
       resendMessage = _a.resendMessage,
@@ -1202,6 +1204,14 @@ function MessageHoc(_a) {
   if (message.messageType !== 'admin') {
     sender = message.sender;
   }
+
+  var RenderedMessage = useMemo(function () {
+    if (renderCustomMessage) {
+      return renderCustomMessage(message, channel);
+    }
+
+    return null;
+  }, [message, renderCustomMessage]);
 
   var _c = useState(false),
       showEdit = _c[0],
@@ -1221,6 +1231,14 @@ function MessageHoc(_a) {
   if (sender && message.messageType !== 'admin') {
     // pending and failed messages are by me
     isByMe = userId === sender.userId || message.requestState === SendingMessageStatus.PENDING || message.requestState === SendingMessageStatus.FAILED;
+  }
+
+  if (RenderedMessage) {
+    return React.createElement("div", {
+      className: "sendbird-msg-hoc sendbird-msg--scroll-ref"
+    }, React.createElement(RenderedMessage, {
+      message: message
+    }));
   }
 
   if (message.messageType === 'user' && showEdit) {
@@ -1345,6 +1363,7 @@ function OpenchannelConversationScroll(_a) {
       hasMore = _a.hasMore,
       onScroll = _a.onScroll,
       scrollDownPromise = _a.scrollDownPromise,
+      renderCustomMessage = _a.renderCustomMessage,
       showScrollDownButton = _a.showScrollDownButton,
       updateMessage = _a.updateMessage,
       deleteMessage = _a.deleteMessage,
@@ -1422,6 +1441,8 @@ function OpenchannelConversationScroll(_a) {
         chainBottom = _a[1];
 
     return React.createElement(MessageHoc, {
+      renderCustomMessage: renderCustomMessage,
+      channel: openchannel,
       key: message.messageId,
       message: message,
       status: status,
@@ -1885,6 +1906,7 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
       _a = props.queries,
       queries = _a === void 0 ? {} : _a,
       disableUserProfile = props.disableUserProfile,
+      renderCustomMessage = props.renderCustomMessage,
       renderUserProfile = props.renderUserProfile,
       renderChannelTitle = props.renderChannelTitle,
       renderMessageInput = props.renderMessageInput,
@@ -1895,7 +1917,8 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
       userStore = stores.userStore;
   var userId = config.userId,
       isOnline = config.isOnline,
-      logger = config.logger;
+      logger = config.logger,
+      pubSub = config.pubSub;
   var sdk = sdkStore.sdk;
   var user = userStore.user; // hook variables
 
@@ -1975,6 +1998,86 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
       //   });
       // });
     }
+  }, [channelUrl, sdkInit]); // handles API calls from withSendbird
+
+  useEffect(function () {
+    var subscriber = new Map();
+
+    if (!pubSub || !pubSub.subscribe) {
+      return;
+    }
+
+    subscriber.set(SEND_USER_MESSAGE, pubSub.subscribe(SEND_USER_MESSAGE, function (msg) {
+      var channel = msg.channel,
+          message = msg.message;
+      scrollIntoLast('.sendbird-msg--scroll-ref');
+
+      if (channel && channelUrl === channel.url) {
+        messagesDispatcher({
+          type: SENDING_MESSAGE_SUCCEEDED,
+          payload: message
+        });
+      }
+    }));
+    subscriber.set(SEND_MESSAGE_START, pubSub.subscribe(SEND_MESSAGE_START, function (msg) {
+      var channel = msg.channel,
+          message = msg.message;
+
+      if (channel && channelUrl === channel.url) {
+        messagesDispatcher({
+          type: SENDING_MESSAGE_START,
+          payload: message
+        });
+      }
+    }));
+    subscriber.set(SEND_FILE_MESSAGE, pubSub.subscribe(SEND_FILE_MESSAGE, function (msg) {
+      var channel = msg.channel,
+          message = msg.message;
+      scrollIntoLast('.sendbird-msg--scroll-ref');
+
+      if (channel && channelUrl === channel.url) {
+        messagesDispatcher({
+          type: SENDING_MESSAGE_SUCCEEDED,
+          payload: message
+        });
+      }
+    }));
+    subscriber.set(UPDATE_USER_MESSAGE, pubSub.subscribe(UPDATE_USER_MESSAGE, function (msg) {
+      var channel = msg.channel,
+          message = msg.message,
+          fromSelector = msg.fromSelector;
+
+      if (fromSelector && channel && channelUrl === channel.url) {
+        messagesDispatcher({
+          type: ON_MESSAGE_UPDATED,
+          payload: {
+            channel: channel,
+            message: message
+          }
+        });
+      }
+    }));
+    subscriber.set(DELETE_MESSAGE, pubSub.subscribe(DELETE_MESSAGE, function (msg) {
+      var channel = msg.channel,
+          messageId = msg.messageId;
+
+      if (channel && channelUrl === channel.url) {
+        messagesDispatcher({
+          type: ON_MESSAGE_DELETED,
+          payload: messageId
+        });
+      }
+    }));
+    return function () {
+      if (subscriber) {
+        subscriber.forEach(function (s) {
+          try {
+            s.remove();
+          } catch (_a) {//
+          }
+        });
+      }
+    };
   }, [channelUrl, sdkInit]); // useHandleChannelEvents
 
   useEffect(function () {
@@ -2704,6 +2807,7 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
     coverImage: currentOpenChannel.coverUrl,
     onActionClick: onChatHeaderActionClick
   }), currentOpenChannel.isFrozen && React.createElement(FrozenNotification, null), React.createElement(OpenchannelConversationScroll, {
+    renderCustomMessage: renderCustomMessage,
     openchannel: currentOpenChannel,
     user: user,
     useMessageGrouping: useMessageGrouping,

@@ -2,11 +2,9 @@
   "name": "sendbird-uikit",
   "version": "2.0.0-alpha.0",
   "description": "React based UI kit for sendbird",
-  "main": "dist/index.js",
+  "main": "dist/esm/index.js",
   "typings": "dist/index.d.js",
   "style": "dist/styles.css",
-  "module": "dist/index.es.js",
-  "jsnext:main": "dist/index.es.js",
   "scripts": {
     "test": "jest",
     "test-update-snapshot": "jest -u",

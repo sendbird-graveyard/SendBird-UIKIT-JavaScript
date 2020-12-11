@@ -8,14 +8,14 @@ var LocalizationContext = require('./LocalizationContext-7c9df62c.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
-var index = require('./index-710314fd.js');
+var index = require('./index-49d966e1.js');
 var utils = require('./utils-6aedec02.js');
-var index$1 = require('./index-64dcc5d9.js');
+var index$1 = require('./index-994f886d.js');
 var format = _interopDefault(require('date-fns/format'));
 var type = require('./type-c7a3bee7.js');
 var utils$1 = require('./utils-a8277ca2.js');
 require('react-dom');
-var index$2 = require('./index-95b18747.js');
+var index$2 = require('./index-6e58a4a2.js');
 var isSameDay = _interopDefault(require('date-fns/isSameDay'));
 var utils$2 = require('./utils-c8e36c68.js');
 var formatDistanceToNowStrict = _interopDefault(require('date-fns/formatDistanceToNowStrict'));
@@ -4386,7 +4386,9 @@ function MessageHoc(_ref) {
       emojiAllMap = _ref.emojiAllMap,
       membersMap = _ref.membersMap,
       toggleReaction = _ref.toggleReaction,
-      memoizedEmojiListItems = _ref.memoizedEmojiListItems;
+      memoizedEmojiListItems = _ref.memoizedEmojiListItems,
+      renderCustomMessage = _ref.renderCustomMessage,
+      currentGroupChannel = _ref.currentGroupChannel;
   var _message$sender = message.sender,
       sender = _message$sender === void 0 ? {} : _message$sender;
 
@@ -4406,7 +4408,25 @@ function MessageHoc(_ref) {
       setShowFileViewer = _useState6[1];
 
   var editMessageInputRef = React.useRef(null);
+  var RenderedMessage = React.useMemo(function () {
+    if (renderCustomMessage) {
+      return renderCustomMessage(message, currentGroupChannel);
+    }
+
+    return null;
+  }, [message, message.message, renderCustomMessage]);
   var isByMe = userId === sender.userId || message.requestState === 'pending' || message.requestState === 'failed';
+
+  if (RenderedMessage) {
+    return React__default.createElement("div", {
+      className: "sendbird-msg-hoc sendbird-msg--scroll-ref"
+    }, hasSeperator && React__default.createElement(index$2.DateSeparator, null, React__default.createElement(index.Label, {
+      type: index.LabelTypography.CAPTION_2,
+      color: index.LabelColors.ONBACKGROUND_2
+    }, format(message.createdAt, 'MMMM dd, yyyy'))), React__default.createElement(RenderedMessage, {
+      message: message
+    }));
+  }
 
   if (showEdit) {
     return React__default.createElement(index$2.MessageInput, {
@@ -4538,6 +4558,8 @@ MessageHoc.propTypes = {
     }),
     ogMetaData: PropTypes.shape({})
   }),
+  renderCustomMessage: PropTypes.func,
+  currentGroupChannel: PropTypes.shape,
   hasSeperator: PropTypes.bool,
   disabled: PropTypes.bool,
   editDisabled: PropTypes.bool,
@@ -4556,6 +4578,8 @@ MessageHoc.propTypes = {
 MessageHoc.defaultProps = {
   userId: '',
   editDisabled: false,
+  renderCustomMessage: null,
+  currentGroupChannel: {},
   message: {},
   hasSeperator: false,
   disabled: false,
@@ -4645,6 +4669,7 @@ function (_Component) {
           deleteMessage = _this$props2.deleteMessage,
           updateMessage = _this$props2.updateMessage,
           resendMessage = _this$props2.resendMessage,
+          renderCustomMessage = _this$props2.renderCustomMessage,
           renderChatItem = _this$props2.renderChatItem,
           emojiContainer = _this$props2.emojiContainer,
           toggleReaction = _this$props2.toggleReaction,
@@ -4690,11 +4715,13 @@ function (_Component) {
         }
 
         return React__default.createElement(MessageHoc, {
+          renderCustomMessage: renderCustomMessage,
           key: m.messageId || m.reqId,
           userId: userId,
           status: readStatus[m.messageId] || getParsedStatus(m, currentGroupChannel) // show status for pending/failed messages
           ,
           message: m,
+          currentGroupChannel: currentGroupChannel,
           disabled: disabled,
           membersMap: membersMap,
           chainTop: chainTop,
@@ -4739,6 +4766,7 @@ ConversationScroll.propTypes = {
     members: PropTypes.arrayOf(PropTypes.shape({}))
   }).isRequired,
   renderChatItem: PropTypes.element,
+  renderCustomMessage: PropTypes.func,
   useReaction: PropTypes.bool,
   emojiContainer: PropTypes.shape({}),
   emojiAllMap: PropTypes.instanceOf(Map),
@@ -4753,6 +4781,7 @@ ConversationScroll.defaultProps = {
   disabled: false,
   initialized: false,
   userId: '',
+  renderCustomMessage: null,
   renderChatItem: null,
   onScroll: null,
   useReaction: true,
@@ -5129,6 +5158,7 @@ var ConversationPanel = function ConversationPanel(props) {
       useReaction = props.useReaction,
       renderChatItem = props.renderChatItem,
       renderChatHeader = props.renderChatHeader,
+      renderCustomMessage = props.renderCustomMessage,
       renderUserProfile = props.renderUserProfile,
       disableUserProfile = props.disableUserProfile,
       renderMessageInput = props.renderMessageInput,
@@ -5392,6 +5422,7 @@ var ConversationPanel = function ConversationPanel(props) {
     toggleReaction: toggleReaction,
     emojiContainer: emojiContainer,
     renderChatItem: renderChatItem,
+    renderCustomMessage: renderCustomMessage,
     useMessageGrouping: useMessageGrouping,
     messagesDispatcher: messagesDispatcher,
     currentGroupChannel: currentGroupChannel,
@@ -5489,6 +5520,7 @@ ConversationPanel.propTypes = {
   // onBeforeSendFileMessage(File)
   onBeforeUpdateUserMessage: PropTypes.func,
   renderChatItem: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
+  renderCustomMessage: PropTypes.func,
   renderMessageInput: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   renderChatHeader: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   onChatHeaderActionClick: PropTypes.func,
@@ -5504,6 +5536,7 @@ ConversationPanel.defaultProps = {
   onBeforeSendFileMessage: null,
   onBeforeUpdateUserMessage: null,
   renderChatItem: null,
+  renderCustomMessage: null,
   renderMessageInput: null,
   renderChatHeader: null,
   useReaction: true,

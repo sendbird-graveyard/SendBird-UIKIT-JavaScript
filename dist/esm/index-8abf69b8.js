@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { I as Icon, a as IconTypes } from './index-0c67ae90.js';
+import { I as Icon, a as IconTypes } from './index-ec3bf9fe.js';
 import { n as noop } from './utils-53ba1773.js';
 
 var Context = React.createContext({
@@ -83,4 +83,4 @@ function Accordion(_a) {
 var AccordionGroup$1 = AccordionGroup;
 
 export { AccordionGroup$1 as A, Accordion as a };
-//# sourceMappingURL=index-7bc4a9f7.js.map
+//# sourceMappingURL=index-8abf69b8.js.map
