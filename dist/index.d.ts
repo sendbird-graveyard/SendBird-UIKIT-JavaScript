@@ -13,10 +13,17 @@ export const sendBirdSelectors: sendBirdSelectorsInterface;
 export const ChannelSettings: React.FunctionComponent<ChannelSettingsProps>
 export const ChannelList: React.FunctionComponent<ChannelListProps>
 export const Channel: React.FunctionComponent<ChannelProps>
+export const OpenChannel: React.FunctionComponent<OpenChannelProps>
+export const OpenChannelSettings: React.FunctionComponent<OpenChannelSettingsProps>
 export function withSendBird (
   ChildComp: React.Component | React.ElementType,
   mapStoreToProps?: (store: SendBirdState) => unknown
-): React.ComponentType<unknown>;
+): (props: unknown) => React.ReactNode;
+
+interface ExtendedSendBirdInstance extends Sendbird.SendBirdInstance {
+  MessageListParams: SendBird.MessageListParams;
+}
+
 export type SendBirdState  = {
   config: SendBirdStateConfig;
   stores: SendBirdStateStore;
@@ -64,9 +71,45 @@ export namespace SendBirdSelectors {
 }
 export function getStringSet(lang?: string): {[label: string]: string}
 
+export type Logger = {
+  info?(title?: unknown, description?: unknown): void;
+  error?(title?: unknown, description?: unknown): void;
+  warning?(title?: unknown, description?: unknown): void;
+};
+
+export interface RenderOpenChannelTitleProps {
+  channel: Sendbird.OpenChannel;
+  user: Sendbird.User;
+}
+
+export interface OpenChannelProps {
+  channelUrl: string;
+  useMessageGrouping?: boolean;
+  queries?: {
+    messageListParams?: Sendbird.MessageListParams,
+  };
+  disableUserProfile?: boolean;
+  renderCustomMessage?: RenderCustomMessage;
+  renderUserProfile?(): JSX.Element;
+  renderChannelTitle?(renderProps: RenderOpenChannelTitleProps): JSX.Element;
+  renderMessageInput?(renderProps: RenderMessageInputProps): JSX.Element;
+  onBeforeSendUserMessage?(text: string): Sendbird.UserMessageParams;
+  onBeforeSendFileMessage?(file_: File): Sendbird.FileMessageParams;
+  onChatHeaderActionClick?(): void;
+}
+
+interface OpenChannelSettingsProps {
+  channelUrl: string,
+  onCloseClick?(): void;
+  onChannelModified?(channel: Sendbird.OpenChannel): void;
+  renderChannelProfile?: (props: SendbirdUIKit.RenderOpenChannelProfileProps) => React.ReactNode;
+  renderUserProfile?: (props: SendbirdUIKit.RenderUserProfileProps) => React.ReactNode;
+  disableUserProfile?: boolean;
+}
+
 // to be used with Conversation.renderMessageInput
-interface RenderMessageInputProps {
-  channel: Sendbird.GroupChannel;
+export interface RenderMessageInputProps {
+  channel: Sendbird.GroupChannel|Sendbird.OpenChannel;
   user: Sendbird.User;
   disabled: boolean;
 }
@@ -82,11 +125,11 @@ interface SendBirdStateConfig {
   setCurrenttheme: (theme: string) => void;
   userListQuery?(): UserListQuery;
 }
-interface SdkStore {
+export interface SdkStore {
   error: boolean;
   initialized: boolean;
   loading: boolean;
-  sdk: Sendbird.SendBirdInstance;
+  sdk: ExtendedSendBirdInstance;
 }
 interface UserStore {
   initialized: boolean;
@@ -111,6 +154,10 @@ interface SendBirdProviderConfig {
 }
 interface RenderChannelProfileProps {
   channel: Sendbird.GroupChannel;
+}
+
+interface RenderOpenChannelProfileProps {
+  channel: Sendbird.OpenChannel;
 }
 interface RenderUserProfileProps {
   user: Sendbird.User | Sendbird.Member;
@@ -239,6 +286,7 @@ interface ChannelProps {
   onBeforeSendFileMessage?(file: File): Sendbird.FileMessageParams;
   onBeforeUpdateUserMessage?(text: string): Sendbird.UserMessageParams;
   onChatHeaderActionClick?(event: React.MouseEvent<HTMLElement>): void;
+  renderCustomMessage?: RenderCustomMessage;
   renderChatItem?: (props: RenderChatItemProps) => React.ReactNode;
   renderMessageInput?: (props: RenderMessageInputProps) => React.ReactNode;
   renderChatHeader?: (props: RenderChatHeaderProps) => React.ReactNode;
@@ -289,3 +337,22 @@ interface AppProps {
   stringSet?: Record<string, string>;
   colorSet?: Record<string, string>;
 }
+
+export type EveryMessage = ClientUserMessage|ClientFileMessage|ClientAdminMessage;
+
+export interface ClientUserMessage extends Sendbird.UserMessage, ClientMessage {}
+export interface ClientFileMessage extends Sendbird.FileMessage, ClientMessage {}
+export interface ClientAdminMessage extends Sendbird.AdminMessage, ClientMessage {}
+interface ClientMessage {
+  reqId: string;
+  file?: File;
+  localUrl?: string;
+  _sender: Sendbird.User;
+}
+
+type RenderCustomMessage  = (
+  message: EveryMessage,
+  channel: Sendbird.OpenChannel | Sendbird.GroupChannel,
+) => RenderCustomMessageProps;
+
+type RenderCustomMessageProps = ({ message: EveryMessage }) => React.ReactElement;

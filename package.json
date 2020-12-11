@@ -1,12 +1,10 @@
 {
   "name": "sendbird-uikit",
-  "version": "1.3.0",
+  "version": "2.0.0-alpha.0",
   "description": "React based UI kit for sendbird",
-  "main": "dist/index.js",
+  "main": "dist/esm/index.js",
   "typings": "dist/index.d.js",
   "style": "dist/styles.css",
-  "module": "dist/index.es.js",
-  "jsnext:main": "dist/index.es.js",
   "scripts": {
     "test": "jest",
     "test-update-snapshot": "jest -u",
@@ -33,7 +31,7 @@
     "date-fns": "^2.16.1",
     "react": "^16.8.6 | ^17.0.0",
     "react-dom": "^16.8.6 | ^17.0.0",
-    "sendbird": "^3.0.133"
+    "sendbird": "^3.0.140"
   },
   "bugs": {
     "url": "https://github.com/sendbird/uikit-js/issues"
@@ -93,6 +91,6 @@
   "dependencies": {
     "css-vars-ponyfill": "^2.3.2",
     "date-fns": "^2.16.1",
-    "sendbird": "^3.0.133"
+    "sendbird": "^3.0.140"
   }
 }
