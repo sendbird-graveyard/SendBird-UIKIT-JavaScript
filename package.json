@@ -91,6 +91,7 @@
   "dependencies": {
     "css-vars-ponyfill": "^2.3.2",
     "date-fns": "^2.16.1",
+    "prop-types": "^15.7.2",
     "sendbird": "^3.0.140"
   }
 }

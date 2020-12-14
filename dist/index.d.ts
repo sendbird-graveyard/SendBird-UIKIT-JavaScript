@@ -158,6 +158,7 @@ interface RenderChannelProfileProps {
 
 interface RenderOpenChannelProfileProps {
   channel: Sendbird.OpenChannel;
+  user: Sendbird.User;
 }
 interface RenderUserProfileProps {
   user: Sendbird.User | Sendbird.Member;
