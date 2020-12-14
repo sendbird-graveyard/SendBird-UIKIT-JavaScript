@@ -11,7 +11,7 @@ require('prop-types');
 var index$1 = require('./index-49d966e1.js');
 var format = _interopDefault(require('date-fns/format'));
 require('react-dom');
-var index$2$1 = require('./index-6e58a4a2.js');
+var index$2$1 = require('./index-5be9c82b.js');
 var isSameDay = _interopDefault(require('date-fns/isSameDay'));
 
 var getMessageCreatedAt = function getMessageCreatedAt(message) {
@@ -1349,12 +1349,14 @@ function MessageHoc(_a) {
         deleteMessage(message);
       }
     }
-  }), showFileViewer && React__default.createElement(index$2$1.FileViewer, {
+  }), showFileViewer && message.messageType === 'file' && React__default.createElement(index$2$1.FileViewer, {
     onClose: function onClose() {
       return setShowFileViewer(false);
     },
     message: message,
-    onDelete: deleteMessage,
+    onDelete: function onDelete() {
+      return deleteMessage(message);
+    },
     isByMe: isByMe
   }));
 }
@@ -1396,10 +1398,12 @@ function OpenchannelConversationScroll(_a) {
         return;
       }
 
-      var nodes_1 = scrollRef.current.querySelectorAll('.sendbird-msg--scroll-ref');
+      var nodes = scrollRef.current.querySelectorAll('.sendbird-msg--scroll-ref');
+      var first_1 = nodes && nodes[0];
       onScroll(function () {
-        var first = nodes_1[0];
-        first.scrollIntoView();
+        try {
+          first_1.scrollIntoView();
+        } catch (error) {}
       });
     }
   };

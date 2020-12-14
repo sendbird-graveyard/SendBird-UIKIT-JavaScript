@@ -8,7 +8,7 @@ import format from 'date-fns/format';
 import { M as MessageStatusType } from './type-0296584d.js';
 import { t as truncate, g as getIsSentFromStatus$3 } from './utils-cfdeb084.js';
 import 'react-dom';
-import { i as isImage, a as isVideo, c as compareIds, u as unSupported, L as LinkLabel, D as DateSeparator, M as MessageInput, F as FileViewer } from './index-19f570c9.js';
+import { i as isImage, a as isVideo, c as compareIds, u as unSupported, L as LinkLabel, D as DateSeparator, M as MessageInput, F as FileViewer } from './index-174a827f.js';
 import isSameDay from 'date-fns/isSameDay';
 import { c as copyToClipboard$1, g as getSenderProfileUrl$1, a as getSenderName$1, b as getMessageCreatedAt$5, d as getIsSentFromStatus$2 } from './utils-d7f59026.js';
 import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict';
@@ -4619,14 +4619,17 @@ function (_Component) {
         }
 
         var nodes = scrollRef.current.querySelectorAll('.sendbird-msg--scroll-ref');
-        var first = nodes[0];
+        var first = nodes && nodes[0];
         onScroll(function (_ref) {
           var _ref2 = _slicedToArray(_ref, 1),
               messages = _ref2[0];
 
           if (messages) {
             // https://github.com/scabbiaza/react-scroll-position-on-updating-dom
-            first.scrollIntoView();
+            try {
+              first.scrollIntoView();
+            } catch (error) {//
+            }
           }
         });
       }

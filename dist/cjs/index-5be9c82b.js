@@ -123,7 +123,7 @@ var MessageInput = React__default.forwardRef(function (props, ref) {
     var elem = ref.current;
     var MAX_HEIGHT = window.document.body.offsetHeight * 0.6;
 
-    if (elem.scrollHeight >= LINE_HEIGHT) {
+    if (elem && elem.scrollHeight >= LINE_HEIGHT) {
       if (MAX_HEIGHT < elem.scrollHeight) {
         elem.style.height = 'auto';
         elem.style.height = "".concat(MAX_HEIGHT, "px");
@@ -440,4 +440,4 @@ exports.compareIds = compareIds;
 exports.isImage = isImage;
 exports.isVideo = isVideo;
 exports.unSupported = unSupported;
-//# sourceMappingURL=index-6e58a4a2.js.map
+//# sourceMappingURL=index-5be9c82b.js.map

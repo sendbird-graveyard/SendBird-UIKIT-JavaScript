@@ -528,6 +528,7 @@ function OpenChannelSettings(props) {
   var channelUrl = props.channelUrl,
       _a = props.onCloseClick,
       _onCloseClick = _a === void 0 ? utils.noop : _a,
+      onBeforeUpdateChannel = props.onBeforeUpdateChannel,
       _b = props.onChannelModified,
       onChannelModified = _b === void 0 ? utils.noop : _b,
       renderChannelProfile = props.renderChannelProfile,
@@ -595,20 +596,33 @@ function OpenChannelSettings(props) {
   })), React__default.createElement("div", {
     className: "sendbird-openchannel-settings__profile"
   }, renderChannelProfile ? renderChannelProfile({
-    channel: channel
+    channel: channel,
+    user: user
   }) : React__default.createElement(ChannelProfile, {
     disabled: !isOnline,
     channel: channel,
     theme: theme,
     onChannelInfoChange: function onChannelInfoChange(currentImg, currentTitle) {
       logger.info('ChannelSettings: Channel information being updated');
-      channel.updateChannel(currentTitle, currentImg, channel.data, function (openChannel) {
-        logger.info('ChannelSettings: Channel information updated', openChannel);
-        onChannelModified(openChannel); // setChannel(openChannel) => alone not working
 
-        setChannel(null);
-        setChannel(openChannel);
-      });
+      if (onBeforeUpdateChannel) {
+        var params = onBeforeUpdateChannel(currentTitle, currentImg, channel.data);
+        logger.info('ChannelSettings: onBeforeUpdateChannel', params);
+        channel.updateChannel(params, function (openChannel) {
+          onChannelModified(openChannel); // setChannel(openChannel) => alone not working
+
+          setChannel(null);
+          setChannel(openChannel);
+        });
+      } else {
+        channel.updateChannel(currentTitle, currentImg, channel.data, function (openChannel) {
+          logger.info('ChannelSettings: Channel information updated', openChannel);
+          onChannelModified(openChannel); // setChannel(openChannel) => alone not working
+
+          setChannel(null);
+          setChannel(openChannel);
+        });
+      }
     }
   })), React__default.createElement("div", {
     className: "sendbird-openchannel-settings__url"

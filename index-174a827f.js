@@ -118,7 +118,7 @@ var MessageInput = React.forwardRef(function (props, ref) {
     var elem = ref.current;
     var MAX_HEIGHT = window.document.body.offsetHeight * 0.6;
 
-    if (elem.scrollHeight >= LINE_HEIGHT) {
+    if (elem && elem.scrollHeight >= LINE_HEIGHT) {
       if (MAX_HEIGHT < elem.scrollHeight) {
         elem.style.height = 'auto';
         elem.style.height = "".concat(MAX_HEIGHT, "px");
@@ -428,4 +428,4 @@ LinkLabel.defaultProps = {
 };
 
 export { DateSeparator as D, FileViewer as F, LinkLabel as L, MessageInput as M, isVideo as a, compareIds as c, isImage as i, unSupported as u };
-//# sourceMappingURL=index-19f570c9.js.map
+//# sourceMappingURL=index-174a827f.js.map

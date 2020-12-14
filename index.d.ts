@@ -101,6 +101,7 @@ export interface OpenChannelProps {
 interface OpenChannelSettingsProps {
   channelUrl: string,
   onCloseClick?(): void;
+  onBeforeUpdateChannel?(currentTitle: string, currentImg: File, data: string): Sendbird.OpenChannelParams;
   onChannelModified?(channel: Sendbird.OpenChannel): void;
   renderChannelProfile?: (props: SendbirdUIKit.RenderOpenChannelProfileProps) => React.ReactNode;
   renderUserProfile?: (props: SendbirdUIKit.RenderUserProfileProps) => React.ReactNode;

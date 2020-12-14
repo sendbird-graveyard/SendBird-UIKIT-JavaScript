@@ -15,7 +15,7 @@ var format = _interopDefault(require('date-fns/format'));
 var type = require('./type-c7a3bee7.js');
 var utils$1 = require('./utils-a8277ca2.js');
 require('react-dom');
-var index$2 = require('./index-6e58a4a2.js');
+var index$2 = require('./index-5be9c82b.js');
 var isSameDay = _interopDefault(require('date-fns/isSameDay'));
 var utils$2 = require('./utils-c8e36c68.js');
 var formatDistanceToNowStrict = _interopDefault(require('date-fns/formatDistanceToNowStrict'));
@@ -4626,14 +4626,17 @@ function (_Component) {
         }
 
         var nodes = scrollRef.current.querySelectorAll('.sendbird-msg--scroll-ref');
-        var first = nodes[0];
+        var first = nodes && nodes[0];
         onScroll(function (_ref) {
           var _ref2 = LocalizationContext._slicedToArray(_ref, 1),
               messages = _ref2[0];
 
           if (messages) {
             // https://github.com/scabbiaza/react-scroll-position-on-updating-dom
-            first.scrollIntoView();
+            try {
+              first.scrollIntoView();
+            } catch (error) {//
+            }
           }
         });
       }

@@ -18,7 +18,7 @@ import './utils-cfdeb084.js';
 import 'react-dom';
 import './index-aa89d60a.js';
 import Conversation from './Channel.js';
-import './index-19f570c9.js';
+import './index-174a827f.js';
 import 'date-fns/isSameDay';
 import './utils-d7f59026.js';
 import 'date-fns/formatDistanceToNowStrict';
