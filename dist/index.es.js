@@ -220,7 +220,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.3.0';
+var APP_VERSION_STRING = '1.3.1';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -9826,7 +9826,7 @@ var MessageInput = React.forwardRef(function (props, ref) {
     var elem = ref.current;
     var MAX_HEIGHT = window.document.body.offsetHeight * 0.6;
 
-    if (elem.scrollHeight >= LINE_HEIGHT) {
+    if (elem && elem.scrollHeight >= LINE_HEIGHT) {
       if (MAX_HEIGHT < elem.scrollHeight) {
         elem.style.height = 'auto';
         elem.style.height = "".concat(MAX_HEIGHT, "px");
@@ -11178,6 +11178,8 @@ function MessageHoc(_ref) {
       updateMessage = _ref.updateMessage,
       status = _ref.status,
       resendMessage = _ref.resendMessage,
+      renderCustomMessage = _ref.renderCustomMessage,
+      currentGroupChannel = _ref.currentGroupChannel,
       useReaction = _ref.useReaction,
       chainTop = _ref.chainTop,
       chainBottom = _ref.chainBottom,
@@ -11204,7 +11206,25 @@ function MessageHoc(_ref) {
       setShowFileViewer = _useState6[1];
 
   var editMessageInputRef = useRef(null);
+  var RenderedMessage = useMemo(function () {
+    if (renderCustomMessage) {
+      return renderCustomMessage(message, currentGroupChannel);
+    }
+
+    return null;
+  }, [message, message.message, renderCustomMessage]);
   var isByMe = userId === sender.userId || message.requestState === 'pending' || message.requestState === 'failed';
+
+  if (RenderedMessage) {
+    return React.createElement("div", {
+      className: "sendbird-msg-hoc sendbird-msg--scroll-ref"
+    }, hasSeperator && React.createElement(DateSeparator, null, React.createElement(Label, {
+      type: LabelTypography.CAPTION_2,
+      color: LabelColors.ONBACKGROUND_2
+    }, format(message.createdAt, 'MMMM dd, yyyy'))), React.createElement(RenderedMessage, {
+      message: message
+    }));
+  }
 
   if (showEdit) {
     return React.createElement(MessageInput, {
@@ -11342,6 +11362,8 @@ MessageHoc.propTypes = {
   deleteMessage: PropTypes.func.isRequired,
   updateMessage: PropTypes.func.isRequired,
   resendMessage: PropTypes.func.isRequired,
+  renderCustomMessage: PropTypes.func,
+  currentGroupChannel: PropTypes.shape,
   status: PropTypes.string,
   useReaction: PropTypes.bool.isRequired,
   chainTop: PropTypes.bool.isRequired,
@@ -11357,6 +11379,8 @@ MessageHoc.defaultProps = {
   message: {},
   hasSeperator: false,
   disabled: false,
+  renderCustomMessage: null,
+  currentGroupChannel: {},
   status: '',
   toggleReaction: function toggleReaction() {},
   memoizedEmojiListItems: function memoizedEmojiListItems() {
@@ -11400,14 +11424,17 @@ function (_Component) {
         }
 
         var nodes = scrollRef.current.querySelectorAll('.sendbird-msg--scroll-ref');
-        var first = nodes[0];
         onScroll(function (_ref) {
           var _ref2 = _slicedToArray(_ref, 1),
               messages = _ref2[0];
 
           if (messages) {
             // https://github.com/scabbiaza/react-scroll-position-on-updating-dom
-            first.scrollIntoView();
+            try {
+              var first = nodes[0];
+              first.scrollIntoView();
+            } catch (error) {//
+            }
           }
         });
       }
@@ -11444,6 +11471,7 @@ function (_Component) {
           updateMessage = _this$props2.updateMessage,
           resendMessage = _this$props2.resendMessage,
           renderChatItem = _this$props2.renderChatItem,
+          renderCustomMessage = _this$props2.renderCustomMessage,
           emojiContainer = _this$props2.emojiContainer,
           toggleReaction = _this$props2.toggleReaction,
           useMessageGrouping = _this$props2.useMessageGrouping,
@@ -11500,6 +11528,8 @@ function (_Component) {
           emojiAllMap: emojiAllMap,
           editDisabled: editDisabled,
           hasSeperator: hasSeperator,
+          renderCustomMessage: renderCustomMessage,
+          currentGroupChannel: currentGroupChannel,
           chainBottom: chainBottom,
           updateMessage: updateMessage,
           deleteMessage: deleteMessage,
@@ -11531,6 +11561,7 @@ ConversationScroll.propTypes = {
   deleteMessage: PropTypes.func.isRequired,
   resendMessage: PropTypes.func.isRequired,
   updateMessage: PropTypes.func.isRequired,
+  renderCustomMessage: PropTypes.func,
   readStatus: PropTypes.shape({}).isRequired,
   currentGroupChannel: PropTypes.shape({
     markAsRead: PropTypes.func,
@@ -11552,6 +11583,7 @@ ConversationScroll.defaultProps = {
   initialized: false,
   userId: '',
   renderChatItem: null,
+  renderCustomMessage: null,
   onScroll: null,
   useReaction: true,
   emojiContainer: {},
@@ -11928,6 +11960,7 @@ var ConversationPanel = function ConversationPanel(props) {
       renderChatItem = props.renderChatItem,
       renderChatHeader = props.renderChatHeader,
       renderMessageInput = props.renderMessageInput,
+      renderCustomMessage = props.renderCustomMessage,
       useMessageGrouping = props.useMessageGrouping,
       onChatHeaderActionClick = props.onChatHeaderActionClick,
       onBeforeSendUserMessage = props.onBeforeSendUserMessage,
@@ -12183,6 +12216,7 @@ var ConversationPanel = function ConversationPanel(props) {
     allMessages: allMessages,
     emojiAllMap: emojiAllMap,
     membersMap: nicknamesMap,
+    renderCustomMessage: renderCustomMessage,
     editDisabled: isDisabledBecauseFrozen(currentGroupChannel),
     deleteMessage: deleteMessage,
     updateMessage: updateMessage,
@@ -12289,6 +12323,7 @@ ConversationPanel.propTypes = {
   renderChatItem: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   renderMessageInput: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   renderChatHeader: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
+  renderCustomMessage: PropTypes.func,
   onChatHeaderActionClick: PropTypes.func,
   useReaction: PropTypes.bool,
   disableUserProfile: PropTypes.bool,
@@ -12304,6 +12339,7 @@ ConversationPanel.defaultProps = {
   renderChatItem: null,
   renderMessageInput: null,
   renderChatHeader: null,
+  renderCustomMessage: null,
   useReaction: true,
   disableUserProfile: false,
   renderUserProfile: null,

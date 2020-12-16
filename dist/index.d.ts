@@ -202,6 +202,24 @@ interface RenderChatHeaderProps {
   channel: Sendbird.GroupChannel;
   user: Sendbird.User;
 }
+export type EveryMessage = ClientUserMessage|ClientFileMessage|ClientAdminMessage;
+
+export interface ClientUserMessage extends Sendbird.UserMessage, ClientMessage {}
+export interface ClientFileMessage extends Sendbird.FileMessage, ClientMessage {}
+export interface ClientAdminMessage extends Sendbird.AdminMessage, ClientMessage {}
+interface ClientMessage {
+  reqId: string;
+  file?: File;
+  localUrl?: string;
+  _sender: Sendbird.User;
+}
+
+type RenderCustomMessage  = (
+  message: EveryMessage,
+  channel: Sendbird.OpenChannel | Sendbird.GroupChannel,
+) => RenderCustomMessageProps;
+
+type RenderCustomMessageProps = ({ message: EveryMessage }) => React.ReactElement;
 interface SendBirdProviderProps {
   userId: string;
   appId: string;
@@ -240,6 +258,7 @@ interface ChannelProps {
   onBeforeUpdateUserMessage?(text: string): Sendbird.UserMessageParams;
   onChatHeaderActionClick?(event: React.MouseEvent<HTMLElement>): void;
   renderChatItem?: (props: RenderChatItemProps) => React.ReactNode;
+  renderCustomMessage?: RenderCustomMessage;
   renderMessageInput?: (props: RenderMessageInputProps) => React.ReactNode;
   renderChatHeader?: (props: RenderChatHeaderProps) => React.ReactNode;
   renderUserProfile?: (props: RenderUserProfileProps) => React.ReactNode;
