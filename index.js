@@ -18,7 +18,7 @@ import './utils-cfdeb084.js';
 import 'react-dom';
 import './index-b49918bb.js';
 export { default as Channel, getAllEmojisFromEmojiContainer, getEmojiCategoriesFromEmojiContainer, getEmojisFromEmojiContainer } from './Channel.js';
-import './index-dd4f8094.js';
+import './index-f7b03766.js';
 import 'date-fns/isSameDay';
 import './utils-d7f59026.js';
 import 'date-fns/formatDistanceToNowStrict';

@@ -1,13 +1,8 @@
-'use strict';
-
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var LocalizationContext = require('./LocalizationContext-9665649b.js');
-var React = require('react');
-var React__default = _interopDefault(React);
-var PropTypes = _interopDefault(require('prop-types'));
-var index = require('./index-478b0dfc.js');
-var reactDom = require('react-dom');
+import { c as _toConsumableArray, e as LocalizationContext, b as _slicedToArray } from './LocalizationContext-5c5b45a0.js';
+import React, { useContext, useRef, useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { b as Label, c as LabelTypography, d as LabelColors, u as Colors, v as changeColorToClassName, e as IconButton, I as Icon, a as IconTypes, g as IconColors, B as Button, T as Type, w as Size, A as Avatar, x as MODAL_ROOT, y as changeColorToClassName$1 } from './index-a2b521ce.js';
+import { createPortal } from 'react-dom';
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types
 var SUPPORTED_MIMES = {
@@ -46,14 +41,14 @@ function DateSeparator(_ref) {
       children = _ref.children,
       separatorColor = _ref.separatorColor;
   var injectingClassName = Array.isArray(className) ? className : [className];
-  return React__default.createElement("div", {
-    className: [].concat(LocalizationContext._toConsumableArray(injectingClassName), ['sendbird-separator']).join(' ')
-  }, React__default.createElement("div", {
-    className: ["".concat(index.changeColorToClassName(separatorColor), "--background-color"), 'sendbird-separator__left'].join(' ')
-  }), React__default.createElement("div", {
+  return React.createElement("div", {
+    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-separator']).join(' ')
+  }, React.createElement("div", {
+    className: ["".concat(changeColorToClassName(separatorColor), "--background-color"), 'sendbird-separator__left'].join(' ')
+  }), React.createElement("div", {
     className: "sendbird-separator__text"
-  }, children), React__default.createElement("div", {
-    className: ["".concat(index.changeColorToClassName(separatorColor), "--background-color"), 'sendbird-separator__right'].join(' ')
+  }, children), React.createElement("div", {
+    className: ["".concat(changeColorToClassName(separatorColor), "--background-color"), 'sendbird-separator__right'].join(' ')
   }));
 }
 DateSeparator.propTypes = {
@@ -63,11 +58,11 @@ DateSeparator.propTypes = {
 };
 DateSeparator.defaultProps = {
   className: '',
-  children: React__default.createElement(index.Label, {
-    type: index.LabelTypography.CAPTION_2,
-    color: index.LabelColors.ONBACKGROUND_2
+  children: React.createElement(Label, {
+    type: LabelTypography.CAPTION_2,
+    color: LabelColors.ONBACKGROUND_2
   }, "Date Separator"),
-  separatorColor: index.Colors.ONBACKGROUND_4
+  separatorColor: Colors.ONBACKGROUND_4
 };
 
 // import IconAttach from '../../svgs/icon-attach.svg';
@@ -92,7 +87,7 @@ var handleUploadFile = function handleUploadFile(callback) {
   };
 };
 
-var MessageInput = React__default.forwardRef(function (props, ref) {
+var MessageInput = React.forwardRef(function (props, ref) {
   var isEdit = props.isEdit,
       disabled = props.disabled,
       value = props.value,
@@ -104,40 +99,43 @@ var MessageInput = React__default.forwardRef(function (props, ref) {
       onCancelEdit = props.onCancelEdit,
       onStartTyping = props.onStartTyping;
 
-  var _useContext = React.useContext(LocalizationContext.LocalizationContext),
+  var _useContext = useContext(LocalizationContext),
       stringSet = _useContext.stringSet;
 
-  var fileInputRef = React.useRef(null);
+  var fileInputRef = useRef(null);
 
-  var _useState = React.useState(value),
-      _useState2 = LocalizationContext._slicedToArray(_useState, 2),
+  var _useState = useState(value),
+      _useState2 = _slicedToArray(_useState, 2),
       inputValue = _useState2[0],
       setInputValue = _useState2[1];
 
-  var _useState3 = React.useState(false),
-      _useState4 = LocalizationContext._slicedToArray(_useState3, 2),
+  var _useState3 = useState(false),
+      _useState4 = _slicedToArray(_useState3, 2),
       isShiftPressed = _useState4[0],
       setIsShiftPressed = _useState4[1];
 
   var setHeight = function setHeight() {
-    var elem = ref.current;
-    var MAX_HEIGHT = window.document.body.offsetHeight * 0.6;
+    try {
+      var elem = ref.current;
+      var MAX_HEIGHT = window.document.body.offsetHeight * 0.6;
 
-    if (elem && elem.scrollHeight >= LINE_HEIGHT) {
-      if (MAX_HEIGHT < elem.scrollHeight) {
-        elem.style.height = 'auto';
-        elem.style.height = "".concat(MAX_HEIGHT, "px");
+      if (elem && elem.scrollHeight >= LINE_HEIGHT) {
+        if (MAX_HEIGHT < elem.scrollHeight) {
+          elem.style.height = 'auto';
+          elem.style.height = "".concat(MAX_HEIGHT, "px");
+        } else {
+          elem.style.height = 'auto';
+          elem.style.height = "".concat(elem.scrollHeight, "px");
+        }
       } else {
-        elem.style.height = 'auto';
-        elem.style.height = "".concat(elem.scrollHeight, "px");
+        elem.style.height = '';
       }
-    } else {
-      elem.style.height = '';
+    } catch (error) {// error
     }
   }; // after setHeight called twice, the textarea goes to the initialized
 
 
-  React.useEffect(function () {
+  useEffect(function () {
     setHeight();
     return setHeight;
   }, [inputValue]);
@@ -157,11 +155,11 @@ var MessageInput = React__default.forwardRef(function (props, ref) {
     }
   };
 
-  return React__default.createElement("form", {
+  return React.createElement("form", {
     className: "\n        ".concat(isEdit ? 'sendbird-message-input__edit' : '', "\n        ").concat(disabled ? 'sendbird-message-input-form__disabled' : '', "\n      ")
-  }, React__default.createElement("div", {
+  }, React.createElement("div", {
     className: "\n          sendbird-message-input\n          ".concat(disabled ? 'sendbird-message-input__disabled' : '', "\n        ")
-  }, React__default.createElement("textarea", {
+  }, React.createElement("textarea", {
     disabled: disabled,
     ref: ref,
     name: name,
@@ -187,21 +185,21 @@ var MessageInput = React__default.forwardRef(function (props, ref) {
         setIsShiftPressed(false);
       }
     }
-  }), !inputValue && React__default.createElement(index.Label, {
-    type: index.LabelTypography.BODY_1,
-    color: index.LabelColors.ONBACKGROUND_3,
+  }), !inputValue && React.createElement(Label, {
+    type: LabelTypography.BODY_1,
+    color: LabelColors.ONBACKGROUND_3,
     className: "sendbird-message-input--placeholder"
-  }, placeholder || stringSet.CHANNEL__MESSAGE_INPUT__PLACE_HOLDER), !isEdit && inputValue && inputValue.trim().length > 0 && React__default.createElement(index.IconButton, {
+  }, placeholder || stringSet.CHANNEL__MESSAGE_INPUT__PLACE_HOLDER), !isEdit && inputValue && inputValue.trim().length > 0 && React.createElement(IconButton, {
     className: "sendbird-message-input--send",
     height: "32px",
     width: "32px",
     onClick: sendMessage
-  }, React__default.createElement(index.Icon, {
-    type: index.IconTypes.SEND,
-    fillColor: index.IconColors.PRIMARY,
+  }, React.createElement(Icon, {
+    type: IconTypes.SEND,
+    fillColor: IconColors.PRIMARY,
     width: "20px",
     height: "20px"
-  })), !isEdit && (!inputValue || !(inputValue.trim().length > 0)) && React__default.createElement(index.IconButton, {
+  })), !isEdit && (!inputValue || !(inputValue.trim().length > 0)) && React.createElement(IconButton, {
     className: "sendbird-message-input--attach",
     height: "32px",
     width: "32px",
@@ -209,26 +207,26 @@ var MessageInput = React__default.forwardRef(function (props, ref) {
       // todo: clear previous input
       fileInputRef.current.click();
     }
-  }, React__default.createElement(index.Icon, {
-    type: index.IconTypes.ATTACH,
+  }, React.createElement(Icon, {
+    type: IconTypes.ATTACH,
     width: "20px",
     height: "20px"
-  }), React__default.createElement("input", {
+  }), React.createElement("input", {
     type: "file",
     ref: fileInputRef,
     onChange: handleUploadFile(onFileUpload),
     className: "sendbird-message-input--attach-input"
-  }))), isEdit && React__default.createElement("div", {
+  }))), isEdit && React.createElement("div", {
     className: "sendbird-message-input--edit-action"
-  }, React__default.createElement(index.Button, {
+  }, React.createElement(Button, {
     className: "sendbird-message-input--edit-action__cancel",
-    type: index.Type.SECONDARY,
-    size: index.Size.SMALL,
+    type: Type.SECONDARY,
+    size: Size.SMALL,
     onClick: onCancelEdit
-  }, stringSet.BUTTON__CANCEL), React__default.createElement(index.Button, {
+  }, stringSet.BUTTON__CANCEL), React.createElement(Button, {
     className: "sendbird-message-input--edit-action__save",
-    type: index.Type.PRIMARY,
-    size: index.Size.SMALL,
+    type: Type.PRIMARY,
+    size: Size.SMALL,
     onClick: function onClick() {
       if (inputValue) {
         var trimmedInputValue = inputValue.trim();
@@ -273,71 +271,71 @@ var FileViewerComponent = function FileViewerComponent(_ref) {
       onClose = _ref.onClose,
       onDelete = _ref.onDelete,
       isByMe = _ref.isByMe;
-  return React__default.createElement("div", {
+  return React.createElement("div", {
     className: "sendbird-fileviewer"
-  }, React__default.createElement("div", {
+  }, React.createElement("div", {
     className: "sendbird-fileviewer__header"
-  }, React__default.createElement("div", {
+  }, React.createElement("div", {
     className: "sendbird-fileviewer__header-left"
-  }, React__default.createElement("div", {
+  }, React.createElement("div", {
     className: "sendbird-fileviewer__header-avatar"
-  }, React__default.createElement(index.Avatar, {
+  }, React.createElement(Avatar, {
     height: "32px",
     width: "32px",
     src: profileUrl
-  })), React__default.createElement(index.Label, {
+  })), React.createElement(Label, {
     className: "sendbird-fileviewer__header-filename",
-    type: index.LabelTypography.H_2,
-    color: index.LabelColors.ONBACKGROUND_1
-  }, name), React__default.createElement(index.Label, {
+    type: LabelTypography.H_2,
+    color: LabelColors.ONBACKGROUND_1
+  }, name), React.createElement(Label, {
     className: "sendbird-fileviewer__header-sendername",
-    type: index.LabelTypography.BODY_1,
-    color: index.LabelColors.ONBACKGROUND_2
-  }, nickname)), React__default.createElement("div", {
+    type: LabelTypography.BODY_1,
+    color: LabelColors.ONBACKGROUND_2
+  }, nickname)), React.createElement("div", {
     className: "sendbird-fileviewer__header-right"
-  }, !unSupported(type) && React__default.createElement("div", {
+  }, !unSupported(type) && React.createElement("div", {
     className: "sendbird-fileviewer__header-actions"
-  }, React__default.createElement("a", {
+  }, React.createElement("a", {
     href: url,
     rel: "noopener noreferrer",
     target: "_blank",
     className: "sendbird-fileviewer__header-download"
-  }, React__default.createElement(index.Icon, {
-    type: index.IconTypes.DOWNLOAD,
+  }, React.createElement(Icon, {
+    type: IconTypes.DOWNLOAD,
     height: "24px",
     width: "24px"
-  })), onDelete && isByMe && React__default.createElement("div", {
+  })), onDelete && isByMe && React.createElement("div", {
     className: "sendbird-fileviewer__header-delete"
-  }, React__default.createElement(index.Icon, {
-    type: index.IconTypes.DELETE,
+  }, React.createElement(Icon, {
+    type: IconTypes.DELETE,
     height: "24px",
     width: "24px",
     onClick: onDelete
-  }))), React__default.createElement("div", {
+  }))), React.createElement("div", {
     className: "sendbird-fileviewer__header-close"
-  }, React__default.createElement(index.Icon, {
-    type: index.IconTypes.CLOSE,
+  }, React.createElement(Icon, {
+    type: IconTypes.CLOSE,
     height: "24px",
     width: "24px",
     onClick: onClose
-  })))), React__default.createElement("div", {
+  })))), React.createElement("div", {
     className: "sendbird-fileviewer__content"
   }, isVideo(type) && // eslint-disable-next-line jsx-a11y/media-has-caption
-  React__default.createElement("video", {
+  React.createElement("video", {
     controls: true,
     className: "sendbird-fileviewer__video"
-  }, React__default.createElement("source", {
+  }, React.createElement("source", {
     src: url,
     type: type
-  })), isImage(type) && React__default.createElement("img", {
+  })), isImage(type) && React.createElement("img", {
     src: url,
     alt: name,
     className: "sendbird-fileviewer__img"
-  }), unSupported(type) && React__default.createElement("div", {
+  }), unSupported(type) && React.createElement("div", {
     className: "sendbird-fileviewer__unsupported"
-  }, React__default.createElement(index.Label, {
-    type: index.LabelTypography.H_1,
-    color: index.LabelColors.ONBACKGROUND_1
+  }, React.createElement(Label, {
+    type: LabelTypography.H_1,
+    color: LabelColors.ONBACKGROUND_1
   }, "Unsupoprted message"))));
 };
 FileViewerComponent.propTypes = {
@@ -366,7 +364,7 @@ function FileViewer(props) {
   var profileUrl = sender.profileUrl,
       _sender$nickname = sender.nickname,
       nickname = _sender$nickname === void 0 ? '' : _sender$nickname;
-  return reactDom.createPortal(React__default.createElement(FileViewerComponent, {
+  return createPortal(React.createElement(FileViewerComponent, {
     profileUrl: profileUrl,
     nickname: nickname,
     type: type,
@@ -375,7 +373,7 @@ function FileViewer(props) {
     onClose: onClose,
     onDelete: onDelete,
     isByMe: isByMe
-  }), document.getElementById(index.MODAL_ROOT));
+  }), document.getElementById(MODAL_ROOT));
 }
 FileViewer.propTypes = {
   onClose: PropTypes.func.isRequired,
@@ -406,16 +404,16 @@ function LinkLabel(_ref) {
   var injectingClassName = Array.isArray(className) ? className : [className];
 
   if (color) {
-    injectingClassName.push(index.changeColorToClassName$1(color));
+    injectingClassName.push(changeColorToClassName$1(color));
   }
 
   var url = http.test(src) ? src : "http://".concat(src);
-  return React__default.createElement("a", {
+  return React.createElement("a", {
     className: "".concat(LINK_LABEL, " ").concat(injectingClassName.join(' ')),
     href: url,
     target: "_blank",
     rel: "noopener noreferrer"
-  }, React__default.createElement(index.Label, {
+  }, React.createElement(Label, {
     type: type,
     color: color,
     className: "".concat(LINK_LABEL, "__label")
@@ -425,19 +423,12 @@ LinkLabel.propTypes = {
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   children: PropTypes.oneOfType([PropTypes.string, PropTypes.element, PropTypes.arrayOf(PropTypes.string), PropTypes.arrayOf(PropTypes.element)]).isRequired,
   src: PropTypes.string.isRequired,
-  type: PropTypes.oneOf(Object.keys(index.LabelTypography)).isRequired,
-  color: PropTypes.oneOf(Object.keys(index.LabelColors)).isRequired
+  type: PropTypes.oneOf(Object.keys(LabelTypography)).isRequired,
+  color: PropTypes.oneOf(Object.keys(LabelColors)).isRequired
 };
 LinkLabel.defaultProps = {
   className: ''
 };
 
-exports.DateSeparator = DateSeparator;
-exports.FileViewer = FileViewer;
-exports.LinkLabel = LinkLabel;
-exports.MessageInput = MessageInput;
-exports.compareIds = compareIds;
-exports.isImage = isImage;
-exports.isVideo = isVideo;
-exports.unSupported = unSupported;
-//# sourceMappingURL=index-26cd409d.js.map
+export { DateSeparator as D, FileViewer as F, LinkLabel as L, MessageInput as M, isVideo as a, compareIds as c, isImage as i, unSupported as u };
+//# sourceMappingURL=index-f7b03766.js.map

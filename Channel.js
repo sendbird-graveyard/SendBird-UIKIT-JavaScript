@@ -8,7 +8,7 @@ import format from 'date-fns/format';
 import { M as MessageStatusType } from './type-0296584d.js';
 import { t as truncate, g as getIsSentFromStatus$3 } from './utils-cfdeb084.js';
 import 'react-dom';
-import { i as isImage, a as isVideo, c as compareIds, u as unSupported, L as LinkLabel, D as DateSeparator, M as MessageInput, F as FileViewer } from './index-dd4f8094.js';
+import { i as isImage, a as isVideo, c as compareIds, u as unSupported, L as LinkLabel, D as DateSeparator, M as MessageInput, F as FileViewer } from './index-f7b03766.js';
 import isSameDay from 'date-fns/isSameDay';
 import { c as copyToClipboard$1, g as getSenderProfileUrl$1, a as getSenderName$1, b as getMessageCreatedAt$5, d as getIsSentFromStatus$2 } from './utils-d7f59026.js';
 import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict';

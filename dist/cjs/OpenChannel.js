@@ -11,7 +11,7 @@ require('prop-types');
 var index$1 = require('./index-478b0dfc.js');
 var format = _interopDefault(require('date-fns/format'));
 require('react-dom');
-var index$2$1 = require('./index-26cd409d.js');
+var index$2$1 = require('./index-728837db.js');
 var isSameDay = _interopDefault(require('date-fns/isSameDay'));
 
 var getMessageCreatedAt = function getMessageCreatedAt(message) {

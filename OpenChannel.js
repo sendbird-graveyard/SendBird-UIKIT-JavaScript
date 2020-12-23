@@ -4,7 +4,7 @@ import 'prop-types';
 import { b as Label, c as LabelTypography, L as LabelStringSet, A as Avatar, I as Icon, a as IconTypes, g as IconColors, d as LabelColors, e as IconButton, n as UserProfileContext, C as ContextMenu, h as MenuItems, o as UserProfile, i as MenuItem, r as ImageRenderer, f as TextButton, M as Modal, P as PlaceHolder, t as PlaceHolderTypes, p as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, q as SEND_FILE_MESSAGE, U as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, l as UserProfileProvider } from './index-a2b521ce.js';
 import format from 'date-fns/format';
 import 'react-dom';
-import { M as MessageInput, L as LinkLabel, i as isImage, a as isVideo, D as DateSeparator, F as FileViewer, c as compareIds } from './index-dd4f8094.js';
+import { M as MessageInput, L as LinkLabel, i as isImage, a as isVideo, D as DateSeparator, F as FileViewer, c as compareIds } from './index-f7b03766.js';
 import isSameDay from 'date-fns/isSameDay';
 
 var getMessageCreatedAt = function getMessageCreatedAt(message) {

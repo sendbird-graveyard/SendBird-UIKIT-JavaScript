@@ -23,7 +23,7 @@ require('./utils-a8277ca2.js');
 require('react-dom');
 require('./index-17b8764d.js');
 var Channel = require('./Channel.js');
-require('./index-26cd409d.js');
+require('./index-728837db.js');
 require('date-fns/isSameDay');
 require('./utils-c8e36c68.js');
 require('date-fns/formatDistanceToNowStrict');

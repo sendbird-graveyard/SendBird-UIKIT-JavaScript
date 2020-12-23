@@ -15,7 +15,7 @@ var format = _interopDefault(require('date-fns/format'));
 var type = require('./type-c7a3bee7.js');
 var utils$1 = require('./utils-a8277ca2.js');
 require('react-dom');
-var index$2 = require('./index-26cd409d.js');
+var index$2 = require('./index-728837db.js');
 var isSameDay = _interopDefault(require('date-fns/isSameDay'));
 var utils$2 = require('./utils-c8e36c68.js');
 var formatDistanceToNowStrict = _interopDefault(require('date-fns/formatDistanceToNowStrict'));
