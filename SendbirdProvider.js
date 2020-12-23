@@ -1,14 +1,9 @@
-'use strict';
-
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var LocalizationContext = require('./LocalizationContext-9665649b.js');
-var React = require('react');
-var React__default = _interopDefault(React);
-var PropTypes = _interopDefault(require('prop-types'));
-var Sb = _interopDefault(require('sendbird'));
-var actionTypes = require('./actionTypes-920b541f.js');
-var cssVars = _interopDefault(require('css-vars-ponyfill'));
+import { _ as __assign, a as _objectSpread2, b as _slicedToArray, u as uuidv4, g as getStringSet, S as SendbirdSdkContext, L as LocalizationProvider } from './LocalizationContext-5c5b45a0.js';
+import React, { useLayoutEffect, useState, useEffect, useReducer } from 'react';
+import PropTypes from 'prop-types';
+import Sb from 'sendbird';
+import { R as RESET_USER, I as INIT_USER, U as UPDATE_USER_INFO } from './actionTypes-a85c0eaa.js';
+import cssVars from 'css-vars-ponyfill';
 
 var INIT_SDK = 'INIT_SDK';
 var SET_SDK_LOADING = 'SET_SDK_LOADING';
@@ -32,7 +27,7 @@ var disconnectSdk = function disconnectSdk(_ref) {
         type: RESET_SDK
       });
       userDispatcher({
-        type: actionTypes.RESET_USER
+        type: RESET_USER
       });
     }).finally(function () {
       onDisconnect();
@@ -79,7 +74,7 @@ var handleConnection = function handleConnection(_ref2, dispatchers) {
             payload: newSdk
           });
           userDispatcher({
-            type: actionTypes.INIT_USER,
+            type: INIT_USER,
             payload: user
           }); // use nickname/profileUrl if provided
           // or set userID as nickname
@@ -88,7 +83,7 @@ var handleConnection = function handleConnection(_ref2, dispatchers) {
           var newProfileUrl = profileUrl || user.profileUrl;
           newSdk.updateCurrentUserInfo(newNickName, newProfileUrl).then(function (namedUser) {
             userDispatcher({
-              type: actionTypes.UPDATE_USER_INFO,
+              type: UPDATE_USER_INFO,
               payload: namedUser
             });
           });
@@ -100,7 +95,7 @@ var handleConnection = function handleConnection(_ref2, dispatchers) {
             type: RESET_SDK
           });
           sdkDispatcher({
-            type: actionTypes.RESET_USER
+            type: RESET_USER
           });
           sdkDispatcher({
             type: SDK_ERROR
@@ -145,10 +140,10 @@ var isEmpty = function isEmpty(obj) {
 };
 
 var useTheme = function useTheme(overrides) {
-  React.useLayoutEffect(function () {
+  useLayoutEffect(function () {
     if (!isEmpty(overrides)) {
       cssVars({
-        variables: LocalizationContext.__assign({
+        variables: __assign({
           '--sendbird-dark-primary-500': '#4d2aa6',
           '--sendbird-dark-primary-400': '#6440C4',
           '--sendbird-dark-primary-300': '#7B53EF',
@@ -242,13 +237,13 @@ var sdkInitialState = {
 function reducer(state, action) {
   switch (action.type) {
     case SET_SDK_LOADING:
-      return LocalizationContext._objectSpread2({}, state, {
+      return _objectSpread2({}, state, {
         initialized: false,
         loading: action.payload
       });
 
     case SDK_ERROR:
-      return LocalizationContext._objectSpread2({}, state, {
+      return _objectSpread2({}, state, {
         initialized: false,
         loading: false,
         error: true
@@ -278,18 +273,18 @@ var userInitialState = {
 
 function reducer$1(state, action) {
   switch (action.type) {
-    case actionTypes.INIT_USER:
+    case INIT_USER:
       return {
         initialized: true,
         loading: false,
         user: action.payload
       };
 
-    case actionTypes.RESET_USER:
+    case RESET_USER:
       return userInitialState;
 
-    case actionTypes.UPDATE_USER_INFO:
-      return LocalizationContext._objectSpread2({}, state, {
+    case UPDATE_USER_INFO:
+      return _objectSpread2({}, state, {
         user: action.payload
       });
 
@@ -299,13 +294,13 @@ function reducer$1(state, action) {
 }
 
 function useConnectionStatus(sdk, logger) {
-  var _useState = React.useState(true),
-      _useState2 = LocalizationContext._slicedToArray(_useState, 2),
+  var _useState = useState(true),
+      _useState2 = _slicedToArray(_useState, 2),
       isOnline = _useState2[0],
       setIsOnline = _useState2[1];
 
-  React.useEffect(function () {
-    var uniqueHandlerId = LocalizationContext.uuidv4();
+  useEffect(function () {
+    var uniqueHandlerId = uuidv4();
     logger.warning('sdk changed', uniqueHandlerId);
     var handler;
 
@@ -343,7 +338,7 @@ function useConnectionStatus(sdk, logger) {
       }
     };
   }, [sdk]);
-  React.useEffect(function () {
+  useEffect(function () {
     var tryReconnect = function tryReconnect() {
       try {
         logger.warning('Try reconnecting SDK');
@@ -363,7 +358,7 @@ function useConnectionStatus(sdk, logger) {
     };
   }, [sdk]); // add offline-class to body
 
-  React.useEffect(function () {
+  useEffect(function () {
     var body = document.querySelector('body');
 
     if (!isOnline) {
@@ -435,7 +430,7 @@ var LoggerFactory = function LoggerFactory(lvl, customInterface) {
 
   var logger = lvlArray.reduce(function (accumulator, currentLvl) {
     if (currentLvl === LOG_LEVELS.DEBUG || currentLvl === LOG_LEVELS.ALL) {
-      return LocalizationContext._objectSpread2({}, accumulator, {
+      return _objectSpread2({}, accumulator, {
         info: applyLog(LOG_LEVELS.INFO),
         error: applyLog(LOG_LEVELS.ERROR),
         warning: applyLog(LOG_LEVELS.WARNING)
@@ -443,24 +438,24 @@ var LoggerFactory = function LoggerFactory(lvl, customInterface) {
     }
 
     if (currentLvl === LOG_LEVELS.INFO) {
-      return LocalizationContext._objectSpread2({}, accumulator, {
+      return _objectSpread2({}, accumulator, {
         info: applyLog(LOG_LEVELS.INFO)
       });
     }
 
     if (currentLvl === LOG_LEVELS.ERROR) {
-      return LocalizationContext._objectSpread2({}, accumulator, {
+      return _objectSpread2({}, accumulator, {
         error: applyLog(LOG_LEVELS.ERROR)
       });
     }
 
     if (currentLvl === LOG_LEVELS.WARNING) {
-      return LocalizationContext._objectSpread2({}, accumulator, {
+      return _objectSpread2({}, accumulator, {
         warning: applyLog(LOG_LEVELS.WARNING)
       });
     }
 
-    return LocalizationContext._objectSpread2({}, accumulator);
+    return _objectSpread2({}, accumulator);
   }, getDefaultLogger());
   return logger;
 };
@@ -505,7 +500,7 @@ var pubSubFactory = (function () {
 function useAppendDomNode() {
   var ids = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
   var rootSelector = arguments.length > 1 ? arguments[1] : undefined;
-  React.useEffect(function () {
+  useEffect(function () {
     var root = document.querySelector(rootSelector);
     ids.forEach(function (id) {
       var elem = document.createElement('div');
@@ -543,31 +538,31 @@ function Sendbird(props) {
   var _config$logLevel = config.logLevel,
       logLevel = _config$logLevel === void 0 ? '' : _config$logLevel;
 
-  var _useState = React.useState(LoggerFactory(logLevel)),
-      _useState2 = LocalizationContext._slicedToArray(_useState, 2),
+  var _useState = useState(LoggerFactory(logLevel)),
+      _useState2 = _slicedToArray(_useState, 2),
       logger = _useState2[0],
       setLogger = _useState2[1];
 
-  var _useState3 = React.useState(),
-      _useState4 = LocalizationContext._slicedToArray(_useState3, 2),
+  var _useState3 = useState(),
+      _useState4 = _slicedToArray(_useState3, 2),
       pubSub = _useState4[0],
       setPubSub = _useState4[1];
 
-  var _useReducer = React.useReducer(reducer, sdkInitialState),
-      _useReducer2 = LocalizationContext._slicedToArray(_useReducer, 2),
+  var _useReducer = useReducer(reducer, sdkInitialState),
+      _useReducer2 = _slicedToArray(_useReducer, 2),
       sdkStore = _useReducer2[0],
       sdkDispatcher = _useReducer2[1];
 
-  var _useReducer3 = React.useReducer(reducer$1, userInitialState),
-      _useReducer4 = LocalizationContext._slicedToArray(_useReducer3, 2),
+  var _useReducer3 = useReducer(reducer$1, userInitialState),
+      _useReducer4 = _slicedToArray(_useReducer3, 2),
       userStore = _useReducer4[0],
       userDispatcher = _useReducer4[1];
 
   useTheme(colorSet);
-  React.useEffect(function () {
+  useEffect(function () {
     setPubSub(pubSubFactory());
   }, []);
-  React.useEffect(function () {
+  useEffect(function () {
     logger.info('App Init'); // dispatch action
 
     handleConnection({
@@ -585,21 +580,21 @@ function Sendbird(props) {
     });
   }, [userId, appId, accessToken]); // to create a pubsub to communicate between parent and child
 
-  React.useEffect(function () {
+  useEffect(function () {
     setLogger(LoggerFactory(logLevel));
   }, [logLevel]);
   useAppendDomNode(['sendbird-modal-root', 'sendbird-dropdown-portal', 'sendbird-emoji-list-portal'], 'body'); // should move to reducer
 
-  var _useState5 = React.useState(theme),
-      _useState6 = LocalizationContext._slicedToArray(_useState5, 2),
+  var _useState5 = useState(theme),
+      _useState6 = _slicedToArray(_useState5, 2),
       currenttheme = _useState6[0],
       setCurrenttheme = _useState6[1];
 
-  React.useEffect(function () {
+  useEffect(function () {
     setCurrenttheme(theme);
   }, [theme]); // add-remove theme from body
 
-  React.useEffect(function () {
+  useEffect(function () {
     logger.info('Setup theme', "Theme: ".concat(currenttheme));
 
     try {
@@ -624,14 +619,14 @@ function Sendbird(props) {
     };
   }, [currenttheme]);
   var isOnline = useConnectionStatus(sdkStore.sdk, logger);
-  var localeStringSet = React__default.useMemo(function () {
+  var localeStringSet = React.useMemo(function () {
     if (!stringSet) {
-      return LocalizationContext.getStringSet('en');
+      return getStringSet('en');
     }
 
-    return LocalizationContext._objectSpread2({}, LocalizationContext.getStringSet('en'), {}, stringSet);
+    return _objectSpread2({}, getStringSet('en'), {}, stringSet);
   }, [stringSet]);
-  return React__default.createElement(LocalizationContext.SendbirdSdkContext.Provider, {
+  return React.createElement(SendbirdSdkContext.Provider, {
     value: {
       stores: {
         sdkStore: sdkStore,
@@ -671,7 +666,7 @@ function Sendbird(props) {
         pubSub: pubSub
       }
     }
-  }, React__default.createElement(LocalizationContext.LocalizationProvider, {
+  }, React.createElement(LocalizationProvider, {
     stringSet: localeStringSet
   }, children));
 }
@@ -712,5 +707,5 @@ Sendbird.defaultProps = {
   colorSet: null
 };
 
-module.exports = Sendbird;
+export default Sendbird;
 //# sourceMappingURL=SendbirdProvider.js.map
