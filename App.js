@@ -1,34 +1,29 @@
-'use strict';
-
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var LocalizationContext = require('./LocalizationContext-9665649b.js');
-var SendbirdProvider = require('./SendbirdProvider.js');
-var React = require('react');
-var React__default = _interopDefault(React);
-var PropTypes = _interopDefault(require('prop-types'));
-require('sendbird');
-require('./actionTypes-920b541f.js');
-require('css-vars-ponyfill');
-require('./index-478b0dfc.js');
-var ChannelList = require('./ChannelList.js');
-require('./utils-6aedec02.js');
-require('./index-6bc291d5.js');
-require('./LeaveChannel-25238612.js');
-require('date-fns/isToday');
-require('date-fns/format');
-require('date-fns/isYesterday');
-require('./type-c7a3bee7.js');
-require('./utils-a8277ca2.js');
-require('react-dom');
-require('./index-17b8764d.js');
-var Channel = require('./Channel.js');
-require('./index-26cd409d.js');
-require('date-fns/isSameDay');
-require('./utils-c8e36c68.js');
-require('date-fns/formatDistanceToNowStrict');
-var ChannelSettings = require('./ChannelSettings.js');
-require('./index-19eb691f.js');
+import { b as _slicedToArray } from './LocalizationContext-5c5b45a0.js';
+import Sendbird from './SendbirdProvider.js';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import 'sendbird';
+import './actionTypes-a85c0eaa.js';
+import 'css-vars-ponyfill';
+import './index-a2b521ce.js';
+import ChannelList from './ChannelList.js';
+import './utils-53ba1773.js';
+import './index-9dc7a088.js';
+import './LeaveChannel-7eba3969.js';
+import 'date-fns/isToday';
+import 'date-fns/format';
+import 'date-fns/isYesterday';
+import './type-0296584d.js';
+import './utils-cfdeb084.js';
+import 'react-dom';
+import './index-b49918bb.js';
+import Conversation from './Channel.js';
+import './index-dd4f8094.js';
+import 'date-fns/isSameDay';
+import './utils-d7f59026.js';
+import 'date-fns/formatDistanceToNowStrict';
+import ChannelSettings from './ChannelSettings.js';
+import './index-3c2fb44d.js';
 
 function App(props) {
   var appId = props.appId,
@@ -49,17 +44,17 @@ function App(props) {
       renderUserProfile = props.renderUserProfile,
       onProfileEditSuccess = props.onProfileEditSuccess;
 
-  var _useState = React.useState(null),
-      _useState2 = LocalizationContext._slicedToArray(_useState, 2),
+  var _useState = useState(null),
+      _useState2 = _slicedToArray(_useState, 2),
       currentChannelUrl = _useState2[0],
       setCurrentChannelUrl = _useState2[1];
 
-  var _useState3 = React.useState(false),
-      _useState4 = LocalizationContext._slicedToArray(_useState3, 2),
+  var _useState3 = useState(false),
+      _useState4 = _slicedToArray(_useState3, 2),
       showSettings = _useState4[0],
       setShowSettings = _useState4[1];
 
-  return React__default.createElement(SendbirdProvider, {
+  return React.createElement(Sendbird, {
     stringSet: stringSet,
     appId: appId,
     userId: userId,
@@ -72,11 +67,11 @@ function App(props) {
     colorSet: colorSet,
     disableUserProfile: disableUserProfile,
     renderUserProfile: renderUserProfile
-  }, React__default.createElement("div", {
+  }, React.createElement("div", {
     className: "sendbird-app__wrap"
-  }, React__default.createElement("div", {
+  }, React.createElement("div", {
     className: "sendbird-app__channellist-wrap"
-  }, React__default.createElement(ChannelList, {
+  }, React.createElement(ChannelList, {
     allowProfileEdit: allowProfileEdit,
     onProfileEditSuccess: onProfileEditSuccess,
     onChannelSelect: function onChannelSelect(channel) {
@@ -86,9 +81,9 @@ function App(props) {
         setCurrentChannelUrl('');
       }
     }
-  })), React__default.createElement("div", {
+  })), React.createElement("div", {
     className: "\n            ".concat(showSettings ? 'sendbird-app__conversation--settings-open' : '', "\n            sendbird-app__conversation-wrap\n          ")
-  }, React__default.createElement(Channel.default, {
+  }, React.createElement(Conversation, {
     channelUrl: currentChannelUrl,
     onChatHeaderActionClick: function onChatHeaderActionClick() {
       if (showSettings) {
@@ -99,9 +94,9 @@ function App(props) {
     },
     useReaction: useReaction,
     useMessageGrouping: useMessageGrouping
-  })), showSettings && React__default.createElement("div", {
+  })), showSettings && React.createElement("div", {
     className: "sendbird-app__settingspanel-wrap"
-  }, React__default.createElement(ChannelSettings, {
+  }, React.createElement(ChannelSettings, {
     channelUrl: currentChannelUrl,
     onCloseClick: function onCloseClick() {
       setShowSettings(false);
@@ -146,5 +141,5 @@ App.defaultProps = {
   colorSet: null
 };
 
-module.exports = App;
+export default App;
 //# sourceMappingURL=App.js.map
