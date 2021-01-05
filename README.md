@@ -199,107 +199,58 @@ Here is a list of components included in the UIKit.
 .block {
     width: 10px;
     height: 10px;
+    display: inline-block;
 }
 </style>
 
 |Light Theme variables|Values|Dark Theme variables|Values|
-|-------|---|-------|---|
-|`--sendbird-light-primary-500`|<div class="block" style="background-color: #4d2aa6"></div>#4d2aa6|
-|`--sendbird-light-primary-400`|#6440C4|
-|`--sendbird-light-primary-300`|#7B53EF|
-|`--sendbird-light-primary-200`|#9E8CF5|
-|`--sendbird-light-primary-100`|#E2DFFF|
-|`--sendbird-light-secondary-500`|#007A7A|
-|`--sendbird-light-secondary-400`|#189A8D|
-|`--sendbird-light-secondary-300`|#2EBA9F|
-|`--sendbird-light-secondary-200`|#6FD6BE|
-|`--sendbird-light-secondary-100`|#AEF2DC|
-|`--sendbird-light-information-100`|#b2d9ff|
-|`--sendbird-light-error-500`|#A30E2D|
-|`--sendbird-light-error-400`|#C11F41|
-|`--sendbird-light-error-300`|#E53157|
-|`--sendbird-light-error-200`|#FF6183|
-|`--sendbird-light-error-100`|#FFABBD|
-|`--sendbird-light-background-700`|#000000|
-|`--sendbird-light-background-600`|#161616|
-|`--sendbird-light-background-500`|#2C2C2C|
-|`--sendbird-light-background-400`|#393939|
-|`--sendbird-light-background-300`|#A8A8A8|
-|`--sendbird-light-background-200`|#D9D9D9|
-|`--sendbird-light-background-100`|#F0F0F0|
-|`--sendbird-light-background-50`| #FFFFFF|
-|`--sendbird-light-overlay`|rgba(0, 0, 0, 0.32)|
-|`--sendbird-light-onlight-01`|rgba(0, 0, 0, 0.88)|
-|`--sendbird-light-onlight-02`|rgba(0, 0, 0, 0.50)|
-|`--sendbird-light-onlight-03`|rgba(0, 0, 0, 0.38)|
-|`--sendbird-light-onlight-04`|rgba(0, 0, 0, 0.12)|
-|`--sendbird-light-ondark-01`|rgba(255, 255, 255, 0.88)|
-|`--sendbird-light-ondark-02`|rgba(255, 255, 255, 0.50)|
-|`--sendbird-light-ondark-03`|rgba(255, 255, 255, 0.38)|
-|`--sendbird-light-ondark-04`|rgba(255, 255, 255, 0.12)|
-|`--sendbird-light-shadow-01`|0 1px 5px 0 rgba(33, 34, 66, 0.04), 0 0 3px 0 rgba(0, 0, 0, 0.08), 0 2px 1px 0 rgba(0, 0, 0, 0.12)|
-|`--sendbird-light-shadow-02`|0 3px 5px -3px rgba(33, 34, 66, 0.04), 0 3px 14px 2px rgba(0, 0, 0, 0.08), 0 8px 10px 1px rgba(0, 0, 0, 0.12)|
-|`--sendbird-light-shadow-03`|0 6px 10px -5px rgba(0, 0, 0, 0.04), 0 6px 30px 5px rgba(0, 0, 0, 0.08), 0 16px 24px 2px rgba(0, 0, 0, 0.12)|
-|`--sendbird-light-shadow-04`|0 9px 15px -7px rgba(0, 0, 0, 0.04), 0 9px 46px 8px rgba(0, 0, 0, 0.08), 0 24px 38px 3px rgba(0, 0, 0, 0.12)|
-|`--sendbird-light-shadow-message-input`|0 1px 5px 0 rgba(33, 34, 66, 0.12), 0 0 1px 0 rgba(33, 34, 66, 0.16), 0 2px 1px 0 rgba(33, 34, 66, 0.08), 0 1px 5px 0 rgba(0, 0, 0, 0.12)|
-|`--sendbird-light-theme-surface-2`|#EAEAEA|
-
-
-### Color set for Dark theme
-
-|Key|Value|
-|---|---|
-|`--sendbird-dark-primary-500`|#4d2aa6|
-|`--sendbird-dark-primary-400`|#6440C4|
-|`--sendbird-dark-primary-300`|#7B53EF|
-|`--sendbird-dark-primary-200`|#9E8CF5|
-|`--sendbird-dark-primary-100`|#E2DFFF|
-|`--sendbird-dark-secondary-500`|#007A7A|
-|`--sendbird-dark-secondary-400`|#189A8D|
-|`--sendbird-dark-secondary-300`|#2EBA9F|
-|`--sendbird-dark-secondary-200`|#6FD6BE|
-|`--sendbird-dark-secondary-100`|#AEF2DC|
-|`--sendbird-dark-information-100`|#b2d9ff|
-|`--sendbird-dark-error-500`|#A30E2D|
-|`--sendbird-dark-error-400`|#C11F41|
-|`--sendbird-dark-error-300`|#E53157|
-|`--sendbird-dark-error-200`|#FF6183|
-|`--sendbird-dark-error-100`|#FFABBD|
-|`--sendbird-dark-background-700`|#000000|
-|`--sendbird-dark-background-600`|#161616|
-|`--sendbird-dark-background-500`|#2C2C2C|
-|`--sendbird-dark-background-400`|#393939|
-|`--sendbird-dark-background-300`|#A8A8A8|
-|`--sendbird-dark-background-200`|#D9D9D9|
-|`--sendbird-dark-background-100`|#F0F0F0|
-|`--sendbird-dark-background-50`| #FFFFFF|
-|`--sendbird-dark-overlay`|rgba(0, 0, 0, 0.32)|
-|`--sendbird-dark-onlight-01`|rgba(0, 0, 0, 0.88)|
-|`--sendbird-dark-onlight-02`|rgba(0, 0, 0, 0.50)|
-|`--sendbird-dark-onlight-03`|rgba(0, 0, 0, 0.38)|
-|`--sendbird-dark-onlight-04`|rgba(0, 0, 0, 0.12)|
-|`--sendbird-dark-ondark-01`|rgba(255, 255, 255, 0.88)|
-|`--sendbird-dark-ondark-02`|rgba(255, 255, 255, 0.50)|
-|`--sendbird-dark-ondark-03`|rgba(255, 255, 255, 0.38)|
-|`--sendbird-dark-ondark-04`|rgba(255, 255, 255, 0.12)|
-|`--sendbird-dark-shadow-01`|0 1px 5px 0 rgba(33, 34, 66, 0.04), 0 0 3px 0 rgba(0, 0, 0, 0.08), 0 2px 1px 0 rgba(0, 0, 0, 0.12)|
-|`--sendbird-dark-shadow-02`|0 3px 5px -3px rgba(33, 34, 66, 0.04), 0 3px 14px 2px rgba(0, 0, 0, 0.08), 0 8px 10px 1px rgba(0, 0, 0, 0.12)|
-|`--sendbird-dark-shadow-03`|0 6px 10px -5px rgba(0, 0, 0, 0.04), 0 6px 30px 5px rgba(0, 0, 0, 0.08), 0 16px 24px 2px rgba(0, 0, 0, 0.12)|
-|`--sendbird-dark-shadow-04`|0 9px 15px -7px rgba(0, 0, 0, 0.04), 0 9px 46px 8px rgba(0, 0, 0, 0.08), 0 24px 38px 3px rgba(0, 0, 0, 0.12)|
-|`--sendbird-dark-shadow-message-input`|0 1px 5px 0 rgba(33, 34, 66, 0.12), 0 0 1px 0 rgba(33, 34, 66, 0.16), 0 2px 1px 0 rgba(33, 34, 66, 0.08), 0 1px 5px 0 rgba(0, 0, 0, 0.12)|
-
+|:--------------------|:----:|:-------------------|:----:|
+|`--sendbird-light-primary-100`|<div class="block" style="background-color: #E2DFFF"></div> #E2DFFF|`--sendbird-dark-primary-100`|<div class="block" style="background-color: #E2DFFF"></div> #E2DFFF|
+|`--sendbird-light-primary-200`|<div class="block" style="background-color: #9E8CF5"></div> #9E8CF5|`--sendbird-dark-primary-200`|<div class="block" style="background-color: #9E8CF5"></div> #9E8CF5|
+|`--sendbird-light-primary-300`|<div class="block" style="background-color: #7B53EF"></div> #7B53EF|`--sendbird-dark-primary-300`|<div class="block" style="background-color: #7B53EF"></div> #7B53EF|
+|`--sendbird-light-primary-400`|<div class="block" style="background-color: #6440C4"></div> #6440C4|`--sendbird-dark-primary-400`|<div class="block" style="background-color: #6440C4"></div> #6440C4|
+|`--sendbird-light-primary-500`|<div class="block" style="background-color: #4d2aa6"></div> #4d2aa6|`--sendbird-dark-primary-500`|<div class="block" style="background-color: #4d2aa6"></div> #4d2aa6|
+|`--sendbird-light-secondary-100`|<div class="block" style="background-color: #AEF2DC"></div> #AEF2DC|`--sendbird-dark-secondary-100`|<div class="block" style="background-color: #AEF2DC"></div> #AEF2DC|
+|`--sendbird-light-secondary-200`|<div class="block" style="background-color: #6FD6BE"></div> #6FD6BE|`--sendbird-dark-secondary-200`|<div class="block" style="background-color: #6FD6BE"></div> #6FD6BE|
+|`--sendbird-light-secondary-300`|<div class="block" style="background-color: #2EBA9F"></div> #2EBA9F|`--sendbird-dark-secondary-300`|<div class="block" style="background-color: #2EBA9F"></div> #2EBA9F|
+|`--sendbird-light-secondary-400`|<div class="block" style="background-color: #189A8D"></div> #189A8D|`--sendbird-dark-secondary-400`|<div class="block" style="background-color: #189A8D"></div> #189A8D|
+|`--sendbird-light-secondary-500`|<div class="block" style="background-color: #007A7A"></div> #007A7A|`--sendbird-dark-secondary-500`|<div class="block" style="background-color: #007A7A"></div> #007A7A|
+|`--sendbird-light-information-100`|<div class="block" style="background-color: #b2d9ff"></div> #b2d9ff|`--sendbird-dark-information-100`|<div class="block" style="background-color: #b2d9ff"></div> #b2d9ff|
+|`--sendbird-light-error-100`|<div class="block" style="background-color: #FFABBD"></div> #FFABBD|`--sendbird-dark-error-100`|<div class="block" style="background-color: #FFABBD"></div> #FFABBD|
+|`--sendbird-light-error-200`|<div class="block" style="background-color: #FF6183"></div> #FF6183|`--sendbird-dark-error-200`|<div class="block" style="background-color: #FF6183"></div> #FF6183|
+|`--sendbird-light-error-300`|<div class="block" style="background-color: #E53157"></div> #E53157|`--sendbird-dark-error-300`|<div class="block" style="background-color: #E53157"></div> #E53157|
+|`--sendbird-light-error-400`|<div class="block" style="background-color: #C11F41"></div> #C11F41|`--sendbird-dark-error-400`|<div class="block" style="background-color: #C11F41"></div> #C11F41|
+|`--sendbird-light-error-500`|<div class="block" style="background-color: #A30E2D"></div> #A30E2D|`--sendbird-dark-error-500`|<div class="block" style="background-color: #A30E2D"></div> #A30E2D|
+|`--sendbird-light-background-50`|<div class="block" style="background-color: #FFFFFF"></div> #FFFFFF|`--sendbird-dark-background-50`|<div class="block" style="background-color: #FFFFFF"></div> #FFFFFF|
+|`--sendbird-light-background-100`|<div class="block" style="background-color: #F0F0F0"></div> #F0F0F0|`--sendbird-dark-background-100`|<div class="block" style="background-color: #F0F0F0"></div> #F0F0F0|
+|`--sendbird-light-background-200`|<div class="block" style="background-color: #D9D9D9"></div> #D9D9D9|`--sendbird-dark-background-200`|<div class="block" style="background-color: #D9D9D9"></div> #D9D9D9|
+|`--sendbird-light-background-300`|<div class="block" style="background-color: #A8A8A8"></div> #A8A8A8|`--sendbird-dark-background-300`|<div class="block" style="background-color: #A8A8A8"></div> #A8A8A8|
+|`--sendbird-light-background-400`|<div class="block" style="background-color: #393939"></div> #393939|`--sendbird-dark-background-400`|<div class="block" style="background-color: #393939"></div> #393939|
+|`--sendbird-light-background-500`|<div class="block" style="background-color: #2C2C2C"></div> #2C2C2C|`--sendbird-dark-background-500`|<div class="block" style="background-color: #2C2C2C"></div> #2C2C2C|
+|`--sendbird-light-background-600`|<div class="block" style="background-color: #161616"></div> #161616|`--sendbird-dark-background-600`|<div class="block" style="background-color: #161616"></div> #161616|
+|`--sendbird-light-background-700`|<div class="block" style="background-color: #000000"></div> #000000|`--sendbird-dark-background-700`|<div class="block" style="background-color: #000000"></div> #000000|
+|`--sendbird-light-overlay`|<div class="block" style="background-color: rgba(0, 0, 0, 0.32)"></div> rgba(0, 0, 0, 0.32)|`--sendbird-dark-overlay`|<div class="block" style="background-color: rgba(0, 0, 0, 0.32)"></div> rgba(0, 0, 0, 0.32)|
+|`--sendbird-light-onlight-01`|<div class="block" style="background-color: rgba(0, 0, 0, 0.88)"></div> rgba(0, 0, 0, 0.88)|`--sendbird-dark-onlight-01`|<div class="block" style="background-color: rgba(0, 0, 0, 0.88)"></div> rgba(0, 0, 0, 0.88)|
+|`--sendbird-light-onlight-02`|<div class="block" style="background-color: rgba(0, 0, 0, 0.50)"></div> rgba(0, 0, 0, 0.50)|`--sendbird-dark-onlight-02`|<div class="block" style="background-color: rgba(0, 0, 0, 0.50)"></div> rgba(0, 0, 0, 0.50)|
+|`--sendbird-light-onlight-03`|<div class="block" style="background-color: rgba(0, 0, 0, 0.38)"></div> rgba(0, 0, 0, 0.38)|`--sendbird-dark-onlight-03`|<div class="block" style="background-color: rgba(0, 0, 0, 0.38)"></div> rgba(0, 0, 0, 0.38)|
+|`--sendbird-light-onlight-04`|<div class="block" style="background-color: rgba(0, 0, 0, 0.12)"></div> rgba(0, 0, 0, 0.12)|`--sendbird-dark-onlight-04`|<div class="block" style="background-color: rgba(0, 0, 0, 0.12)"></div> rgba(0, 0, 0, 0.12)|
+|`--sendbird-light-ondark-01`|<div class="block" style="background-color: rgba(255, 255, 255, 0.88)"></div> rgba(255, 255, 255, 0.88)|`--sendbird-dark-ondark-01`|<div class="block" style="background-color: rgba(255, 255, 255, 0.88)"></div> rgba(255, 255, 255, 0.88)|
+|`--sendbird-light-ondark-02`|<div class="block" style="background-color: rgba(255, 255, 255, 0.50)"></div> rgba(255, 255, 255, 0.50)|`--sendbird-dark-ondark-02`|<div class="block" style="background-color: rgba(255, 255, 255, 0.50)"></div> rgba(255, 255, 255, 0.50)|
+|`--sendbird-light-ondark-03`|<div class="block" style="background-color: rgba(255, 255, 255, 0.38)"></div> rgba(255, 255, 255, 0.38)|`--sendbird-dark-ondark-03`|<div class="block" style="background-color: rgba(255, 255, 255, 0.38)"></div> rgba(255, 255, 255, 0.38)|
+|`--sendbird-light-ondark-04`|<div class="block" style="background-color: rgba(255, 255, 255, 0.12)"></div> rgba(255, 255, 255, 0.12)|`--sendbird-dark-ondark-04`|<div class="block" style="background-color: rgba(255, 255, 255, 0.12)"></div> rgba(255, 255, 255, 0.12)|
+|`--sendbird-light-shadow-message-input`|0 1px 5px 0 rgba(33, 34, 66, 0.12),<br /> 0 0 1px 0 rgba(33, 34, 66, 0.16),<br /> 0 2px 1px 0 rgba(33, 34, 66, 0.08), 0 1px 5px 0 rgba(0, 0, 0, 0.12)|`--sendbird-dark-shadow-message-input`|0 1px 5px 0 rgba(33, 34, 66, 0.12),<br /> 0 0 1px 0 rgba(33, 34, 66, 0.16),<br /> 0 2px 1px 0 rgba(33, 34, 66, 0.08), 0 1px 5px 0 rgba(0, 0, 0, 0.12)|
 
 #### Color set for all themes
 
 |Key|Value|
 |---|---|
-|`--sendbird-iconbutton-color`|#825eeb|
-|`--sendbird-message-input-border-active`|#7B53EF|
-|`--sendbird-selected-reaction-button-border-hover`|#9E8CF5|
-|`--sendbird-add-reaction-button-border-hover`|#9E8CF5|
-|`--sendbird-tooltip-background`|#000000|
-|`--sendbird-tooltip-text-color`|rgba(255, 255, 255, 0.88)|
-|`--sendbird-button-border-focus`|#FFFFFF|
-|`--sendbird-file-message-icon-background`|#FFFFFF|
-|`--sendbird-font-family-default`|'Open Sans', sans-serif|
+|`--sendbird-add-reaction-button-border-hover`|<div class="block" style="background-color: #9E8CF5"></div> #9E8CF5|
+|`--sendbird-selected-reaction-button-border-hover`|<div class="block" style="background-color: #9E8CF5"></div> #9E8CF5|
+|`--sendbird-iconbutton-color`|<div class="block" style="background-color: #825eeb"></div> #825eeb|
+|`--sendbird-message-input-border-active`|<div class="block" style="background-color: #7B53EF"></div> #7B53EF|
+|`--sendbird-tooltip-background`|<div class="block" style="background-color: #000000"></div> #000000|
+|`--sendbird-tooltip-text-color`|<div class="block" style="background-color: rgba(255, 255, 255, 0.88)"></div> rgba(255, 255, 255, 0.88)|
+|`--sendbird-button-border-focus`|<div class="block" style="background-color: #FFFFFF"></div> #FFFFFF|
+|`--sendbird-file-message-icon-background`|<div class="block" style="background-color: #FFFFFF"></div> #FFFFFF|
+|`--sendbird-font-family-default`|<span style="font-family: 'Open Sans', sans-serif">'Open Sans', sans-serif</span>|
 |`--sendbird-message-balloon-width`|404px|
