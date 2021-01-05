@@ -193,11 +193,18 @@ Here is a list of components included in the UIKit.
 
 ## Appendix
 
-### Color set for Light theme
+### Color set for Light and Dark theme
 
-|Key|Value|
-|---|---|
-|`--sendbird-light-primary-500`|#4d2aa6|
+<style>
+.block {
+    width: 10px;
+    height: 10px;
+}
+</style>
+
+|Light Theme variables|Values|Dark Theme variables|Values|
+|-------|---|-------|---|
+|`--sendbird-light-primary-500`|<div class="block" style="background-color: #4d2aa6"></div>#4d2aa6|
 |`--sendbird-light-primary-400`|#6440C4|
 |`--sendbird-light-primary-300`|#7B53EF|
 |`--sendbird-light-primary-200`|#9E8CF5|
