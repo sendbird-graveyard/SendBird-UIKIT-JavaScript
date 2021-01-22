@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.2](Jan 21, 2021)
+
+- Bugfixes:
+  * Scroll to end of list if user is at end of the conversation
+
 ## [1.3.0](Nov 9, 2020)
 
 - Features:

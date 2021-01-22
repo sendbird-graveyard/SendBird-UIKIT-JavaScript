@@ -227,7 +227,7 @@ var INIT_USER = 'INIT_USER';
 var RESET_USER = 'RESET_USER';
 var UPDATE_USER_INFO = 'UPDATE_USER_INFO';
 
-var APP_VERSION_STRING = '1.3.1';
+var APP_VERSION_STRING = '1.3.2';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -6829,17 +6829,24 @@ function reducer$3(state, action) {
       {
         var _action$payload = action.payload,
             channel = _action$payload.channel,
-            message = _action$payload.message;
+            message = _action$payload.message,
+            scrollToEnd = _action$payload.scrollToEnd;
+        var unreadCount = 0;
 
         var _state$currentGroupCh = state.currentGroupChannel,
             _currentGroupChannel = _state$currentGroupCh === void 0 ? {} : _state$currentGroupCh,
-            unreadCount = state.unreadCount,
             unreadSince = state.unreadSince;
 
         var currentGroupChannelUrl = _currentGroupChannel.url;
 
         if (!compareIds(channel.url, currentGroupChannelUrl)) {
           return state;
+        }
+
+        unreadCount = state.unreadCount + 1; // reset unreadCount if have to scrollToEnd
+
+        if (scrollToEnd) {
+          unreadCount = 0;
         } // Excluded overlapping messages
 
 
@@ -6856,8 +6863,8 @@ function reducer$3(state, action) {
         }
 
         return _objectSpread2({}, state, {
-          unreadCount: unreadCount + 1,
-          unreadSince: unreadCount === 0 ? format(new Date(), 'p MMM dd') : unreadSince,
+          unreadCount: unreadCount,
+          unreadSince: unreadCount === 1 ? format(new Date(), 'p MMM dd') : unreadSince,
           allMessages: passUnsuccessfullMessages(state.allMessages, message)
         });
       }
@@ -6946,7 +6953,8 @@ function useHandleChannelEvents(_ref, _ref2) {
       sdkInit = _ref.sdkInit;
   var messagesDispatcher = _ref2.messagesDispatcher,
       sdk = _ref2.sdk,
-      logger = _ref2.logger;
+      logger = _ref2.logger,
+      scrollRef = _ref2.scrollRef;
   var channelUrl = currentGroupChannel && currentGroupChannel.url;
   React.useEffect(function () {
     var messageReciverId = uuidv4();
@@ -6958,13 +6966,33 @@ function useHandleChannelEvents(_ref, _ref2) {
       ChannelHandler.onMessageReceived = function (channel, message) {
         if (compareIds(channel.url, currentGroupChannel.url)) {
           logger.info('Channel | useHandleChannelEvents: onMessageReceived', message);
+          var scrollToEnd = false;
+
+          try {
+            var current = scrollRef.current;
+            scrollToEnd = current.offsetHeight + current.scrollTop >= current.scrollHeight;
+          } catch (error) {//
+          }
+
           messagesDispatcher({
             type: ON_MESSAGE_RECEIVED,
             payload: {
               channel: channel,
-              message: message
+              message: message,
+              scrollToEnd: scrollToEnd
             }
           });
+
+          if (scrollToEnd) {
+            try {
+              setTimeout(function () {
+                currentGroupChannel.markAsRead();
+                scrollIntoLast('.sendbird-msg--scroll-ref');
+              });
+            } catch (error) {
+              logger.warn('Channel | onMessageReceived | scroll to end failed');
+            }
+          }
         }
       };
 
@@ -11370,7 +11398,7 @@ MessageHoc.propTypes = {
   updateMessage: PropTypes.func.isRequired,
   resendMessage: PropTypes.func.isRequired,
   renderCustomMessage: PropTypes.func,
-  currentGroupChannel: PropTypes.shape,
+  currentGroupChannel: PropTypes.shape({}),
   status: PropTypes.string,
   useReaction: PropTypes.bool.isRequired,
   chainTop: PropTypes.bool.isRequired,
@@ -12058,12 +12086,12 @@ var ConversationPanel = function ConversationPanel(props) {
 
   useHandleChannelEvents({
     currentGroupChannel: currentGroupChannel,
-    sdkInit: sdkInit,
-    userId: userId
+    sdkInit: sdkInit
   }, {
     messagesDispatcher: messagesDispatcher,
     sdk: sdk,
-    logger: logger
+    logger: logger,
+    scrollRef: scrollRef
   });
   useInitialMessagesFetch({
     currentGroupChannel: currentGroupChannel,
