@@ -8,14 +8,14 @@ var LocalizationContext = require('./LocalizationContext-9665649b.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
-var index = require('./index-478b0dfc.js');
+var index = require('./index-dfc2e550.js');
 var utils = require('./utils-6aedec02.js');
-var index$1 = require('./index-6bc291d5.js');
+var index$1 = require('./index-16cd2d77.js');
 var format = _interopDefault(require('date-fns/format'));
 var type = require('./type-c7a3bee7.js');
 var utils$1 = require('./utils-a8277ca2.js');
 require('react-dom');
-var index$2 = require('./index-728837db.js');
+var index$2 = require('./index-77ab2680.js');
 var isSameDay = _interopDefault(require('date-fns/isSameDay'));
 var utils$2 = require('./utils-c8e36c68.js');
 var formatDistanceToNowStrict = _interopDefault(require('date-fns/formatDistanceToNowStrict'));
@@ -73,8 +73,8 @@ var UNDEFINED = 'undefined';
 var SUCCEEDED = SendingMessageStatus.SUCCEEDED,
     FAILED = SendingMessageStatus.FAILED,
     PENDING = SendingMessageStatus.PENDING;
-var scrollIntoLast = function scrollIntoLast(selector) {
-  var intialTry = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+var scrollIntoLast = function scrollIntoLast() {
+  var intialTry = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
   var MAX_TRIES = 10;
   var currentTry = intialTry;
 
@@ -83,13 +83,12 @@ var scrollIntoLast = function scrollIntoLast(selector) {
   }
 
   try {
-    var nodes = document.querySelectorAll(selector);
-    var last = nodes[nodes.length - 1];
-    last.scrollIntoView(false);
-    /** alignToTop: false */
+    var scrollDOM = document.querySelector('.sendbird-conversation__scroll-container'); // eslint-disable-next-line no-multi-assign
+
+    scrollDOM.scrollTop = scrollDOM.scrollHeight;
   } catch (error) {
     setTimeout(function () {
-      scrollIntoLast(selector, currentTry + 1);
+      scrollIntoLast(currentTry + 1);
     }, 500 * currentTry);
   }
 };
@@ -107,7 +106,7 @@ var pubSubHandler = function pubSubHandler(channelUrl, pubSub, dispatcher) {
   subscriber.set(index.SEND_USER_MESSAGE, pubSub.subscribe(index.SEND_USER_MESSAGE, function (msg) {
     var channel = msg.channel,
         message = msg.message;
-    scrollIntoLast('.sendbird-msg--scroll-ref');
+    scrollIntoLast();
 
     if (channel && channelUrl === channel.url) {
       dispatcher({
@@ -130,7 +129,7 @@ var pubSubHandler = function pubSubHandler(channelUrl, pubSub, dispatcher) {
   subscriber.set(index.SEND_FILE_MESSAGE, pubSub.subscribe(index.SEND_FILE_MESSAGE, function (msg) {
     var channel = msg.channel,
         message = msg.message;
-    scrollIntoLast('.sendbird-msg--scroll-ref');
+    scrollIntoLast();
 
     if (channel && channelUrl === channel.url) {
       dispatcher({
@@ -303,6 +302,21 @@ var passUnsuccessfullMessages = function passUnsuccessfullMessages(allMessages, 
   }
 
   return [].concat(LocalizationContext._toConsumableArray(allMessages), [newMessage]);
+};
+var pxToNumber = function pxToNumber(px) {
+  if (typeof px === 'number') {
+    return px;
+  }
+
+  if (typeof px === 'string') {
+    var parsed = Number.parseFloat(px);
+
+    if (!Number.isNaN(parsed)) {
+      return parsed;
+    }
+  }
+
+  return null;
 };
 
 var messagesInitialState = {
@@ -750,6 +764,9 @@ function useInitialMessagesFetch(_ref, _ref2) {
         currentGroupChannel: currentGroupChannel,
         userFilledMessageListQuery: userFilledMessageListQuery
       });
+      messagesDispatcher({
+        type: GET_PREV_MESSAGES_START
+      });
       currentGroupChannel.getMessagesByTimestamp(new Date().getTime(), messageListParams).then(function (messages) {
         var hasMore = messages && messages.length > 0;
         var lastMessageTimeStamp = hasMore ? messages[0].createdAt : null;
@@ -776,7 +793,7 @@ function useInitialMessagesFetch(_ref, _ref2) {
       }).finally(function () {
         currentGroupChannel.markAsRead();
         setTimeout(function () {
-          return scrollIntoLast('.sendbird-msg--scroll-ref');
+          return scrollIntoLast();
         });
       });
     }
@@ -835,7 +852,7 @@ function useHandleReconnect(_ref, _ref2) {
               }
             });
             setTimeout(function () {
-              return scrollIntoLast('.sendbird-msg--scroll-ref');
+              return scrollIntoLast();
             });
           }).catch(function (error) {
             logger.error('Channel: Fetching messages failed', error);
@@ -1151,7 +1168,7 @@ function useSendMessageCallback(_ref, _ref2) {
       channel: currentGroupChannel
     });
     setTimeout(function () {
-      return scrollIntoLast('.sendbird-msg--scroll-ref');
+      return scrollIntoLast();
     });
   }, [currentGroupChannel, onBeforeSendUserMessage]);
   return [messageInputRef, sendMessage];
@@ -1159,69 +1176,161 @@ function useSendMessageCallback(_ref, _ref2) {
 
 function useSendFileMessageCallback(_ref, _ref2) {
   var currentGroupChannel = _ref.currentGroupChannel,
-      onBeforeSendFileMessage = _ref.onBeforeSendFileMessage;
+      onBeforeSendFileMessage = _ref.onBeforeSendFileMessage,
+      _ref$imageCompression = _ref.imageCompression,
+      imageCompression = _ref$imageCompression === void 0 ? {} : _ref$imageCompression;
   var sdk = _ref2.sdk,
       logger = _ref2.logger,
       pubSub = _ref2.pubSub,
       messagesDispatcher = _ref2.messagesDispatcher;
   var sendMessage = React.useCallback(function (file) {
+    var compressionRate = imageCompression.compressionRate,
+        resizingWidth = imageCompression.resizingWidth,
+        resizingHeight = imageCompression.resizingHeight;
+    var createCustomParams = onBeforeSendFileMessage && typeof onBeforeSendFileMessage === 'function';
+    var compressibleFileType = file.type === 'image/jpg' || file.type === 'image/png' || file.type === 'image/jpeg';
+    var compressibleRatio = compressionRate > 0 && compressionRate < 1; // pxToNumber returns null if values are invalid
+
+    var compressibleDiamensions = pxToNumber(resizingWidth) || pxToNumber(resizingHeight);
+    var canCompressImage = compressibleFileType && (compressibleRatio || compressibleDiamensions);
+
     var createParamsDefault = function createParamsDefault(file_) {
       var params = new sdk.FileMessageParams();
       params.file = file_;
       return params;
     };
 
-    var createCustomPrams = onBeforeSendFileMessage && typeof onBeforeSendFileMessage === 'function';
+    if (canCompressImage) {
+      // Using image compression
+      try {
+        var image = document.createElement('img');
+        image.src = URL.createObjectURL(file);
 
-    if (createCustomPrams) {
-      logger.info('Channel: creating params using onBeforeSendFileMessage', onBeforeSendFileMessage);
-    }
+        image.onload = function () {
+          URL.revokeObjectURL(image.src);
+          var canvas = document.createElement('canvas');
+          var imageWdith = image.naturalWidth || image.width;
+          var imageHeight = image.naturalHeight || image.height;
+          var targetWidth = pxToNumber(resizingWidth) || imageWdith;
+          var targetHeight = pxToNumber(resizingHeight) || imageHeight; // In canvas.toBlob(callback, mimeType, qualityArgument)
+          // qualityArgument doesnt work
+          // so in case compressibleDiamensions are not present, we use ratio
 
-    var params = onBeforeSendFileMessage ? onBeforeSendFileMessage(file) : createParamsDefault(file);
-    logger.info('Channel: Uploading file message start!', params);
-    var pendingMsg = currentGroupChannel.sendFileMessage(params, function (response, err) {
-      var swapParams = sdk.getErrorFirstCallback();
-      var message = response;
-      var error = err;
+          if (file.type === 'image/png' && !compressibleDiamensions) {
+            targetWidth *= compressionRate;
+            targetHeight *= compressionRate;
+          }
 
-      if (swapParams) {
-        message = err;
-        error = response;
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          var context = canvas.getContext('2d');
+          context.drawImage(image, 0, 0, targetWidth, targetHeight);
+          context.canvas.toBlob(function (newImageBlob) {
+            var compressedFile = new File([newImageBlob], file.name, {
+              type: file.type
+            });
+
+            if (createCustomParams) {
+              logger.info('Channel: Creating params using onBeforeSendFileMessage', onBeforeSendFileMessage);
+            }
+
+            var params = createCustomParams ? onBeforeSendFileMessage(compressedFile) : createParamsDefault(compressedFile);
+            logger.info('Channel: Uploading file message start!', params);
+            var pendingMessage = currentGroupChannel.sendFileMessage(params, function (response, err) {
+              var swapParams = sdk.getErrorFirstCallback();
+
+              var _ref3 = swapParams ? [err, response] : [response, err],
+                  _ref4 = LocalizationContext._slicedToArray(_ref3, 2),
+                  message = _ref4[0],
+                  error = _ref4[1];
+
+              if (error) {
+                // sending params instead of pending message
+                // to make sure that we can resend the message once it fails
+                logger.error('Channel: Sending file message failed!', message);
+                message.localUrl = URL.createObjectURL(compressedFile);
+                message.file = compressedFile;
+                messagesDispatcher({
+                  type: SEND_MESSAGEGE_FAILURE,
+                  payload: message
+                });
+                return;
+              }
+
+              logger.info('Channel: Sending file message success!', message);
+              messagesDispatcher({
+                type: SEND_MESSAGEGE_SUCESS,
+                payload: message
+              });
+            });
+            pubSub.publish(index.SEND_MESSAGE_START, {
+              /* pubSub is used instead of messagesDispatcher
+                to avoid redundantly calling `messageActionTypes.SEND_MESSAGEGE_START` */
+              message: LocalizationContext._objectSpread2({}, pendingMessage, {
+                url: URL.createObjectURL(compressedFile),
+                // pending thumbnail message seems to be failed
+                requestState: 'pending'
+              }),
+              channel: currentGroupChannel
+            });
+            setTimeout(function () {
+              return scrollIntoLast();
+            }, 1000);
+          }, file.type, compressionRate);
+        };
+      } catch (error) {
+        logger.error('Channel: Sending file message failed!');
+      }
+    } else {
+      // Not using image compression
+      if (createCustomParams) {
+        logger.info('Channel: creating params using onBeforeSendFileMessage', onBeforeSendFileMessage);
       }
 
-      if (error) {
-        // sending params instead of pending message
-        // to make sure that we can resend the message once it fails
-        logger.error('Channel: Sending file message failed!', message);
-        message.localUrl = URL.createObjectURL(file);
-        message.file = file;
+      var params = onBeforeSendFileMessage ? onBeforeSendFileMessage(file) : createParamsDefault(file);
+      logger.info('Channel: Uploading file message start!', params);
+      var pendingMsg = currentGroupChannel.sendFileMessage(params, function (response, err) {
+        var swapParams = sdk.getErrorFirstCallback();
+
+        var _ref5 = swapParams ? [err, response] : [response, err],
+            _ref6 = LocalizationContext._slicedToArray(_ref5, 2),
+            message = _ref6[0],
+            error = _ref6[1];
+
+        if (error) {
+          // sending params instead of pending message
+          // to make sure that we can resend the message once it fails
+          logger.error('Channel: Sending file message failed!', message);
+          message.localUrl = URL.createObjectURL(file);
+          message.file = file;
+          messagesDispatcher({
+            type: SEND_MESSAGEGE_FAILURE,
+            payload: message
+          });
+          return;
+        }
+
+        logger.info('Channel: Sending message success!', message);
         messagesDispatcher({
-          type: SEND_MESSAGEGE_FAILURE,
+          type: SEND_MESSAGEGE_SUCESS,
           payload: message
         });
-        return;
-      }
-
-      logger.info('Channel: Sending message success!', message);
-      messagesDispatcher({
-        type: SEND_MESSAGEGE_SUCESS,
-        payload: message
       });
-    });
-    pubSub.publish(index.SEND_MESSAGE_START, {
-      /* pubSub is used instead of messagesDispatcher
-        to avoid redundantly calling `messageActionTypes.SEND_MESSAGEGE_START` */
-      message: LocalizationContext._objectSpread2({}, pendingMsg, {
-        url: URL.createObjectURL(file),
-        // pending thumbnail message seems to be failed
-        requestState: 'pending'
-      }),
-      channel: currentGroupChannel
-    });
-    setTimeout(function () {
-      return scrollIntoLast('.sendbird-msg--scroll-ref');
-    }, 1000);
-  }, [currentGroupChannel, onBeforeSendFileMessage]);
+      pubSub.publish(index.SEND_MESSAGE_START, {
+        /* pubSub is used instead of messagesDispatcher
+          to avoid redundantly calling `messageActionTypes.SEND_MESSAGEGE_START` */
+        message: LocalizationContext._objectSpread2({}, pendingMsg, {
+          url: URL.createObjectURL(file),
+          // pending thumbnail message seems to be failed
+          requestState: 'pending'
+        }),
+        channel: currentGroupChannel
+      });
+      setTimeout(function () {
+        return scrollIntoLast();
+      }, 1000);
+    }
+  }, [currentGroupChannel, onBeforeSendFileMessage, imageCompression]);
   return [sendMessage];
 }
 
@@ -1905,6 +2014,11 @@ function OutgoingUserMessage(_ref) {
       moreActive = _useState4[0],
       setMoreActive = _useState4[1];
 
+  var _useState5 = React.useState(false),
+      _useState6 = LocalizationContext._slicedToArray(_useState5, 2),
+      menuDisplaying = _useState6[0],
+      setMenuDisplaying = _useState6[1];
+
   var handleMoreIconClick = function handleMoreIconClick() {
     setMoreActive(true);
   };
@@ -1941,6 +2055,7 @@ function OutgoingUserMessage(_ref) {
         onClick: function onClick() {
           toggleDropdown();
           handleMoreIconClick();
+          setMenuDisplaying(true);
         },
         onBlur: function onBlur() {
           handleMoreIconBlur();
@@ -1952,12 +2067,20 @@ function OutgoingUserMessage(_ref) {
         fillColor: index.IconColors.CONTENT_INVERSE
       }));
     },
-    menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(index.MenuItems, {
-        parentRef: parentRefMenus // for catching location(x, y) of MenuItems
-        ,
-        parentContainRef: parentContainRef // for toggling more options(menus & reactions)
-        ,
+    menuItems: function menuItems(close) {
+      var closeDropdown = function closeDropdown() {
+        close();
+        setMenuDisplaying(false);
+      };
+
+      return React__default.createElement(index.MenuItems
+      /**
+       * parentRef: For catching location(x, y) of MenuItems
+       * parentContainRef: For toggling more options(menus & reactions)
+       */
+      , {
+        parentRef: parentRefMenus,
+        parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
         openLeft: true
       }, isMessageSent && React__default.createElement(index.MenuItem, {
@@ -2001,6 +2124,7 @@ function OutgoingUserMessage(_ref) {
         onClick: function onClick() {
           toggleDropdown();
           handleMoreIconClick();
+          setMenuDisplaying(true);
         },
         onBlur: function onBlur() {
           handleMoreIconBlur();
@@ -2012,7 +2136,12 @@ function OutgoingUserMessage(_ref) {
         fillColor: index.IconColors.CONTENT_INVERSE
       }));
     },
-    menuItems: function menuItems(closeDropdown) {
+    menuItems: function menuItems(close) {
+      var closeDropdown = function closeDropdown() {
+        close();
+        setMenuDisplaying(false);
+      };
+
       return React__default.createElement(MemoizedEmojiListItems, {
         message: message,
         parentRef: parentRefReactions,
@@ -2023,14 +2152,11 @@ function OutgoingUserMessage(_ref) {
         }
       });
     }
-  })), !chainBottom && !(mousehover || moreActive) && React__default.createElement("div", {
+  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React__default.createElement("div", {
     className: "sendbird-user-message__status"
   }, React__default.createElement(MessageStatus, {
     message: message,
-    status: status // onDelete={() => { showRemove(true); }}
-    // onResend={() => resendMessage(message)}
-    // duplicated and should replace to more
-
+    status: status
   }))), React__default.createElement("div", {
     className: "sendbird-user-message__text-balloon"
   }, React__default.createElement("div", {
@@ -2075,15 +2201,20 @@ function IncomingUserMessage(_ref2) {
       disableUserProfile = _React$useContext.disableUserProfile,
       renderUserProfile = _React$useContext.renderUserProfile;
 
-  var _useState5 = React.useState(false),
-      _useState6 = LocalizationContext._slicedToArray(_useState5, 2),
-      mousehover = _useState6[0],
-      setMousehover = _useState6[1];
-
   var _useState7 = React.useState(false),
       _useState8 = LocalizationContext._slicedToArray(_useState7, 2),
-      moreActive = _useState8[0],
-      setMoreActive = _useState8[1];
+      mousehover = _useState8[0],
+      setMousehover = _useState8[1];
+
+  var _useState9 = React.useState(false),
+      _useState10 = LocalizationContext._slicedToArray(_useState9, 2),
+      moreActive = _useState10[0],
+      setMoreActive = _useState10[1];
+
+  var _useState11 = React.useState(false),
+      _useState12 = LocalizationContext._slicedToArray(_useState11, 2),
+      menuDisplaying = _useState12[0],
+      setMenuDisplaying = _useState12[1];
 
   var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
   var showEmojiReactions = useReaction && message.reactions && message.reactions.length > 0;
@@ -2127,11 +2258,14 @@ function IncomingUserMessage(_ref2) {
       });
     },
     menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(index.MenuItems, {
-        parentRef: avatarRef // for catching location(x, y) of MenuItems
-        ,
-        parentContainRef: avatarRef // for toggling more options(menus & reactions)
-        ,
+      return React__default.createElement(index.MenuItems
+      /**
+       * parentRef: For catching location(x, y) of MenuItems
+       * parentContainRef: For toggling more options(menus & reactions)
+       */
+      , {
+        parentRef: avatarRef,
+        parentContainRef: avatarRef,
         closeDropdown: closeDropdown,
         style: {
           paddingTop: 0,
@@ -2171,7 +2305,10 @@ function IncomingUserMessage(_ref2) {
     className: "sendbird-user-message__right-padding"
   }, React__default.createElement("div", {
     className: "sendbird-user-message__more",
-    ref: parentContainRef
+    ref: parentContainRef,
+    style: {
+      top: chainTop ? '6px' : '22px'
+    }
   }, showReactionAddButton && React__default.createElement(index.ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React__default.createElement(index.IconButton, {
@@ -2181,6 +2318,7 @@ function IncomingUserMessage(_ref2) {
         onClick: function onClick() {
           toggleDropdown();
           handleMoreIconClick();
+          setMenuDisplaying(true);
         },
         onBlur: function onBlur() {
           handleMoreIconBlur();
@@ -2192,7 +2330,12 @@ function IncomingUserMessage(_ref2) {
         fillColor: index.IconColors.CONTENT_INVERSE
       }));
     },
-    menuItems: function menuItems(closeDropdown) {
+    menuItems: function menuItems(close) {
+      var closeDropdown = function closeDropdown() {
+        close();
+        setMenuDisplaying(false);
+      };
+
       return React__default.createElement(MemoizedEmojiListItems, {
         parentRef: parentRefReactions,
         parentContainRef: parentContainRef,
@@ -2212,6 +2355,7 @@ function IncomingUserMessage(_ref2) {
         onClick: function onClick() {
           toggleDropdown();
           handleMoreIconClick();
+          setMenuDisplaying(true);
         },
         onBlur: function onBlur() {
           handleMoreIconBlur();
@@ -2223,7 +2367,12 @@ function IncomingUserMessage(_ref2) {
         fillColor: index.IconColors.CONTENT_INVERSE
       }));
     },
-    menuItems: function menuItems(closeDropdown) {
+    menuItems: function menuItems(close) {
+      var closeDropdown = function closeDropdown() {
+        close();
+        setMenuDisplaying(false);
+      };
+
       return React__default.createElement(index.MenuItems, {
         parentRef: parentRefMenus,
         parentContainRef: parentContainRef,
@@ -2236,7 +2385,7 @@ function IncomingUserMessage(_ref2) {
         }
       }, "Copy"));
     }
-  })), !chainBottom && !(mousehover || moreActive) && React__default.createElement(index.Label, {
+  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React__default.createElement(index.Label, {
     className: "sendbird-user-message__sent-at",
     type: index.LabelTypography.CAPTION_3,
     color: index.LabelColors.ONBACKGROUND_2
@@ -2399,7 +2548,9 @@ function OutgoingThumbnailMessage(_ref2) {
       chainBottom = _ref2.chainBottom;
   var type = message.type,
       url = message.url,
-      localUrl = message.localUrl;
+      localUrl = message.localUrl,
+      thumbnails = message.thumbnails;
+  var thumbnailUrl = thumbnails && thumbnails.length > 0 && thumbnails[0].url || null;
 
   var _useContext = React.useContext(LocalizationContext.LocalizationContext),
       stringSet = _useContext.stringSet;
@@ -2418,6 +2569,11 @@ function OutgoingThumbnailMessage(_ref2) {
       _useState4 = LocalizationContext._slicedToArray(_useState3, 2),
       moreActive = _useState4[0],
       setMoreActive = _useState4[1];
+
+  var _useState5 = React.useState(false),
+      _useState6 = LocalizationContext._slicedToArray(_useState5, 2),
+      menuDisplaying = _useState6[0],
+      setMenuDisplaying = _useState6[1];
 
   var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
   var MemoizedEmojiListItems = memoizedEmojiListItems;
@@ -2458,6 +2614,7 @@ function OutgoingThumbnailMessage(_ref2) {
         onClick: function onClick() {
           toggleDropdown();
           handleMoreIconClick();
+          setMenuDisplaying(true);
         },
         onBlur: function onBlur() {
           handleMoreIconBlur();
@@ -2469,8 +2626,18 @@ function OutgoingThumbnailMessage(_ref2) {
         color: index.IconColors.CONTENT_INVERSE
       }));
     },
-    menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(index.MenuItems, {
+    menuItems: function menuItems(close) {
+      var closeDropdown = function closeDropdown() {
+        close();
+        setMenuDisplaying(false);
+      };
+
+      return React__default.createElement(index.MenuItems
+      /**
+       * parentRef: For catching location(x, y) of MenuItems
+       * parentContainRef: For toggling more options(menus & reactions)
+       */
+      , {
         parentRef: menuRef,
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
@@ -2500,6 +2667,7 @@ function OutgoingThumbnailMessage(_ref2) {
         onClick: function onClick() {
           toggleDropdown();
           handleMoreIconClick();
+          setMenuDisplaying(true);
         },
         onBlur: function onBlur() {
           handleMoreIconBlur();
@@ -2511,7 +2679,12 @@ function OutgoingThumbnailMessage(_ref2) {
         color: index.IconColors.CONTENT_INVERSE
       }));
     },
-    menuItems: function menuItems(closeDropdown) {
+    menuItems: function menuItems(close) {
+      var closeDropdown = function closeDropdown() {
+        close();
+        setMenuDisplaying(false);
+      };
+
       return React__default.createElement(MemoizedEmojiListItems, {
         message: message,
         parentRef: reactionAddRef,
@@ -2522,7 +2695,7 @@ function OutgoingThumbnailMessage(_ref2) {
         }
       });
     }
-  })), !chainBottom && !(mousehover || moreActive) && React__default.createElement(MessageStatus, {
+  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React__default.createElement(MessageStatus, {
     message: message,
     status: status,
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-left-padding__status")
@@ -2540,7 +2713,15 @@ function OutgoingThumbnailMessage(_ref2) {
     } : function () {},
     tabIndex: 0,
     role: "button"
-  }, index$2.isVideo(type) && React__default.createElement(React__default.Fragment, null, React__default.createElement("video", {
+  }, index$2.isVideo(type) && React__default.createElement(React__default.Fragment, null, thumbnailUrl ? React__default.createElement(index.ImageRenderer, {
+    className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__video"),
+    url: thumbnailUrl,
+    alt: "video/thumbnail",
+    width: "404px",
+    height: "280px"
+  }) :
+  /* eslint-disable-next-line jsx-a11y/media-has-caption */
+  React__default.createElement("video", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__video")
   }, React__default.createElement("source", {
     src: url || localUrl,
@@ -2550,16 +2731,12 @@ function OutgoingThumbnailMessage(_ref2) {
     width: "56px",
     height: "56px",
     type: index.IconTypes.PLAY
-  })), index$2.isImage(type) && React__default.createElement("div", {
+  })), index$2.isImage(type) && React__default.createElement(index.ImageRenderer, {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__img"),
-    style: {
-      backgroundImage: "url(".concat(url || localUrl, ")"),
-      height: '280px',
-      width: '404px',
-      backgroundSize: 'cover',
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'center'
-    }
+    url: thumbnailUrl || url || localUrl,
+    alt: "image/thumbnail",
+    width: "404px",
+    height: "280px"
   }), index$2.unSupported(type) && React__default.createElement("div", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__other")
   }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React__default.createElement("div", {
@@ -2589,7 +2766,9 @@ function IncomingThumbnailMessage(_ref3) {
       chainBottom = _ref3.chainBottom;
   var type = message.type,
       url = message.url,
-      localUrl = message.localUrl;
+      localUrl = message.localUrl,
+      thumbnails = message.thumbnails;
+  var thumbnailUrl = thumbnails && thumbnails.length > 0 && thumbnails[0].url || null;
 
   var _React$useContext = React__default.useContext(index.UserProfileContext),
       disableUserProfile = _React$useContext.disableUserProfile,
@@ -2603,15 +2782,20 @@ function IncomingThumbnailMessage(_ref3) {
   var reactionAddRef = React.useRef(null);
   var avatarRef = React.useRef(null);
 
-  var _useState5 = React.useState(false),
-      _useState6 = LocalizationContext._slicedToArray(_useState5, 2),
-      mousehover = _useState6[0],
-      setMousehover = _useState6[1];
-
   var _useState7 = React.useState(false),
       _useState8 = LocalizationContext._slicedToArray(_useState7, 2),
-      moreActive = _useState8[0],
-      setMoreActive = _useState8[1];
+      mousehover = _useState8[0],
+      setMousehover = _useState8[1];
+
+  var _useState9 = React.useState(false),
+      _useState10 = LocalizationContext._slicedToArray(_useState9, 2),
+      moreActive = _useState10[0],
+      setMoreActive = _useState10[1];
+
+  var _useState11 = React.useState(false),
+      _useState12 = LocalizationContext._slicedToArray(_useState11, 2),
+      menuDisplaying = _useState12[0],
+      setMenuDisplaying = _useState12[1];
 
   var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
   var MemoizedEmojiListItems = memoizedEmojiListItems;
@@ -2649,6 +2833,7 @@ function IncomingThumbnailMessage(_ref3) {
   }, !chainBottom && React__default.createElement(index.ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React__default.createElement(index.Avatar, {
+        ref: avatarRef,
         onClick: function onClick() {
           if (!disableUserProfile) {
             toggleDropdown();
@@ -2661,11 +2846,14 @@ function IncomingThumbnailMessage(_ref3) {
       });
     },
     menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(index.MenuItems, {
-        parentRef: avatarRef // for catching location(x, y) of MenuItems
-        ,
-        parentContainRef: avatarRef // for toggling more options(menus & reactions)
-        ,
+      return React__default.createElement(index.MenuItems
+      /**
+       * parentRef: For catching location(x, y) of MenuItems
+       * parentContainRef: For toggling more options(menus & reactions)
+       */
+      , {
+        parentRef: avatarRef,
+        parentContainRef: avatarRef,
         closeDropdown: closeDropdown,
         style: {
           paddingTop: 0,
@@ -2689,7 +2877,15 @@ function IncomingThumbnailMessage(_ref3) {
     onKeyDown: isMessageSent ? function () {
       return onClick(true);
     } : function () {}
-  }, index$2.isVideo(type) && React__default.createElement(React__default.Fragment, null, React__default.createElement("video", {
+  }, index$2.isVideo(type) && React__default.createElement(React__default.Fragment, null, thumbnailUrl ? React__default.createElement(index.ImageRenderer, {
+    className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__video"),
+    src: thumbnailUrl,
+    alt: "video/thumbnail",
+    width: "404px",
+    height: "280px"
+  }) :
+  /* eslint-disable-next-line jsx-a11y/media-has-caption */
+  React__default.createElement("video", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__video")
   }, React__default.createElement("source", {
     src: url || localUrl,
@@ -2699,16 +2895,12 @@ function IncomingThumbnailMessage(_ref3) {
     width: "56px",
     height: "56px",
     type: index.IconTypes.PLAY
-  })), index$2.isImage(type) && React__default.createElement("div", {
+  })), index$2.isImage(type) && React__default.createElement(index.ImageRenderer, {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__img"),
-    style: {
-      backgroundImage: "url(".concat(url || localUrl, ")"),
-      height: '280px',
-      width: '404px',
-      backgroundSize: 'cover',
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'center'
-    }
+    url: thumbnailUrl || url || localUrl,
+    alt: "image/thumbnail",
+    width: "404px",
+    height: "280px"
   }), index$2.unSupported(type) && React__default.createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__other")
   }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React__default.createElement("div", {
@@ -2723,7 +2915,7 @@ function IncomingThumbnailMessage(_ref3) {
     memoizedEmojiListItems: memoizedEmojiListItems
   }))), React__default.createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__right-padding")
-  }, !chainBottom && !(mousehover || moreActive) && React__default.createElement(index.Label, {
+  }, !chainBottom && !(mousehover || moreActive || menuDisplaying) && React__default.createElement(index.Label, {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__sent-at"),
     type: index.LabelTypography.CAPTION_3,
     color: index.LabelColors.ONBACKGROUND_2
@@ -2739,6 +2931,7 @@ function IncomingThumbnailMessage(_ref3) {
         onClick: function onClick() {
           toggleDropdown();
           handleMoreIconClick();
+          setMenuDisplaying(true);
         },
         onBlur: function onBlur() {
           handleMoreIconBlur();
@@ -2750,7 +2943,12 @@ function IncomingThumbnailMessage(_ref3) {
         color: index.IconColors.CONTENT_INVERSE
       }));
     },
-    menuItems: function menuItems(closeDropdown) {
+    menuItems: function menuItems(close) {
+      var closeDropdown = function closeDropdown() {
+        close();
+        setMenuDisplaying(false);
+      };
+
       return React__default.createElement(MemoizedEmojiListItems, {
         message: message,
         parentRef: reactionAddRef,
@@ -2900,6 +3098,11 @@ function OutgoingFileMessage(_ref) {
       moreActive = _useState4[0],
       setMoreActive = _useState4[1];
 
+  var _useState5 = React.useState(false),
+      _useState6 = LocalizationContext._slicedToArray(_useState5, 2),
+      menuDisplaying = _useState6[0],
+      setMenuDisplaying = _useState6[1];
+
   var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
   var MemoizedEmojiListItems = memoizedEmojiListItems;
   var isMessageSent = utils$1.getIsSentFromStatus(status);
@@ -2940,6 +3143,7 @@ function OutgoingFileMessage(_ref) {
         onClick: function onClick() {
           toggleDropdown();
           handleMoreIconClick();
+          setMenuDisplaying(true);
         },
         onBlur: function onBlur() {
           handleMoreIconBlur();
@@ -2950,8 +3154,18 @@ function OutgoingFileMessage(_ref) {
         type: index.IconTypes.MORE
       }));
     },
-    menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(index.MenuItems, {
+    menuItems: function menuItems(close) {
+      var closeDropdown = function closeDropdown() {
+        close();
+        setMenuDisplaying(false);
+      };
+
+      return React__default.createElement(index.MenuItems
+      /**
+       * parentRef: For catching location(x, y) of MenuItems
+       * parentContainRef: For toggling more options(menus & reactions)
+       */
+      , {
         parentRef: menuRef,
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
@@ -2981,6 +3195,7 @@ function OutgoingFileMessage(_ref) {
         onClick: function onClick() {
           toggleDropdown();
           handleMoreIconClick();
+          setMenuDisplaying(true);
         },
         onBlur: function onBlur() {
           handleMoreIconBlur();
@@ -2992,7 +3207,12 @@ function OutgoingFileMessage(_ref) {
         fillColor: index.IconColors.CONTENT_INVERSE
       }));
     },
-    menuItems: function menuItems(closeDropdown) {
+    menuItems: function menuItems(close) {
+      var closeDropdown = function closeDropdown() {
+        close();
+        setMenuDisplaying(false);
+      };
+
       return React__default.createElement(MemoizedEmojiListItems, {
         message: message,
         parentRef: reactionAddButtonRef,
@@ -3003,7 +3223,7 @@ function OutgoingFileMessage(_ref) {
         }
       });
     }
-  })), !chainBottom && !(mousehover || moreActive) && React__default.createElement("div", {
+  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React__default.createElement("div", {
     className: "sendbird-file-message__status"
   }, React__default.createElement(MessageStatus, {
     message: message,
@@ -3058,15 +3278,20 @@ function IncomingFileMessage(_ref2) {
   var avatarRef = React.useRef(null);
   var reactionAddButtonRef = React.useRef(null);
 
-  var _useState5 = React.useState(false),
-      _useState6 = LocalizationContext._slicedToArray(_useState5, 2),
-      mousehover = _useState6[0],
-      setMousehover = _useState6[1];
-
   var _useState7 = React.useState(false),
       _useState8 = LocalizationContext._slicedToArray(_useState7, 2),
-      moreActive = _useState8[0],
-      setMoreActive = _useState8[1];
+      mousehover = _useState8[0],
+      setMousehover = _useState8[1];
+
+  var _useState9 = React.useState(false),
+      _useState10 = LocalizationContext._slicedToArray(_useState9, 2),
+      moreActive = _useState10[0],
+      setMoreActive = _useState10[1];
+
+  var _useState11 = React.useState(false),
+      _useState12 = LocalizationContext._slicedToArray(_useState11, 2),
+      menuDisplaying = _useState12[0],
+      setMenuDisplaying = _useState12[1];
 
   var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
   var MemoizedEmojiListItems = memoizedEmojiListItems;
@@ -3110,11 +3335,14 @@ function IncomingFileMessage(_ref2) {
       });
     },
     menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(index.MenuItems, {
-        parentRef: avatarRef // for catching location(x, y) of MenuItems
-        ,
-        parentContainRef: avatarRef // for toggling more options(menus & reactions)
-        ,
+      return React__default.createElement(index.MenuItems
+      /**
+       * parentRef: For catching location(x, y) of MenuItems
+       * parentContainRef: For toggling more options(menus & reactions)
+       */
+      , {
+        parentRef: avatarRef,
+        parentContainRef: avatarRef,
         closeDropdown: closeDropdown,
         style: {
           paddingTop: 0,
@@ -3169,6 +3397,7 @@ function IncomingFileMessage(_ref2) {
         onClick: function onClick() {
           toggleDropdown();
           handleMoreIconClick();
+          setMenuDisplaying(true);
         },
         onBlur: function onBlur() {
           handleMoreIconBlur();
@@ -3180,7 +3409,12 @@ function IncomingFileMessage(_ref2) {
         fillColor: index.IconColors.CONTENT_INVERSE
       }));
     },
-    menuItems: function menuItems(closeDropdown) {
+    menuItems: function menuItems(close) {
+      var closeDropdown = function closeDropdown() {
+        close();
+        setMenuDisplaying(false);
+      };
+
       return React__default.createElement(MemoizedEmojiListItems, {
         message: message,
         parentRef: reactionAddButtonRef,
@@ -3191,7 +3425,7 @@ function IncomingFileMessage(_ref2) {
         }
       });
     }
-  })), !chainBottom && !(mousehover || moreActive) && React__default.createElement(index.Label, {
+  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React__default.createElement(index.Label, {
     className: "sendbird-file-message__sent-at",
     type: index.LabelTypography.CAPTION_3,
     color: index.LabelColors.ONBACKGROUND_2
@@ -3416,6 +3650,11 @@ function OutgoingUnknownMessage(_ref2) {
       moreActive = _useState4[0],
       setMoreActive = _useState4[1];
 
+  var _useState5 = React.useState(false),
+      _useState6 = LocalizationContext._slicedToArray(_useState5, 2),
+      menuDisplaying = _useState6[0],
+      setMenuDisplaying = _useState6[1];
+
   var _useContext = React.useContext(LocalizationContext.LocalizationContext),
       stringSet = _useContext.stringSet;
 
@@ -3455,6 +3694,7 @@ function OutgoingUnknownMessage(_ref2) {
         onClick: function onClick() {
           toggleDropdown();
           handleMoreIconClick();
+          setMenuDisplaying(true);
         },
         onBlur: function onBlur() {
           handleMoreIconBlur();
@@ -3466,12 +3706,20 @@ function OutgoingUnknownMessage(_ref2) {
         fillColor: index.IconColors.CONTENT_INVERSE
       }));
     },
-    menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(index.MenuItems, {
-        parentRef: menuRef // for catching location(x, y) of MenuItems
-        ,
-        parentContainRef: parentContainRef // for toggling more options(menus & reactions)
-        ,
+    menuItems: function menuItems(close) {
+      var closeDropdown = function closeDropdown() {
+        close();
+        setMenuDisplaying(false);
+      };
+
+      return React__default.createElement(index.MenuItems
+      /**
+       * parentRef: For catching location(x, y) of MenuItems
+       * parentContainRef: For toggling more options(menus & reactions)
+       */
+      , {
+        parentRef: menuRef,
+        parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
         openLeft: true
       }, React__default.createElement(index.MenuItem, {
@@ -3481,7 +3729,7 @@ function OutgoingUnknownMessage(_ref2) {
         }
       }, "Delete"));
     }
-  })), !chainBottom && !(mousehover || moreActive) && React__default.createElement("div", {
+  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React__default.createElement("div", {
     className: "".concat(className, "__message-status")
   }, React__default.createElement(MessageStatus, {
     message: message,
@@ -3543,11 +3791,14 @@ function IncomingUnknownMessage(_ref3) {
       });
     },
     menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(index.MenuItems, {
-        parentRef: avatarRef // for catching location(x, y) of MenuItems
-        ,
-        parentContainRef: avatarRef // for toggling more options(menus & reactions)
-        ,
+      return React__default.createElement(index.MenuItems
+      /**
+       * parentRef: For catching location(x, y) of MenuItems
+       * parentContainRef: For toggling more options(menus & reactions)
+       */
+      , {
+        parentRef: avatarRef,
+        parentContainRef: avatarRef,
         closeDropdown: closeDropdown,
         style: {
           paddingTop: 0,
@@ -4559,7 +4810,7 @@ MessageHoc.propTypes = {
     ogMetaData: PropTypes.shape({})
   }),
   renderCustomMessage: PropTypes.func,
-  currentGroupChannel: PropTypes.shape,
+  currentGroupChannel: PropTypes.shape({}),
   hasSeperator: PropTypes.bool,
   disabled: PropTypes.bool,
   editDisabled: PropTypes.bool,
@@ -4679,6 +4930,21 @@ function (_Component) {
           useMessageGrouping = _this$props2.useMessageGrouping,
           currentGroupChannel = _this$props2.currentGroupChannel,
           memoizedEmojiListItems = _this$props2.memoizedEmojiListItems;
+
+      if (!initialized) {
+        return React__default.createElement(index.PlaceHolder, {
+          className: "sendbird-conversation__not-initialized",
+          type: index.PlaceHolderTypes$1.WRONG
+        });
+      }
+
+      if (allMessages.length < 1) {
+        return React__default.createElement(index.PlaceHolder, {
+          className: "sendbird-conversation__no-messages",
+          type: index.PlaceHolderTypes$1.NO_MESSAGES
+        });
+      }
+
       return React__default.createElement("div", {
         className: "sendbird-conversation__messages"
       }, React__default.createElement("div", {
@@ -4689,7 +4955,7 @@ function (_Component) {
         className: "sendbird-conversation__padding"
       }), React__default.createElement("div", {
         className: "sendbird-conversation__messages-padding"
-      }, initialized && allMessages.map(function (m, idx) {
+      }, allMessages.map(function (m, idx) {
         var previousMessage = allMessages[idx - 1];
         var nextMessage = allMessages[idx + 1];
 
@@ -5155,6 +5421,7 @@ var ConversationPanel = function ConversationPanel(props) {
       pubSub = _props$config.pubSub,
       isOnline = _props$config.isOnline,
       theme = _props$config.theme,
+      imageCompression = _props$config.imageCompression,
       reconnect = props.dispatchers.reconnect,
       _props$queries = props.queries,
       queries = _props$queries === void 0 ? {} : _props$queries,
@@ -5202,10 +5469,11 @@ var ConversationPanel = function ConversationPanel(props) {
       emojiContainer = messagesStore.emojiContainer,
       readStatus = messagesStore.readStatus;
   var isFrozen = currentGroupChannel.isFrozen,
-      isBroadcast = currentGroupChannel.isBroadcast;
+      isBroadcast = currentGroupChannel.isBroadcast,
+      isSuper = currentGroupChannel.isSuper;
   var _sdk$appInfo = sdk.appInfo,
       appInfo = _sdk$appInfo === void 0 ? {} : _sdk$appInfo;
-  var usingReaction = appInfo.isUsingReaction && !isBroadcast || useReaction || false;
+  var usingReaction = appInfo.isUsingReaction && !isBroadcast && !isSuper && useReaction;
   var userDefinedDisableUserProfile = disableUserProfile || config.disableUserProfile;
   var userDefinedRenderProfile = renderUserProfile || config.renderUserProfile;
   var emojiAllMap = React.useMemo(function () {
@@ -5331,7 +5599,8 @@ var ConversationPanel = function ConversationPanel(props) {
 
   var _useSendFileMessageCa = useSendFileMessageCallback({
     currentGroupChannel: currentGroupChannel,
-    onBeforeSendFileMessage: onBeforeSendFileMessage
+    onBeforeSendFileMessage: onBeforeSendFileMessage,
+    imageCompression: imageCompression
   }, {
     sdk: sdk,
     logger: logger,
@@ -5395,7 +5664,7 @@ var ConversationPanel = function ConversationPanel(props) {
   }), isFrozen && React__default.createElement(FrozenNotification, null), unreadCount > 0 && React__default.createElement(Notification, {
     count: unreadCount,
     onClick: function onClick() {
-      scrollIntoLast('.sendbird-msg--scroll-ref'); // there is no scroll
+      scrollIntoLast(); // there is no scroll
 
       if (scrollRef.current.scrollTop === 0) {
         currentGroupChannel.markAsRead();
@@ -5492,6 +5761,11 @@ ConversationPanel.propTypes = {
     pubSub: PropTypes.shape({
       subscribe: PropTypes.func,
       publish: PropTypes.func
+    }),
+    imageCompression: PropTypes.shape({
+      compressionRate: PropTypes.number,
+      resizingWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      resizingHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
     })
   }).isRequired,
   queries: PropTypes.shape({

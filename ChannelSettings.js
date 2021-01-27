@@ -1,14 +1,14 @@
 import { b as _slicedToArray, e as LocalizationContext, d as __spreadArrays, _ as __assign, w as withSendbirdContext, u as uuidv4 } from './LocalizationContext-5c5b45a0.js';
 import React, { useRef, useState, useContext, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { M as Modal, T as Type, A as Avatar, f as TextButton, b as Label, c as LabelTypography, d as LabelColors, C as ContextMenu, e as IconButton, I as Icon, a as IconTypes, g as IconColors, h as MenuItems, i as MenuItem, n as UserProfileContext, o as UserProfile, B as Button, w as Size, z as getSdk, P as PlaceHolder, m as PlaceHolderTypes, l as UserProfileProvider } from './index-a2b521ce.js';
+import { M as Modal, T as Type, A as Avatar, f as TextButton, b as Label, c as LabelTypography, d as LabelColors, C as ContextMenu, e as IconButton, I as Icon, a as IconTypes, g as IconColors, h as MenuItems, i as MenuItem, n as UserProfileContext, o as UserProfile, B as Button, w as Size, z as getSdk, P as PlaceHolder, m as PlaceHolderTypes, l as UserProfileProvider } from './index-c97add1b.js';
 import { n as noop } from './utils-53ba1773.js';
-import { C as ChannelAvatar } from './index-9dc7a088.js';
-import { I as InviteMembers$1, B as Badge, c as createDefaultUserListQuery, L as LeaveChannelModal } from './LeaveChannel-7eba3969.js';
+import { C as ChannelAvatar } from './index-fa2a92d8.js';
+import { I as InviteMembers$1, B as Badge, c as createDefaultUserListQuery, L as LeaveChannelModal } from './LeaveChannel-cf9903b4.js';
 import 'date-fns/format';
 import 'react-dom';
-import { I as InputLabel, a as Input, U as UserListItem$2, M as MutedAvatarOverlay } from './index-b49918bb.js';
-import { A as AccordionGroup, a as Accordion } from './index-3c2fb44d.js';
+import { I as InputLabel, a as Input, U as UserListItem$2, M as MutedAvatarOverlay } from './index-2c17b4ed.js';
+import { A as AccordionGroup, a as Accordion } from './index-e492270c.js';
 
 var EditDetails = function EditDetails(props) {
   var _onSubmit = props.onSubmit,
@@ -1111,7 +1111,7 @@ var MemberList = function MemberList(_a) {
                   });
                 }
               }
-            }, member.isMuted ? 'Unmute' : 'Mute'), React.createElement(MenuItem, {
+            }, member.isMuted ? 'Unmute' : 'Mute'), member.role && member.role !== 'operator' && React.createElement(MenuItem, {
               onClick: function onClick() {
                 channel.banUser(member, -1, '', function () {
                   refershList();

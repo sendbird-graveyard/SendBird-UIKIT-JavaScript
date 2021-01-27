@@ -5,25 +5,25 @@ import PropTypes from 'prop-types';
 import 'sendbird';
 import './actionTypes-a85c0eaa.js';
 import 'css-vars-ponyfill';
-import './index-a2b521ce.js';
+import './index-c97add1b.js';
 import ChannelList from './ChannelList.js';
 import './utils-53ba1773.js';
-import './index-9dc7a088.js';
-import './LeaveChannel-7eba3969.js';
+import './index-fa2a92d8.js';
+import './LeaveChannel-cf9903b4.js';
 import 'date-fns/isToday';
 import 'date-fns/format';
 import 'date-fns/isYesterday';
 import './type-0296584d.js';
 import './utils-cfdeb084.js';
 import 'react-dom';
-import './index-b49918bb.js';
+import './index-2c17b4ed.js';
 import Conversation from './Channel.js';
-import './index-f7b03766.js';
+import './index-f48d282b.js';
 import 'date-fns/isSameDay';
 import './utils-d7f59026.js';
 import 'date-fns/formatDistanceToNowStrict';
 import ChannelSettings from './ChannelSettings.js';
-import './index-3c2fb44d.js';
+import './index-e492270c.js';
 
 function App(props) {
   var appId = props.appId,
@@ -42,7 +42,8 @@ function App(props) {
       allowProfileEdit = props.allowProfileEdit,
       disableUserProfile = props.disableUserProfile,
       renderUserProfile = props.renderUserProfile,
-      onProfileEditSuccess = props.onProfileEditSuccess;
+      onProfileEditSuccess = props.onProfileEditSuccess,
+      imageCompression = props.imageCompression;
 
   var _useState = useState(null),
       _useState2 = _slicedToArray(_useState, 2),
@@ -66,7 +67,8 @@ function App(props) {
     config: config,
     colorSet: colorSet,
     disableUserProfile: disableUserProfile,
-    renderUserProfile: renderUserProfile
+    renderUserProfile: renderUserProfile,
+    imageCompression: imageCompression
   }, React.createElement("div", {
     className: "sendbird-app__wrap"
   }, React.createElement("div", {
@@ -122,7 +124,12 @@ App.propTypes = {
   useReaction: PropTypes.bool,
   useMessageGrouping: PropTypes.bool,
   stringSet: PropTypes.objectOf(PropTypes.string),
-  colorSet: PropTypes.objectOf(PropTypes.string)
+  colorSet: PropTypes.objectOf(PropTypes.string),
+  imageCompression: PropTypes.shape({
+    compressionRate: PropTypes.number,
+    resizingWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    resizingHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+  })
 };
 App.defaultProps = {
   accessToken: '',
@@ -138,7 +145,8 @@ App.defaultProps = {
   useReaction: true,
   useMessageGrouping: true,
   stringSet: null,
-  colorSet: null
+  colorSet: null,
+  imageCompression: {}
 };
 
 export default App;

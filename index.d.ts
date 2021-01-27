@@ -6,6 +6,9 @@
 import React from 'react';
 import Sendbird from 'sendbird';
 
+export type OpenChannelType = Sendbird.OpenChannel;
+export type GroupChannelType = Sendbird.GroupChannel;
+
 export as namespace SendbirdUIKit;
 export const App: React.FunctionComponent<AppProps>
 export const SendBirdProvider: React.FunctionComponent<SendBirdProviderProps>
@@ -15,12 +18,12 @@ export const ChannelList: React.FunctionComponent<ChannelListProps>
 export const Channel: React.FunctionComponent<ChannelProps>
 export const OpenChannel: React.FunctionComponent<OpenChannelProps>
 export const OpenChannelSettings: React.FunctionComponent<OpenChannelSettingsProps>
-export function withSendBird (
+export function withSendBird(
   ChildComp: React.Component | React.ElementType,
   mapStoreToProps?: (store: SendBirdState) => unknown
 ): (props: unknown) => React.ReactNode;
 
-export type SendBirdState  = {
+export type SendBirdState = {
   config: SendBirdStateConfig;
   stores: SendBirdStateStore;
 }
@@ -45,7 +48,7 @@ export namespace SendBirdSelectors {
   ) => Promise<Sendbird.FileMessage>;
   type GetUpdateUserMessage = (
     channelUrl: string,
-    messageId: string|number,
+    messageId: string | number,
     params: Sendbird.UserMessageParams
   ) => Promise<Sendbird.UserMessage>;
   type GetDeleteMessage = (
@@ -64,8 +67,37 @@ export namespace SendBirdSelectors {
   type GetUnFreezeChannel = (channelUrl: string) => Promise<Sendbird.GroupChannel>;
   type GetCreateChannel = (channelParams: Sendbird.GroupChannelParams) => Promise<Sendbird.GroupChannel>;
   type GetLeaveChannel = (channelUrl: string) => Promise<Sendbird.GroupChannel>;
+  type GetCreateOpenChannel = (channelParams: Sendbird.OpenChannelParams) => Promise<Sendbird.OpenChannel>;
+  type GetEnterOpenChannel = (channelUrl: string) => Promise<null>;
+  type GetExitOpenChannel = (channelUrl: string) => Promise<null>;
+  type GetOpenChannelSendUserMessage = (
+    channelUrl: string,
+    params: Sendbird.UserMessageParams,
+  ) => Promise<Sendbird.UserMessage>;
+  type GetOpenChannelSendFileMessage = (
+    channelUrl: string,
+    params: Sendbird.FileMessageParams,
+  ) => Promise<Sendbird.FileMessage>;
+  type GetOpenChannelUpdateUserMessage = (
+    channelUrl: string,
+    messageId: string,
+    params: Sendbird.UserMessageParams,
+  ) => Promise<Sendbird.UserMessage>;
+  type GetOpenChannelDeleteMessage = (
+    channelUrl: string,
+    message: Sendbird.UserMessage | Sendbird.FileMessage,
+  ) => Promise<Sendbird.UserMessage | Sendbird.FileMessage>;
+  type GetOpenChannelResendUserMessage = (
+    channelUrl: string,
+    failedMessage: Sendbird.UserMessage,
+  ) => Promise<Sendbird.UserMessage>;
+  type GetOpenChannelResendFileMessage = (
+    channelUrl: string,
+    failedMessage: Sendbird.FileMessage,
+  ) => Promise<Sendbird.FileMessage>;
 }
-export function getStringSet(lang?: string): {[label: string]: string}
+
+export function getStringSet(lang?: string): { [label: string]: string }
 
 export type Logger = {
   info?(title?: unknown, description?: unknown): void;
@@ -100,6 +132,7 @@ interface OpenChannelSettingsProps {
   onCloseClick?(): void;
   onBeforeUpdateChannel?(currentTitle: string, currentImg: File, data: string): Sendbird.OpenChannelParams;
   onChannelModified?(channel: Sendbird.OpenChannel): void;
+  onDeleteChannel?(channel: Sendbird.OpenChannel): void;
   renderChannelProfile?: (props: SendbirdUIKit.RenderOpenChannelProfileProps) => React.ReactNode;
   renderUserProfile?: (props: SendbirdUIKit.RenderUserProfileProps) => React.ReactNode;
   disableUserProfile?: boolean;
@@ -107,7 +140,7 @@ interface OpenChannelSettingsProps {
 
 // to be used with Conversation.renderMessageInput
 export interface RenderMessageInputProps {
-  channel: Sendbird.GroupChannel|Sendbird.OpenChannel;
+  channel: Sendbird.GroupChannel | Sendbird.OpenChannel;
   user: Sendbird.User;
   disabled: boolean;
 }
@@ -122,6 +155,11 @@ interface SendBirdStateConfig {
   theme: string;
   setCurrenttheme: (theme: string) => void;
   userListQuery?(): UserListQuery;
+  imageCompression?: {
+    compressionRate?: number,
+    resizingWidth?: number | string,
+    resizingHeight?: number | string,
+  };
 }
 export interface SdkStore {
   error: boolean;
@@ -138,6 +176,9 @@ interface SendBirdStateStore {
   sdkStore: SdkStore;
   userStore: UserStore;
 }
+
+export type Sdk = Sendbird.SendBirdInstance;
+
 interface RenderUserProfileProps {
   user: Sendbird.Member | Sendbird.User;
   currentUserId: string;
@@ -263,6 +304,11 @@ interface SendBirdProviderProps {
   config?: SendBirdProviderConfig;
   stringSet?: Record<string, string>;
   colorSet?: Record<string, string>;
+  imageCompression?: {
+    compressionRate?: number,
+    resizingWidth?: number | string,
+    resizingHeight?: number | string,
+  };
 }
 interface ChannelListProps {
   disableUserProfile?: boolean;
@@ -307,6 +353,17 @@ interface sendBirdSelectorsInterface {
   getUnFreezeChannel: (store: SendBirdState) => SendBirdSelectors.GetUnFreezeChannel;
   getCreateChannel: (store: SendBirdState) => SendBirdSelectors.GetCreateChannel;
   getLeaveChannel: (store: SendBirdState) => SendBirdSelectors.GetLeaveChannel;
+  getCreateOpenChannel: (store: SendBirdState) => SendBirdSelectors.GetCreateOpenChannel;
+  getEnterOpenChannel: (store: SendBirdState) => SendBirdSelectors.GetEnterOpenChannel;
+  getExitOpenChannel: (store: SendBirdState) => SendBirdSelectors.GetExitOpenChannel;
+  enterOpenChannel: (store: SendBirdState) => SendBirdSelectors.GetEnterOpenChannel;
+  exitOpenChannel: (store: SendBirdState) => SendBirdSelectors.GetExitOpenChannel;
+  getOpenChannelSendUserMessage: (store: SendBirdState) => SendBirdSelectors.GetOpenChannelSendUserMessage;
+  getOpenChannelSendFileMessage: (store: SendBirdState) => SendBirdSelectors.GetOpenChannelSendFileMessage;
+  getOpenChannelUpdateUserMessage: (store: SendBirdState) => SendBirdSelectors.GetOpenChannelUpdateUserMessage;
+  getOpenChannelDeleteMessage: (store: SendBirdState) => SendBirdSelectors.GetOpenChannelDeleteMessage;
+  getOpenChannelResendUserMessage: (store: SendBirdState) => SendBirdSelectors.GetOpenChannelResendUserMessage;
+  getOpenChannelResendFileMessage: (store: SendBirdState) => SendBirdSelectors.GetOpenChannelResendFileMessage;
 }
 interface ChannelSettingsProps {
   channelUrl: string;
@@ -335,13 +392,18 @@ interface AppProps {
   useMessageGrouping?: boolean;
   stringSet?: Record<string, string>;
   colorSet?: Record<string, string>;
+  imageCompression?: {
+    compressionRate?: number,
+    resizingWidth?: number | string,
+    resizingHeight?: number | string,
+  };
 }
 
-export type EveryMessage = ClientUserMessage|ClientFileMessage|ClientAdminMessage;
+export type EveryMessage = ClientUserMessage | ClientFileMessage | ClientAdminMessage;
 
-export interface ClientUserMessage extends Sendbird.UserMessage, ClientMessage {}
-export interface ClientFileMessage extends Sendbird.FileMessage, ClientMessage {}
-export interface ClientAdminMessage extends Sendbird.AdminMessage, ClientMessage {}
+export interface ClientUserMessage extends Sendbird.UserMessage, ClientMessage { }
+export interface ClientFileMessage extends Sendbird.FileMessage, ClientMessage { }
+export interface ClientAdminMessage extends Sendbird.AdminMessage, ClientMessage { }
 interface ClientMessage {
   reqId: string;
   file?: File;
@@ -349,7 +411,7 @@ interface ClientMessage {
   _sender: Sendbird.User;
 }
 
-type RenderCustomMessage  = (
+type RenderCustomMessage = (
   message: EveryMessage,
   channel: Sendbird.OpenChannel | Sendbird.GroupChannel,
 ) => RenderCustomMessageProps;

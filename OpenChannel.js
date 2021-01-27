@@ -1,16 +1,16 @@
 import { e as LocalizationContext, n as uuidv4, d as __spreadArrays, _ as __assign, w as withSendbirdContext } from './LocalizationContext-5c5b45a0.js';
-import React, { useContext, useRef, useState, useMemo, useEffect, useReducer, useCallback } from 'react';
+import React, { useContext, useRef, useState, useMemo, useEffect, useCallback, useReducer } from 'react';
 import 'prop-types';
-import { b as Label, c as LabelTypography, L as LabelStringSet, A as Avatar, I as Icon, a as IconTypes, g as IconColors, d as LabelColors, e as IconButton, n as UserProfileContext, C as ContextMenu, h as MenuItems, o as UserProfile, i as MenuItem, r as ImageRenderer, f as TextButton, M as Modal, P as PlaceHolder, t as PlaceHolderTypes, p as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, q as SEND_FILE_MESSAGE, U as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, l as UserProfileProvider } from './index-a2b521ce.js';
+import { b as Label, c as LabelTypography, L as LabelStringSet, A as Avatar, I as Icon, a as IconTypes, g as IconColors, d as LabelColors, e as IconButton, n as UserProfileContext, C as ContextMenu, h as MenuItems, o as UserProfile, s as Loader, i as MenuItem, r as ImageRenderer, f as TextButton, M as Modal, P as PlaceHolder, t as PlaceHolderTypes, p as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, q as SEND_FILE_MESSAGE, U as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, l as UserProfileProvider } from './index-c97add1b.js';
 import format from 'date-fns/format';
 import 'react-dom';
-import { M as MessageInput, L as LinkLabel, i as isImage, a as isVideo, D as DateSeparator, F as FileViewer, c as compareIds } from './index-f7b03766.js';
+import { M as MessageInput, L as LinkLabel, i as isImage, a as isVideo, D as DateSeparator, F as FileViewer, c as compareIds } from './index-f48d282b.js';
 import isSameDay from 'date-fns/isSameDay';
 
 var getMessageCreatedAt = function getMessageCreatedAt(message) {
   return format(message.createdAt, 'p');
 };
-var scrollIntoLast = function scrollIntoLast(selector, intialTry) {
+var scrollIntoLast = function scrollIntoLast(intialTry) {
   if (intialTry === void 0) {
     intialTry = 0;
   }
@@ -23,13 +23,12 @@ var scrollIntoLast = function scrollIntoLast(selector, intialTry) {
   }
 
   try {
-    var nodes = document.querySelectorAll(selector);
-    var last = nodes[nodes.length - 1];
-    last.scrollIntoView(false);
-    /** alignToTop: false */
+    var scrollDOM = document.querySelector('.sendbird-openchannel-conversation-scroll'); // eslint-disable-next-line no-multi-assign
+
+    scrollDOM.scrollTop = scrollDOM.scrollHeight;
   } catch (error) {
     setTimeout(function () {
-      scrollIntoLast(selector, currentTry + 1);
+      scrollIntoLast(currentTry + 1);
     }, 500 * currentTry);
   }
 };
@@ -89,6 +88,21 @@ var fetchWithListQuery = function fetchWithListQuery(listQuery, logger, eachQuer
 
   logger.info('OpenChannel | FetchUserList start', listQuery);
   fetchList(listQuery);
+};
+var pxToNumber = function pxToNumber(px) {
+  if (typeof px === 'number') {
+    return px;
+  }
+
+  if (typeof px === 'string') {
+    var parsed = Number.parseFloat(px);
+
+    if (!Number.isNaN(parsed)) {
+      return parsed;
+    }
+  }
+
+  return null;
 };
 
 var MessageInputWrapper = function MessageInputWrapper(_a, ref) {
@@ -226,6 +240,12 @@ var getSenderFromMessage = function getSenderFromMessage(message) {
 var checkIsSent = function checkIsSent(status) {
   return status === OpenChannelMessageStatusTypes.SUCCEEDED;
 };
+var checkIsPending = function checkIsPending(status) {
+  return status === OpenChannelMessageStatusTypes.PENDING;
+};
+var checkIsFailed = function checkIsFailed(status) {
+  return status === OpenChannelMessageStatusTypes.FAILED;
+};
 var checkIsByMe = function checkIsByMe(message, userId) {
   return getSenderFromMessage(message).userId === userId;
 };
@@ -237,7 +257,7 @@ var isFineResend = function isFineResend(_a) {
   var message = _a.message,
       status = _a.status,
       userId = _a.userId;
-  return checkIsByMe(message, userId) && !checkIsSent(status) && message.isResendable && message.isResendable();
+  return checkIsByMe(message, userId) && checkIsFailed(status) && message.isResendable && message.isResendable();
 };
 var isFineEdit = function isFineEdit(_a) {
   var message = _a.message,
@@ -320,6 +340,8 @@ function OpenchannelUserMessage(_a) {
   var injectingClassName = Array.isArray(className) ? className : [className];
   injectingClassName.push("sendbird-openchannel-user-message");
   var isByMe = checkIsByMe(message, userId);
+  var isPending = checkIsPending(status);
+  var isFailed = checkIsFailed(status);
   var sender = getSenderFromMessage(message);
   var MemoizedMessageText = useMemo(function () {
     return function () {
@@ -408,7 +430,23 @@ function OpenchannelUserMessage(_a) {
     className: "sendbird-openchannel-user-message__right__bottom__message",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, MemoizedMessageText()))), React.createElement("div", {
+  }, MemoizedMessageText())), (isPending || isFailed) && React.createElement("div", {
+    className: "sendbird-openchannel-user-message__right__tail"
+  }, isPending && React.createElement(Loader, {
+    width: "16px",
+    height: "16px"
+  }, React.createElement(Icon, {
+    className: "sendbird-openchannel-user-message__right__tail__pending",
+    type: IconTypes.SPINNER_LARGE,
+    fillColor: IconColors.PRIMARY,
+    width: "16px",
+    height: "16px"
+  })), isFailed && React.createElement(Icon, {
+    className: "sendbird-openchannel-user-message__right__tail__failed",
+    type: IconTypes.ERROR,
+    width: "16px",
+    height: "16px"
+  }))), React.createElement("div", {
     className: "sendbird-openchannel-user-message__context-menu",
     ref: contextMenuRef,
     style: contextStyle
@@ -561,6 +599,8 @@ function OpenchannelOGMessage(_a) {
   var injectingClassName = Array.isArray(className) ? className : [className];
   injectingClassName.push('sendbird-openchannel-og-message');
   var isByMe = checkIsByMe(message, userId);
+  var isPending = checkIsPending(status);
+  var isFailed = checkIsFailed(status);
   var sender = getSenderFromMessage(message);
   var MemoizedMessageText = useMemo(function () {
     return function () {
@@ -786,7 +826,23 @@ function OpenchannelOGMessage(_a) {
       height: "56px",
       type: IconTypes.NO_THUMBNAIL
     }))
-  })))));
+  }))), (isPending || isFailed) && React.createElement("div", {
+    className: "sendbird-openchannel-og-message__top__right__tail"
+  }, isPending && React.createElement(Loader, {
+    width: "16px",
+    height: "16px"
+  }, React.createElement(Icon, {
+    className: "sendbird-openchannel-og-message__top__right__tail__pending",
+    width: "16px",
+    height: "16px",
+    type: IconTypes.SPINNER_LARGE,
+    fillColor: IconColors.PRIMARY
+  })), isFailed && React.createElement(Icon, {
+    className: "sendbird-openchannel-og-message__top__right__tail__failed",
+    width: "16px",
+    height: "16px",
+    type: IconTypes.ERROR
+  }))));
 }
 
 var SUPPORTING_TYPES = {
@@ -824,7 +880,9 @@ function OpenchannelThumbnailMessage(_a) {
       resendMessage = _a.resendMessage;
   var type = message.type,
       url = message.url,
-      localUrl = message.localUrl;
+      localUrl = message.localUrl,
+      thumbnails = message.thumbnails;
+  var thumbnailUrl = thumbnails && thumbnails.length > 0 && thumbnails[0].url || null;
   var stringSet = useContext(LocalizationContext).stringSet;
 
   var _c = useContext(UserProfileContext),
@@ -837,6 +895,8 @@ function OpenchannelThumbnailMessage(_a) {
   injectingClassName.push('sendbird-openchannel-thumbnail-message');
   var isByMe = checkIsByMe(message, userId);
   var isMessageSent = checkIsSent(status);
+  var isPending = checkIsPending(status);
+  var isFailed = checkIsFailed(status);
   var sender = getSenderFromMessage(message);
   return React.createElement("div", {
     className: injectingClassName.join(' ')
@@ -907,7 +967,12 @@ function OpenchannelThumbnailMessage(_a) {
     className: "sendbird-openchannel-thumbnail-message__right__body__wrap__overlay"
   }), (_b = {}, _b[SUPPORTING_TYPES.VIDEO] = url || localUrl ? React.createElement("div", {
     className: "sendbird-openchannel-thumbnail-message__right__body__wrap__video"
-  }, React.createElement("video", {
+  }, thumbnailUrl ? React.createElement(ImageRenderer, {
+    className: "sendbird-openchannel-thumbnail-message__right__body__wrap__video",
+    url: thumbnailUrl,
+    height: "270px",
+    alt: "image"
+  }) : React.createElement("video", {
     className: "sendbird-openchannel-thumbnail-message__right__body__wrap__video__video"
   }, React.createElement("source", {
     src: url || localUrl,
@@ -925,8 +990,9 @@ function OpenchannelThumbnailMessage(_a) {
     fillColor: IconColors.ON_BACKGROUND_2
   }), _b[SUPPORTING_TYPES.IMAGE] = url || localUrl ? React.createElement(ImageRenderer, {
     className: "sendbird-openchannel-thumbnail-message__right__body__wrap__image",
+    url: thumbnailUrl || url || localUrl,
+    width: "360px",
     height: "270px",
-    url: url || localUrl,
     alt: "image"
   }) : React.createElement(Icon, {
     className: "sendbird-openchannel-thumbnail-message__right__body__wrap__image--icon",
@@ -940,7 +1006,23 @@ function OpenchannelThumbnailMessage(_a) {
     height: "56px",
     type: IconTypes.PHOTO,
     fillColor: IconColors.ON_BACKGROUND_2
-  }), _b)[getSupportingFileType(type)]))), React.createElement("div", {
+  }), _b)[getSupportingFileType(type)])), (isPending || isFailed) && React.createElement("div", {
+    className: "sendbird-openchannel-thumbnail-message__right__tail"
+  }, isPending && React.createElement(Loader, {
+    width: "16px",
+    height: "16px"
+  }, React.createElement(Icon, {
+    className: "sendbird-openchannel-thumbnail-message__right__tail__pending",
+    type: IconTypes.SPINNER_LARGE,
+    fillColor: IconColors.PRIMARY,
+    width: "16px",
+    height: "16px"
+  })), isFailed && React.createElement(Icon, {
+    className: "sendbird-openchannel-thumbnail-message__right__tail__failed",
+    type: IconTypes.ERROR,
+    width: "16px",
+    height: "16px"
+  }))), React.createElement("div", {
     className: "sendbird-openchannel-thumbnail-message__context-menu",
     ref: contextMenuRef
   }, React.createElement(ContextMenu, {
@@ -1042,6 +1124,8 @@ function OpenchannelFileMessage(_a) {
   var injectingClassName = Array.isArray(className) ? className : [className];
   injectingClassName.push('sendbird-openchannel-file-message');
   var isByMe = checkIsByMe(message, userId);
+  var isPending = checkIsPending(status);
+  var isFailed = checkIsFailed(status);
   var sender = getSenderFromMessage(message);
   return React.createElement("div", {
     className: injectingClassName.join(' ')
@@ -1106,7 +1190,23 @@ function OpenchannelFileMessage(_a) {
   }, React.createElement(Label, {
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, truncate(message.name || message.url, 40))))), React.createElement("div", {
+  }, truncate(message.name || message.url, 40)))), (isPending || isFailed) && React.createElement("div", {
+    className: "sendbird-openchannel-file-message__right__tail"
+  }, isPending && React.createElement(Loader, {
+    width: "16px",
+    height: "16px"
+  }, React.createElement(Icon, {
+    className: "sendbird-openchannel-file-message__right__tail__pending",
+    type: IconTypes.SPINNER_LARGE,
+    fillColor: IconColors.PRIMARY,
+    width: "16px",
+    height: "16px"
+  })), isFailed && React.createElement(Icon, {
+    className: "sendbird-openchannel-file-message__right__tail__failed",
+    type: IconTypes.ERROR,
+    width: "16px",
+    height: "16px"
+  }))), React.createElement("div", {
     className: "sendbird-openchannel-file-message__context-menu",
     ref: contextMenuRef
   }, React.createElement(ContextMenu, {
@@ -1500,6 +1600,7 @@ var OpenchannelConversationScroll$1 = React.forwardRef(OpenchannelConversationSc
 var SET_CURRENT_CHANNEL = 'SET_CURRENT_CHANNEL';
 var SET_CHANNEL_INVALID = 'SET_CHANNEL_INVALID';
 var RESET_MESSAGES = 'RESET_MESSAGES';
+var GET_PREV_MESSAGES_START = 'GET_PREV_MESSAGES_START';
 var GET_PREV_MESSAGES_SUCESS = 'GET_PREV_MESSAGES_SUCESS';
 var GET_PREV_MESSAGES_FAIL = 'GET_PREV_MESSAGES_FAIL';
 var SENDING_MESSAGE_FAILED = 'SENDING_MESSAGE_FAILED';
@@ -1531,6 +1632,44 @@ var ON_META_COUNTERS_CREATED = 'ON_META_COUNTERS_CREATED';
 var ON_META_COUNTERS_UPDATED = 'ON_META_COUNTERS_UPDATED';
 var ON_META_COUNTERS_DELETED = 'ON_META_COUNTERS_DELETED';
 var ON_MENTION_RECEIVED = 'ON_MENTION_RECEIVED';
+
+var messageActionTypes = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    SET_CURRENT_CHANNEL: SET_CURRENT_CHANNEL,
+    SET_CHANNEL_INVALID: SET_CHANNEL_INVALID,
+    RESET_MESSAGES: RESET_MESSAGES,
+    GET_PREV_MESSAGES_START: GET_PREV_MESSAGES_START,
+    GET_PREV_MESSAGES_SUCESS: GET_PREV_MESSAGES_SUCESS,
+    GET_PREV_MESSAGES_FAIL: GET_PREV_MESSAGES_FAIL,
+    SENDING_MESSAGE_FAILED: SENDING_MESSAGE_FAILED,
+    SENDING_MESSAGE_SUCCEEDED: SENDING_MESSAGE_SUCCEEDED,
+    SENDING_MESSAGE_START: SENDING_MESSAGE_START,
+    RESENDING_MESSAGE_START: RESENDING_MESSAGE_START,
+    FETCH_PARTICIPANT_LIST: FETCH_PARTICIPANT_LIST,
+    FETCH_BANNED_USER_LIST: FETCH_BANNED_USER_LIST,
+    FETCH_MUTED_USER_LIST: FETCH_MUTED_USER_LIST,
+    ON_MESSAGE_RECEIVED: ON_MESSAGE_RECEIVED,
+    ON_MESSAGE_UPDATED: ON_MESSAGE_UPDATED,
+    ON_MESSAGE_DELETED: ON_MESSAGE_DELETED,
+    ON_MESSAGE_DELETED_BY_REQ_ID: ON_MESSAGE_DELETED_BY_REQ_ID,
+    ON_OPERATOR_UPDATED: ON_OPERATOR_UPDATED,
+    ON_USER_ENTERED: ON_USER_ENTERED,
+    ON_USER_EXITED: ON_USER_EXITED,
+    ON_USER_MUTED: ON_USER_MUTED,
+    ON_USER_UNMUTED: ON_USER_UNMUTED,
+    ON_USER_BANNED: ON_USER_BANNED,
+    ON_USER_UNBANNED: ON_USER_UNBANNED,
+    ON_CHANNEL_FROZEN: ON_CHANNEL_FROZEN,
+    ON_CHANNEL_UNFROZEN: ON_CHANNEL_UNFROZEN,
+    ON_CHANNEL_CHANGED: ON_CHANNEL_CHANGED,
+    ON_META_DATA_CREATED: ON_META_DATA_CREATED,
+    ON_META_DATA_UPDATED: ON_META_DATA_UPDATED,
+    ON_META_DATA_DELETED: ON_META_DATA_DELETED,
+    ON_META_COUNTERS_CREATED: ON_META_COUNTERS_CREATED,
+    ON_META_COUNTERS_UPDATED: ON_META_COUNTERS_UPDATED,
+    ON_META_COUNTERS_DELETED: ON_META_COUNTERS_DELETED,
+    ON_MENTION_RECEIVED: ON_MENTION_RECEIVED
+});
 
 function reducer(state, action) {
   switch (action.type) {
@@ -1564,6 +1703,13 @@ function reducer(state, action) {
       {
         return __assign(__assign({}, state), {
           isInvalid: true
+        });
+      }
+
+    case GET_PREV_MESSAGES_START:
+      {
+        return __assign(__assign({}, state), {
+          loading: true
         });
       }
 
@@ -2016,75 +2162,13 @@ var initialState = {
   mutedParticipantIds: []
 };
 
-var COMPONENT_CLASS_NAME$1 = 'sendbird-openchannel-conversation';
-var OpenchannelConversation = function OpenchannelConversation(props) {
-  // props
-  var useMessageGrouping = props.useMessageGrouping,
-      channelUrl = props.channelUrl,
-      stores = props.stores,
-      config = props.config,
-      _a = props.queries,
-      queries = _a === void 0 ? {} : _a,
-      disableUserProfile = props.disableUserProfile,
-      _b = props.fetchingParticipants,
-      fetchingParticipants = _b === void 0 ? false : _b,
-      // We didn't decide to support fetching participant list
-  renderCustomMessage = props.renderCustomMessage,
-      renderUserProfile = props.renderUserProfile,
-      renderChannelTitle = props.renderChannelTitle,
-      renderMessageInput = props.renderMessageInput,
-      onBeforeSendUserMessage = props.onBeforeSendUserMessage,
-      onBeforeSendFileMessage = props.onBeforeSendFileMessage,
-      onChatHeaderActionClick = props.onChatHeaderActionClick;
-  var sdkStore = stores.sdkStore,
-      userStore = stores.userStore;
-  var userId = config.userId,
-      isOnline = config.isOnline,
-      logger = config.logger,
-      pubSub = config.pubSub;
-  var sdk = sdkStore.sdk;
-  var user = userStore.user; // hook variables
-
-  var _c = useReducer(reducer, initialState),
-      messagesStore = _c[0],
-      messagesDispatcher = _c[1];
-
-  var allMessages = messagesStore.allMessages,
-      loading = messagesStore.loading,
-      initialized = messagesStore.initialized,
-      currentOpenChannel = messagesStore.currentOpenChannel,
-      isInvalid = messagesStore.isInvalid,
-      hasMore = messagesStore.hasMore,
-      lastMessageTimestamp = messagesStore.lastMessageTimestamp,
-      operators = messagesStore.operators,
-      bannedParticipantIds = messagesStore.bannedParticipantIds,
-      mutedParticipantIds = messagesStore.mutedParticipantIds; // ref
-
-  var messageInputRef = useRef(null); // useSendMessageCallback
-
-  var conversationScrollRef = useRef(null); // useScrollAfterSendMessageCallback
-
-  var stringSet = useContext(LocalizationContext).stringSet; // const
-
-  var sdkInit = sdkStore.initialized;
-  var userFilledMessageListParams = queries ? queries.messageListParams : null;
-  var disabled = !initialized || !isOnline || isDisabledBecauseFrozen(currentOpenChannel, userId); // || utils.isDisabledBecauseMuted(mutedParticipantIds, userId)
-
-  var userDefinedDisableUserProfile = disableUserProfile || config.disableUserProfile;
-  var userDefinedRenderProfile = renderUserProfile || config.renderUserProfile; // useMemo
-
-  var amIBanned = useMemo(function () {
-    return bannedParticipantIds.indexOf(user.userId) >= 0;
-  }, [channelUrl, bannedParticipantIds, user]);
-  var amIMuted = useMemo(function () {
-    return mutedParticipantIds.indexOf(user.userId) >= 0;
-  }, [channelUrl, mutedParticipantIds, user]);
-  var amIOperator = useMemo(function () {
-    return operators.map(function (operator) {
-      return operator.userId;
-    }).indexOf(user.userId) >= 0;
-  }, [channelUrl, operators, user]); // useSetChannel
-
+function useSetChannel(_a, _b) {
+  var channelUrl = _a.channelUrl,
+      sdkInit = _a.sdkInit,
+      fetchingParticipants = _a.fetchingParticipants;
+  var sdk = _b.sdk,
+      logger = _b.logger,
+      messagesDispatcher = _b.messagesDispatcher;
   useEffect(function () {
     if (channelUrl && sdkInit && sdk && sdk.OpenChannel) {
       logger.info('OpenChannel | useSetChannel fetching channel', channelUrl);
@@ -2095,14 +2179,15 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
             type: SET_CURRENT_CHANNEL,
             payload: openChannel
           });
-          openChannel.enter(function (response, error) {
+          openChannel.enter(function (_, error) {
             if (error) {
               logger.warning('OpenChannel | useSetChannel enter channel failed', {
                 channelUrl: channelUrl,
                 error: error
               });
               messagesDispatcher({
-                type: SET_CHANNEL_INVALID
+                type: SET_CHANNEL_INVALID,
+                payload: null
               });
             }
 
@@ -2141,12 +2226,13 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
             }
           });
         } else {
-          logger.warning('OpenChannel | useSetChannel fetch channel failed', {
+          logger.warning('OpenChannel | useSetChannel fetching channel failed', {
             channelUrl: channelUrl,
             error: error
           });
           messagesDispatcher({
-            type: SET_CHANNEL_INVALID
+            type: SET_CHANNEL_INVALID,
+            payload: null
           });
         }
       }); // .then((openChannel) => {
@@ -2155,102 +2241,81 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
       //     type: messageActionTypes.SET_CURRENT_CHANNEL,
       //     payload: openChannel,
       //   });
+      //   openChannel.enter((_, error) => {
+      //     if (error) {
+      //       logger.warning('OpenChannel | useSetChannel enter channel failed', { channelUrl, error });
+      //       messagesDispatcher({
+      //         type: messageActionTypes.SET_CHANNEL_INVALID,
+      //       });
+      //     }
+      //     if (fetchingParticipants) {
+      //       // fetch participants, banned participantIds, muted participantIds
+      //       const participantListQuery = openChannel.createParticipantListQuery();
+      //       const bannedParticipantListQuery = openChannel.createBannedUserListQuery();
+      //       const mutedParticipantListQuery = openChannel.createMutedUserListQuery();
+      //       utils.fetchWithListQuery(
+      //         participantListQuery,
+      //         logger,
+      //         (users) => {
+      //           messagesDispatcher({
+      //             type: messageActionTypes.FETCH_PARTICIPANT_LIST,
+      //             payload: {
+      //               channel: openChannel,
+      //               users,
+      //             },
+      //           });
+      //         },
+      //       );
+      //       utils.fetchWithListQuery(
+      //         bannedParticipantListQuery,
+      //         logger,
+      //         (users) => {
+      //           messagesDispatcher({
+      //             type: messageActionTypes.FETCH_BANNED_USER_LIST,
+      //             payload: {
+      //               channel: openChannel,
+      //               users,
+      //             },
+      //           });
+      //         },
+      //       );
+      //       utils.fetchWithListQuery(
+      //         mutedParticipantListQuery,
+      //         logger,
+      //         (users) => {
+      //           messagesDispatcher({
+      //             type: messageActionTypes.FETCH_MUTED_USER_LIST,
+      //             payload: {
+      //               channel: openChannel,
+      //               users,
+      //             },
+      //           });
+      //         },
+      //       );
+      //     }
+      //   });
       // })
       // .catch((error) => {
-      //   logger.warning('OpenChannel | useSetChannel fetch channel failed', { channelUrl, error });
+      //   logger.warning('OpenChannel | useSetChannel fetching channel failed', { channelUrl, error });
       //   messagesDispatcher({
       //     type: messageActionTypes.SET_CHANNEL_INVALID,
       //   });
       // });
     }
-  }, [channelUrl, sdkInit]); // handles API calls from withSendbird
+  }, [channelUrl, sdkInit, fetchingParticipants]);
+}
 
-  useEffect(function () {
-    var subscriber = new Map();
-
-    if (!pubSub || !pubSub.subscribe) {
-      return;
-    }
-
-    subscriber.set(SEND_USER_MESSAGE, pubSub.subscribe(SEND_USER_MESSAGE, function (msg) {
-      var channel = msg.channel,
-          message = msg.message;
-      scrollIntoLast('.sendbird-msg--scroll-ref');
-
-      if (channel && channelUrl === channel.url) {
-        messagesDispatcher({
-          type: SENDING_MESSAGE_SUCCEEDED,
-          payload: message
-        });
-      }
-    }));
-    subscriber.set(SEND_MESSAGE_START, pubSub.subscribe(SEND_MESSAGE_START, function (msg) {
-      var channel = msg.channel,
-          message = msg.message;
-
-      if (channel && channelUrl === channel.url) {
-        messagesDispatcher({
-          type: SENDING_MESSAGE_START,
-          payload: message
-        });
-      }
-    }));
-    subscriber.set(SEND_FILE_MESSAGE, pubSub.subscribe(SEND_FILE_MESSAGE, function (msg) {
-      var channel = msg.channel,
-          message = msg.message;
-      scrollIntoLast('.sendbird-msg--scroll-ref');
-
-      if (channel && channelUrl === channel.url) {
-        messagesDispatcher({
-          type: SENDING_MESSAGE_SUCCEEDED,
-          payload: message
-        });
-      }
-    }));
-    subscriber.set(UPDATE_USER_MESSAGE, pubSub.subscribe(UPDATE_USER_MESSAGE, function (msg) {
-      var channel = msg.channel,
-          message = msg.message,
-          fromSelector = msg.fromSelector;
-
-      if (fromSelector && channel && channelUrl === channel.url) {
-        messagesDispatcher({
-          type: ON_MESSAGE_UPDATED,
-          payload: {
-            channel: channel,
-            message: message
-          }
-        });
-      }
-    }));
-    subscriber.set(DELETE_MESSAGE, pubSub.subscribe(DELETE_MESSAGE, function (msg) {
-      var channel = msg.channel,
-          messageId = msg.messageId;
-
-      if (channel && channelUrl === channel.url) {
-        messagesDispatcher({
-          type: ON_MESSAGE_DELETED,
-          payload: messageId
-        });
-      }
-    }));
-    return function () {
-      if (subscriber) {
-        subscriber.forEach(function (s) {
-          try {
-            s.remove();
-          } catch (_a) {//
-          }
-        });
-      }
-    };
-  }, [channelUrl, sdkInit]); // useHandleChannelEvents
-
+function useHandleChannelEvents(_a, _b) {
+  var currentOpenChannel = _a.currentOpenChannel;
+  var sdk = _b.sdk,
+      logger = _b.logger,
+      messagesDispatcher = _b.messagesDispatcher;
   useEffect(function () {
     var messageReceiverId = uuidv4();
 
     if (currentOpenChannel && currentOpenChannel.url && sdk && sdk.ChannelHandler) {
       var ChannelHandler = new sdk.ChannelHandler();
-      logger.info('OpenChannel | useHandleChannelEvents: Setup event handler', messageReceiverId);
+      logger.info('OpenChannel | useHandleChannelEvents: Setup evnet handler', messageReceiverId);
 
       ChannelHandler.onMessageReceived = function (channel, message) {
         var channelUrl = channel.url;
@@ -2540,12 +2605,20 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
         sdk.removeChannelHandler(messageReceiverId);
       }
     };
-  }, [currentOpenChannel]); // useInitialMessagesFetch
+  }, [currentOpenChannel]);
+}
 
+function useInitialMessagesFetch(_a, _b) {
+  var currentOpenChannel = _a.currentOpenChannel,
+      userFilledMessageListParams = _a.userFilledMessageListParams;
+  var sdk = _b.sdk,
+      logger = _b.logger,
+      messagesDispatcher = _b.messagesDispatcher;
   useEffect(function () {
     logger.info('OpenChannel | useInitialMessagesFetch: Setup started', currentOpenChannel);
     messagesDispatcher({
-      type: RESET_MESSAGES
+      type: RESET_MESSAGES,
+      payload: null
     });
 
     if (sdk && sdk.MessageListParams && currentOpenChannel && currentOpenChannel.getMessagesByTimestamp) {
@@ -2559,16 +2632,81 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
         Object.keys(userFilledMessageListParams).forEach(function (key) {
           messageListParams_1[key] = userFilledMessageListParams[key];
         });
-        logger.info('OpenChannel | Used customizedMessageListParams');
+        logger.info('OpenChannel | useInitialMessagesFetch: Used customizedMessageListParams');
       }
 
-      logger.info('OpenChannel | Fetching messages', {
+      logger.info('OpenChannel | useInitialMessagesFetch: Fetching messages', {
         currentOpenChannel: currentOpenChannel,
         messageListParams: messageListParams_1
       });
+      messagesDispatcher({
+        type: GET_PREV_MESSAGES_START,
+        payload: null
+      });
       currentOpenChannel.getMessagesByTimestamp(new Date().getTime(), messageListParams_1, function (messages, error) {
         if (!error) {
-          logger.info('OpenChannel | Fetching messages succeeded', messages);
+          logger.info('OpenChannel | useInitialMessagesFetch: Fetching messages succeeded', messages);
+          var hasMore = messages && messages.length > 0;
+          var lastMessageTimestamp = hasMore ? messages[0].createdAt : null;
+          messagesDispatcher({
+            type: GET_PREV_MESSAGES_SUCESS,
+            payload: {
+              currentOpenChannel: currentOpenChannel,
+              messages: messages,
+              hasMore: hasMore,
+              lastMessageTimestamp: lastMessageTimestamp
+            }
+          });
+          setTimeout(function () {
+            scrollIntoLast();
+          });
+        } else {
+          logger.error('OpenChannel | useInitialMessagesFetch: Fetching messages failed', error);
+          messagesDispatcher({
+            type: GET_PREV_MESSAGES_FAIL,
+            payload: {
+              currentOpenChannel: currentOpenChannel,
+              messages: [],
+              hasMore: false,
+              lastMessageTimestamp: 0
+            }
+          });
+        }
+      });
+    }
+  }, [currentOpenChannel, userFilledMessageListParams]);
+}
+
+function useScrollCallback(_a, _b) {
+  var currentOpenChannel = _a.currentOpenChannel,
+      lastMessageTimestamp = _a.lastMessageTimestamp;
+  var sdk = _b.sdk,
+      logger = _b.logger,
+      messagesDispatcher = _b.messagesDispatcher,
+      hasMore = _b.hasMore,
+      userFilledMessageListParams = _b.userFilledMessageListParams;
+  return useCallback(function (callback) {
+    if (hasMore && sdk && sdk.MessageListParams) {
+      logger.info('OpenChannel | useScrollCallback: start');
+      var messageListParams_1 = new sdk.MessageListParams();
+      messageListParams_1.prevResultSize = 30;
+      messageListParams_1.includeReplies = false;
+      messageListParams_1.includeReactions = false;
+
+      if (userFilledMessageListParams) {
+        Object.keys(userFilledMessageListParams).forEach(function (key) {
+          messageListParams_1[key] = userFilledMessageListParams[key];
+        });
+        logger.info('OpenChannel | useScrollCallback: Used userFilledMessageListParams', userFilledMessageListParams);
+      }
+
+      logger.info('OpenChannel | useScrollCallback: Fetching messages', {
+        currentOpenChannel: currentOpenChannel,
+        messageListParams: messageListParams_1
+      });
+      currentOpenChannel.getMessagesByTimestamp(lastMessageTimestamp || new Date().getTime(), messageListParams_1, function (messages, error) {
+        if (!error) {
+          logger.info('OpenChannel | useScrollCallback: Fetching messages succeeded', messages);
           var hasMore_1 = messages && messages.length > 0;
           var lastMessageTimestamp_1 = hasMore_1 ? messages[0].createdAt : null;
           messagesDispatcher({
@@ -2581,10 +2719,10 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
             }
           });
           setTimeout(function () {
-            scrollIntoLast('.sendbird-msg--scroll-ref');
-          }, 500);
+            callback();
+          });
         } else {
-          logger.error('OpenChannel | Fetching messages failed', error);
+          logger.error('OpenChannel | useScrollCallback: Fetching messages failed', error);
           messagesDispatcher({
             type: GET_PREV_MESSAGES_FAIL,
             payload: {
@@ -2595,232 +2733,272 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
             }
           });
         }
-      }); // todo: use promise after CoreSDK adds required TS methods
-      // .then((messages) => {
-      //   console.log('get messages via getMessagesByTimestamp', messages);
-      //   const hasMore = (messages && messages.length > 0);
-      //   const lastMessageTimestamp = hasMore
-      //     ? messages[0].createdAt
-      //     : null;
-      //   messagesDispatcher({
-      //     type: messageActionTypes.GET_PREV_MESSAGES_SUCESS,
-      //     payload: {
-      //       currentOpenChannel,
-      //       messages,
-      //       hasMore,
-      //       lastMessageTimestamp,
-      //     },
-      //   });
-      // })
-      // .catch((error: Error): void => {
-      //   logger.error('OpenChannel | Fetching messages failed', error);
-      //   messagesDispatcher({
-      //     type: messageActionTypes.GET_PREV_MESSAGES_FAIL,
-      //     payload: {
-      //       currentOpenChannel,
-      //       messages: [],
-      //       hasMore: false,
-      //       lastMessageTimestamp: 0,
-      //     }
-      //   });
-      // });
-    }
-  }, [currentOpenChannel]); // useScrollCallback
-
-  var onScroll = useCallback(function (callback) {
-    if (!hasMore) {
-      return;
-    }
-
-    var messageListParams = new sdk.MessageListParams();
-    messageListParams.prevResultSize = 30;
-    messageListParams.includeReplies = false;
-    messageListParams.includeReactions = false;
-
-    if (userFilledMessageListParams) {
-      Object.keys(userFilledMessageListParams).forEach(function (key) {
-        messageListParams[key] = userFilledMessageListParams[key];
       });
-      logger.info('OpenChannel: Used userFilledMessageListParams');
     }
+  }, [currentOpenChannel, lastMessageTimestamp]);
+}
 
-    logger.info('OpenChannel: Fetching messages', {
-      currentOpenChannel: currentOpenChannel,
-      messageListParams: messageListParams
-    });
-    currentOpenChannel.getMessagesByTimestamp(lastMessageTimestamp || new Date().getTime(), messageListParams, function (messages, error) {
-      if (!error) {
-        logger.info('OpenChannel | Fetching messages succeeded', messages);
-        var hasMore_2 = messages && messages.length > 0;
-        var lastMessageTimestamp_2 = hasMore_2 ? messages[0].createdAt : null;
-        messagesDispatcher({
-          type: GET_PREV_MESSAGES_SUCESS,
-          payload: {
-            currentOpenChannel: currentOpenChannel,
-            messages: messages,
-            hasMore: hasMore_2,
-            lastMessageTimestamp: lastMessageTimestamp_2
-          }
-        });
-        setTimeout(function () {
-          callback();
-        });
-      } else {
-        logger.error('OpenChannel | Fetching messages failed', error);
-        messagesDispatcher({
-          type: GET_PREV_MESSAGES_FAIL,
-          payload: {
-            currentOpenChannel: currentOpenChannel,
-            messages: [],
-            hasMore: false,
-            lastMessageTimestamp: 0
-          }
-        });
-      }
-    });
-  }, [currentOpenChannel, lastMessageTimestamp]); // useCheckIsScrollBottom
-
-  var checkScrollBottom = function checkScrollBottom() {
+function useCheckScrollBottom(_a, _b) {
+  var conversationScrollRef = _a.conversationScrollRef;
+  var logger = _b.logger;
+  return useCallback(function () {
     var isBottom = true;
 
-    try {
-      var conversationScroll = conversationScrollRef.current;
-      isBottom = conversationScroll.scrollHeight <= conversationScroll.scrollTop + conversationScroll.clientHeight;
-    } catch (error) {}
+    if (conversationScrollRef) {
+      try {
+        var conversationScroll = conversationScrollRef.current;
+        isBottom = conversationScroll.scrollHeight <= conversationScroll.scrollTop + conversationScroll.clientHeight;
+      } catch (error) {
+        logger.error('OpenChannel | useCheckScrollBottom', error);
+      }
+    }
 
     return isBottom;
-  }; // useSendMessageCallback
+  }, [conversationScrollRef]);
+}
 
+function useSendMessageCallback(_a, _b) {
+  var currentOpenChannel = _a.currentOpenChannel,
+      onBeforeSendUserMessage = _a.onBeforeSendUserMessage,
+      checkScrollBottom = _a.checkScrollBottom,
+      messageInputRef = _a.messageInputRef;
+  var sdk = _b.sdk,
+      logger = _b.logger,
+      messagesDispatcher = _b.messagesDispatcher;
+  return useCallback(function () {
+    if (sdk && sdk.UserMessageParams) {
+      var text = messageInputRef.current.value;
 
-  var handleSendMessage = useCallback(function () {
-    var text = messageInputRef.current.value;
+      var createParamsDefault = function createParamsDefault(txt) {
+        var message = typeof txt === 'string' ? txt.trim() : txt.toString(10).trim();
+        var params = new sdk.UserMessageParams();
+        params.message = message;
+        return params;
+      };
 
-    function createParamsDefualt(txt) {
-      var message = typeof txt === 'string' ? txt.trim() : txt.toString(10).trim();
-      var params = new sdk.UserMessageParams();
-      params.message = message;
-      return params;
-    }
+      var createCustomParams = onBeforeSendUserMessage && typeof onBeforeSendUserMessage === 'function';
 
-    var createCustomParams = onBeforeSendUserMessage && typeof onBeforeSendUserMessage === 'function';
-
-    if (createCustomParams) {
-      logger.info('OpenChannel | Creating params using onBeforeSendUserMessage', onBeforeSendUserMessage);
-    }
-
-    var params = onBeforeSendUserMessage ? onBeforeSendUserMessage(text) : createParamsDefualt(text);
-    logger.info('OpenChannel | Sending message has started', params);
-    var isBottom = checkScrollBottom();
-    var pendingMessage = currentOpenChannel.sendUserMessage(params, function (message, error) {
-      if (error) {
-        logger.warning('OpenChannel | Sending message failed', {
-          message: message
-        });
-        messagesDispatcher({
-          type: SENDING_MESSAGE_FAILED,
-          payload: message
-        });
-        return;
+      if (createCustomParams) {
+        logger.info('OpenChannel | useSendMessageCallback: Creating params using onBeforeSendUserMessage', onBeforeSendUserMessage);
       }
 
-      logger.info('OpenChannel | Sending message succeeded', {
-        message: message
+      var params = onBeforeSendUserMessage ? onBeforeSendUserMessage(text) : createParamsDefault(text);
+      logger.info('OpenChannel | useSendMessageCallback: Sending message has started', params);
+      var isBottom_1 = checkScrollBottom();
+      var pendingMessage = currentOpenChannel.sendUserMessage(params, function (message, error) {
+        if (!error) {
+          logger.info('OpenChannel | useSendMessageCallback: Sending message succeeded', message);
+          messagesDispatcher({
+            type: SENDING_MESSAGE_SUCCEEDED,
+            payload: message
+          });
+
+          if (isBottom_1) {
+            setTimeout(function () {
+              scrollIntoLast();
+            });
+          }
+        } else {
+          logger.warning('OpenChannel | useSendMessageCallback: Sending message failed', error);
+          messagesDispatcher({
+            type: SENDING_MESSAGE_FAILED,
+            payload: messageActionTypes
+          });
+        }
       });
       messagesDispatcher({
-        type: SENDING_MESSAGE_SUCCEEDED,
-        payload: message
+        type: SENDING_MESSAGE_START,
+        payload: {
+          message: pendingMessage,
+          channel: currentOpenChannel
+        }
       });
-
-      if (isBottom) {
-        setTimeout(function () {
-          scrollIntoLast('.sendbird-msg--scroll-ref');
-        });
-      }
-    });
-    messagesDispatcher({
-      type: SENDING_MESSAGE_START,
-      payload: {
-        message: pendingMessage,
-        channel: currentOpenChannel
-      }
-    });
-  }, [currentOpenChannel, onBeforeSendUserMessage]); // useFileUploadCallback
-
-  var handleFileUpload = useCallback(function (file) {
-    function createParamsDefualt(file_) {
-      var params = new sdk.FileMessageParams();
-      params.file = file_;
-      return params;
     }
+  }, [currentOpenChannel, onBeforeSendUserMessage, checkScrollBottom, messageInputRef]);
+}
 
-    var createCustomParams = onBeforeSendFileMessage && typeof onBeforeSendFileMessage === 'function';
+function useFileUploadCallback(_a, _b) {
+  var currentOpenChannel = _a.currentOpenChannel,
+      checkScrollBottom = _a.checkScrollBottom,
+      _c = _a.imageCompression,
+      imageCompression = _c === void 0 ? {} : _c,
+      onBeforeSendFileMessage = _a.onBeforeSendFileMessage;
+  var sdk = _b.sdk,
+      logger = _b.logger,
+      messagesDispatcher = _b.messagesDispatcher;
+  return useCallback(function (file) {
+    if (sdk && sdk.FileMessageParams) {
+      var compressionRate_1 = imageCompression.compressionRate,
+          resizingWidth_1 = imageCompression.resizingWidth,
+          resizingHeight_1 = imageCompression.resizingHeight;
+      var createCustomParams_1 = onBeforeSendFileMessage && typeof onBeforeSendFileMessage === 'function';
+      var compressibleFileType = file.type === 'image/jpg' || file.type === 'image/png' || file.type === 'image/jpeg';
+      var compressibleRatio = compressionRate_1 > 0 && compressionRate_1 < 1; // pxToNumber returns null if values are invalid
 
-    if (createCustomParams) {
-      logger.info('OpenChannel | Creating params using onBeforeSendFileMessage', onBeforeSendFileMessage);
-    }
+      var compressibleDiamensions_1 = pxToNumber(resizingWidth_1) || pxToNumber(resizingHeight_1);
+      var canCompressImage = compressibleFileType && (compressibleRatio || compressibleDiamensions_1);
 
-    var params = onBeforeSendFileMessage ? onBeforeSendFileMessage(file) : createParamsDefualt(file);
-    logger.info('OpenChannel | Uploading file message start', params);
-    var isBottom = checkScrollBottom();
-    var pendingMessage = currentOpenChannel.sendFileMessage(params, function (message, error) {
-      if (error) {
-        logger.error('OpenChannel | Sending file message failed', {
-          message: message,
-          error: error
+      var createParamsDefault_1 = function createParamsDefault_1(file_) {
+        var params = new sdk.FileMessageParams();
+        params.file = file_;
+        return params;
+      };
+
+      if (canCompressImage) {
+        // Using image compression
+        try {
+          var image_1 = document.createElement('img');
+          image_1.src = URL.createObjectURL(file);
+
+          image_1.onload = function () {
+            URL.revokeObjectURL(image_1.src);
+            var canvas = document.createElement('canvas');
+            var imageWidth = image_1.naturalWidth || image_1.width;
+            var imageHeight = image_1.naturalHeight || image_1.height;
+            var targetWidth = pxToNumber(resizingWidth_1) || imageWidth;
+            var targetHeight = pxToNumber(resizingHeight_1) || imageHeight; // In canvas.toBlob(callback, mimeType, qualityArgument)
+            // qualityArgument doesnt work
+            // so in case compressibleDiamensions are not present, we use ratio
+
+            if (file.type === 'image/png' && !compressibleDiamensions_1) {
+              targetWidth *= compressionRate_1;
+              targetHeight *= compressionRate_1;
+            }
+
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            var context = canvas.getContext('2d');
+            context.drawImage(image_1, 0, 0, targetWidth, targetHeight);
+            context.canvas.toBlob(function (newImageBlob) {
+              var compressedFile = new File([newImageBlob], file.name, {
+                type: file.type
+              });
+
+              if (createCustomParams_1) {
+                logger.info('OpenChannel | useFileUploadCallback: Creating params using onBeforeSendFileMessage', onBeforeSendFileMessage);
+              }
+
+              var params = onBeforeSendFileMessage ? onBeforeSendFileMessage(compressedFile) : createParamsDefault_1(compressedFile);
+              logger.info('OpenChannel | useFileUploadCallback: Uploading file message start', params);
+              var isBottom = checkScrollBottom();
+              var pendingMessage = currentOpenChannel.sendFileMessage(params, function (message, error) {
+                if (!error) {
+                  logger.info('OpenChannel | useFileUploadCallback: Sending message succeeded', message);
+                  messagesDispatcher({
+                    type: SENDING_MESSAGE_SUCCEEDED,
+                    payload: message
+                  });
+
+                  if (isBottom) {
+                    setTimeout(function () {
+                      scrollIntoLast();
+                    });
+                  }
+                } else {
+                  logger.error('OpenChannel | useFileUploadCallback: Sending file message failed', {
+                    message: message,
+                    error: error
+                  });
+                  message.localUrl = URL.createObjectURL(file);
+                  message.file = file;
+                  messagesDispatcher({
+                    type: SENDING_MESSAGE_FAILED,
+                    payload: message
+                  });
+                }
+              });
+              messagesDispatcher({
+                type: SENDING_MESSAGE_START,
+                payload: {
+                  message: __assign(__assign({}, pendingMessage), {
+                    url: URL.createObjectURL(file),
+                    // pending thumbnail message seems to be failed
+                    requestState: 'pending'
+                  }),
+                  channel: currentOpenChannel
+                }
+              });
+            }, file.type, compressionRate_1);
+          };
+        } catch (error) {
+          logger.warning('OpenChannel | useFileUploadCallback: Sending file message with image compression failed', error);
+        }
+      } else {
+        // Not using image compression
+        if (createCustomParams_1) {
+          logger.info('OpenChannel | useFileUploadCallback: Creating params using onBeforeSendFileMessage', onBeforeSendFileMessage);
+        }
+
+        var params = onBeforeSendFileMessage ? onBeforeSendFileMessage(file) : createParamsDefault_1(file);
+        logger.info('OpenChannel | useFileUploadCallback: Uploading file message start', params);
+        var isBottom_1 = checkScrollBottom();
+        var pendingMessage = currentOpenChannel.sendFileMessage(params, function (message, error) {
+          if (!error) {
+            logger.info('OpenChannel | useFileUploadCallback: Sending message succeeded', message);
+            messagesDispatcher({
+              type: SENDING_MESSAGE_SUCCEEDED,
+              payload: message
+            });
+
+            if (isBottom_1) {
+              setTimeout(function () {
+                scrollIntoLast();
+              });
+            }
+          } else {
+            logger.error('OpenChannel | useFileUploadCallback: Sending file message failed', {
+              message: message,
+              error: error
+            });
+            message.localUrl = URL.createObjectURL(file);
+            message.file = file;
+            messagesDispatcher({
+              type: SENDING_MESSAGE_FAILED,
+              payload: message
+            });
+          }
         });
-        message.localUrl = URL.createObjectURL(file);
-        message.file = file;
         messagesDispatcher({
-          type: SENDING_MESSAGE_FAILED,
-          payload: message
-        });
-        return;
-      }
-
-      logger.info('OpenChannel | Sending message succeeded', message);
-      messagesDispatcher({
-        type: SENDING_MESSAGE_SUCCEEDED,
-        payload: message
-      });
-
-      if (isBottom) {
-        setTimeout(function () {
-          scrollIntoLast('.sendbird-msg--scroll-ref');
+          type: SENDING_MESSAGE_START,
+          payload: {
+            message: __assign(__assign({}, pendingMessage), {
+              url: URL.createObjectURL(file),
+              // pending thumbnail message seems to be failed
+              requestState: 'pending'
+            }),
+            channel: currentOpenChannel
+          }
         });
       }
-    });
-    messagesDispatcher({
-      type: SENDING_MESSAGE_START,
-      payload: {
-        message: __assign(__assign({}, pendingMessage), {
-          url: URL.createObjectURL(file),
-          // pending thumbnail message seems to be failed
-          requestState: 'pending'
-        }),
-        channel: currentOpenChannel
-      }
-    });
-  }, [currentOpenChannel, onBeforeSendFileMessage]); // useUpdateMessageCallback
+    }
+  }, [currentOpenChannel, onBeforeSendFileMessage, checkScrollBottom, imageCompression]);
+}
 
-  var updateMessage = useCallback(function (messageId, text, callback) {
-    function createParamsDefualt(txt) {
+function useUpdateMessageCallback(_a, _b) {
+  var currentOpenChannel = _a.currentOpenChannel,
+      onBeforeSendUserMessage = _a.onBeforeSendUserMessage;
+  var sdk = _b.sdk,
+      logger = _b.logger,
+      messagesDispatcher = _b.messagesDispatcher;
+  return useCallback(function (messageId, text, callback) {
+    var createParamsDefault = function createParamsDefault(txt) {
       var params = new sdk.UserMessageParams();
       params.message = txt;
       return params;
-    }
+    };
 
     if (onBeforeSendUserMessage && typeof onBeforeSendUserMessage === 'function') {
-      logger.info('OpenChannel | Creating params using onBeforeUpdateUserMessage');
+      logger.info('OpenChannel | useUpdateMessageCallback: Creating params using onBeforeUpdateUserMessage');
     }
 
-    var params = onBeforeSendUserMessage ? onBeforeSendUserMessage(text) : createParamsDefualt(text);
+    var params = onBeforeSendUserMessage ? onBeforeSendUserMessage(text) : createParamsDefault(text);
     currentOpenChannel.updateUserMessage(messageId, params, function (message, error) {
       if (callback) {
         callback();
       }
 
       if (!error) {
-        logger.info('OpenChannel | Updating message succeeded', {
+        logger.info('OpenChannel | useUpdateMessageCallback: Updating message succeeded', {
           message: message,
           params: params
         });
@@ -2832,18 +3010,23 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
           }
         });
       } else {
-        logger.warning('OpenChannel | Updating message failed', error);
+        logger.warning('OpenChannel | useUpdateMessageCallback: Updating message failed', error);
       }
     });
-  }, [currentOpenChannel, messagesDispatcher, onBeforeSendUserMessage]); // useDeleteMessageCallback
+  }, [currentOpenChannel, onBeforeSendUserMessage]);
+}
 
-  var deleteMessage = useCallback(function (message, callback) {
+function useDeleteMessageCallback(_a, _b) {
+  var currentOpenChannel = _a.currentOpenChannel;
+  var logger = _b.logger,
+      messagesDispatcher = _b.messagesDispatcher;
+  return useCallback(function (message, callback) {
     logger.info('OpenChannel | useDeleteMessageCallback: Deleting message', message);
-    var requestState = message.requestState;
-    logger.info('OpenChannel | useDeleteMessageCallback: Deleting message requestState: ', requestState);
+    var sendingStatus = message.sendingStatus;
+    logger.info('OpenChannel | useDeleteMessageCallback: Deleting message requestState', sendingStatus);
 
-    if (requestState === 'failed' || requestState === 'pending') {
-      logger.info('OpenChannel | useDeleteMessageCallback: Deleted message from local: ', message);
+    if (sendingStatus === 'failed' || sendingStatus === 'pending') {
+      logger.info('OpenChannel | useDeleteMessageCallback: Deleted message from local', message);
       messagesDispatcher({
         type: ON_MESSAGE_DELETED_BY_REQ_ID,
         payload: message.reqId
@@ -2852,34 +3035,37 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
       if (callback) {
         callback();
       }
+    } else {
+      currentOpenChannel.deleteMessage(message, function (error) {
+        logger.info('OpenChannel | useDeleteMessageCallback: Deleting message on server', sendingStatus);
 
-      return;
+        if (callback) {
+          callback();
+        }
+
+        if (!error) {
+          logger.info('OpenChannel | useDeleteMessageCallback: Deleting message succeeded', message);
+          messagesDispatcher({
+            type: ON_MESSAGE_DELETED,
+            payload: {
+              channel: currentOpenChannel,
+              messageId: message.messageId
+            }
+          });
+        } else {
+          logger.warning('OpenChannel | useDeleteMessageCallback: Deleting message failed', error);
+        }
+      });
     }
+  }, [currentOpenChannel]);
+}
 
-    currentOpenChannel.deleteMessage(message, function (error) {
-      logger.info('OpenChannel | useDeleteMessageCallback: Deleting message from remote: ', requestState);
-
-      if (callback) {
-        callback();
-      }
-
-      if (!error) {
-        logger.info('OpenChannel | useDeleteMessageCallback: Deleting message succeeded', message);
-        messagesDispatcher({
-          type: ON_MESSAGE_DELETED,
-          payload: {
-            channel: currentOpenChannel,
-            messageId: message.messageId
-          }
-        });
-      } else {
-        logger.warning('OpenChannel | useDeleteMessageCallback: Deleting message failed', error);
-      }
-    });
-  }, [currentOpenChannel, messagesDispatcher]); // useResendMessageCallback
-
-  var resendMessage = useCallback(function (failedMessage) {
-    logger.info('OpenChannel | Reseding message has started', failedMessage);
+function useResendMessageCallback(_a, _b) {
+  var currentOpenChannel = _a.currentOpenChannel;
+  var logger = _b.logger,
+      messagesDispatcher = _b.messagesDispatcher;
+  return useCallback(function (failedMessage) {
+    logger.info('OpenChannel | useResendMessageCallback: Resending message has started', failedMessage);
     var messageType = failedMessage.messageType,
         file = failedMessage.file;
 
@@ -2897,13 +3083,13 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
       if (messageType === 'user' && failedMessage.messageType === 'user') {
         currentOpenChannel.resendUserMessage(failedMessage, function (message, error) {
           if (!error) {
-            logger.info('OpenChannel | Reseding message succeeded', message);
+            logger.info('OpenChannel | useResendMessageCallback: Reseding message succeeded', message);
             messagesDispatcher({
               type: SENDING_MESSAGE_SUCCEEDED,
               payload: message
             });
           } else {
-            logger.warning('OpenChannel | Resending message failed', error); // eslint-disable-next-line no-param-reassign
+            logger.warning('OpenChannel | useResendMessageCallback: Resending message failed', error); // eslint-disable-next-line no-param-reassign
 
             failedMessage.requestState = 'failed';
             messagesDispatcher({
@@ -2919,13 +3105,13 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
       if (messageType === 'file' && failedMessage.messageType === 'file') {
         currentOpenChannel.resendFileMessage(failedMessage, file, function (message, error) {
           if (!error) {
-            logger.info('OpenChannel | Resending file message succeeded', message);
+            logger.info('OpenChannel | useResendMessageCallback: Resending file message succeeded', message);
             messagesDispatcher({
               type: SENDING_MESSAGE_SUCCEEDED,
               payload: message
             });
           } else {
-            logger.warning('OpenChannel | Resending file message failed', error); // eslint-disable-next-line no-param-reassign
+            logger.warning('OpenChannel | useResendMessageCallback: Resending file message failed', error); // eslint-disable-next-line no-param-reassign
 
             failedMessage.requestState = 'failed';
             messagesDispatcher({
@@ -2938,10 +3124,241 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
     } else {
       // to alert user on console
       // eslint-disable-next-line no-console
-      console.error('OpenChannel | Message is not resendable');
-      logger.warning('OpenChannel | Message is not resendable', failedMessage);
+      console.error('OpenChannel | useResendMessageCallback: Message is not resendable');
+      logger.warning('OpenChannel | useResendMessageCallback: Message is not resendable', failedMessage);
     }
-  }, [currentOpenChannel, messagesDispatcher]);
+  }, [currentOpenChannel]);
+}
+
+var COMPONENT_CLASS_NAME$1 = 'sendbird-openchannel-conversation';
+var OpenchannelConversation = function OpenchannelConversation(props) {
+  // props
+  var useMessageGrouping = props.useMessageGrouping,
+      channelUrl = props.channelUrl,
+      stores = props.stores,
+      config = props.config,
+      _a = props.queries,
+      queries = _a === void 0 ? {} : _a,
+      disableUserProfile = props.disableUserProfile,
+      _b = props.fetchingParticipants,
+      fetchingParticipants = _b === void 0 ? false : _b,
+      // We didn't decide to support fetching participant list
+  renderCustomMessage = props.renderCustomMessage,
+      renderUserProfile = props.renderUserProfile,
+      renderChannelTitle = props.renderChannelTitle,
+      renderMessageInput = props.renderMessageInput,
+      onBeforeSendUserMessage = props.onBeforeSendUserMessage,
+      onBeforeSendFileMessage = props.onBeforeSendFileMessage,
+      onChatHeaderActionClick = props.onChatHeaderActionClick;
+  var sdkStore = stores.sdkStore,
+      userStore = stores.userStore;
+  var userId = config.userId,
+      isOnline = config.isOnline,
+      logger = config.logger,
+      pubSub = config.pubSub,
+      imageCompression = config.imageCompression;
+  var sdk = sdkStore.sdk;
+  var user = userStore.user; // hook variables
+
+  var _c = useReducer(reducer, initialState),
+      messagesStore = _c[0],
+      messagesDispatcher = _c[1];
+
+  var allMessages = messagesStore.allMessages,
+      loading = messagesStore.loading,
+      initialized = messagesStore.initialized,
+      currentOpenChannel = messagesStore.currentOpenChannel,
+      isInvalid = messagesStore.isInvalid,
+      hasMore = messagesStore.hasMore,
+      lastMessageTimestamp = messagesStore.lastMessageTimestamp,
+      operators = messagesStore.operators,
+      bannedParticipantIds = messagesStore.bannedParticipantIds,
+      mutedParticipantIds = messagesStore.mutedParticipantIds; // ref
+
+  var messageInputRef = useRef(null); // useSendMessageCallback
+
+  var conversationScrollRef = useRef(null); // useScrollAfterSendMessageCallback
+
+  var stringSet = useContext(LocalizationContext).stringSet; // const
+
+  var sdkInit = sdkStore.initialized;
+  var userFilledMessageListParams = queries ? queries.messageListParams : null;
+  var disabled = !initialized || !isOnline || isDisabledBecauseFrozen(currentOpenChannel, userId); // || utils.isDisabledBecauseMuted(mutedParticipantIds, userId)
+
+  var userDefinedDisableUserProfile = disableUserProfile || config.disableUserProfile;
+  var userDefinedRenderProfile = renderUserProfile || config.renderUserProfile; // useMemo
+
+  var amIBanned = useMemo(function () {
+    return bannedParticipantIds.indexOf(user.userId) >= 0;
+  }, [channelUrl, bannedParticipantIds, user]);
+  var amIMuted = useMemo(function () {
+    return mutedParticipantIds.indexOf(user.userId) >= 0;
+  }, [channelUrl, mutedParticipantIds, user]);
+  var amIOperator = useMemo(function () {
+    return operators.map(function (operator) {
+      return operator.userId;
+    }).indexOf(user.userId) >= 0;
+  }, [channelUrl, operators, user]); // use hooks
+
+  useSetChannel({
+    channelUrl: channelUrl,
+    sdkInit: sdkInit,
+    fetchingParticipants: fetchingParticipants
+  }, {
+    sdk: sdk,
+    logger: logger,
+    messagesDispatcher: messagesDispatcher
+  });
+  useHandleChannelEvents({
+    currentOpenChannel: currentOpenChannel
+  }, {
+    sdk: sdk,
+    logger: logger,
+    messagesDispatcher: messagesDispatcher
+  });
+  useInitialMessagesFetch({
+    currentOpenChannel: currentOpenChannel,
+    userFilledMessageListParams: userFilledMessageListParams
+  }, {
+    sdk: sdk,
+    logger: logger,
+    messagesDispatcher: messagesDispatcher
+  });
+  var onScroll = useScrollCallback({
+    currentOpenChannel: currentOpenChannel,
+    lastMessageTimestamp: lastMessageTimestamp
+  }, {
+    sdk: sdk,
+    logger: logger,
+    messagesDispatcher: messagesDispatcher,
+    hasMore: hasMore,
+    userFilledMessageListParams: userFilledMessageListParams
+  });
+  var checkScrollBottom = useCheckScrollBottom({
+    conversationScrollRef: conversationScrollRef
+  }, {
+    logger: logger
+  });
+  var handleSendMessage = useSendMessageCallback({
+    currentOpenChannel: currentOpenChannel,
+    onBeforeSendUserMessage: onBeforeSendUserMessage,
+    checkScrollBottom: checkScrollBottom,
+    messageInputRef: messageInputRef
+  }, {
+    sdk: sdk,
+    logger: logger,
+    messagesDispatcher: messagesDispatcher
+  });
+  var handleFileUpload = useFileUploadCallback({
+    currentOpenChannel: currentOpenChannel,
+    onBeforeSendFileMessage: onBeforeSendFileMessage,
+    checkScrollBottom: checkScrollBottom,
+    imageCompression: imageCompression
+  }, {
+    sdk: sdk,
+    logger: logger,
+    messagesDispatcher: messagesDispatcher
+  });
+  var updateMessage = useUpdateMessageCallback({
+    currentOpenChannel: currentOpenChannel,
+    onBeforeSendUserMessage: onBeforeSendUserMessage
+  }, {
+    sdk: sdk,
+    logger: logger,
+    messagesDispatcher: messagesDispatcher
+  });
+  var deleteMessage = useDeleteMessageCallback({
+    currentOpenChannel: currentOpenChannel
+  }, {
+    logger: logger,
+    messagesDispatcher: messagesDispatcher
+  });
+  var resendMessage = useResendMessageCallback({
+    currentOpenChannel: currentOpenChannel
+  }, {
+    logger: logger,
+    messagesDispatcher: messagesDispatcher
+  }); // handle API calls from withSendbird
+
+  useEffect(function () {
+    var subscriber = new Map();
+
+    if (!pubSub || !pubSub.subscribe) {
+      return;
+    }
+
+    subscriber.set(SEND_USER_MESSAGE, pubSub.subscribe(SEND_USER_MESSAGE, function (msg) {
+      var channel = msg.channel,
+          message = msg.message;
+      scrollIntoLast();
+
+      if (channel && channelUrl === channel.url) {
+        messagesDispatcher({
+          type: SENDING_MESSAGE_SUCCEEDED,
+          payload: message
+        });
+      }
+    }));
+    subscriber.set(SEND_MESSAGE_START, pubSub.subscribe(SEND_MESSAGE_START, function (msg) {
+      var channel = msg.channel,
+          message = msg.message;
+
+      if (channel && channelUrl === channel.url) {
+        messagesDispatcher({
+          type: SENDING_MESSAGE_START,
+          payload: message
+        });
+      }
+    }));
+    subscriber.set(SEND_FILE_MESSAGE, pubSub.subscribe(SEND_FILE_MESSAGE, function (msg) {
+      var channel = msg.channel,
+          message = msg.message;
+      scrollIntoLast();
+
+      if (channel && channelUrl === channel.url) {
+        messagesDispatcher({
+          type: SENDING_MESSAGE_SUCCEEDED,
+          payload: message
+        });
+      }
+    }));
+    subscriber.set(UPDATE_USER_MESSAGE, pubSub.subscribe(UPDATE_USER_MESSAGE, function (msg) {
+      var channel = msg.channel,
+          message = msg.message,
+          fromSelector = msg.fromSelector;
+
+      if (fromSelector && channel && channelUrl === channel.url) {
+        messagesDispatcher({
+          type: ON_MESSAGE_UPDATED,
+          payload: {
+            channel: channel,
+            message: message
+          }
+        });
+      }
+    }));
+    subscriber.set(DELETE_MESSAGE, pubSub.subscribe(DELETE_MESSAGE, function (msg) {
+      var channel = msg.channel,
+          messageId = msg.messageId;
+
+      if (channel && channelUrl === channel.url) {
+        messagesDispatcher({
+          type: ON_MESSAGE_DELETED,
+          payload: messageId
+        });
+      }
+    }));
+    return function () {
+      if (subscriber) {
+        subscriber.forEach(function (s) {
+          try {
+            s.remove();
+          } catch (_a) {//
+          }
+        });
+      }
+    };
+  }, [channelUrl, sdkInit]);
 
   if (!currentOpenChannel || !currentOpenChannel.url || amIBanned) {
     return React.createElement("div", {
