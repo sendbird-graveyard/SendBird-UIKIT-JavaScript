@@ -10,25 +10,25 @@ var PropTypes = _interopDefault(require('prop-types'));
 require('sendbird');
 require('./actionTypes-920b541f.js');
 require('css-vars-ponyfill');
-require('./index-478b0dfc.js');
+require('./index-dfc2e550.js');
 var ChannelList = require('./ChannelList.js');
 require('./utils-6aedec02.js');
-require('./index-6bc291d5.js');
-require('./LeaveChannel-25238612.js');
+require('./index-16cd2d77.js');
+require('./LeaveChannel-2b4f1405.js');
 require('date-fns/isToday');
 require('date-fns/format');
 require('date-fns/isYesterday');
 require('./type-c7a3bee7.js');
 require('./utils-a8277ca2.js');
 require('react-dom');
-require('./index-17b8764d.js');
+require('./index-005b875b.js');
 var Channel = require('./Channel.js');
-require('./index-728837db.js');
+require('./index-77ab2680.js');
 require('date-fns/isSameDay');
 require('./utils-c8e36c68.js');
 require('date-fns/formatDistanceToNowStrict');
 var ChannelSettings = require('./ChannelSettings.js');
-require('./index-19eb691f.js');
+require('./index-fd689e05.js');
 
 function App(props) {
   var appId = props.appId,
@@ -47,7 +47,8 @@ function App(props) {
       allowProfileEdit = props.allowProfileEdit,
       disableUserProfile = props.disableUserProfile,
       renderUserProfile = props.renderUserProfile,
-      onProfileEditSuccess = props.onProfileEditSuccess;
+      onProfileEditSuccess = props.onProfileEditSuccess,
+      imageCompression = props.imageCompression;
 
   var _useState = React.useState(null),
       _useState2 = LocalizationContext._slicedToArray(_useState, 2),
@@ -71,7 +72,8 @@ function App(props) {
     config: config,
     colorSet: colorSet,
     disableUserProfile: disableUserProfile,
-    renderUserProfile: renderUserProfile
+    renderUserProfile: renderUserProfile,
+    imageCompression: imageCompression
   }, React__default.createElement("div", {
     className: "sendbird-app__wrap"
   }, React__default.createElement("div", {
@@ -127,7 +129,12 @@ App.propTypes = {
   useReaction: PropTypes.bool,
   useMessageGrouping: PropTypes.bool,
   stringSet: PropTypes.objectOf(PropTypes.string),
-  colorSet: PropTypes.objectOf(PropTypes.string)
+  colorSet: PropTypes.objectOf(PropTypes.string),
+  imageCompression: PropTypes.shape({
+    compressionRate: PropTypes.number,
+    resizingWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    resizingHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+  })
 };
 App.defaultProps = {
   accessToken: '',
@@ -143,7 +150,8 @@ App.defaultProps = {
   useReaction: true,
   useMessageGrouping: true,
   stringSet: null,
-  colorSet: null
+  colorSet: null,
+  imageCompression: {}
 };
 
 module.exports = App;

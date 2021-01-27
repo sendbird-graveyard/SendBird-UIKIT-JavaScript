@@ -2,17 +2,17 @@ import { a as _objectSpread2, c as _toConsumableArray, e as LocalizationContext,
 import React, { useContext, useRef, useState, useEffect, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import { U as UPDATE_USER_INFO } from './actionTypes-a85c0eaa.js';
-import { L as LabelStringSet, I as Icon, a as IconTypes, b as Label, c as LabelTypography, d as LabelColors, e as IconButton, A as Avatar, M as Modal, T as Type, f as TextButton, g as IconColors, C as ContextMenu, h as MenuItems, i as MenuItem, P as PlaceHolder, j as CREATE_CHANNEL$1, U as UPDATE_USER_MESSAGE, k as LEAVE_CHANNEL, S as SEND_MESSAGE_START, l as UserProfileProvider, m as PlaceHolderTypes } from './index-a2b521ce.js';
+import { L as LabelStringSet, I as Icon, a as IconTypes, b as Label, c as LabelTypography, d as LabelColors, e as IconButton, A as Avatar, M as Modal, T as Type, f as TextButton, g as IconColors, C as ContextMenu, h as MenuItems, i as MenuItem, P as PlaceHolder, j as CREATE_CHANNEL$1, U as UPDATE_USER_MESSAGE, k as LEAVE_CHANNEL, S as SEND_MESSAGE_START, l as UserProfileProvider, m as PlaceHolderTypes } from './index-c97add1b.js';
 import { n as noop$1 } from './utils-53ba1773.js';
-import { C as ChannelAvatar } from './index-9dc7a088.js';
-import { B as Badge, i as isBroadcastChannelEnabled, a as isSuperGroupChannelEnabled, I as InviteMembers, c as createDefaultUserListQuery, b as createChannel, L as LeaveChannelModal } from './LeaveChannel-7eba3969.js';
+import { C as ChannelAvatar } from './index-fa2a92d8.js';
+import { B as Badge, i as isBroadcastChannelEnabled, a as isSuperGroupChannelEnabled, I as InviteMembers, c as createDefaultUserListQuery, b as createChannel, L as LeaveChannelModal } from './LeaveChannel-cf9903b4.js';
 import isToday from 'date-fns/isToday';
 import format from 'date-fns/format';
 import isYesterday from 'date-fns/isYesterday';
 import './type-0296584d.js';
 import { t as truncate } from './utils-cfdeb084.js';
 import 'react-dom';
-import { I as InputLabel, a as Input } from './index-b49918bb.js';
+import { I as InputLabel, a as Input } from './index-2c17b4ed.js';
 
 var RESET_CHANNEL_LIST = 'RESET_CHANNEL_LIST';
 var CREATE_CHANNEL = 'CREATE_CHANNEL';

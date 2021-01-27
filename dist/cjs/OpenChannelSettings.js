@@ -6,14 +6,14 @@ var LocalizationContext = require('./LocalizationContext-9665649b.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 require('prop-types');
-var index$1 = require('./index-478b0dfc.js');
+var index$1 = require('./index-dfc2e550.js');
 var utils = require('./utils-6aedec02.js');
 require('date-fns/format');
 require('./type-c7a3bee7.js');
 require('react-dom');
-var index$2 = require('./index-17b8764d.js');
+var index$2 = require('./index-005b875b.js');
 var utils$2 = require('./utils-c8e36c68.js');
-var index$3 = require('./index-19eb691f.js');
+var index$3 = require('./index-fd689e05.js');
 
 function ChannelAvatar(_a) {
   var channel = _a.channel,
@@ -533,6 +533,7 @@ function OpenChannelSettings(props) {
       onChannelModified = _b === void 0 ? utils.noop : _b,
       renderChannelProfile = props.renderChannelProfile,
       renderUserProfile = props.renderUserProfile,
+      _onDeleteChannel = props.onDeleteChannel,
       _c = props.disableUserProfile,
       disableUserProfile = _c === void 0 ? false : _c,
       _d = props.logger,
@@ -654,6 +655,10 @@ function OpenChannelSettings(props) {
         }
 
         logger.info('OpenChannelSettings: Delete channel success', response);
+
+        if (_onDeleteChannel) {
+          _onDeleteChannel(channel);
+        }
       });
     }
   })) : React__default.createElement(ParticipantsList, {

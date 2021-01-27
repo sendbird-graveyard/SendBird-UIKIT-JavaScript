@@ -1,5 +1,29 @@
 # Changelog
 
+## [2.0.1](Jan 27 2020)
+
+- Features:
+  * ImageCompression for sending jpg, jpeg & png files
+
+- Bugfixes:
+  * Add Pending and Failed Icon in OpenChannel Messages
+  * Scrolling of Channel component
+  * Add get-prefix to selectors(getExitOpenChannel, getEnterOpenChannel)
+  * Cosmetic fixes
+
+## [2.0.0] Open Channel
+
+* OpenChannel
+<OpenChannel /> is the component where conversation between the users
+happen.
+It is similar to <Channel /> component among group channel components.
+
+* OpenChannelSettings
+<OpenChannelSettings /> works as the configuration component for open
+channel OpenChannelSettings
+
+* A set of selectors for OpenChannel operations
+
 ## [1.3.0](Nov 9, 2020)
 
 - Features:

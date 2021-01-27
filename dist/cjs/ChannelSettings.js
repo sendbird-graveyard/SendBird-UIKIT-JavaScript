@@ -6,14 +6,14 @@ var LocalizationContext = require('./LocalizationContext-9665649b.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
-var index$1 = require('./index-478b0dfc.js');
+var index$1 = require('./index-dfc2e550.js');
 var utils = require('./utils-6aedec02.js');
-var index$1$1 = require('./index-6bc291d5.js');
-var LeaveChannel = require('./LeaveChannel-25238612.js');
+var index$1$1 = require('./index-16cd2d77.js');
+var LeaveChannel = require('./LeaveChannel-2b4f1405.js');
 require('date-fns/format');
 require('react-dom');
-var index$2 = require('./index-17b8764d.js');
-var index$3 = require('./index-19eb691f.js');
+var index$2 = require('./index-005b875b.js');
+var index$3 = require('./index-fd689e05.js');
 
 var EditDetails = function EditDetails(props) {
   var _onSubmit = props.onSubmit,
@@ -1116,7 +1116,7 @@ var MemberList = function MemberList(_a) {
                   });
                 }
               }
-            }, member.isMuted ? 'Unmute' : 'Mute'), React__default.createElement(index$1.MenuItem, {
+            }, member.isMuted ? 'Unmute' : 'Mute'), member.role && member.role !== 'operator' && React__default.createElement(index$1.MenuItem, {
               onClick: function onClick() {
                 channel.banUser(member, -1, '', function () {
                   refershList();

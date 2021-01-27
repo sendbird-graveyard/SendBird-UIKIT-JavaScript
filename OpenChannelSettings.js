@@ -1,14 +1,14 @@
 import { e as LocalizationContext, d as __spreadArrays, w as withSendbirdContext } from './LocalizationContext-5c5b45a0.js';
 import React, { useContext, useMemo, useRef, useState, useEffect } from 'react';
 import 'prop-types';
-import { A as Avatar, M as Modal, T as Type, f as TextButton, b as Label, c as LabelTypography, d as LabelColors, I as Icon, a as IconTypes, g as IconColors, B as Button, w as Size, n as UserProfileContext, C as ContextMenu, h as MenuItems, o as UserProfile, P as PlaceHolder, m as PlaceHolderTypes, F as selectors, l as UserProfileProvider } from './index-a2b521ce.js';
+import { A as Avatar, M as Modal, T as Type, f as TextButton, b as Label, c as LabelTypography, d as LabelColors, I as Icon, a as IconTypes, g as IconColors, B as Button, w as Size, n as UserProfileContext, C as ContextMenu, h as MenuItems, o as UserProfile, P as PlaceHolder, m as PlaceHolderTypes, F as selectors, l as UserProfileProvider } from './index-c97add1b.js';
 import { d as getOpenChannelAvatar, n as noop } from './utils-53ba1773.js';
 import 'date-fns/format';
 import './type-0296584d.js';
 import 'react-dom';
-import { I as InputLabel, a as Input, U as UserListItem$1 } from './index-b49918bb.js';
+import { I as InputLabel, a as Input, U as UserListItem$1 } from './index-2c17b4ed.js';
 import { c as copyToClipboard } from './utils-d7f59026.js';
-import { a as Accordion, A as AccordionGroup } from './index-3c2fb44d.js';
+import { a as Accordion, A as AccordionGroup } from './index-e492270c.js';
 
 function ChannelAvatar(_a) {
   var channel = _a.channel,
@@ -528,6 +528,7 @@ function OpenChannelSettings(props) {
       onChannelModified = _b === void 0 ? noop : _b,
       renderChannelProfile = props.renderChannelProfile,
       renderUserProfile = props.renderUserProfile,
+      _onDeleteChannel = props.onDeleteChannel,
       _c = props.disableUserProfile,
       disableUserProfile = _c === void 0 ? false : _c,
       _d = props.logger,
@@ -649,6 +650,10 @@ function OpenChannelSettings(props) {
         }
 
         logger.info('OpenChannelSettings: Delete channel success', response);
+
+        if (_onDeleteChannel) {
+          _onDeleteChannel(channel);
+        }
       });
     }
   })) : React.createElement(ParticipantsList, {

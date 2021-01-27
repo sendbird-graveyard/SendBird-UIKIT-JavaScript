@@ -15,7 +15,7 @@ var SET_SDK_LOADING = 'SET_SDK_LOADING';
 var RESET_SDK = 'RESET_SDK';
 var SDK_ERROR = 'SDK_ERROR';
 
-var APP_VERSION_STRING = '2.0.0-alpha.2';
+var APP_VERSION_STRING = '2.0.1';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -539,7 +539,8 @@ function Sendbird(props) {
       _props$config = props.config,
       config = _props$config === void 0 ? {} : _props$config,
       colorSet = props.colorSet,
-      stringSet = props.stringSet;
+      stringSet = props.stringSet,
+      imageCompression = props.imageCompression;
   var _config$logLevel = config.logLevel,
       logLevel = _config$logLevel === void 0 ? '' : _config$logLevel;
 
@@ -668,7 +669,8 @@ function Sendbird(props) {
         setCurrenttheme: setCurrenttheme,
         userListQuery: userListQuery,
         logger: logger,
-        pubSub: pubSub
+        pubSub: pubSub,
+        imageCompression: imageCompression
       }
     }
   }, React__default.createElement(LocalizationContext.LocalizationProvider, {
@@ -696,7 +698,12 @@ Sendbird.propTypes = {
     })
   }),
   stringSet: PropTypes.objectOf(PropTypes.string),
-  colorSet: PropTypes.objectOf(PropTypes.string)
+  colorSet: PropTypes.objectOf(PropTypes.string),
+  imageCompression: PropTypes.shape({
+    compressionRate: PropTypes.number,
+    resizingWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    resizingHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+  })
 };
 Sendbird.defaultProps = {
   accessToken: '',
@@ -709,7 +716,8 @@ Sendbird.defaultProps = {
   userListQuery: null,
   config: {},
   stringSet: null,
-  colorSet: null
+  colorSet: null,
+  imageCompression: {}
 };
 
 module.exports = Sendbird;
