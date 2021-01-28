@@ -178,7 +178,7 @@ const App = () => {
 
 ## UIKit at a glance
 
-Here is a list of components included in the UIKit.  
+Here is a list of components included in the UIKit.
 
 |Component|Description|
 |---|---|
@@ -197,31 +197,32 @@ Here is a list of components included in the UIKit.
 
 |Light Theme variables|Values|Dark Theme variables|Values|
 |:--------------------|:----:|:-------------------|:----:|
-|`--sendbird-light-primary-100`|![#E2DFFF](https://via.placeholder.com/15/E2DFFF/000000?text=+) #E2DFFF|`--sendbird-dark-primary-100`|![#E2DFFF](https://via.placeholder.com/15/E2DFFF/000000?text=+) #E2DFFF|
-|`--sendbird-light-primary-200`|![#9E8CF5](https://via.placeholder.com/15/9E8CF5/000000?text=+) #9E8CF5|`--sendbird-dark-primary-200`|![#9E8CF5](https://via.placeholder.com/15/9E8CF5/000000?text=+) #9E8CF5|
-|`--sendbird-light-primary-300`|![#7B53EF](https://via.placeholder.com/15/7B53EF/000000?text=+) #7B53EF|`--sendbird-dark-primary-300`|![#7B53EF](https://via.placeholder.com/15/7B53EF/000000?text=+) #7B53EF|
-|`--sendbird-light-primary-400`|![#6440C4](https://via.placeholder.com/15/6440C4/000000?text=+) #6440C4|`--sendbird-dark-primary-400`|![#6440C4](https://via.placeholder.com/15/6440C4/000000?text=+) #6440C4|
-|`--sendbird-light-primary-500`|![#4d2aa6](https://via.placeholder.com/15/4d2aa6/000000?text=+) #4d2aa6|`--sendbird-dark-primary-500`|![#4d2aa6](https://via.placeholder.com/15/4d2aa6/000000?text=+) #4d2aa6|
-|`--sendbird-light-secondary-100`|![#AEF2DC](https://via.placeholder.com/15/AEF2DC/000000?text=+) #AEF2DC|`--sendbird-dark-secondary-100`|![#AEF2DC](https://via.placeholder.com/15/AEF2DC/000000?text=+) #AEF2DC|
-|`--sendbird-light-secondary-200`|![#6FD6BE](https://via.placeholder.com/15/6FD6BE/000000?text=+) #6FD6BE|`--sendbird-dark-secondary-200`|![#6FD6BE](https://via.placeholder.com/15/6FD6BE/000000?text=+) #6FD6BE|
-|`--sendbird-light-secondary-300`|![#2EBA9F](https://via.placeholder.com/15/2EBA9F/000000?text=+) #2EBA9F|`--sendbird-dark-secondary-300`|![#2EBA9F](https://via.placeholder.com/15/2EBA9F/000000?text=+) #2EBA9F|
-|`--sendbird-light-secondary-400`|![#189A8D](https://via.placeholder.com/15/189A8D/000000?text=+) #189A8D|`--sendbird-dark-secondary-400`|![#189A8D](https://via.placeholder.com/15/189A8D/000000?text=+) #189A8D|
-|`--sendbird-light-secondary-500`|![#007A7A](https://via.placeholder.com/15/007A7A/000000?text=+) #007A7A|`--sendbird-dark-secondary-500`|![#007A7A](https://via.placeholder.com/15/007A7A/000000?text=+) #007A7A|
-|`--sendbird-light-information-100`|![#b2d9ff](https://via.placeholder.com/15/b2d9ff/000000?text=+) #b2d9ff|`--sendbird-dark-information-100`|![#b2d9ff](https://via.placeholder.com/15/b2d9ff/000000?text=+) #b2d9ff|
-|`--sendbird-light-error-100`|![#FFABBD](https://via.placeholder.com/15/FFABBD/000000?text=+) #FFABBD|`--sendbird-dark-error-100`|![#FFABBD](https://via.placeholder.com/15/FFABBD/000000?text=+) #FFABBD|
-|`--sendbird-light-error-200`|![#FF6183](https://via.placeholder.com/15/FF6183/000000?text=+) #FF6183|`--sendbird-dark-error-200`|![#FF6183](https://via.placeholder.com/15/FF6183/000000?text=+) #FF6183|
-|`--sendbird-light-error-300`|![#E53157](https://via.placeholder.com/15/E53157/000000?text=+) #E53157|`--sendbird-dark-error-300`|![#E53157](https://via.placeholder.com/15/E53157/000000?text=+) #E53157|
-|`--sendbird-light-error-400`|![#C11F41](https://via.placeholder.com/15/C11F41/000000?text=+) #C11F41|`--sendbird-dark-error-400`|![#C11F41](https://via.placeholder.com/15/C11F41/000000?text=+) #C11F41|
-|`--sendbird-light-error-500`|![#A30E2D](https://via.placeholder.com/15/A30E2D/000000?text=+) #A30E2D|`--sendbird-dark-error-500`|![#A30E2D](https://via.placeholder.com/15/A30E2D/000000?text=+) #A30E2D|
+|`--sendbird-light-primary-100`|![#dbd1ff](https://via.placeholder.com/15/dbd1ff/000000?text=+) #dbd1ff|`--sendbird-dark-primary-100`|![#dbd1ff](https://via.placeholder.com/15/dbd1ff/000000?text=+) #dbd1ff|
+|`--sendbird-light-primary-200`|![#c2a9fa](https://via.placeholder.com/15/c2a9fa/000000?text=+) #c2a9fa|`--sendbird-dark-primary-200`|![#c2a9fa](https://via.placeholder.com/15/c2a9fa/000000?text=+) #c2a9fa|
+|`--sendbird-light-primary-300`|![#742ddd](https://via.placeholder.com/15/742ddd/000000?text=+) #742ddd|`--sendbird-dark-primary-300`|![#742ddd](https://via.placeholder.com/15/742ddd/000000?text=+) #742ddd|
+|`--sendbird-light-primary-400`|![#6211c8](https://via.placeholder.com/15/6211c8/000000?text=+) #6211c8|`--sendbird-dark-primary-400`|![#6211c8](https://via.placeholder.com/15/6211c8/000000?text=+) #6211c8|
+|`--sendbird-light-primary-500`|![#491389](https://via.placeholder.com/15/491389/000000?text=+) #491389|`--sendbird-dark-primary-500`|![#491389](https://via.placeholder.com/15/491389/000000?text=+) #491389|
+|`--sendbird-light-secondary-100`|![#a8e2ab](https://via.placeholder.com/15/a8e2ab/000000?text=+) #a8e2ab|`--sendbird-dark-secondary-100`|![#a8e2ab](https://via.placeholder.com/15/a8e2ab/000000?text=+) #a8e2ab|
+|`--sendbird-light-secondary-200`|![#69c085](https://via.placeholder.com/15/69c085/000000?text=+) #69c085|`--sendbird-dark-secondary-200`|![#69c085](https://via.placeholder.com/15/69c085/000000?text=+) #69c085|
+|`--sendbird-light-secondary-300`|![#259c72](https://via.placeholder.com/15/259c72/000000?text=+) #259c72|`--sendbird-dark-secondary-300`|![#259c72](https://via.placeholder.com/15/259c72/000000?text=+) #259c72|
+|`--sendbird-light-secondary-400`|![#027d69](https://via.placeholder.com/15/027d69/000000?text=+) #027d69|`--sendbird-dark-secondary-400`|![#027d69](https://via.placeholder.com/15/027d69/000000?text=+) #027d69|
+|`--sendbird-light-secondary-500`|![#066858](https://via.placeholder.com/15/066858/000000?text=+) #066858|`--sendbird-dark-secondary-500`|![#066858](https://via.placeholder.com/15/066858/000000?text=+) #066858|
+|`--sendbird-light-information-100`|![#adc9ff](https://via.placeholder.com/15/adc9ff/000000?text=+) #adc9ff|`--sendbird-dark-information-100`|![#adc9ff](https://via.placeholder.com/15/adc9ff/000000?text=+) #adc9ff|
+|`--sendbird-light-error-100`|![#fdaaaa](https://via.placeholder.com/15/fdaaaa/000000?text=+) #fdaaaa|`--sendbird-dark-error-100`|![#fdaaaa](https://via.placeholder.com/15/fdaaaa/000000?text=+) #fdaaaa|
+|`--sendbird-light-error-200`|![#f66161](https://via.placeholder.com/15/f66161/000000?text=+) #f66161|`--sendbird-dark-error-200`|![#f66161](https://via.placeholder.com/15/f66161/000000?text=+) #f66161|
+|`--sendbird-light-error-300`|![#de360b](https://via.placeholder.com/15/de360b/000000?text=+) #de360b|`--sendbird-dark-error-300`|![#de360b](https://via.placeholder.com/15/de360b/000000?text=+) #de360b|
+|`--sendbird-light-error-400`|![#bf0711](https://via.placeholder.com/15/bf0711/000000?text=+) #bf0711|`--sendbird-dark-error-400`|![#bf0711](https://via.placeholder.com/15/bf0711/000000?text=+) #bf0711|
+|`--sendbird-light-error-500`|![#9d091e](https://via.placeholder.com/15/9d091e/000000?text=+) #9d091e|`--sendbird-dark-error-500`|![#9d091e](https://via.placeholder.com/15/9d091e/000000?text=+) #9d091e|
 |`--sendbird-light-background-50`|![#FFFFFF](https://via.placeholder.com/15/FFFFFF/000000?text=+) #FFFFFF|`--sendbird-dark-background-50`|![#FFFFFF](https://via.placeholder.com/15/FFFFFF/000000?text=+) #FFFFFF|
-|`--sendbird-light-background-100`|![#F0F0F0](https://via.placeholder.com/15/F0F0F0/000000?text=+) #F0F0F0|`--sendbird-dark-background-100`|![#F0F0F0](https://via.placeholder.com/15/F0F0F0/000000?text=+) #F0F0F0|
-|`--sendbird-light-background-200`|![#D9D9D9](https://via.placeholder.com/15/D9D9D9/000000?text=+) #D9D9D9|`--sendbird-dark-background-200`|![#D9D9D9](https://via.placeholder.com/15/D9D9D9/000000?text=+) #D9D9D9|
-|`--sendbird-light-background-300`|![#A8A8A8](https://via.placeholder.com/15/A8A8A8/000000?text=+) #A8A8A8|`--sendbird-dark-background-300`|![#A8A8A8](https://via.placeholder.com/15/A8A8A8/000000?text=+) #A8A8A8|
+|`--sendbird-light-background-100`|![#eeeeee](https://via.placeholder.com/15/eeeeee/000000?text=+) #eeeeee|`--sendbird-dark-background-100`|![#eeeeee](https://via.placeholder.com/15/eeeeee/000000?text=+) #eeeeee|
+|`--sendbird-light-background-200`|![#e0e0e0](https://via.placeholder.com/15/e0e0e0/000000?text=+) #e0e0e0|`--sendbird-dark-background-200`|![#e0e0e0](https://via.placeholder.com/15/e0e0e0/000000?text=+) #e0e0e0|
+|`--sendbird-light-background-300`|![#bdbdbd](https://via.placeholder.com/15/bdbdbd/000000?text=+) #bdbdbd|`--sendbird-dark-background-300`|![#bdbdbd](https://via.placeholder.com/15/bdbdbd/000000?text=+) #bdbdbd|
 |`--sendbird-light-background-400`|![#393939](https://via.placeholder.com/15/393939/000000?text=+) #393939|`--sendbird-dark-background-400`|![#393939](https://via.placeholder.com/15/393939/000000?text=+) #393939|
 |`--sendbird-light-background-500`|![#2C2C2C](https://via.placeholder.com/15/2C2C2C/000000?text=+) #2C2C2C|`--sendbird-dark-background-500`|![#2C2C2C](https://via.placeholder.com/15/2C2C2C/000000?text=+) #2C2C2C|
 |`--sendbird-light-background-600`|![#161616](https://via.placeholder.com/15/161616/161616?text=+) #161616|`--sendbird-dark-background-600`|![#161616](https://via.placeholder.com/15/161616/161616?text=+) #161616|
 |`--sendbird-light-background-700`|![#000000](https://via.placeholder.com/15/000000/000000?text=+) #000000|`--sendbird-dark-background-700`|![#000000](https://via.placeholder.com/15/000000/000000?text=+) #000000|
-|`--sendbird-light-overlay`|![rgba(0, 0, 0, 0.32)](https://user-images.githubusercontent.com/46333979/103625341-3181dd00-4f7e-11eb-9ae3-4253ae3acabf.png) rgba(0, 0, 0, 0.32)|`--sendbird-dark-overlay`|![rgba(0, 0, 0, 0.32)](https://user-images.githubusercontent.com/46333979/103625341-3181dd00-4f7e-11eb-9ae3-4253ae3acabf.png) rgba(0, 0, 0, 0.32)|
+|`--sendbird-light-overlay-01`|![rgba(0, 0, 0, 0.55)](https://user-images.githubusercontent.com/46333979/106102244-72869f00-6182-11eb-9a90-9dcea7e565af.png) rgba(0, 0, 0, 0.55)|`--sendbird-dark-overlay-01`|![rgba(0, 0, 0, 0.55)](https://user-images.githubusercontent.com/46333979/106102244-72869f00-6182-11eb-9a90-9dcea7e565af.png) rgba(0, 0, 0, 0.55)|
+|`--sendbird-light-overlay-02`|![rgba(0, 0, 0, 0.32)](https://user-images.githubusercontent.com/46333979/103625341-3181dd00-4f7e-11eb-9ae3-4253ae3acabf.png) rgba(0, 0, 0, 0.32)|`--sendbird-dark-overlay-02`|![rgba(0, 0, 0, 0.32)](https://user-images.githubusercontent.com/46333979/103625341-3181dd00-4f7e-11eb-9ae3-4253ae3acabf.png) rgba(0, 0, 0, 0.32)|
 |`--sendbird-light-onlight-01`|![rgba(0, 0, 0, 0.88)](https://user-images.githubusercontent.com/46333979/103625475-60984e80-4f7e-11eb-969b-66ba6404f4e8.png) rgba(0, 0, 0, 0.88)|`--sendbird-dark-onlight-01`|![rgba(0, 0, 0, 0.88)](https://user-images.githubusercontent.com/46333979/103625475-60984e80-4f7e-11eb-969b-66ba6404f4e8.png) rgba(0, 0, 0, 0.88)|
 |`--sendbird-light-onlight-02`|![rgba(0, 0, 0, 0.50)](https://user-images.githubusercontent.com/46333979/103625587-89b8df00-4f7e-11eb-9219-37e22b3e2d64.png) rgba(0, 0, 0, 0.50)|`--sendbird-dark-onlight-02`|![rgba(0, 0, 0, 0.50)](https://user-images.githubusercontent.com/46333979/103625587-89b8df00-4f7e-11eb-9219-37e22b3e2d64.png) rgba(0, 0, 0, 0.50)|
 |`--sendbird-light-onlight-03`|![rgba(0, 0, 0, 0.38)](https://user-images.githubusercontent.com/46333979/103625907-e9af8580-4f7e-11eb-86f3-c6032819fff3.png) rgba(0, 0, 0, 0.38)|`--sendbird-dark-onlight-03`|![rgba(0, 0, 0, 0.38)](https://user-images.githubusercontent.com/46333979/103625907-e9af8580-4f7e-11eb-86f3-c6032819fff3.png) rgba(0, 0, 0, 0.38)|
@@ -236,10 +237,10 @@ Here is a list of components included in the UIKit.
 
 |Key|Value|
 |---|---|
-|`--sendbird-add-reaction-button-border-hover`|![#9E8CF5](https://via.placeholder.com/15/9E8CF5/000000?text=+) #9E8CF5|
-|`--sendbird-selected-reaction-button-border-hover`|![#9E8CF5](https://via.placeholder.com/15/9E8CF5/000000?text=+) #9E8CF5|
+|`--sendbird-add-reaction-button-border-hover`|![#c2a9fa](https://via.placeholder.com/15/c2a9fa/000000?text=+) #c2a9fa|
+|`--sendbird-selected-reaction-button-border-hover`|![#c2a9fa](https://via.placeholder.com/15/c2a9fa/000000?text=+) #c2a9fa|
 |`--sendbird-iconbutton-color`|![#825eeb](https://via.placeholder.com/15/825eeb/000000?text=+) #825eeb|
-|`--sendbird-message-input-border-active`|![#7B53EF](https://via.placeholder.com/15/7B53EF/000000?text=+) #7B53EF|
+|`--sendbird-message-input-border-active`|![#742ddd](https://via.placeholder.com/15/742ddd/000000?text=+) #742ddd|
 |`--sendbird-tooltip-background`|![#000000](https://via.placeholder.com/15/000000/000000?text=+) #000000|
 |`--sendbird-tooltip-text-color`|![rgba(255, 255, 255, 0.88)](https://user-images.githubusercontent.com/46333979/103626638-d355f980-4f7f-11eb-8d1d-7351b989aca6.png) rgba(255, 255, 255, 0.88)|
 |`--sendbird-button-border-focus`|![#FFFFFF](https://via.placeholder.com/15/FFFFFF/000000?text=+) #FFFFFF|
