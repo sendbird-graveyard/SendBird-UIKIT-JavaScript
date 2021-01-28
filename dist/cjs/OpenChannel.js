@@ -2313,7 +2313,8 @@ function useSetChannel(_a, _b) {
 }
 
 function useHandleChannelEvents(_a, _b) {
-  var currentOpenChannel = _a.currentOpenChannel;
+  var currentOpenChannel = _a.currentOpenChannel,
+      checkScrollBottom = _a.checkScrollBottom;
   var sdk = _b.sdk,
       logger = _b.logger,
       messagesDispatcher = _b.messagesDispatcher;
@@ -2325,6 +2326,7 @@ function useHandleChannelEvents(_a, _b) {
       logger.info('OpenChannel | useHandleChannelEvents: Setup evnet handler', messageReceiverId);
 
       ChannelHandler.onMessageReceived = function (channel, message) {
+        var scrollToEnd = checkScrollBottom();
         var channelUrl = channel.url;
         logger.info('OpenChannel | useHandleChannelEvents: onMessageReceived', {
           channelUrl: channelUrl,
@@ -2337,6 +2339,16 @@ function useHandleChannelEvents(_a, _b) {
             message: message
           }
         });
+
+        if (scrollToEnd) {
+          try {
+            setTimeout(function () {
+              scrollIntoLast();
+            });
+          } catch (error) {
+            logger.warning('OpenChannel | onMessageReceived | scroll to end failed');
+          }
+        }
       };
 
       ChannelHandler.onMessageUpdated = function (channel, message) {
@@ -3216,8 +3228,14 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
     logger: logger,
     messagesDispatcher: messagesDispatcher
   });
+  var checkScrollBottom = useCheckScrollBottom({
+    conversationScrollRef: conversationScrollRef
+  }, {
+    logger: logger
+  });
   useHandleChannelEvents({
-    currentOpenChannel: currentOpenChannel
+    currentOpenChannel: currentOpenChannel,
+    checkScrollBottom: checkScrollBottom
   }, {
     sdk: sdk,
     logger: logger,
@@ -3240,11 +3258,6 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
     messagesDispatcher: messagesDispatcher,
     hasMore: hasMore,
     userFilledMessageListParams: userFilledMessageListParams
-  });
-  var checkScrollBottom = useCheckScrollBottom({
-    conversationScrollRef: conversationScrollRef
-  }, {
-    logger: logger
   });
   var handleSendMessage = useSendMessageCallback({
     currentOpenChannel: currentOpenChannel,

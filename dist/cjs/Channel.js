@@ -442,11 +442,12 @@ function reducer(state, action) {
       {
         var _action$payload = action.payload,
             channel = _action$payload.channel,
-            message = _action$payload.message;
+            message = _action$payload.message,
+            scrollToEnd = _action$payload.scrollToEnd;
+        var unreadCount = 0;
 
         var _state$currentGroupCh = state.currentGroupChannel,
             _currentGroupChannel = _state$currentGroupCh === void 0 ? {} : _state$currentGroupCh,
-            unreadCount = state.unreadCount,
             unreadSince = state.unreadSince;
 
         var currentGroupChannelUrl = _currentGroupChannel.url;
@@ -462,6 +463,12 @@ function reducer(state, action) {
           return state;
         }
 
+        unreadCount = state.unreadCount + 1; // reset unreadCount if have to scrollToEnd
+
+        if (scrollToEnd) {
+          unreadCount = 0;
+        }
+
         if (message.isAdminMessage && message.isAdminMessage()) {
           return LocalizationContext._objectSpread2({}, state, {
             allMessages: passUnsuccessfullMessages(state.allMessages, message)
@@ -469,8 +476,8 @@ function reducer(state, action) {
         }
 
         return LocalizationContext._objectSpread2({}, state, {
-          unreadCount: unreadCount + 1,
-          unreadSince: unreadCount === 0 ? format(new Date(), 'p MMM dd') : unreadSince,
+          unreadCount: unreadCount,
+          unreadSince: unreadCount === 1 ? format(new Date(), 'p MMM dd') : unreadSince,
           allMessages: passUnsuccessfullMessages(state.allMessages, message)
         });
       }
@@ -559,7 +566,8 @@ function useHandleChannelEvents(_ref, _ref2) {
       sdkInit = _ref.sdkInit;
   var messagesDispatcher = _ref2.messagesDispatcher,
       sdk = _ref2.sdk,
-      logger = _ref2.logger;
+      logger = _ref2.logger,
+      scrollRef = _ref2.scrollRef;
   var channelUrl = currentGroupChannel && currentGroupChannel.url;
   React.useEffect(function () {
     var messageReceiverId = LocalizationContext.uuidv4$1();
@@ -570,14 +578,34 @@ function useHandleChannelEvents(_ref, _ref2) {
 
       ChannelHandler.onMessageReceived = function (channel, message) {
         if (index$2.compareIds(channel.url, currentGroupChannel.url)) {
+          var scrollToEnd = false;
+
+          try {
+            var current = scrollRef.current;
+            scrollToEnd = current.offsetHeight + current.scrollTop >= current.scrollHeight;
+          } catch (error) {//
+          }
+
           logger.info('Channel | useHandleChannelEvents: onMessageReceived', message);
           messagesDispatcher({
             type: ON_MESSAGE_RECEIVED,
             payload: {
               channel: channel,
-              message: message
+              message: message,
+              scrollToEnd: scrollToEnd
             }
           });
+
+          if (scrollToEnd) {
+            try {
+              setTimeout(function () {
+                currentGroupChannel.markAsRead();
+                scrollIntoLast();
+              });
+            } catch (error) {
+              logger.warning('Channel | onMessageReceived | scroll to end failed');
+            }
+          }
         }
       };
 
@@ -5521,12 +5549,12 @@ var ConversationPanel = function ConversationPanel(props) {
 
   useHandleChannelEvents({
     currentGroupChannel: currentGroupChannel,
-    sdkInit: sdkInit,
-    userId: userId
+    sdkInit: sdkInit
   }, {
     messagesDispatcher: messagesDispatcher,
     sdk: sdk,
-    logger: logger
+    logger: logger,
+    scrollRef: scrollRef
   });
   useInitialMessagesFetch({
     currentGroupChannel: currentGroupChannel,
