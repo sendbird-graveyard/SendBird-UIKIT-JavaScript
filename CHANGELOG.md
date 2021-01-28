@@ -1,6 +1,11 @@
 # Changelog
 
-## [2.0.1](Jan 27 2020)
+## [2.0.2](Jan 28 2021)
+
+- Bugfixes:
+  * When message arrive, autoscroll if user is at end of Channel
+
+## [2.0.1](Jan 27 2021)
 
 - Features:
   * ImageCompression for sending jpg, jpeg & png files
