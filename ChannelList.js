@@ -1,18 +1,18 @@
-import { a as _objectSpread2, c as _toConsumableArray, e as LocalizationContext, w as withSendbirdContext, b as _slicedToArray, u as uuidv4 } from './LocalizationContext-5c5b45a0.js';
+import { a as _objectSpread2, c as _toConsumableArray, e as LocalizationContext, w as withSendbirdContext, b as _slicedToArray, u as uuidv4 } from './LocalizationContext-34316336.js';
 import React, { useContext, useRef, useState, useEffect, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import { U as UPDATE_USER_INFO } from './actionTypes-a85c0eaa.js';
-import { L as LabelStringSet, I as Icon, a as IconTypes, b as Label, c as LabelTypography, d as LabelColors, e as IconButton, A as Avatar, M as Modal, T as Type, f as TextButton, g as IconColors, C as ContextMenu, h as MenuItems, i as MenuItem, P as PlaceHolder, j as CREATE_CHANNEL$1, U as UPDATE_USER_MESSAGE, k as LEAVE_CHANNEL, S as SEND_MESSAGE_START, l as UserProfileProvider, m as PlaceHolderTypes } from './index-c97add1b.js';
+import { L as LabelStringSet, I as Icon, a as IconTypes, b as IconColors, c as Label, d as LabelTypography, e as LabelColors, f as IconButton, A as Avatar, M as Modal, T as Type, g as TextButton, C as ContextMenu, h as MenuItems, i as MenuItem, P as PlaceHolder, j as CREATE_CHANNEL$1, U as UPDATE_USER_MESSAGE, k as LEAVE_CHANNEL, S as SEND_MESSAGE_START, l as UserProfileProvider, m as PlaceHolderTypes } from './index-79d744e1.js';
+import { C as ChannelAvatar } from './index-cee71d44.js';
 import { n as noop$1 } from './utils-53ba1773.js';
-import { C as ChannelAvatar } from './index-fa2a92d8.js';
-import { B as Badge, i as isBroadcastChannelEnabled, a as isSuperGroupChannelEnabled, I as InviteMembers, c as createDefaultUserListQuery, b as createChannel, L as LeaveChannelModal } from './LeaveChannel-cf9903b4.js';
+import { B as Badge, i as isBroadcastChannelEnabled, a as isSuperGroupChannelEnabled, I as InviteMembers, c as createDefaultUserListQuery, b as createChannel, L as LeaveChannelModal } from './LeaveChannel-42e6a67d.js';
 import isToday from 'date-fns/isToday';
 import format from 'date-fns/format';
 import isYesterday from 'date-fns/isYesterday';
 import './type-0296584d.js';
 import { t as truncate } from './utils-cfdeb084.js';
 import 'react-dom';
-import { I as InputLabel, a as Input } from './index-2c17b4ed.js';
+import { I as InputLabel, a as Input } from './index-49dfd24f.js';
 
 var RESET_CHANNEL_LIST = 'RESET_CHANNEL_LIST';
 var CREATE_CHANNEL = 'CREATE_CHANNEL';
@@ -354,9 +354,10 @@ function ChannelPreview(_ref) {
   }, isBroadcast && React.createElement("div", {
     className: "sendbird-channel-preview__broadcast-icon"
   }, React.createElement(Icon, {
-    type: theme === 'dark' ? IconTypes.BROADCAST_DARK : IconTypes.BROADCAST_LIGHT,
-    height: 12,
-    width: 12
+    type: IconTypes.BROADCAST,
+    fillColor: IconColors.SECONDARY,
+    height: "16px",
+    width: "16px"
   })), React.createElement(Label, {
     className: "sendbird-channel-preview__content__upper__header__channel-name",
     type: LabelTypography.SUBTITLE_2,
@@ -369,7 +370,8 @@ function ChannelPreview(_ref) {
     title: "Frozen",
     className: "sendbird-channel-preview__frozen-icon"
   }, React.createElement(Icon, {
-    type: theme === 'dark' ? IconTypes.FROZEN_DARK : IconTypes.FROZEN_LIGHT,
+    type: IconTypes.FREEZE,
+    fillColor: IconColors.PRIMARY,
     height: 12,
     width: 12
   }))), React.createElement(Label, {
@@ -685,7 +687,7 @@ function AddChannel(_ref) {
       setStep(1);
     }
   }, React.createElement(Icon, {
-    type: IconTypes.SUPER_GROUP
+    type: IconTypes.SUPERGROUP
   }), React.createElement(Label, {
     type: LabelTypography.SUBTITLE_1,
     color: LabelColors.ONBACKGROUND_1

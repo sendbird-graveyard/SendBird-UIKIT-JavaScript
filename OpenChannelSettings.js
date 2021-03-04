@@ -1,14 +1,14 @@
-import { e as LocalizationContext, d as __spreadArrays, w as withSendbirdContext } from './LocalizationContext-5c5b45a0.js';
+import { e as LocalizationContext, d as __spreadArrays, w as withSendbirdContext } from './LocalizationContext-34316336.js';
 import React, { useContext, useMemo, useRef, useState, useEffect } from 'react';
 import 'prop-types';
-import { A as Avatar, M as Modal, T as Type, f as TextButton, b as Label, c as LabelTypography, d as LabelColors, I as Icon, a as IconTypes, g as IconColors, B as Button, w as Size, n as UserProfileContext, C as ContextMenu, h as MenuItems, o as UserProfile, P as PlaceHolder, m as PlaceHolderTypes, F as selectors, l as UserProfileProvider } from './index-c97add1b.js';
+import { A as Avatar, M as Modal, T as Type, g as TextButton, c as Label, d as LabelTypography, e as LabelColors, I as Icon, a as IconTypes, b as IconColors, B as Button, w as Size, n as UserProfileContext, C as ContextMenu, h as MenuItems, o as UserProfile, P as PlaceHolder, m as PlaceHolderTypes, F as selectors, l as UserProfileProvider } from './index-79d744e1.js';
 import { d as getOpenChannelAvatar, n as noop } from './utils-53ba1773.js';
 import 'date-fns/format';
 import './type-0296584d.js';
 import 'react-dom';
-import { I as InputLabel, a as Input, U as UserListItem$1 } from './index-2c17b4ed.js';
+import { I as InputLabel, a as Input, U as UserListItem$1 } from './index-49dfd24f.js';
 import { c as copyToClipboard } from './utils-d7f59026.js';
-import { a as Accordion, A as AccordionGroup } from './index-e492270c.js';
+import { a as Accordion, A as AccordionGroup } from './index-cb09a8ab.js';
 
 function ChannelAvatar(_a) {
   var channel = _a.channel,
@@ -20,7 +20,7 @@ function ChannelAvatar(_a) {
   var stringSet = useContext(LocalizationContext).stringSet;
   var memoizedAvatar = useMemo(function () {
     return React.createElement(Avatar, {
-      className: "sendbird-chat-header__avatar--group-channel",
+      className: "sendbird-chat-header__avatar--open-channel",
       src: getOpenChannelAvatar(channel),
       width: width + "px",
       height: height + "px",

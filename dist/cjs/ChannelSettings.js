@@ -2,18 +2,18 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var LocalizationContext = require('./LocalizationContext-9665649b.js');
+var LocalizationContext = require('./LocalizationContext-12a9343d.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
-var index$1 = require('./index-dfc2e550.js');
+var index = require('./index-2a2230b8.js');
+var index$1 = require('./index-9431d920.js');
 var utils = require('./utils-6aedec02.js');
-var index$1$1 = require('./index-16cd2d77.js');
-var LeaveChannel = require('./LeaveChannel-2b4f1405.js');
+var LeaveChannel = require('./LeaveChannel-c93b4597.js');
 require('date-fns/format');
 require('react-dom');
-var index$2 = require('./index-005b875b.js');
-var index$3 = require('./index-fd689e05.js');
+var index$2 = require('./index-a8367321.js');
+var index$3 = require('./index-ccc7b14d.js');
 
 var EditDetails = function EditDetails(props) {
   var _onSubmit = props.onSubmit,
@@ -39,7 +39,7 @@ var EditDetails = function EditDetails(props) {
       stringSet = _useContext.stringSet;
 
   var title = channel.name;
-  return React__default.createElement(index$1.Modal, {
+  return React__default.createElement(index.Modal, {
     titleText: stringSet.MODAL__CHANNEL_INFORMATION__TITLE,
     submitText: stringSet.BUTTON__SAVE,
     onCancel: onCancel,
@@ -57,7 +57,7 @@ var EditDetails = function EditDetails(props) {
 
       onCancel();
     },
-    type: index$1.Type.PRIMARY
+    type: index.Type.PRIMARY
   }, React__default.createElement("form", {
     className: "channel-profile-form",
     ref: formRef,
@@ -68,11 +68,11 @@ var EditDetails = function EditDetails(props) {
     className: "channel-profile-form__img-section"
   }, React__default.createElement(index$2.InputLabel, null, stringSet.MODAL__CHANNEL_INFORMATION__CHANNEL_IMAGE), React__default.createElement("div", {
     className: "channel-profile-form__avatar"
-  }, currentImg ? React__default.createElement(index$1.Avatar, {
+  }, currentImg ? React__default.createElement(index.Avatar, {
     height: "80px",
     width: "80px",
     src: currentImg
-  }) : React__default.createElement(index$1$1.ChannelAvatar, {
+  }) : React__default.createElement(index$1.ChannelAvatar, {
     height: 80,
     width: 80,
     channel: channel,
@@ -90,15 +90,15 @@ var EditDetails = function EditDetails(props) {
       setNewFile(e.target.files[0]);
       hiddenInputRef.current.value = '';
     }
-  }), React__default.createElement(index$1.TextButton, {
+  }), React__default.createElement(index.TextButton, {
     className: "channel-profile-form__avatar-button",
     onClick: function onClick() {
       return hiddenInputRef.current.click();
     },
     notUnderline: true
-  }, React__default.createElement(index$1.Label, {
-    type: index$1.LabelTypography.BUTTON_1,
-    color: index$1.LabelColors.PRIMARY
+  }, React__default.createElement(index.Label, {
+    type: index.LabelTypography.BUTTON_1,
+    color: index.LabelColors.PRIMARY
   }, stringSet.MODAL__CHANNEL_INFORMATION__UPLOAD))), React__default.createElement("div", {
     className: "channel-profile-form__name-section"
   }, React__default.createElement(index$2.InputLabel, null, stringSet.MODAL__CHANNEL_INFORMATION__CHANNEL_NAME), React__default.createElement(index$2.Input, {
@@ -142,15 +142,17 @@ var ChannelProfile = function ChannelProfile(props) {
     className: "sendbird-channel-profile--inner"
   }, React__default.createElement("div", {
     className: "sendbird-channel-profile__avatar"
-  }, React__default.createElement(index$1$1.ChannelAvatar, {
+  }, React__default.createElement(index$1.ChannelAvatar, {
     channel: channel,
     userId: userId,
-    theme: theme
-  })), React__default.createElement(index$1.Label, {
-    type: index$1.LabelTypography.SUBTITLE_2,
-    color: index$1.LabelColors.ONBACKGROUND_1,
+    theme: theme,
+    width: 80,
+    height: 80
+  })), React__default.createElement(index.Label, {
+    type: index.LabelTypography.SUBTITLE_2,
+    color: index.LabelColors.ONBACKGROUND_1,
     className: "sendbird-channel-profile__title"
-  }, title), React__default.createElement(index$1.TextButton, {
+  }, title), React__default.createElement(index.TextButton, {
     disabled: disabled,
     className: "sendbird-channel-profile__edit",
     onClick: function onClick() {
@@ -161,9 +163,9 @@ var ChannelProfile = function ChannelProfile(props) {
       setShowModal(true);
     },
     notUnderline: true
-  }, React__default.createElement(index$1.Label, {
-    type: index$1.LabelTypography.BUTTON_1,
-    color: disabled ? index$1.LabelColors.ONBACKGROUND_2 : index$1.LabelColors.PRIMARY
+  }, React__default.createElement(index.Label, {
+    type: index.LabelTypography.BUTTON_1,
+    color: disabled ? index.LabelColors.ONBACKGROUND_2 : index.LabelColors.PRIMARY
   }, stringSet.CHANNEL_SETTING__PROFILE__EDIT)), showModal && React__default.createElement(EditDetails, {
     onCancel: function onCancel() {
       return setShowModal(false);
@@ -215,7 +217,7 @@ function MembersModal(_a) {
     });
     setMemberQuery(memberListQuery);
   }, []);
-  return React__default.createElement("div", null, React__default.createElement(index$1.Modal, {
+  return React__default.createElement("div", null, React__default.createElement(index.Modal, {
     hideFooter: true,
     onCancel: function onCancel() {
       return hideModal();
@@ -247,28 +249,28 @@ function MembersModal(_a) {
       action: function action(_a) {
         var parentRef = _a.parentRef,
             actionRef = _a.actionRef;
-        return React__default.createElement(React__default.Fragment, null, channel.myRole === 'operator' && React__default.createElement(index$1.ContextMenu, {
+        return React__default.createElement(React__default.Fragment, null, channel.myRole === 'operator' && React__default.createElement(index.ContextMenu, {
           menuTrigger: function menuTrigger(toggleDropdown) {
-            return React__default.createElement(index$1.IconButton, {
+            return React__default.createElement(index.IconButton, {
               className: "sendbird-user-message__more__menu",
               width: "32px",
               height: "32px",
               onClick: toggleDropdown
-            }, React__default.createElement(index$1.Icon, {
+            }, React__default.createElement(index.Icon, {
               width: "24px",
               height: "24px",
-              type: index$1.IconTypes.MORE,
-              fillColor: index$1.IconColors.CONTENT_INVERSE
+              type: index.IconTypes.MORE,
+              fillColor: index.IconColors.CONTENT_INVERSE
             }));
           },
           menuItems: function menuItems(closeDropdown) {
-            return React__default.createElement(index$1.MenuItems, {
+            return React__default.createElement(index.MenuItems, {
               parentContainRef: parentRef,
               parentRef: actionRef // for catching location(x, y) of MenuItems
               ,
               closeDropdown: closeDropdown,
               openLeft: true
-            }, React__default.createElement(index$1.MenuItem, {
+            }, React__default.createElement(index.MenuItem, {
               onClick: function onClick() {
                 if (member.role !== 'operator') {
                   channel.addOperators([member.userId], function () {
@@ -299,7 +301,7 @@ function MembersModal(_a) {
                 }
               }
             }, member.role !== 'operator' ? 'Promote to operator' : 'Demote operator'), // No muted members in broadcast channel
-            !channel.isBroadcast && React__default.createElement(index$1.MenuItem, {
+            !channel.isBroadcast && React__default.createElement(index.MenuItem, {
               onClick: function onClick() {
                 if (member.isMuted) {
                   channel.unmuteUser(member, function () {
@@ -329,7 +331,7 @@ function MembersModal(_a) {
                   });
                 }
               }
-            }, member.isMuted ? 'Unmute' : 'Mute'), React__default.createElement(index$1.MenuItem, {
+            }, member.isMuted ? 'Unmute' : 'Mute'), React__default.createElement(index.MenuItem, {
               onClick: function onClick() {
                 channel.banUser(member, -1, '', function () {
                   setMembers(members.filter(function (_a) {
@@ -355,7 +357,7 @@ var UserListItem = function UserListItem(_ref) {
       currentUser = _ref$currentUser === void 0 ? '' : _ref$currentUser;
   var avatarRef = React.useRef(null);
 
-  var _useContext = React.useContext(index$1.UserProfileContext),
+  var _useContext = React.useContext(index.UserProfileContext),
       disableUserProfile = _useContext.disableUserProfile,
       renderUserProfile = _useContext.renderUserProfile;
 
@@ -366,9 +368,9 @@ var UserListItem = function UserListItem(_ref) {
     className: "sendbird-members-accordion__member"
   }, React__default.createElement("div", {
     className: "sendbird-members-accordion__member-avatar"
-  }, React__default.createElement(index$1.ContextMenu, {
+  }, React__default.createElement(index.ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React__default.createElement(index$1.Avatar, {
+      return React__default.createElement(index.Avatar, {
         onClick: function onClick() {
           if (!disableUserProfile) {
             toggleDropdown();
@@ -381,7 +383,7 @@ var UserListItem = function UserListItem(_ref) {
       });
     },
     menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(index$1.MenuItems, {
+      return React__default.createElement(index.MenuItems, {
         openLeft: true,
         parentRef: avatarRef // for catching location(x, y) of MenuItems
         ,
@@ -396,15 +398,15 @@ var UserListItem = function UserListItem(_ref) {
         user: member,
         currentUserId: currentUser,
         close: closeDropdown
-      }) : React__default.createElement(index$1.UserProfile, {
+      }) : React__default.createElement(index.UserProfile, {
         user: member,
         currentUserId: currentUser,
         onSuccess: closeDropdown
       }));
     }
-  })), React__default.createElement(index$1.Label, {
-    type: index$1.LabelTypography.SUBTITLE_2,
-    color: index$1.LabelColors.ONBACKGROUND_1
+  })), React__default.createElement(index.Label, {
+    type: index.LabelTypography.SUBTITLE_2,
+    color: index.LabelColors.ONBACKGROUND_1
   }, member.nickname || stringSet.NO_NAME, currentUser === member.userId && stringSet.YOU));
 };
 
@@ -451,10 +453,10 @@ var MemebersAccordion = function MemebersAccordion(_ref2) {
     });
   })), React__default.createElement("div", {
     className: "sendbird-members-accordion__footer"
-  }, members.length >= SHOWN_MEMBER_MAX && React__default.createElement(index$1.Button, {
+  }, members.length >= SHOWN_MEMBER_MAX && React__default.createElement(index.Button, {
     className: "sendbird-members-accordion__footer__all-members",
-    type: index$1.Type.SECONDARY,
-    size: index$1.Size.SMALL,
+    type: index.Type.SECONDARY,
+    size: index.Size.SMALL,
     onClick: function onClick() {
       return setShowMoreModal(true);
     }
@@ -464,10 +466,10 @@ var MemebersAccordion = function MemebersAccordion(_ref2) {
       setShowMoreModal(false);
     },
     channel: channel
-  }), React__default.createElement(index$1.Button, {
+  }), React__default.createElement(index.Button, {
     className: "sendbird-members-accordion__footer__invite-users",
-    type: index$1.Type.SECONDARY,
-    size: index$1.Size.SMALL,
+    type: index.Type.SECONDARY,
+    size: index.Size.SMALL,
     disabled: disabled,
     onClick: function onClick() {
       if (disabled) {
@@ -521,7 +523,7 @@ var UserListItem$1 = function UserListItem(_a) {
   var avatarRef = React.useRef(null);
   var stringSet = React.useContext(LocalizationContext.LocalizationContext).stringSet;
 
-  var _b = React.useContext(index$1.UserProfileContext),
+  var _b = React.useContext(index.UserProfileContext),
       disableUserProfile = _b.disableUserProfile,
       renderUserProfile = _b.renderUserProfile;
 
@@ -529,9 +531,9 @@ var UserListItem$1 = function UserListItem(_a) {
   return React__default.createElement("div", {
     ref: parentRef,
     className: LocalizationContext.__spreadArrays([COMPONENT_NAME], injectingClassNames).join(' ')
-  }, user.isMuted && React__default.createElement(index$2.MutedAvatarOverlay, null), React__default.createElement(index$1.ContextMenu, {
+  }, user.isMuted && React__default.createElement(index$2.MutedAvatarOverlay, null), React__default.createElement(index.ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React__default.createElement(index$1.Avatar, {
+      return React__default.createElement(index.Avatar, {
         onClick: function onClick() {
           if (!disableUserProfile) {
             toggleDropdown();
@@ -545,7 +547,7 @@ var UserListItem$1 = function UserListItem(_a) {
       });
     },
     menuItems: function menuItems(closeDropdown) {
-      return React__default.createElement(index$1.MenuItems, {
+      return React__default.createElement(index.MenuItems, {
         openLeft: true,
         parentRef: avatarRef // for catching location(x, y) of MenuItems
         ,
@@ -560,24 +562,24 @@ var UserListItem$1 = function UserListItem(_a) {
         user: user,
         currentUserId: currentUser,
         close: closeDropdown
-      }) : React__default.createElement(index$1.UserProfile, {
+      }) : React__default.createElement(index.UserProfile, {
         user: user,
         currentUserId: currentUser,
         onSuccess: closeDropdown
       }));
     }
-  }), React__default.createElement(index$1.Label, {
+  }), React__default.createElement(index.Label, {
     className: COMPONENT_NAME + "__title",
-    type: index$1.LabelTypography.SUBTITLE_1,
-    color: index$1.LabelColors.ONBACKGROUND_1
-  }, user.nickname || stringSet.NO_NAME, currentUser === user.userId && " (You)"), !user.nickname && React__default.createElement(index$1.Label, {
+    type: index.LabelTypography.SUBTITLE_1,
+    color: index.LabelColors.ONBACKGROUND_1
+  }, user.nickname || stringSet.NO_NAME, currentUser === user.userId && " (You)"), !user.nickname && React__default.createElement(index.Label, {
     className: COMPONENT_NAME + "__subtitle",
-    type: index$1.LabelTypography.CAPTION_3,
-    color: index$1.LabelColors.ONBACKGROUND_2
-  }, user.userId), user.role === 'operator' && React__default.createElement(index$1.Label, {
+    type: index.LabelTypography.CAPTION_3,
+    color: index.LabelColors.ONBACKGROUND_2
+  }, user.userId), user.role === 'operator' && React__default.createElement(index.Label, {
     className: COMPONENT_NAME + "__operator",
-    type: index$1.LabelTypography.SUBTITLE_2,
-    color: index$1.LabelColors.ONBACKGROUND_2
+    type: index.LabelTypography.SUBTITLE_2,
+    color: index.LabelColors.ONBACKGROUND_2
   }, "Operator"), action && React__default.createElement("div", {
     ref: actionRef,
     className: COMPONENT_NAME + "__action"
@@ -612,7 +614,7 @@ function OperatorsModal(_a) {
     });
     setOperatorQuery(operatorListQuery);
   }, []);
-  return React__default.createElement("div", null, React__default.createElement(index$1.Modal, {
+  return React__default.createElement("div", null, React__default.createElement(index.Modal, {
     hideFooter: true,
     onCancel: function onCancel() {
       return hideModal();
@@ -644,28 +646,28 @@ function OperatorsModal(_a) {
       action: function action(_a) {
         var parentRef = _a.parentRef,
             actionRef = _a.actionRef;
-        return React__default.createElement(index$1.ContextMenu, {
+        return React__default.createElement(index.ContextMenu, {
           menuTrigger: function menuTrigger(toggleDropdown) {
-            return React__default.createElement(index$1.IconButton, {
+            return React__default.createElement(index.IconButton, {
               className: "sendbird-user-message__more__menu",
               width: "32px",
               height: "32px",
               onClick: toggleDropdown
-            }, React__default.createElement(index$1.Icon, {
+            }, React__default.createElement(index.Icon, {
               width: "24px",
               height: "24px",
-              type: index$1.IconTypes.MORE,
-              fillColor: index$1.IconColors.CONTENT_INVERSE
+              type: index.IconTypes.MORE,
+              fillColor: index.IconColors.CONTENT_INVERSE
             }));
           },
           menuItems: function menuItems(closeDropdown) {
-            return React__default.createElement(index$1.MenuItems, {
+            return React__default.createElement(index.MenuItems, {
               parentContainRef: parentRef,
               parentRef: actionRef // for catching location(x, y) of MenuItems
               ,
               closeDropdown: closeDropdown,
               openLeft: true
-            }, React__default.createElement(index$1.MenuItem, {
+            }, React__default.createElement(index.MenuItem, {
               onClick: function onClick() {
                 channel.removeOperators([member.userId], function (response, error) {
                   if (error) {
@@ -720,8 +722,8 @@ function AddOperatorsModal(_a) {
   var selectedCount = Object.keys(selectedMembers).filter(function (m) {
     return selectedMembers[m];
   }).length;
-  return React__default.createElement("div", null, React__default.createElement(index$1.Modal, {
-    type: index$1.Type.PRIMARY,
+  return React__default.createElement("div", null, React__default.createElement(index.Modal, {
+    type: index.Type.PRIMARY,
     submitText: "Add",
     onCancel: function onCancel() {
       return hideModal();
@@ -734,9 +736,9 @@ function AddOperatorsModal(_a) {
       _onSubmit(members);
     },
     titleText: "Select members"
-  }, React__default.createElement(index$1.Label, {
-    color: selectedCount > 0 ? index$1.LabelColors.PRIMARY : index$1.LabelColors.ONBACKGROUND_3,
-    type: index$1.LabelTypography.CAPTION_1
+  }, React__default.createElement(index.Label, {
+    color: selectedCount > 0 ? index.LabelColors.PRIMARY : index.LabelColors.ONBACKGROUND_3,
+    type: index.LabelTypography.CAPTION_1
   }, selectedCount + " " + stringSet.MODAL__INVITE_MEMBER__SELECTEC), React__default.createElement("div", {
     className: "sendbird-more-members__popup-scroll",
     onScroll: function onScroll(e) {
@@ -838,28 +840,28 @@ var OperatorList = function OperatorList(_a) {
       action: function action(_a) {
         var actionRef = _a.actionRef,
             parentRef = _a.parentRef;
-        return React__default.createElement(index$1.ContextMenu, {
+        return React__default.createElement(index.ContextMenu, {
           menuTrigger: function menuTrigger(toggleDropdown) {
-            return React__default.createElement(index$1.IconButton, {
+            return React__default.createElement(index.IconButton, {
               className: "sendbird-user-message__more__menu",
               width: "32px",
               height: "32px",
               onClick: toggleDropdown
-            }, React__default.createElement(index$1.Icon, {
+            }, React__default.createElement(index.Icon, {
               width: "24px",
               height: "24px",
-              type: index$1.IconTypes.MORE,
-              fillColor: index$1.IconColors.CONTENT_INVERSE
+              type: index.IconTypes.MORE,
+              fillColor: index.IconColors.CONTENT_INVERSE
             }));
           },
           menuItems: function menuItems(closeDropdown) {
-            return React__default.createElement(index$1.MenuItems, {
+            return React__default.createElement(index.MenuItems, {
               parentContainRef: parentRef,
               parentRef: actionRef // for catching location(x, y) of MenuItems
               ,
               closeDropdown: closeDropdown,
               openLeft: true
-            }, React__default.createElement(index$1.MenuItem, {
+            }, React__default.createElement(index.MenuItem, {
               onClick: function onClick() {
                 channel.removeOperators([operator.userId], function (response, error) {
                   if (error) {
@@ -880,15 +882,15 @@ var OperatorList = function OperatorList(_a) {
     });
   }), hasNext && React__default.createElement("div", {
     className: "sendbird-channel-settings-accordion__footer"
-  }, React__default.createElement(index$1.Button, {
-    type: index$1.Type.SECONDARY,
-    size: index$1.Size.SMALL,
+  }, React__default.createElement(index.Button, {
+    type: index.Type.SECONDARY,
+    size: index.Size.SMALL,
     onClick: function onClick() {
       setShowMore(true);
     }
-  }, stringSet.CHANNEL_SETTING__OPERATORS__TITLE_ALL), React__default.createElement(index$1.Button, {
-    type: index$1.Type.SECONDARY,
-    size: index$1.Size.SMALL,
+  }, stringSet.CHANNEL_SETTING__OPERATORS__TITLE_ALL), React__default.createElement(index.Button, {
+    type: index.Type.SECONDARY,
+    size: index.Size.SMALL,
     onClick: function onClick() {
       setShowAdd(true);
     }
@@ -915,7 +917,7 @@ var OperatorList = function OperatorList(_a) {
 
 var mapStoreToProps = function mapStoreToProps(store) {
   return {
-    sdk: index$1.getSdk(store)
+    sdk: index.getSdk(store)
   };
 };
 
@@ -950,10 +952,10 @@ function InviteMembers(_a) {
     });
     setUserQuery(userListQuery);
   }, []);
-  return React__default.createElement("div", null, React__default.createElement(index$1.Modal, {
+  return React__default.createElement("div", null, React__default.createElement(index.Modal, {
     disabled: Object.keys(selectedMembers).length === 0,
     submitText: "Invite",
-    type: index$1.Type.PRIMARY,
+    type: index.Type.PRIMARY,
     onCancel: function onCancel() {
       return hideModal();
     },
@@ -1006,7 +1008,8 @@ function InviteMembers(_a) {
 var MemberList = function MemberList(_a) {
   var sdk = _a.sdk,
       channel = _a.channel,
-      userQueryCreator = _a.userQueryCreator;
+      userQueryCreator = _a.userQueryCreator,
+      userId = _a.userId;
 
   var _b = React.useState([]),
       members = _b[0],
@@ -1063,31 +1066,31 @@ var MemberList = function MemberList(_a) {
       key: member.userId,
       user: member,
       currentUser: sdk.currentUser.userId,
-      action: function action(_a) {
+      action: userId !== member.userId ? function (_a) {
         var actionRef = _a.actionRef,
             parentRef = _a.parentRef;
-        return React__default.createElement(index$1.ContextMenu, {
+        return React__default.createElement(index.ContextMenu, {
           menuTrigger: function menuTrigger(toggleDropdown) {
-            return React__default.createElement(index$1.IconButton, {
+            return React__default.createElement(index.IconButton, {
               className: "sendbird-user-message__more__menu",
               width: "32px",
               height: "32px",
               onClick: toggleDropdown
-            }, React__default.createElement(index$1.Icon, {
+            }, React__default.createElement(index.Icon, {
               width: "24px",
               height: "24px",
-              type: index$1.IconTypes.MORE,
-              fillColor: index$1.IconColors.CONTENT_INVERSE
+              type: index.IconTypes.MORE,
+              fillColor: index.IconColors.CONTENT_INVERSE
             }));
           },
           menuItems: function menuItems(closeDropdown) {
-            return React__default.createElement(index$1.MenuItems, {
+            return React__default.createElement(index.MenuItems, {
               parentContainRef: parentRef,
               parentRef: actionRef // for catching location(x, y) of MenuItems
               ,
               closeDropdown: closeDropdown,
               openLeft: true
-            }, React__default.createElement(index$1.MenuItem, {
+            }, React__default.createElement(index.MenuItem, {
               onClick: function onClick() {
                 if (member.role !== 'operator') {
                   channel.addOperators([member.userId], function () {
@@ -1102,7 +1105,7 @@ var MemberList = function MemberList(_a) {
                 }
               }
             }, member.role !== 'operator' ? 'Promote to operator' : 'Demote operator'), // No muted members in broadcast channel
-            !channel.isBroadcast && React__default.createElement(index$1.MenuItem, {
+            !channel.isBroadcast && React__default.createElement(index.MenuItem, {
               onClick: function onClick() {
                 if (member.isMuted) {
                   channel.unmuteUser(member, function () {
@@ -1116,7 +1119,7 @@ var MemberList = function MemberList(_a) {
                   });
                 }
               }
-            }, member.isMuted ? 'Unmute' : 'Mute'), member.role && member.role !== 'operator' && React__default.createElement(index$1.MenuItem, {
+            }, member.isMuted ? 'Unmute' : 'Mute'), React__default.createElement(index.MenuItem, {
               onClick: function onClick() {
                 channel.banUser(member, -1, '', function () {
                   refershList();
@@ -1126,19 +1129,19 @@ var MemberList = function MemberList(_a) {
             }, "Ban"));
           }
         });
-      }
+      } : null
     });
   }), React__default.createElement("div", {
     className: "sendbird-channel-settings-accordion__footer"
-  }, hasNext && React__default.createElement(index$1.Button, {
-    type: index$1.Type.SECONDARY,
-    size: index$1.Size.SMALL,
+  }, hasNext && React__default.createElement(index.Button, {
+    type: index.Type.SECONDARY,
+    size: index.Size.SMALL,
     onClick: function onClick() {
       return setShowAllMembers(true);
     }
-  }, "All members"), React__default.createElement(index$1.Button, {
-    type: index$1.Type.SECONDARY,
-    size: index$1.Size.SMALL,
+  }, "All members"), React__default.createElement(index.Button, {
+    type: index.Type.SECONDARY,
+    size: index.Size.SMALL,
     onClick: function onClick() {
       return setShowInviteMembers(true);
     }
@@ -1166,7 +1169,7 @@ var MemberList = function MemberList(_a) {
 
 var mapStoreToProps$1 = function mapStoreToProps(store) {
   return {
-    sdk: index$1.getSdk(store)
+    sdk: index.getSdk(store)
   };
 };
 
@@ -1195,7 +1198,7 @@ function BannedMembersModal(_a) {
     });
     setMemberQuery(bannedUserListQuery);
   }, []);
-  return React__default.createElement("div", null, React__default.createElement(index$1.Modal, {
+  return React__default.createElement("div", null, React__default.createElement(index.Modal, {
     hideFooter: true,
     onCancel: function onCancel() {
       return hideModal();
@@ -1226,28 +1229,28 @@ function BannedMembersModal(_a) {
       action: function action(_a) {
         var parentRef = _a.parentRef,
             actionRef = _a.actionRef;
-        return React__default.createElement(index$1.ContextMenu, {
+        return React__default.createElement(index.ContextMenu, {
           menuTrigger: function menuTrigger(toggleDropdown) {
-            return React__default.createElement(index$1.IconButton, {
+            return React__default.createElement(index.IconButton, {
               className: "sendbird-user-message__more__menu",
               width: "32px",
               height: "32px",
               onClick: toggleDropdown
-            }, React__default.createElement(index$1.Icon, {
+            }, React__default.createElement(index.Icon, {
               width: "24px",
               height: "24px",
-              type: index$1.IconTypes.MORE,
-              fillColor: index$1.IconColors.CONTENT_INVERSE
+              type: index.IconTypes.MORE,
+              fillColor: index.IconColors.CONTENT_INVERSE
             }));
           },
           menuItems: function menuItems(closeDropdown) {
-            return React__default.createElement(index$1.MenuItems, {
+            return React__default.createElement(index.MenuItems, {
               parentContainRef: parentRef,
               parentRef: actionRef // for catching location(x, y) of MenuItems
               ,
               closeDropdown: closeDropdown,
               openLeft: true
-            }, React__default.createElement(index$1.MenuItem, {
+            }, React__default.createElement(index.MenuItem, {
               onClick: function onClick() {
                 channel.unbanUser(member, function () {
                   closeDropdown();
@@ -1318,28 +1321,28 @@ var BannedMemberList = function BannedMemberList(_a) {
       action: function action(_a) {
         var actionRef = _a.actionRef,
             parentRef = _a.parentRef;
-        return React__default.createElement(index$1.ContextMenu, {
+        return React__default.createElement(index.ContextMenu, {
           menuTrigger: function menuTrigger(toggleDropdown) {
-            return React__default.createElement(index$1.IconButton, {
+            return React__default.createElement(index.IconButton, {
               className: "sendbird-user-message__more__menu",
               width: "32px",
               height: "32px",
               onClick: toggleDropdown
-            }, React__default.createElement(index$1.Icon, {
+            }, React__default.createElement(index.Icon, {
               width: "24px",
               height: "24px",
-              type: index$1.IconTypes.MORE,
-              fillColor: index$1.IconColors.CONTENT_INVERSE
+              type: index.IconTypes.MORE,
+              fillColor: index.IconColors.CONTENT_INVERSE
             }));
           },
           menuItems: function menuItems(closeDropdown) {
-            return React__default.createElement(index$1.MenuItems, {
+            return React__default.createElement(index.MenuItems, {
               parentContainRef: parentRef,
               parentRef: actionRef // for catching location(x, y) of MenuItems
               ,
               closeDropdown: closeDropdown,
               openLeft: true
-            }, React__default.createElement(index$1.MenuItem, {
+            }, React__default.createElement(index.MenuItem, {
               onClick: function onClick() {
                 channel.unbanUser(member, function () {
                   closeDropdown();
@@ -1351,15 +1354,15 @@ var BannedMemberList = function BannedMemberList(_a) {
         });
       }
     });
-  }), members && members.length === 0 && React__default.createElement(index$1.Label, {
+  }), members && members.length === 0 && React__default.createElement(index.Label, {
     className: "sendbird-channel-settings__empty-list",
-    type: index$1.LabelTypography.SUBTITLE_2,
-    color: index$1.LabelColors.ONBACKGROUND_3
+    type: index.LabelTypography.SUBTITLE_2,
+    color: index.LabelColors.ONBACKGROUND_3
   }, "No banned members yet"), hasNext && React__default.createElement("div", {
     className: "sendbird-channel-settings-accordion__footer"
-  }, React__default.createElement(index$1.Button, {
-    type: index$1.Type.SECONDARY,
-    size: index$1.Size.SMALL,
+  }, React__default.createElement(index.Button, {
+    type: index.Type.SECONDARY,
+    size: index.Size.SMALL,
     onClick: function onClick() {
       setShowModal(true);
     }
@@ -1374,7 +1377,7 @@ var BannedMemberList = function BannedMemberList(_a) {
 
 var mapStoreToProps$2 = function mapStoreToProps(store) {
   return {
-    sdk: index$1.getSdk(store)
+    sdk: index.getSdk(store)
   };
 };
 
@@ -1406,7 +1409,7 @@ function MutedMembersModal(_a) {
     });
     setMemberQuery(memberUserListQuery);
   }, []);
-  return React__default.createElement("div", null, React__default.createElement(index$1.Modal, {
+  return React__default.createElement("div", null, React__default.createElement(index.Modal, {
     hideFooter: true,
     onCancel: function onCancel() {
       return hideModal();
@@ -1438,28 +1441,28 @@ function MutedMembersModal(_a) {
       action: function action(_a) {
         var actionRef = _a.actionRef,
             parentRef = _a.parentRef;
-        return React__default.createElement(index$1.ContextMenu, {
+        return React__default.createElement(index.ContextMenu, {
           menuTrigger: function menuTrigger(toggleDropdown) {
-            return React__default.createElement(index$1.IconButton, {
+            return React__default.createElement(index.IconButton, {
               className: "sendbird-user-message__more__menu",
               width: "32px",
               height: "32px",
               onClick: toggleDropdown
-            }, React__default.createElement(index$1.Icon, {
+            }, React__default.createElement(index.Icon, {
               width: "24px",
               height: "24px",
-              type: index$1.IconTypes.MORE,
-              fillColor: index$1.IconColors.CONTENT_INVERSE
+              type: index.IconTypes.MORE,
+              fillColor: index.IconColors.CONTENT_INVERSE
             }));
           },
           menuItems: function menuItems(closeDropdown) {
-            return React__default.createElement(index$1.MenuItems, {
+            return React__default.createElement(index.MenuItems, {
               parentContainRef: parentRef,
               parentRef: actionRef // for catching location(x, y) of MenuItems
               ,
               closeDropdown: closeDropdown,
               openLeft: true
-            }, React__default.createElement(index$1.MenuItem, {
+            }, React__default.createElement(index.MenuItem, {
               onClick: function onClick() {
                 channel.unmuteUser(member, function () {
                   closeDropdown();
@@ -1536,28 +1539,28 @@ var MutedMemberList = function MutedMemberList(_a) {
       action: function action(_a) {
         var actionRef = _a.actionRef,
             parentRef = _a.parentRef;
-        return React__default.createElement(index$1.ContextMenu, {
+        return React__default.createElement(index.ContextMenu, {
           menuTrigger: function menuTrigger(toggleDropdown) {
-            return React__default.createElement(index$1.IconButton, {
+            return React__default.createElement(index.IconButton, {
               className: "sendbird-user-message__more__menu",
               width: "32px",
               height: "32px",
               onClick: toggleDropdown
-            }, React__default.createElement(index$1.Icon, {
+            }, React__default.createElement(index.Icon, {
               width: "24px",
               height: "24px",
-              type: index$1.IconTypes.MORE,
-              fillColor: index$1.IconColors.CONTENT_INVERSE
+              type: index.IconTypes.MORE,
+              fillColor: index.IconColors.CONTENT_INVERSE
             }));
           },
           menuItems: function menuItems(closeDropdown) {
-            return React__default.createElement(index$1.MenuItems, {
+            return React__default.createElement(index.MenuItems, {
               closeDropdown: closeDropdown,
               openLeft: true,
               parentContainRef: parentRef,
               parentRef: actionRef // for catching location(x, y) of MenuItems
 
-            }, React__default.createElement(index$1.MenuItem, {
+            }, React__default.createElement(index.MenuItem, {
               onClick: function onClick() {
                 channel.unmuteUser(member, function () {
                   refreshList();
@@ -1569,15 +1572,15 @@ var MutedMemberList = function MutedMemberList(_a) {
         });
       }
     });
-  }), members && members.length === 0 && React__default.createElement(index$1.Label, {
+  }), members && members.length === 0 && React__default.createElement(index.Label, {
     className: "sendbird-channel-settings__empty-list",
-    type: index$1.LabelTypography.SUBTITLE_2,
-    color: index$1.LabelColors.ONBACKGROUND_3
+    type: index.LabelTypography.SUBTITLE_2,
+    color: index.LabelColors.ONBACKGROUND_3
   }, "No muted members yet"), hasNext && React__default.createElement("div", {
     className: "sendbird-channel-settings-accordion__footer"
-  }, React__default.createElement(index$1.Button, {
-    type: index$1.Type.SECONDARY,
-    size: index$1.Size.SMALL,
+  }, React__default.createElement(index.Button, {
+    type: index.Type.SECONDARY,
+    size: index.Size.SMALL,
     onClick: function onClick() {
       setShowModal(true);
     }
@@ -1593,7 +1596,7 @@ var MutedMemberList = function MutedMemberList(_a) {
 
 var mapStoreToProps$3 = function mapStoreToProps(store) {
   return {
-    sdk: index$1.getSdk(store)
+    sdk: index.getSdk(store)
   };
 };
 
@@ -1603,9 +1606,10 @@ var kFormatter = function kFormatter(num) {
   return Math.abs(num) > 999 ? (Math.abs(num) / 1000).toFixed(1) + "K" : num;
 };
 
-function index(_a) {
+function AdminPannel(_a) {
   var userQueryCreator = _a.userQueryCreator,
-      channel = _a.channel;
+      channel = _a.channel,
+      userId = _a.userId;
 
   var _b = React.useState(false),
       frozen = _b[0],
@@ -1624,15 +1628,15 @@ function index(_a) {
     className: "sendbird-channel-settings__operators-list",
     id: "operators",
     renderTitle: function renderTitle() {
-      return React__default.createElement(React__default.Fragment, null, React__default.createElement(index$1.Icon, {
-        type: index$1.IconTypes.ICON_OPERATOR,
-        fillColor: index$1.IconColors.PRIMARY,
+      return React__default.createElement(React__default.Fragment, null, React__default.createElement(index.Icon, {
+        type: index.IconTypes.OPERATOR,
+        fillColor: index.IconColors.PRIMARY,
         width: 24,
         height: 24,
         className: "sendbird-channel-settings__accordion-icon"
-      }), React__default.createElement(index$1.Label, {
-        type: index$1.LabelTypography.SUBTITLE_1,
-        color: index$1.LabelColors.ONBACKGROUND_1
+      }), React__default.createElement(index.Label, {
+        type: index.LabelTypography.SUBTITLE_1,
+        color: index.LabelColors.ONBACKGROUND_1
       }, stringSet.CHANNEL_SETTING__OPERATORS__TITLE));
     },
     renderContent: function renderContent() {
@@ -1644,15 +1648,15 @@ function index(_a) {
     className: "sendbird-channel-settings__members-list",
     id: "members",
     renderTitle: function renderTitle() {
-      return React__default.createElement(React__default.Fragment, null, React__default.createElement(index$1.Icon, {
-        type: index$1.IconTypes.MEMBERS,
-        fillColor: index$1.IconColors.PRIMARY,
+      return React__default.createElement(React__default.Fragment, null, React__default.createElement(index.Icon, {
+        type: index.IconTypes.MEMBERS,
+        fillColor: index.IconColors.PRIMARY,
         width: 24,
         height: 24,
         className: "sendbird-channel-settings__accordion-icon"
-      }), React__default.createElement(index$1.Label, {
-        type: index$1.LabelTypography.SUBTITLE_1,
-        color: index$1.LabelColors.ONBACKGROUND_1
+      }), React__default.createElement(index.Label, {
+        type: index.LabelTypography.SUBTITLE_1,
+        color: index.LabelColors.ONBACKGROUND_1
       }, stringSet.CHANNEL_SETTING__MEMBERS__TITLE), React__default.createElement(LeaveChannel.Badge, {
         count: kFormatter(channel.memberCount)
       }));
@@ -1660,7 +1664,8 @@ function index(_a) {
     renderContent: function renderContent() {
       return React__default.createElement(React__default.Fragment, null, React__default.createElement(MemberList$1, {
         userQueryCreator: userQueryCreator,
-        channel: channel
+        channel: channel,
+        userId: userId
       }));
     }
   }), // No muted members in broadcast channel
@@ -1668,15 +1673,15 @@ function index(_a) {
     id: "mutedMembers",
     className: "sendbird-channel-settings__muted-members-list",
     renderTitle: function renderTitle() {
-      return React__default.createElement(React__default.Fragment, null, React__default.createElement(index$1.Icon, {
-        type: index$1.IconTypes.ICON_MUTED,
-        fillColor: index$1.IconColors.PRIMARY,
+      return React__default.createElement(React__default.Fragment, null, React__default.createElement(index.Icon, {
+        type: index.IconTypes.MUTE,
+        fillColor: index.IconColors.PRIMARY,
         width: 24,
         height: 24,
         className: "sendbird-channel-settings__accordion-icon"
-      }), React__default.createElement(index$1.Label, {
-        type: index$1.LabelTypography.SUBTITLE_1,
-        color: index$1.LabelColors.ONBACKGROUND_1
+      }), React__default.createElement(index.Label, {
+        type: index.LabelTypography.SUBTITLE_1,
+        color: index.LabelColors.ONBACKGROUND_1
       }, stringSet.CHANNEL_SETTING__MUTED_MEMBERS__TITLE));
     },
     renderContent: function renderContent() {
@@ -1688,15 +1693,15 @@ function index(_a) {
     className: "sendbird-channel-settings__banned-members-list",
     id: "bannedMembers",
     renderTitle: function renderTitle() {
-      return React__default.createElement(React__default.Fragment, null, React__default.createElement(index$1.Icon, {
-        type: index$1.IconTypes.ICON_BANNED,
-        fillColor: index$1.IconColors.PRIMARY,
+      return React__default.createElement(React__default.Fragment, null, React__default.createElement(index.Icon, {
+        type: index.IconTypes.BAN,
+        fillColor: index.IconColors.PRIMARY,
         width: 24,
         height: 24,
         className: "sendbird-channel-settings__accordion-icon"
-      }), React__default.createElement(index$1.Label, {
-        type: index$1.LabelTypography.SUBTITLE_1,
-        color: index$1.LabelColors.ONBACKGROUND_1
+      }), React__default.createElement(index.Label, {
+        type: index.LabelTypography.SUBTITLE_1,
+        color: index.LabelColors.ONBACKGROUND_1
       }, stringSet.CHANNEL_SETTING__BANNED_MEMBERS__TITLE));
     },
     renderContent: function renderContent() {
@@ -1707,33 +1712,35 @@ function index(_a) {
   }), // cannot frozen broadcast channel
   !channel.isBroadcast && React__default.createElement("div", {
     className: "sendbird-channel-settings__freeze"
-  }, React__default.createElement(index$1.Icon, {
-    type: index$1.IconTypes.FROZEN_LIGHT,
-    fillColor: index$1.IconColors.PRIMARY,
+  }, React__default.createElement(index.Icon, {
+    type: index.IconTypes.FREEZE,
+    fillColor: index.IconColors.PRIMARY,
     width: 24,
     height: 24,
     className: "sendbird-channel-settings__accordion-icon"
-  }), React__default.createElement(index$1.Label, {
-    type: index$1.LabelTypography.SUBTITLE_1,
-    color: index$1.LabelColors.ONBACKGROUND_1
+  }), React__default.createElement(index.Label, {
+    type: index.LabelTypography.SUBTITLE_1,
+    color: index.LabelColors.ONBACKGROUND_1
   }, stringSet.CHANNEL_SETTING__FREEZE_CHANNEL), React__default.createElement("div", {
     className: "sendbird-channel-settings__frozen-icon"
-  }, frozen ? React__default.createElement(index$1.Icon, {
+  }, frozen ? React__default.createElement(index.Icon, {
     onClick: function onClick() {
       channel.unfreeze(function () {
         setFrozen(false);
       });
     },
-    type: index$1.IconTypes.TOGGLE_ON,
+    type: index.IconTypes.TOGGLE_ON,
+    fillColor: index.IconColors.PRIMARY,
     width: 44,
     height: 24
-  }) : React__default.createElement(index$1.Icon, {
+  }) : React__default.createElement(index.Icon, {
     onClick: function onClick() {
       channel.freeze(function () {
         setFrozen(true);
       });
     },
-    type: index$1.IconTypes.TOGGLE_OFF,
+    type: index.IconTypes.TOGGLE_OFF,
+    fillColor: index.IconColors.PRIMARY,
     width: 44,
     height: 24
   }))));
@@ -1827,11 +1834,11 @@ function ChannelSettings(props) {
       className: "sendbird-channel-settings"
     }, React__default.createElement("div", {
       className: "sendbird-channel-settings__header"
-    }, React__default.createElement(index$1.Label, {
-      type: index$1.LabelTypography.H_2,
-      color: index$1.LabelColors.ONBACKGROUND_1
-    }, stringSet.CHANNEL_SETTING__HEADER__TITLE), React__default.createElement(index$1.Icon, {
-      type: index$1.IconTypes.CLOSE,
+    }, React__default.createElement(index.Label, {
+      type: index.LabelTypography.H_2,
+      color: index.LabelColors.ONBACKGROUND_1
+    }, stringSet.CHANNEL_SETTING__HEADER__TITLE), React__default.createElement(index.Icon, {
+      type: index.IconTypes.CLOSE,
       className: "sendbird-channel-settings__close-icon",
       height: "24px",
       width: "24px",
@@ -1839,31 +1846,31 @@ function ChannelSettings(props) {
         logger.info('ChannelSettings: Click close');
         onCloseClick();
       }
-    })), React__default.createElement("div", null, React__default.createElement(index$1.PlaceHolder, {
-      type: index$1.PlaceHolderTypes.WRONG
+    })), React__default.createElement("div", null, React__default.createElement(index.PlaceHolder, {
+      type: index.PlaceHolderTypes.WRONG
     })));
   }
 
-  return React__default.createElement(index$1.UserProfileProvider, {
+  return React__default.createElement(index.UserProfileProvider, {
     disableUserProfile: userDefinedDisableUserProfile,
     renderUserProfile: userDefinedRenderProfile,
     className: "sendbird-channel-settings"
   }, React__default.createElement("div", {
     className: "sendbird-channel-settings__header"
-  }, React__default.createElement(index$1.Label, {
-    type: index$1.LabelTypography.H_2,
-    color: index$1.LabelColors.ONBACKGROUND_1
+  }, React__default.createElement(index.Label, {
+    type: index.LabelTypography.H_2,
+    color: index.LabelColors.ONBACKGROUND_1
   }, stringSet.CHANNEL_SETTING__HEADER__TITLE), React__default.createElement("div", {
     className: "sendbird-channel-settings__header-icon"
-  }, React__default.createElement(index$1.IconButton, {
+  }, React__default.createElement(index.IconButton, {
     width: "32px",
     height: "32px",
     onClick: function onClick() {
       logger.info('ChannelSettings: Click close');
       onCloseClick();
     }
-  }, React__default.createElement(index$1.Icon, {
-    type: index$1.IconTypes.CLOSE,
+  }, React__default.createElement(index.Icon, {
+    type: index.IconTypes.CLOSE,
     className: "sendbird-channel-settings__close-icon",
     height: "24px",
     width: "24px"
@@ -1911,8 +1918,9 @@ function ChannelSettings(props) {
         setChannelUpdateId(LocalizationContext.uuidv4());
       });
     }
-  }), channel.myRole === 'operator' ? React__default.createElement(index, {
+  }), channel.myRole === 'operator' ? React__default.createElement(AdminPannel, {
     channel: channel,
+    userId: userId,
     onChannelModified: function onChannelModified(groupChannel) {
       // setChannelUpdateId(uuidv4());
       _onChannelModified(groupChannel);
@@ -1934,19 +1942,19 @@ function ChannelSettings(props) {
     onClick: function onClick() {
       return setShowAccordion(!showAccordion);
     }
-  }, React__default.createElement(index$1.Icon, {
-    type: index$1.IconTypes.MEMBERS,
+  }, React__default.createElement(index.Icon, {
+    type: index.IconTypes.MEMBERS,
     className: "sendbird-channel-settings__panel-icon-left",
     height: "24px",
     width: "24px",
-    fillColor: index$1.IconColors.PRIMARY
-  }), React__default.createElement(index$1.Label, {
-    type: index$1.LabelTypography.SUBTITLE_1,
-    color: index$1.LabelColors.ONBACKGROUND_1
+    fillColor: index.IconColors.PRIMARY
+  }), React__default.createElement(index.Label, {
+    type: index.LabelTypography.SUBTITLE_1,
+    color: index.LabelColors.ONBACKGROUND_1
   }, "".concat(stringSet.CHANNEL_SETTING__MEMBERS__TITLE), React__default.createElement(LeaveChannel.Badge, {
     count: kFormatter$1(channel.memberCount)
-  })), React__default.createElement(index$1.Icon, {
-    type: index$1.IconTypes.SHEVRON,
+  })), React__default.createElement(index.Icon, {
+    type: index.IconTypes.CHEVRON_RIGHT,
     className: ['sendbird-channel-settings__panel-icon-right', 'sendbird-channel-settings__panel-icon--chevron', showAccordion ? 'sendbird-channel-settings__panel-icon--open' : ''].join(' '),
     height: "24px",
     width: "24px"
@@ -1991,14 +1999,14 @@ function ChannelSettings(props) {
 
       setShowLeaveChannelModal(true);
     }
-  }, React__default.createElement(index$1.Icon, {
-    type: index$1.IconTypes.LEAVE,
+  }, React__default.createElement(index.Icon, {
+    type: index.IconTypes.LEAVE,
     className: ['sendbird-channel-settings__panel-icon-left', 'sendbird-channel-settings__panel-icon__leave'].join(' '),
     height: "24px",
     width: "24px"
-  }), React__default.createElement(index$1.Label, {
-    type: index$1.LabelTypography.SUBTITLE_1,
-    color: index$1.LabelColors.ONBACKGROUND_1
+  }), React__default.createElement(index.Label, {
+    type: index.LabelTypography.SUBTITLE_1,
+    color: index.LabelColors.ONBACKGROUND_1
   }, stringSet.CHANNEL_SETTING__LEAVE_CHANNEL__TITLE)), showLeaveChannelModal && React__default.createElement(LeaveChannel.LeaveChannelModal, {
     onCloseModal: function onCloseModal() {
       return setShowLeaveChannelModal(false);

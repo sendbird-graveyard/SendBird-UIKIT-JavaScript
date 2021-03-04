@@ -1,14 +1,14 @@
-import { b as _slicedToArray, e as LocalizationContext, d as __spreadArrays, _ as __assign, w as withSendbirdContext, u as uuidv4 } from './LocalizationContext-5c5b45a0.js';
+import { b as _slicedToArray, e as LocalizationContext, d as __spreadArrays, _ as __assign, w as withSendbirdContext, u as uuidv4 } from './LocalizationContext-34316336.js';
 import React, { useRef, useState, useContext, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { M as Modal, T as Type, A as Avatar, f as TextButton, b as Label, c as LabelTypography, d as LabelColors, C as ContextMenu, e as IconButton, I as Icon, a as IconTypes, g as IconColors, h as MenuItems, i as MenuItem, n as UserProfileContext, o as UserProfile, B as Button, w as Size, z as getSdk, P as PlaceHolder, m as PlaceHolderTypes, l as UserProfileProvider } from './index-c97add1b.js';
+import { M as Modal, T as Type, A as Avatar, g as TextButton, c as Label, d as LabelTypography, e as LabelColors, C as ContextMenu, f as IconButton, I as Icon, a as IconTypes, b as IconColors, h as MenuItems, i as MenuItem, n as UserProfileContext, o as UserProfile, B as Button, w as Size, z as getSdk, P as PlaceHolder, m as PlaceHolderTypes, l as UserProfileProvider } from './index-79d744e1.js';
+import { C as ChannelAvatar } from './index-cee71d44.js';
 import { n as noop } from './utils-53ba1773.js';
-import { C as ChannelAvatar } from './index-fa2a92d8.js';
-import { I as InviteMembers$1, B as Badge, c as createDefaultUserListQuery, L as LeaveChannelModal } from './LeaveChannel-cf9903b4.js';
+import { I as InviteMembers$1, B as Badge, c as createDefaultUserListQuery, L as LeaveChannelModal } from './LeaveChannel-42e6a67d.js';
 import 'date-fns/format';
 import 'react-dom';
-import { I as InputLabel, a as Input, U as UserListItem$2, M as MutedAvatarOverlay } from './index-2c17b4ed.js';
-import { A as AccordionGroup, a as Accordion } from './index-e492270c.js';
+import { I as InputLabel, a as Input, U as UserListItem$2, M as MutedAvatarOverlay } from './index-49dfd24f.js';
+import { A as AccordionGroup, a as Accordion } from './index-cb09a8ab.js';
 
 var EditDetails = function EditDetails(props) {
   var _onSubmit = props.onSubmit,
@@ -140,7 +140,9 @@ var ChannelProfile = function ChannelProfile(props) {
   }, React.createElement(ChannelAvatar, {
     channel: channel,
     userId: userId,
-    theme: theme
+    theme: theme,
+    width: 80,
+    height: 80
   })), React.createElement(Label, {
     type: LabelTypography.SUBTITLE_2,
     color: LabelColors.ONBACKGROUND_1,
@@ -1001,7 +1003,8 @@ function InviteMembers(_a) {
 var MemberList = function MemberList(_a) {
   var sdk = _a.sdk,
       channel = _a.channel,
-      userQueryCreator = _a.userQueryCreator;
+      userQueryCreator = _a.userQueryCreator,
+      userId = _a.userId;
 
   var _b = useState([]),
       members = _b[0],
@@ -1058,7 +1061,7 @@ var MemberList = function MemberList(_a) {
       key: member.userId,
       user: member,
       currentUser: sdk.currentUser.userId,
-      action: function action(_a) {
+      action: userId !== member.userId ? function (_a) {
         var actionRef = _a.actionRef,
             parentRef = _a.parentRef;
         return React.createElement(ContextMenu, {
@@ -1111,7 +1114,7 @@ var MemberList = function MemberList(_a) {
                   });
                 }
               }
-            }, member.isMuted ? 'Unmute' : 'Mute'), member.role && member.role !== 'operator' && React.createElement(MenuItem, {
+            }, member.isMuted ? 'Unmute' : 'Mute'), React.createElement(MenuItem, {
               onClick: function onClick() {
                 channel.banUser(member, -1, '', function () {
                   refershList();
@@ -1121,7 +1124,7 @@ var MemberList = function MemberList(_a) {
             }, "Ban"));
           }
         });
-      }
+      } : null
     });
   }), React.createElement("div", {
     className: "sendbird-channel-settings-accordion__footer"
@@ -1598,9 +1601,10 @@ var kFormatter = function kFormatter(num) {
   return Math.abs(num) > 999 ? (Math.abs(num) / 1000).toFixed(1) + "K" : num;
 };
 
-function index(_a) {
+function AdminPannel(_a) {
   var userQueryCreator = _a.userQueryCreator,
-      channel = _a.channel;
+      channel = _a.channel,
+      userId = _a.userId;
 
   var _b = useState(false),
       frozen = _b[0],
@@ -1620,7 +1624,7 @@ function index(_a) {
     id: "operators",
     renderTitle: function renderTitle() {
       return React.createElement(React.Fragment, null, React.createElement(Icon, {
-        type: IconTypes.ICON_OPERATOR,
+        type: IconTypes.OPERATOR,
         fillColor: IconColors.PRIMARY,
         width: 24,
         height: 24,
@@ -1655,7 +1659,8 @@ function index(_a) {
     renderContent: function renderContent() {
       return React.createElement(React.Fragment, null, React.createElement(MemberList$1, {
         userQueryCreator: userQueryCreator,
-        channel: channel
+        channel: channel,
+        userId: userId
       }));
     }
   }), // No muted members in broadcast channel
@@ -1664,7 +1669,7 @@ function index(_a) {
     className: "sendbird-channel-settings__muted-members-list",
     renderTitle: function renderTitle() {
       return React.createElement(React.Fragment, null, React.createElement(Icon, {
-        type: IconTypes.ICON_MUTED,
+        type: IconTypes.MUTE,
         fillColor: IconColors.PRIMARY,
         width: 24,
         height: 24,
@@ -1684,7 +1689,7 @@ function index(_a) {
     id: "bannedMembers",
     renderTitle: function renderTitle() {
       return React.createElement(React.Fragment, null, React.createElement(Icon, {
-        type: IconTypes.ICON_BANNED,
+        type: IconTypes.BAN,
         fillColor: IconColors.PRIMARY,
         width: 24,
         height: 24,
@@ -1703,7 +1708,7 @@ function index(_a) {
   !channel.isBroadcast && React.createElement("div", {
     className: "sendbird-channel-settings__freeze"
   }, React.createElement(Icon, {
-    type: IconTypes.FROZEN_LIGHT,
+    type: IconTypes.FREEZE,
     fillColor: IconColors.PRIMARY,
     width: 24,
     height: 24,
@@ -1720,6 +1725,7 @@ function index(_a) {
       });
     },
     type: IconTypes.TOGGLE_ON,
+    fillColor: IconColors.PRIMARY,
     width: 44,
     height: 24
   }) : React.createElement(Icon, {
@@ -1729,6 +1735,7 @@ function index(_a) {
       });
     },
     type: IconTypes.TOGGLE_OFF,
+    fillColor: IconColors.PRIMARY,
     width: 44,
     height: 24
   }))));
@@ -1906,8 +1913,9 @@ function ChannelSettings(props) {
         setChannelUpdateId(uuidv4());
       });
     }
-  }), channel.myRole === 'operator' ? React.createElement(index, {
+  }), channel.myRole === 'operator' ? React.createElement(AdminPannel, {
     channel: channel,
+    userId: userId,
     onChannelModified: function onChannelModified(groupChannel) {
       // setChannelUpdateId(uuidv4());
       _onChannelModified(groupChannel);
@@ -1941,7 +1949,7 @@ function ChannelSettings(props) {
   }, "".concat(stringSet.CHANNEL_SETTING__MEMBERS__TITLE), React.createElement(Badge, {
     count: kFormatter$1(channel.memberCount)
   })), React.createElement(Icon, {
-    type: IconTypes.SHEVRON,
+    type: IconTypes.CHEVRON_RIGHT,
     className: ['sendbird-channel-settings__panel-icon-right', 'sendbird-channel-settings__panel-icon--chevron', showAccordion ? 'sendbird-channel-settings__panel-icon--open' : ''].join(' '),
     height: "24px",
     width: "24px"

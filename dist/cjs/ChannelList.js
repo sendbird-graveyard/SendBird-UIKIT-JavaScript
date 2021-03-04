@@ -2,22 +2,22 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var LocalizationContext = require('./LocalizationContext-9665649b.js');
+var LocalizationContext = require('./LocalizationContext-12a9343d.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
 var actionTypes = require('./actionTypes-920b541f.js');
-var index = require('./index-dfc2e550.js');
+var index = require('./index-2a2230b8.js');
+var index$1 = require('./index-9431d920.js');
 var utils = require('./utils-6aedec02.js');
-var index$1 = require('./index-16cd2d77.js');
-var LeaveChannel = require('./LeaveChannel-2b4f1405.js');
+var LeaveChannel = require('./LeaveChannel-c93b4597.js');
 var isToday = _interopDefault(require('date-fns/isToday'));
 var format = _interopDefault(require('date-fns/format'));
 var isYesterday = _interopDefault(require('date-fns/isYesterday'));
 require('./type-c7a3bee7.js');
 var utils$1 = require('./utils-a8277ca2.js');
 require('react-dom');
-var index$2 = require('./index-005b875b.js');
+var index$2 = require('./index-a8367321.js');
 
 var RESET_CHANNEL_LIST = 'RESET_CHANNEL_LIST';
 var CREATE_CHANNEL = 'CREATE_CHANNEL';
@@ -359,9 +359,10 @@ function ChannelPreview(_ref) {
   }, isBroadcast && React__default.createElement("div", {
     className: "sendbird-channel-preview__broadcast-icon"
   }, React__default.createElement(index.Icon, {
-    type: theme === 'dark' ? index.IconTypes.BROADCAST_DARK : index.IconTypes.BROADCAST_LIGHT,
-    height: 12,
-    width: 12
+    type: index.IconTypes.BROADCAST,
+    fillColor: index.IconColors.SECONDARY,
+    height: "16px",
+    width: "16px"
   })), React__default.createElement(index.Label, {
     className: "sendbird-channel-preview__content__upper__header__channel-name",
     type: index.LabelTypography.SUBTITLE_2,
@@ -374,7 +375,8 @@ function ChannelPreview(_ref) {
     title: "Frozen",
     className: "sendbird-channel-preview__frozen-icon"
   }, React__default.createElement(index.Icon, {
-    type: theme === 'dark' ? index.IconTypes.FROZEN_DARK : index.IconTypes.FROZEN_LIGHT,
+    type: index.IconTypes.FREEZE,
+    fillColor: index.IconColors.PRIMARY,
     height: 12,
     width: 12
   }))), React__default.createElement(index.Label, {
@@ -690,7 +692,7 @@ function AddChannel(_ref) {
       setStep(1);
     }
   }, React__default.createElement(index.Icon, {
-    type: index.IconTypes.SUPER_GROUP
+    type: index.IconTypes.SUPERGROUP
   }), React__default.createElement(index.Label, {
     type: index.LabelTypography.SUBTITLE_1,
     color: index.LabelColors.ONBACKGROUND_1

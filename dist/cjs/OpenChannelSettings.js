@@ -2,18 +2,18 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var LocalizationContext = require('./LocalizationContext-9665649b.js');
+var LocalizationContext = require('./LocalizationContext-12a9343d.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 require('prop-types');
-var index$1 = require('./index-dfc2e550.js');
+var index$1 = require('./index-2a2230b8.js');
 var utils = require('./utils-6aedec02.js');
 require('date-fns/format');
 require('./type-c7a3bee7.js');
 require('react-dom');
-var index$2 = require('./index-005b875b.js');
+var index$2 = require('./index-a8367321.js');
 var utils$2 = require('./utils-c8e36c68.js');
-var index$3 = require('./index-fd689e05.js');
+var index$3 = require('./index-ccc7b14d.js');
 
 function ChannelAvatar(_a) {
   var channel = _a.channel,
@@ -25,7 +25,7 @@ function ChannelAvatar(_a) {
   var stringSet = React.useContext(LocalizationContext.LocalizationContext).stringSet;
   var memoizedAvatar = React.useMemo(function () {
     return React__default.createElement(index$1.Avatar, {
-      className: "sendbird-chat-header__avatar--group-channel",
+      className: "sendbird-chat-header__avatar--open-channel",
       src: utils.getOpenChannelAvatar(channel),
       width: width + "px",
       height: height + "px",

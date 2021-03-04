@@ -4,18 +4,18 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var LocalizationContext = require('./LocalizationContext-9665649b.js');
+var LocalizationContext = require('./LocalizationContext-12a9343d.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
-var index = require('./index-dfc2e550.js');
+var index = require('./index-2a2230b8.js');
+var index$1 = require('./index-9431d920.js');
 var utils = require('./utils-6aedec02.js');
-var index$1 = require('./index-16cd2d77.js');
 var format = _interopDefault(require('date-fns/format'));
 var type = require('./type-c7a3bee7.js');
 var utils$1 = require('./utils-a8277ca2.js');
 require('react-dom');
-var index$2 = require('./index-77ab2680.js');
+var index$2 = require('./index-5fe9ee1f.js');
 var isSameDay = _interopDefault(require('date-fns/isSameDay'));
 var utils$2 = require('./utils-c8e36c68.js');
 var formatDistanceToNowStrict = _interopDefault(require('date-fns/formatDistanceToNowStrict'));
@@ -25,11 +25,14 @@ var RESET_STATE = 'RESET_STATE';
 var CLEAR_SENT_MESSAGES = 'CLEAR_SENT_MESSAGES';
 var GET_PREV_MESSAGES_START = 'GET_PREV_MESSAGES_START';
 var GET_PREV_MESSAGES_SUCESS = 'GET_PREV_MESSAGES_SUCESS';
+var GET_NEXT_MESSAGES_SUCESS = 'GET_NEXT_MESSAGES_SUCESS';
+var GET_NEXT_MESSAGES_FAILURE = 'GET_NEXT_MESSAGES_FAILURE';
 var SEND_MESSAGEGE_START = 'SEND_MESSAGEGE_START';
 var SEND_MESSAGEGE_SUCESS = 'SEND_MESSAGEGE_SUCESS';
 var SEND_MESSAGEGE_FAILURE = 'SEND_MESSAGEGE_FAILURE';
 var RESEND_MESSAGEGE_START = 'RESEND_MESSAGEGE_START';
 var ON_MESSAGE_RECEIVED = 'ON_MESSAGE_RECEIVED';
+var UPDATE_UNREAD_COUNT = 'UPDATE_UNREAD_COUNT';
 var ON_MESSAGE_UPDATED = 'ON_MESSAGE_UPDATED';
 var ON_MESSAGE_DELETED = 'ON_MESSAGE_DELETED';
 var ON_MESSAGE_DELETED_BY_REQ_ID = 'ON_MESSAGE_DELETED_BY_REQ_ID';
@@ -284,6 +287,16 @@ var isSameGroup = function isSameGroup(message, comparingMessage) {
 var compareMessagesForGrouping = function compareMessagesForGrouping(prevMessage, currMessage, nextMessage) {
   return [isSameGroup(prevMessage, currMessage), isSameGroup(currMessage, nextMessage)];
 };
+var hasOwnProperty = function hasOwnProperty(property) {
+  return function (payload) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (payload && payload.hasOwnProperty && payload.hasOwnProperty(property)) {
+      return true;
+    }
+
+    return false;
+  };
+};
 var passUnsuccessfullMessages = function passUnsuccessfullMessages(allMessages, newMessage) {
   var _newMessage$sendingSt = newMessage.sendingStatus,
       sendingStatus = _newMessage$sendingSt === void 0 ? UNDEFINED : _newMessage$sendingSt;
@@ -326,8 +339,12 @@ var messagesInitialState = {
   currentGroupChannel: {
     members: []
   },
+  // for scrollup
   hasMore: false,
   lastMessageTimeStamp: 0,
+  // for scroll down
+  hasMoreToBottom: false,
+  latestFetchedMessageTimeStamp: 0,
   emojiContainer: {},
   readStatus: {},
   unreadCount: 0,
@@ -383,13 +400,60 @@ function reducer(state, action) {
             return index$2.compareIds(messageId, msg.messageId);
           });
         });
+        var hasHasMoreToBottom = hasOwnProperty('hasMoreToBottom')(action.payload);
+        var hasLatestFetchedMessageTimeStamp = hasOwnProperty('latestFetchedMessageTimeStamp')(action.payload);
+        return LocalizationContext._objectSpread2({}, state, {
+          loading: false,
+          initialized: true,
+          hasMore: action.payload.hasMore,
+          lastMessageTimeStamp: action.payload.lastMessageTimeStamp
+        }, hasHasMoreToBottom && {
+          hasMoreToBottom: action.payload.hasMoreToBottom
+        }, {}, hasLatestFetchedMessageTimeStamp && {
+          latestFetchedMessageTimeStamp: action.payload.latestFetchedMessageTimeStamp
+        }, {
+          allMessages: [].concat(LocalizationContext._toConsumableArray(receivedMessages), LocalizationContext._toConsumableArray(filteredAllMessages))
+        });
+      }
+
+    case GET_NEXT_MESSAGES_SUCESS:
+      {
+        var _receivedMessages = action.payload.messages || [];
+
+        var _action$payload$curre2 = action.payload.currentGroupChannel,
+            _currentGroupChannel = _action$payload$curre2 === void 0 ? {} : _action$payload$curre2;
+
+        var _stateChannel = state.currentGroupChannel || {};
+
+        var _stateChannelUrl = _stateChannel.url;
+        var _actionChannelUrl = _currentGroupChannel.url;
+
+        if (_actionChannelUrl !== _stateChannelUrl) {
+          return state;
+        } // remove duplicate messages
+
+
+        var _filteredAllMessages = state.allMessages.filter(function (msg) {
+          return !_receivedMessages.find(function (_ref2) {
+            var messageId = _ref2.messageId;
+            return index$2.compareIds(messageId, msg.messageId);
+          });
+        });
+
         return LocalizationContext._objectSpread2({}, state, {
           loading: false,
           initialized: true,
           hasMore: action.payload.hasMore,
           lastMessageTimeStamp: action.payload.lastMessageTimeStamp,
-          allMessages: [].concat(LocalizationContext._toConsumableArray(receivedMessages), LocalizationContext._toConsumableArray(filteredAllMessages))
+          hasMoreToBottom: action.payload.hasMoreToBottom,
+          latestFetchedMessageTimeStamp: action.payload.latestFetchedMessageTimeStamp,
+          allMessages: [].concat(LocalizationContext._toConsumableArray(_filteredAllMessages), LocalizationContext._toConsumableArray(_receivedMessages))
         });
+      }
+
+    case GET_NEXT_MESSAGES_FAILURE:
+      {
+        return LocalizationContext._objectSpread2({}, state);
       }
 
     case SEND_MESSAGEGE_START:
@@ -438,21 +502,40 @@ function reducer(state, action) {
         });
       }
 
+    case UPDATE_UNREAD_COUNT:
+      {
+        var channel = action.payload.channel;
+
+        var _state$currentGroupCh = state.currentGroupChannel,
+            _currentGroupChannel2 = _state$currentGroupCh === void 0 ? {} : _state$currentGroupCh,
+            unreadCount = state.unreadCount;
+
+        var currentGroupChannelUrl = _currentGroupChannel2.url;
+
+        if (!index$2.compareIds(channel.url, currentGroupChannelUrl)) {
+          return state;
+        }
+
+        return LocalizationContext._objectSpread2({}, state, {
+          unreadSince: unreadCount + 1
+        });
+      }
+
     case ON_MESSAGE_RECEIVED:
       {
         var _action$payload = action.payload,
-            channel = _action$payload.channel,
+            _channel = _action$payload.channel,
             message = _action$payload.message,
             scrollToEnd = _action$payload.scrollToEnd;
-        var unreadCount = 0;
+        var _unreadCount = 0;
 
-        var _state$currentGroupCh = state.currentGroupChannel,
-            _currentGroupChannel = _state$currentGroupCh === void 0 ? {} : _state$currentGroupCh,
+        var _state$currentGroupCh2 = state.currentGroupChannel,
+            _currentGroupChannel3 = _state$currentGroupCh2 === void 0 ? {} : _state$currentGroupCh2,
             unreadSince = state.unreadSince;
 
-        var currentGroupChannelUrl = _currentGroupChannel.url;
+        var _currentGroupChannelUrl = _currentGroupChannel3.url;
 
-        if (!index$2.compareIds(channel.url, currentGroupChannelUrl)) {
+        if (!index$2.compareIds(_channel.url, _currentGroupChannelUrl)) {
           return state;
         } // Excluded overlapping messages
 
@@ -463,10 +546,10 @@ function reducer(state, action) {
           return state;
         }
 
-        unreadCount = state.unreadCount + 1; // reset unreadCount if have to scrollToEnd
+        _unreadCount = state.unreadCount + 1; // reset unreadCount if have to scrollToEnd
 
         if (scrollToEnd) {
-          unreadCount = 0;
+          _unreadCount = 0;
         }
 
         if (message.isAdminMessage && message.isAdminMessage()) {
@@ -476,8 +559,8 @@ function reducer(state, action) {
         }
 
         return LocalizationContext._objectSpread2({}, state, {
-          unreadCount: unreadCount,
-          unreadSince: unreadCount === 1 ? format(new Date(), 'p MMM dd') : unreadSince,
+          unreadCount: _unreadCount,
+          unreadSince: _unreadCount === 1 ? format(new Date(), 'p MMM dd') : unreadSince,
           allMessages: passUnsuccessfullMessages(state.allMessages, message)
         });
       }
@@ -563,7 +646,8 @@ function reducer(state, action) {
 
 function useHandleChannelEvents(_ref, _ref2) {
   var currentGroupChannel = _ref.currentGroupChannel,
-      sdkInit = _ref.sdkInit;
+      sdkInit = _ref.sdkInit,
+      hasMoreToBottom = _ref.hasMoreToBottom;
   var messagesDispatcher = _ref2.messagesDispatcher,
       sdk = _ref2.sdk,
       logger = _ref2.logger,
@@ -577,7 +661,8 @@ function useHandleChannelEvents(_ref, _ref2) {
       logger.info('Channel | useHandleChannelEvents: Setup event handler', messageReceiverId);
 
       ChannelHandler.onMessageReceived = function (channel, message) {
-        if (index$2.compareIds(channel.url, currentGroupChannel.url)) {
+        // donot update if hasMoreToBottom
+        if (index$2.compareIds(channel.url, currentGroupChannel.url) && !hasMoreToBottom) {
           var scrollToEnd = false;
 
           try {
@@ -606,6 +691,15 @@ function useHandleChannelEvents(_ref, _ref2) {
               logger.warning('Channel | onMessageReceived | scroll to end failed');
             }
           }
+        }
+
+        if (index$2.compareIds(channel.url, currentGroupChannel.url) && hasMoreToBottom) {
+          messagesDispatcher({
+            type: UPDATE_UNREAD_COUNT,
+            payload: {
+              channel: channel
+            }
+          });
         }
       };
 
@@ -762,9 +856,19 @@ function useSetChannel(_ref, _ref2) {
   }, [channelUrl, sdkInit]);
 }
 
+var PREV_RESULT_SIZE = 30;
+var NEXT_RESULT_SIZE = 10;
+
+var getLatestMessageTimeStamp = function getLatestMessageTimeStamp() {
+  var messages = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var latestMessage = messages[messages.length - 1];
+  return latestMessage && latestMessage.createdAt || null;
+};
+
 function useInitialMessagesFetch(_ref, _ref2) {
   var currentGroupChannel = _ref.currentGroupChannel,
-      userFilledMessageListQuery = _ref.userFilledMessageListQuery;
+      userFilledMessageListQuery = _ref.userFilledMessageListQuery,
+      intialTimeStamp = _ref.intialTimeStamp;
   var sdk = _ref2.sdk,
       logger = _ref2.logger,
       messagesDispatcher = _ref2.messagesDispatcher;
@@ -777,7 +881,7 @@ function useInitialMessagesFetch(_ref, _ref2) {
 
     if (sdk && sdk.MessageListParams && currentGroupChannel && currentGroupChannel.getMessagesByMessageId) {
       var messageListParams = new sdk.MessageListParams();
-      messageListParams.prevResultSize = 30;
+      messageListParams.prevResultSize = PREV_RESULT_SIZE;
       messageListParams.isInclusive = true;
       messageListParams.includeReplies = false;
       messageListParams.includeReaction = true;
@@ -795,17 +899,27 @@ function useInitialMessagesFetch(_ref, _ref2) {
       messagesDispatcher({
         type: GET_PREV_MESSAGES_START
       });
-      currentGroupChannel.getMessagesByTimestamp(new Date().getTime(), messageListParams).then(function (messages) {
+
+      if (intialTimeStamp) {
+        messageListParams.nextResultSize = NEXT_RESULT_SIZE;
+      }
+
+      currentGroupChannel.getMessagesByTimestamp(intialTimeStamp || new Date().getTime(), messageListParams).then(function (messages) {
         var hasMore = messages && messages.length > 0;
         var lastMessageTimeStamp = hasMore ? messages[0].createdAt : null;
+        var latestFetchedMessageTimeStamp = getLatestMessageTimeStamp(messages);
         messagesDispatcher({
           type: GET_PREV_MESSAGES_SUCESS,
-          payload: {
+          payload: LocalizationContext._objectSpread2({
             messages: messages,
             hasMore: hasMore,
             lastMessageTimeStamp: lastMessageTimeStamp,
-            currentGroupChannel: currentGroupChannel
-          }
+            currentGroupChannel: currentGroupChannel,
+            latestFetchedMessageTimeStamp: latestFetchedMessageTimeStamp,
+            hasMoreToBottom: false
+          }, intialTimeStamp && {
+            hasMoreToBottom: true
+          })
         });
       }).catch(function (error) {
         logger.error('Channel: Fetching messages failed', error);
@@ -819,13 +933,16 @@ function useInitialMessagesFetch(_ref, _ref2) {
           }
         });
       }).finally(function () {
+        if (!intialTimeStamp) {
+          setTimeout(function () {
+            return scrollIntoLast();
+          });
+        }
+
         currentGroupChannel.markAsRead();
-        setTimeout(function () {
-          return scrollIntoLast();
-        });
       });
     }
-  }, [channelUrl, userFilledMessageListQuery]);
+  }, [channelUrl, userFilledMessageListQuery, intialTimeStamp]);
 }
 
 function useHandleReconnect(_ref, _ref2) {
@@ -950,6 +1067,68 @@ function useScrollCallback(_ref, _ref2) {
       currentGroupChannel.markAsRead();
     });
   }, [currentGroupChannel, lastMessageTimeStamp]);
+}
+
+var RESULT_SIZE = 30;
+
+function useScrollDownCallback(_ref, _ref2) {
+  var currentGroupChannel = _ref.currentGroupChannel,
+      latestFetchedMessageTimeStamp = _ref.latestFetchedMessageTimeStamp,
+      userFilledMessageListQuery = _ref.userFilledMessageListQuery,
+      hasMoreToBottom = _ref.hasMoreToBottom;
+  var logger = _ref2.logger,
+      messagesDispatcher = _ref2.messagesDispatcher,
+      sdk = _ref2.sdk;
+  return React.useCallback(function (cb) {
+    if (!hasMoreToBottom) {
+      return;
+    }
+
+    var messageListParams = new sdk.MessageListParams();
+    messageListParams.nextResultSize = RESULT_SIZE;
+    messageListParams.includeReplies = false;
+    messageListParams.includeReaction = true;
+
+    if (userFilledMessageListQuery) {
+      Object.keys(userFilledMessageListQuery).forEach(function (key) {
+        messageListParams[key] = userFilledMessageListQuery[key];
+      });
+    }
+
+    logger.info('Channel: Fetching later messages', {
+      currentGroupChannel: currentGroupChannel,
+      userFilledMessageListQuery: userFilledMessageListQuery
+    });
+    currentGroupChannel.getMessagesByTimestamp(latestFetchedMessageTimeStamp || new Date().getTime(), messageListParams).then(function (messages) {
+      var messagesLength = messages && messages.length || 0;
+      var hasMoreMessages = messagesLength > 0 && messageListParams.nextResultSize === messagesLength;
+      var lastMessageTs = hasMoreMessages ? messages[messages.length - 1].createdAt : null;
+      messagesDispatcher({
+        type: GET_NEXT_MESSAGES_SUCESS,
+        payload: {
+          messages: messages,
+          hasMoreToBottom: hasMoreMessages,
+          latestFetchedMessageTimeStamp: lastMessageTs,
+          currentGroupChannel: currentGroupChannel
+        }
+      });
+      cb([messages, null]);
+    }).catch(function (error) {
+      logger.error('Channel: Fetching later messages failed', error);
+      messagesDispatcher({
+        type: GET_NEXT_MESSAGES_FAILURE,
+        payload: {
+          messages: [],
+          hasMoreToBottom: false,
+          latestFetchedMessageTimeStamp: 0,
+          currentGroupChannel: currentGroupChannel
+        }
+      });
+      cb([null, error]);
+    }).finally(function () {
+      currentGroupChannel.markAsRead();
+    });
+  }, [currentGroupChannel, latestFetchedMessageTimeStamp, hasMoreToBottom]);
 }
 
 function useDeleteMessageCallback(_ref, _ref2) {
@@ -1506,7 +1685,7 @@ function useMemoizedEmojiListItems(_ref, _ref2) {
           defaultComponent: React__default.createElement(index.Icon, {
             width: "28px",
             height: "28px",
-            type: index.IconTypes.EMOJI_FAILED
+            type: index.IconTypes.QUESTION
           })
         }));
       }));
@@ -1579,21 +1758,21 @@ function MessageStatus(_ref) {
       className: "sendbird-message-status__icon",
       width: "16px",
       height: "16px",
-      type: index.IconTypes.SENT,
+      type: index.IconTypes.DONE,
       fillColor: index.IconColors.SENT
     }),
     DELIVERED: React__default.createElement(index.Icon, {
       className: "sendbird-message-status__icon",
       width: "16px",
       height: "16px",
-      type: index.IconTypes.DELIVERED,
+      type: index.IconTypes.DONE_ALL,
       fillColor: index.IconColors.SENT
     }),
     READ: React__default.createElement(index.Icon, {
       className: "sendbird-message-status__icon",
       width: "16px",
       height: "16px",
-      type: index.IconTypes.READ,
+      type: index.IconTypes.DONE_ALL,
       fillColor: index.IconColors.READ
     }),
     FAILED: React__default.createElement(index.Icon, {
@@ -1798,7 +1977,7 @@ function EmojiReactions(_ref) {
       defaultComponent: React__default.createElement(index.Icon, {
         width: imageWidth,
         height: imageHeight,
-        type: index.IconTypes.EMOJI_FAILED
+        type: index.IconTypes.QUESTION
       })
     })));
   }), messageReactions.length < emojiAllMap.size && React__default.createElement(index.ContextMenu, {
@@ -1812,7 +1991,7 @@ function EmojiReactions(_ref) {
         width: imageWidth,
         height: imageHeight,
         fillColor: index.IconColors.ON_BACKGROUND_3,
-        type: index.IconTypes.EMOJI_REACTIONS_ADD
+        type: index.IconTypes.EMOJI_MORE
       }));
     },
     menuItems: function menuItems(closeDropdown) {
@@ -2160,7 +2339,7 @@ function OutgoingUserMessage(_ref) {
       }, React__default.createElement(index.Icon, {
         width: "24px",
         height: "24px",
-        type: index.IconTypes.EMOJI_REACTIONS_ADD,
+        type: index.IconTypes.EMOJI_MORE,
         fillColor: index.IconColors.CONTENT_INVERSE
       }));
     },
@@ -2354,7 +2533,7 @@ function IncomingUserMessage(_ref2) {
       }, React__default.createElement(index.Icon, {
         width: "24px",
         height: "24px",
-        type: index.IconTypes.EMOJI_REACTIONS_ADD,
+        type: index.IconTypes.EMOJI_MORE,
         fillColor: index.IconColors.CONTENT_INVERSE
       }));
     },
@@ -2703,7 +2882,7 @@ function OutgoingThumbnailMessage(_ref2) {
       }, React__default.createElement(index.Icon, {
         width: "24px",
         height: "24px",
-        type: index.IconTypes.EMOJI_REACTIONS_ADD,
+        type: index.IconTypes.EMOJI_MORE,
         color: index.IconColors.CONTENT_INVERSE
       }));
     },
@@ -2746,7 +2925,15 @@ function OutgoingThumbnailMessage(_ref2) {
     url: thumbnailUrl,
     alt: "video/thumbnail",
     width: "404px",
-    height: "280px"
+    height: "280px",
+    defaultComponent: React__default.createElement("div", {
+      className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "__thumbnail-placeholder--video")
+    }, React__default.createElement(index.Icon, {
+      type: index.IconTypes.PLAY,
+      fillColor: index.IconColors.ON_BACKGROUND_2,
+      width: "56px",
+      height: "56px"
+    }))
   }) :
   /* eslint-disable-next-line jsx-a11y/media-has-caption */
   React__default.createElement("video", {
@@ -2764,7 +2951,15 @@ function OutgoingThumbnailMessage(_ref2) {
     url: thumbnailUrl || url || localUrl,
     alt: "image/thumbnail",
     width: "404px",
-    height: "280px"
+    height: "280px",
+    defaultComponent: React__default.createElement("div", {
+      className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "__thumbnail-placeholder--video")
+    }, React__default.createElement(index.Icon, {
+      type: index.IconTypes.PHOTO,
+      fillColor: index.IconColors.ON_BACKGROUND_2,
+      width: "56px",
+      height: "56px"
+    }))
   }), index$2.unSupported(type) && React__default.createElement("div", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__other")
   }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React__default.createElement("div", {
@@ -2907,10 +3102,18 @@ function IncomingThumbnailMessage(_ref3) {
     } : function () {}
   }, index$2.isVideo(type) && React__default.createElement(React__default.Fragment, null, thumbnailUrl ? React__default.createElement(index.ImageRenderer, {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__video"),
-    src: thumbnailUrl,
+    url: thumbnailUrl,
     alt: "video/thumbnail",
     width: "404px",
-    height: "280px"
+    height: "280px",
+    defaultComponent: React__default.createElement("div", {
+      className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__thumbnail-placeholder--video")
+    }, React__default.createElement(index.Icon, {
+      type: index.IconTypes.PLAY,
+      fillColor: index.IconColors.ON_BACKGROUND_2,
+      width: "56px",
+      height: "56px"
+    }))
   }) :
   /* eslint-disable-next-line jsx-a11y/media-has-caption */
   React__default.createElement("video", {
@@ -2928,7 +3131,15 @@ function IncomingThumbnailMessage(_ref3) {
     url: thumbnailUrl || url || localUrl,
     alt: "image/thumbnail",
     width: "404px",
-    height: "280px"
+    height: "280px",
+    defaultComponent: React__default.createElement("div", {
+      className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__thumbnail-placeholder--image")
+    }, React__default.createElement(index.Icon, {
+      type: index.IconTypes.PHOTO,
+      fillColor: index.IconColors.ON_BACKGROUND_2,
+      width: "56px",
+      height: "56px"
+    }))
   }), index$2.unSupported(type) && React__default.createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__other")
   }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React__default.createElement("div", {
@@ -2967,7 +3178,7 @@ function IncomingThumbnailMessage(_ref3) {
       }, React__default.createElement(index.Icon, {
         width: "24px",
         height: "24px",
-        type: index.IconTypes.EMOJI_REACTIONS_ADD,
+        type: index.IconTypes.EMOJI_MORE,
         color: index.IconColors.CONTENT_INVERSE
       }));
     },
@@ -3231,7 +3442,7 @@ function OutgoingFileMessage(_ref) {
       }, React__default.createElement(index.Icon, {
         width: "24px",
         height: "24px",
-        type: index.IconTypes.EMOJI_REACTIONS_ADD,
+        type: index.IconTypes.EMOJI_MORE,
         fillColor: index.IconColors.CONTENT_INVERSE
       }));
     },
@@ -3433,7 +3644,7 @@ function IncomingFileMessage(_ref2) {
       }, React__default.createElement(index.Icon, {
         width: "24px",
         height: "24px",
-        type: index.IconTypes.EMOJI_REACTIONS_ADD,
+        type: index.IconTypes.EMOJI_MORE,
         fillColor: index.IconColors.CONTENT_INVERSE
       }));
     },
@@ -4207,7 +4418,7 @@ function OutgoingOGMessage(props) {
       }, React__default.createElement(index.Icon, {
         width: "24px",
         height: "24px",
-        type: index.IconTypes.EMOJI_REACTIONS_ADD,
+        type: index.IconTypes.EMOJI_MORE,
         fillColor: index.IconColors.CONTENT_INVERSE
       }));
     },
@@ -4248,7 +4459,7 @@ function OutgoingOGMessage(props) {
     }, React__default.createElement(index.Icon, {
       width: "56px",
       height: "56px",
-      type: index.IconTypes.NO_THUMBNAIL
+      type: index.IconTypes.THUMBNAIL_NONE
     }))
   })), React__default.createElement("div", {
     className: "".concat(OUTGOING_OG_MESSAGE, "__og-tag ").concat(checkOGIsEnalbed(message) ? '' : "".concat(OUTGOING_OG_MESSAGE, "__og-tag--disabled")),
@@ -4416,7 +4627,7 @@ function IncomingOGMessage(props) {
     }, React__default.createElement(index.Icon, {
       width: "56px",
       height: "56px",
-      type: index.IconTypes.NO_THUMBNAIL
+      type: index.IconTypes.THUMBNAIL_NONE
     }))
   })), React__default.createElement("div", {
     className: "".concat(INCOMING_OG_MESSAGE, "__og-tag ").concat(checkOGIsEnalbed(message) ? '' : "".concat(INCOMING_OG_MESSAGE, "__og-tag--disabled")),
@@ -4484,7 +4695,7 @@ function IncomingOGMessage(props) {
       }, React__default.createElement(index.Icon, {
         width: "24px",
         height: "24px",
-        type: index.IconTypes.EMOJI_REACTIONS_ADD,
+        type: index.IconTypes.EMOJI_MORE,
         fillColor: index.IconColors.CONTENT_INVERSE
       }));
     },
@@ -4664,6 +4875,7 @@ function MessageHoc(_ref) {
       chainBottom = _ref.chainBottom,
       emojiAllMap = _ref.emojiAllMap,
       membersMap = _ref.membersMap,
+      highLightedMessageId = _ref.highLightedMessageId,
       toggleReaction = _ref.toggleReaction,
       memoizedEmojiListItems = _ref.memoizedEmojiListItems,
       renderCustomMessage = _ref.renderCustomMessage,
@@ -4686,10 +4898,31 @@ function MessageHoc(_ref) {
       showFileViewer = _useState6[0],
       setShowFileViewer = _useState6[1];
 
+  var _useState7 = React.useState(false),
+      _useState8 = LocalizationContext._slicedToArray(_useState7, 2),
+      isAnimated = _useState8[0],
+      setIsAnimated = _useState8[1];
+
   var editMessageInputRef = React.useRef(null);
+  var useMessageScrollRef = React.useRef(null);
+  React.useLayoutEffect(function () {
+    if (highLightedMessageId === message.messageId) {
+      if (useMessageScrollRef && useMessageScrollRef.current) {
+        setTimeout(function () {
+          useMessageScrollRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'end'
+          });
+          setIsAnimated(true);
+        });
+      }
+    } else {
+      setIsAnimated(false);
+    }
+  }, [highLightedMessageId, useMessageScrollRef.current, message.messageId]);
   var RenderedMessage = React.useMemo(function () {
     if (renderCustomMessage) {
-      return renderCustomMessage(message, currentGroupChannel);
+      return renderCustomMessage(message, currentGroupChannel, chainTop, chainBottom); // Let's change this to object type on next major version up
     }
 
     return null;
@@ -4698,7 +4931,8 @@ function MessageHoc(_ref) {
 
   if (RenderedMessage) {
     return React__default.createElement("div", {
-      className: "sendbird-msg-hoc sendbird-msg--scroll-ref"
+      ref: useMessageScrollRef,
+      className: "\n          sendbird-msg-hoc sendbird-msg--scroll-ref\n          ".concat(isAnimated ? 'sendbird-msg-hoc__highlighted' : '', "\n        ")
     }, hasSeperator && React__default.createElement(index$2.DateSeparator, null, React__default.createElement(index.Label, {
       type: index.LabelTypography.CAPTION_2,
       color: index.LabelColors.ONBACKGROUND_2
@@ -4722,7 +4956,8 @@ function MessageHoc(_ref) {
   }
 
   return React__default.createElement("div", {
-    className: "sendbird-msg-hoc sendbird-msg--scroll-ref"
+    ref: useMessageScrollRef,
+    className: "\n        sendbird-msg-hoc sendbird-msg--scroll-ref\n        ".concat(isAnimated ? 'sendbird-msg-hoc__animated' : '', "\n      ")
   }, hasSeperator && React__default.createElement(index$2.DateSeparator, null, React__default.createElement(index.Label, {
     type: index.LabelTypography.CAPTION_2,
     color: index.LabelColors.ONBACKGROUND_2
@@ -4837,6 +5072,7 @@ MessageHoc.propTypes = {
     }),
     ogMetaData: PropTypes.shape({})
   }),
+  highLightedMessageId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   renderCustomMessage: PropTypes.func,
   currentGroupChannel: PropTypes.shape({}),
   hasSeperator: PropTypes.bool,
@@ -4862,6 +5098,7 @@ MessageHoc.defaultProps = {
   message: {},
   hasSeperator: false,
   disabled: false,
+  highLightedMessageId: null,
   status: '',
   toggleReaction: function toggleReaction() {},
   memoizedEmojiListItems: function memoizedEmojiListItems() {
@@ -4893,6 +5130,7 @@ function (_Component) {
           hasMore = _this$props.hasMore,
           messagesDispatcher = _this$props.messagesDispatcher,
           onScroll = _this$props.onScroll,
+          onScrollDown = _this$props.onScrollDown,
           currentGroupChannel = _this$props.currentGroupChannel;
       var element = e.target;
       var scrollTop = element.scrollTop,
@@ -4920,6 +5158,25 @@ function (_Component) {
         });
       }
 
+      if (clientHeight + scrollTop === scrollHeight) {
+        var _nodes = scrollRef.current.querySelectorAll('.sendbird-msg--scroll-ref');
+
+        var last = _nodes && _nodes[_nodes.length - 1];
+        onScrollDown(function (_ref3) {
+          var _ref4 = LocalizationContext._slicedToArray(_ref3, 1),
+              messages = _ref4[0];
+
+          if (messages) {
+            // https://github.com/scabbiaza/react-scroll-position-on-updating-dom
+            try {
+              last.scrollIntoView();
+            } catch (error) {//
+            }
+          }
+        });
+      } // do this later
+
+
       setTimeout(function () {
         // mark as read if scroll is at end
         if (clientHeight + scrollTop === scrollHeight) {
@@ -4943,7 +5200,6 @@ function (_Component) {
           scrollRef = _this$props2.scrollRef,
           readStatus = _this$props2.readStatus,
           membersMap = _this$props2.membersMap,
-          initialized = _this$props2.initialized,
           allMessages = _this$props2.allMessages,
           useReaction = _this$props2.useReaction,
           emojiAllMap = _this$props2.emojiAllMap,
@@ -4953,18 +5209,12 @@ function (_Component) {
           resendMessage = _this$props2.resendMessage,
           renderCustomMessage = _this$props2.renderCustomMessage,
           renderChatItem = _this$props2.renderChatItem,
+          highLightedMessageId = _this$props2.highLightedMessageId,
           emojiContainer = _this$props2.emojiContainer,
           toggleReaction = _this$props2.toggleReaction,
           useMessageGrouping = _this$props2.useMessageGrouping,
           currentGroupChannel = _this$props2.currentGroupChannel,
           memoizedEmojiListItems = _this$props2.memoizedEmojiListItems;
-
-      if (!initialized) {
-        return React__default.createElement(index.PlaceHolder, {
-          className: "sendbird-conversation__not-initialized",
-          type: index.PlaceHolderTypes$1.WRONG
-        });
-      }
 
       if (allMessages.length < 1) {
         return React__default.createElement(index.PlaceHolder, {
@@ -4987,10 +5237,10 @@ function (_Component) {
         var previousMessage = allMessages[idx - 1];
         var nextMessage = allMessages[idx + 1];
 
-        var _ref3 = useMessageGrouping ? compareMessagesForGrouping(previousMessage, m, nextMessage) : [false, false],
-            _ref4 = LocalizationContext._slicedToArray(_ref3, 2),
-            chainTop = _ref4[0],
-            chainBottom = _ref4[1];
+        var _ref5 = useMessageGrouping ? compareMessagesForGrouping(previousMessage, m, nextMessage) : [false, false],
+            _ref6 = LocalizationContext._slicedToArray(_ref5, 2),
+            chainTop = _ref6[0],
+            chainBottom = _ref6[1];
 
         var previousMessageCreatedAt = previousMessage && previousMessage.createdAt;
         var currentCreatedAt = m.createdAt; // https://stackoverflow.com/a/41855608
@@ -5003,15 +5253,19 @@ function (_Component) {
             className: "sendbird-msg--scroll-ref"
           }, renderChatItem({
             message: m,
+            highLightedMessageId: highLightedMessageId,
             channel: currentGroupChannel,
             onDeleteMessage: deleteMessage,
             onUpdateMessage: updateMessage,
             onResendMessage: resendMessage,
-            emojiContainer: emojiContainer
+            emojiContainer: emojiContainer,
+            chainTop: chainTop,
+            chainBottom: chainBottom
           }));
         }
 
         return React__default.createElement(MessageHoc, {
+          highLightedMessageId: highLightedMessageId,
           renderCustomMessage: renderCustomMessage,
           key: m.messageId || m.reqId,
           userId: userId,
@@ -5047,7 +5301,7 @@ ConversationScroll.propTypes = {
   hasMore: PropTypes.bool,
   messagesDispatcher: PropTypes.func.isRequired,
   onScroll: PropTypes.func,
-  initialized: PropTypes.bool,
+  onScrollDown: PropTypes.func,
   editDisabled: PropTypes.bool,
   disabled: PropTypes.bool,
   userId: PropTypes.string,
@@ -5062,6 +5316,7 @@ ConversationScroll.propTypes = {
     markAsRead: PropTypes.func,
     members: PropTypes.arrayOf(PropTypes.shape({}))
   }).isRequired,
+  highLightedMessageId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   renderChatItem: PropTypes.element,
   renderCustomMessage: PropTypes.func,
   useReaction: PropTypes.bool,
@@ -5076,11 +5331,12 @@ ConversationScroll.defaultProps = {
   hasMore: false,
   editDisabled: false,
   disabled: false,
-  initialized: false,
   userId: '',
   renderCustomMessage: null,
   renderChatItem: null,
+  highLightedMessageId: null,
   onScroll: null,
+  onScrollDown: null,
   useReaction: true,
   emojiContainer: {},
   emojiAllMap: new Map(),
@@ -5113,7 +5369,7 @@ function Notification(_ref) {
     }, "".concat(count, " "), stringSet.CHANNEL__MESSAGE_LIST__NOTIFICATION__NEW_MESSAGE, " ".concat(timeArray.join(' '))), React__default.createElement(index.Icon, {
       width: "24px",
       height: "24px",
-      type: index.IconTypes.SHEVRON_DOWN,
+      type: index.IconTypes.CHEVRON_DOWN,
       fillColor: index.IconColors.CONTENT
     }))
   );
@@ -5353,6 +5609,8 @@ AutoRefresh.propTypes = {
   repeatFunc: PropTypes.func.isRequired
 };
 
+var noop$4 = function noop() {};
+
 function ChatHeader(props) {
   var currentGroupChannel = props.currentGroupChannel,
       currentUser = props.currentUser,
@@ -5360,6 +5618,8 @@ function ChatHeader(props) {
       subTitle = props.subTitle,
       isActive = props.isActive,
       isMuted = props.isMuted,
+      showSearchIcon = props.showSearchIcon,
+      onSearchClick = props.onSearchClick,
       onActionClick = props.onActionClick,
       theme = props.theme;
   var userId = currentUser.userId;
@@ -5395,10 +5655,20 @@ function ChatHeader(props) {
     className: "sendbird-chat-header__right"
   }, typeof isMuted === 'string' && isMuted === 'true' || typeof isMuted === 'boolean' && isMuted ? React__default.createElement(index.Icon, {
     className: "sendbird-chat-header__mute",
-    type: index.IconTypes.MUTE,
+    type: index.IconTypes.NOTIFICATIONS_OFF_FILLED,
     width: "24px",
     height: "24px"
-  }) : null, React__default.createElement(index.IconButton, {
+  }) : null, showSearchIcon && React__default.createElement(index.IconButton, {
+    className: "sendbird-chat-header__search",
+    width: "32px",
+    height: "32px",
+    onClick: onSearchClick
+  }, React__default.createElement(index.Icon, {
+    type: index.IconTypes.SEARCH,
+    fillColor: index.IconColors.PRIMARY,
+    width: "24px",
+    height: "24px"
+  })), React__default.createElement(index.IconButton, {
     className: "sendbird-chat-header__info",
     width: "32px",
     height: "32px",
@@ -5419,6 +5689,8 @@ ChatHeader.propTypes = {
   currentUser: PropTypes.shape({
     userId: PropTypes.string
   }),
+  onSearchClick: PropTypes.func,
+  showSearchIcon: PropTypes.bool,
   title: PropTypes.string,
   subTitle: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
   isActive: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
@@ -5431,12 +5703,14 @@ ChatHeader.defaultProps = {
   theme: 'light',
   subTitle: '',
   isActive: false,
+  onSearchClick: noop$4,
+  showSearchIcon: false,
   isMuted: false,
   currentUser: {},
   onActionClick: function onActionClick() {}
 };
 
-var noop$4 = function noop() {};
+var noop$5 = function noop() {};
 
 var ConversationPanel = function ConversationPanel(props) {
   var channelUrl = props.channelUrl,
@@ -5453,7 +5727,11 @@ var ConversationPanel = function ConversationPanel(props) {
       reconnect = props.dispatchers.reconnect,
       _props$queries = props.queries,
       queries = _props$queries === void 0 ? {} : _props$queries,
+      startingPoint = props.startingPoint,
+      highlightedMessage = props.highlightedMessage,
       useReaction = props.useReaction,
+      showSearchIcon = props.showSearchIcon,
+      onSearchClick = props.onSearchClick,
       renderChatItem = props.renderChatItem,
       renderChatHeader = props.renderChatHeader,
       renderCustomMessage = props.renderCustomMessage,
@@ -5473,10 +5751,19 @@ var ConversationPanel = function ConversationPanel(props) {
 
   if (queries.messageListQuery) {
     // eslint-disable-next-line no-console
-    console.warn('messageListQuery will be deprecared in v1.3.0, please use messageListParams instead');
+    console.warn('messageListQuery has been deprecated, please use messageListParams instead');
   }
 
-  var userFilledMessageListQuery = queries.messageListParams || queries.messageListQuery;
+  var _useState = React.useState(startingPoint),
+      _useState2 = LocalizationContext._slicedToArray(_useState, 2),
+      intialTimeStamp = _useState2[0],
+      setIntialTimeStamp = _useState2[1];
+
+  React.useEffect(function () {
+    setIntialTimeStamp(startingPoint);
+  }, [startingPoint, channelUrl]);
+  var highLightedMessageId = highlightedMessage;
+  var userFilledMessageListQuery = queries.messageListParams;
 
   var _useReducer = React.useReducer(reducer, messagesInitialState),
       _useReducer2 = LocalizationContext._slicedToArray(_useReducer, 2),
@@ -5486,14 +5773,16 @@ var ConversationPanel = function ConversationPanel(props) {
   var scrollRef = React.useRef(null);
   var allMessages = messagesStore.allMessages,
       loading = messagesStore.loading,
-      hasMore = messagesStore.hasMore,
       initialized = messagesStore.initialized,
       unreadCount = messagesStore.unreadCount,
       unreadSince = messagesStore.unreadSince,
       isInvalid = messagesStore.isInvalid,
       _messagesStore$curren = messagesStore.currentGroupChannel,
       currentGroupChannel = _messagesStore$curren === void 0 ? {} : _messagesStore$curren,
+      hasMore = messagesStore.hasMore,
       lastMessageTimeStamp = messagesStore.lastMessageTimeStamp,
+      hasMoreToBottom = messagesStore.hasMoreToBottom,
+      latestFetchedMessageTimeStamp = messagesStore.latestFetchedMessageTimeStamp,
       emojiContainer = messagesStore.emojiContainer,
       readStatus = messagesStore.readStatus;
   var isFrozen = currentGroupChannel.isFrozen,
@@ -5519,6 +5808,16 @@ var ConversationPanel = function ConversationPanel(props) {
     userFilledMessageListQuery: userFilledMessageListQuery
   }, {
     hasMore: hasMore,
+    logger: logger,
+    messagesDispatcher: messagesDispatcher,
+    sdk: sdk
+  });
+  var onScrollDownCallback = useScrollDownCallback({
+    currentGroupChannel: currentGroupChannel,
+    latestFetchedMessageTimeStamp: latestFetchedMessageTimeStamp,
+    userFilledMessageListQuery: userFilledMessageListQuery,
+    hasMoreToBottom: hasMoreToBottom
+  }, {
     logger: logger,
     messagesDispatcher: messagesDispatcher,
     sdk: sdk
@@ -5549,7 +5848,8 @@ var ConversationPanel = function ConversationPanel(props) {
 
   useHandleChannelEvents({
     currentGroupChannel: currentGroupChannel,
-    sdkInit: sdkInit
+    sdkInit: sdkInit,
+    hasMoreToBottom: hasMoreToBottom
   }, {
     messagesDispatcher: messagesDispatcher,
     sdk: sdk,
@@ -5558,7 +5858,8 @@ var ConversationPanel = function ConversationPanel(props) {
   });
   useInitialMessagesFetch({
     currentGroupChannel: currentGroupChannel,
-    userFilledMessageListQuery: userFilledMessageListQuery
+    userFilledMessageListQuery: userFilledMessageListQuery,
+    intialTimeStamp: intialTimeStamp
   }, {
     sdk: sdk,
     logger: logger,
@@ -5638,6 +5939,22 @@ var ConversationPanel = function ConversationPanel(props) {
       _useSendFileMessageCa2 = LocalizationContext._slicedToArray(_useSendFileMessageCa, 1),
       onSendFileMessage = _useSendFileMessageCa2[0];
 
+  if (!channelUrl) {
+    return React__default.createElement("div", {
+      className: "sendbird-conversation"
+    }, React__default.createElement(index.PlaceHolder, {
+      type: index.PlaceHolderTypes$1.NO_CHANNELS
+    }));
+  }
+
+  if (isInvalid) {
+    return React__default.createElement("div", {
+      className: "sendbird-conversation"
+    }, React__default.createElement(index.PlaceHolder, {
+      type: index.PlaceHolderTypes$1.WRONG
+    }));
+  }
+
   if (sdkError) {
     return React__default.createElement("div", {
       className: "sendbird-conversation"
@@ -5647,30 +5964,6 @@ var ConversationPanel = function ConversationPanel(props) {
         logger.info('Channel: reconnecting');
         reconnect();
       }
-    }));
-  }
-
-  if (!channelUrl) {
-    return React__default.createElement("div", {
-      className: "sendbird-conversation"
-    }, React__default.createElement(index.PlaceHolder, {
-      type: index.PlaceHolderTypes$1.NO_CHANNELS
-    }));
-  }
-
-  if (loading) {
-    return React__default.createElement("div", {
-      className: "sendbird-conversation"
-    }, React__default.createElement(index.PlaceHolder, {
-      type: index.PlaceHolderTypes$1.LOADING
-    }));
-  }
-
-  if (isInvalid) {
-    return React__default.createElement("div", {
-      className: "sendbird-conversation"
-    }, React__default.createElement(index.PlaceHolder, {
-      type: index.PlaceHolderTypes$1.WRONG
     }));
   }
 
@@ -5685,6 +5978,8 @@ var ConversationPanel = function ConversationPanel(props) {
     theme: theme,
     currentGroupChannel: currentGroupChannel,
     currentUser: user,
+    showSearchIcon: showSearchIcon,
+    onSearchClick: onSearchClick,
     onActionClick: onChatHeaderActionClick,
     subTitle: currentGroupChannel.members && currentGroupChannel.members.length !== 2,
     isActive: false,
@@ -5692,25 +5987,34 @@ var ConversationPanel = function ConversationPanel(props) {
   }), isFrozen && React__default.createElement(FrozenNotification, null), unreadCount > 0 && React__default.createElement(Notification, {
     count: unreadCount,
     onClick: function onClick() {
-      scrollIntoLast(); // there is no scroll
+      if (intialTimeStamp) {
+        setIntialTimeStamp(null);
+      } else {
+        scrollIntoLast(); // there is no scroll
 
-      if (scrollRef.current.scrollTop === 0) {
-        currentGroupChannel.markAsRead();
-        messagesDispatcher({
-          type: MARK_AS_READ
-        });
+        if (scrollRef.current.scrollTop === 0) {
+          currentGroupChannel.markAsRead();
+          messagesDispatcher({
+            type: MARK_AS_READ
+          });
+        }
       }
     },
     time: unreadSince
-  }), React__default.createElement(ConversationScroll, {
+  }), loading ? React__default.createElement("div", {
+    className: "sendbird-conversation"
+  }, React__default.createElement(index.PlaceHolder, {
+    type: index.PlaceHolderTypes$1.LOADING
+  })) : React__default.createElement(ConversationScroll, {
     swapParams: sdk && sdk.getErrorFirstCallback && sdk.getErrorFirstCallback(),
+    highLightedMessageId: highLightedMessageId,
     userId: userId,
     hasMore: hasMore,
     disabled: !isOnline,
     onScroll: onScrollCallback,
+    onScrollDown: onScrollDownCallback,
     scrollRef: scrollRef,
     readStatus: readStatus,
-    initialized: initialized,
     useReaction: usingReaction,
     allMessages: allMessages,
     emojiAllMap: emojiAllMap,
@@ -5806,19 +6110,10 @@ ConversationPanel.propTypes = {
       limit: PropTypes.number,
       reverse: PropTypes.bool,
       senderUserIdsFilter: PropTypes.arrayOf(PropTypes.string)
-    }),
-    // deprecate in v1.3
-    messageListQuery: PropTypes.shape({
-      includeMetaArray: PropTypes.bool,
-      includeParentMessageText: PropTypes.bool,
-      includeReaction: PropTypes.bool,
-      includeReplies: PropTypes.bool,
-      includeThreadInfo: PropTypes.bool,
-      limit: PropTypes.number,
-      reverse: PropTypes.bool,
-      senderUserIdsFilter: PropTypes.arrayOf(PropTypes.string)
     })
   }),
+  startingPoint: PropTypes.number,
+  highlightedMessage: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onBeforeSendUserMessage: PropTypes.func,
   // onBeforeSendUserMessage(text)
   onBeforeSendFileMessage: PropTypes.func,
@@ -5828,6 +6123,8 @@ ConversationPanel.propTypes = {
   renderCustomMessage: PropTypes.func,
   renderMessageInput: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   renderChatHeader: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
+  showSearchIcon: PropTypes.bool,
+  onSearchClick: PropTypes.func,
   onChatHeaderActionClick: PropTypes.func,
   useReaction: PropTypes.bool,
   disableUserProfile: PropTypes.bool,
@@ -5840,15 +6137,19 @@ ConversationPanel.defaultProps = {
   onBeforeSendUserMessage: null,
   onBeforeSendFileMessage: null,
   onBeforeUpdateUserMessage: null,
+  startingPoint: null,
+  highlightedMessage: null,
   renderChatItem: null,
   renderCustomMessage: null,
   renderMessageInput: null,
   renderChatHeader: null,
   useReaction: true,
+  showSearchIcon: false,
+  onSearchClick: noop$5,
   disableUserProfile: false,
   renderUserProfile: null,
   useMessageGrouping: true,
-  onChatHeaderActionClick: noop$4
+  onChatHeaderActionClick: noop$5
 };
 var getEmojiCategoriesFromEmojiContainer$1 = getEmojiCategoriesFromEmojiContainer,
     getAllEmojisFromEmojiContainer$1 = getAllEmojisFromEmojiContainer,
