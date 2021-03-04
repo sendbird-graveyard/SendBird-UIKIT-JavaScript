@@ -22,6 +22,7 @@ export function withSendBird(
   ChildComp: React.Component | React.ElementType,
   mapStoreToProps?: (store: SendBirdState) => unknown
 ): (props: unknown) => React.ReactNode;
+export function useSendbirdStateContext(): SendBirdState;
 
 export type SendBirdState = {
   config: SendBirdStateConfig;
@@ -121,7 +122,7 @@ export interface OpenChannelProps {
   renderCustomMessage?: RenderCustomMessage;
   renderUserProfile?(): JSX.Element;
   renderChannelTitle?(renderProps: RenderOpenChannelTitleProps): JSX.Element;
-  renderMessageInput?(renderProps: RenderMessageInputProps): JSX.Element;
+  renderMessageInput?(renderProps: RenderOpenChannelMessageInputProps): JSX.Element;
   onBeforeSendUserMessage?(text: string): Sendbird.UserMessageParams;
   onBeforeSendFileMessage?(file_: File): Sendbird.FileMessageParams;
   onChatHeaderActionClick?(): void;
@@ -139,8 +140,15 @@ interface OpenChannelSettingsProps {
 }
 
 // to be used with Conversation.renderMessageInput
-export interface RenderMessageInputProps {
-  channel: Sendbird.GroupChannel | Sendbird.OpenChannel;
+export interface RenderGroupChannelMessageInputProps {
+  channel: Sendbird.GroupChannel;
+  user: Sendbird.User;
+  disabled: boolean;
+}
+
+// to be used with OpenChannel.renderMessageInput
+export interface RenderOpenChannelMessageInputProps {
+  channel: Sendbird.OpenChannel;
   user: Sendbird.User;
   disabled: boolean;
 }
@@ -177,6 +185,17 @@ interface SendBirdStateStore {
   userStore: UserStore;
 }
 
+export type MessageSearchQueryType = {
+  limit: number,
+  reverse: boolean,
+  exactMatch: boolean,
+  channelUrl: string,
+  channelCustomType: string,
+  messageTimestampFrom: number,
+  messageTimestampTo: number,
+  order: 'ts' | 'score',
+};
+
 export type Sdk = Sendbird.SendBirdInstance;
 
 interface RenderUserProfileProps {
@@ -189,7 +208,7 @@ interface UserListQuery {
   next(callback: unknown): void;
 }
 interface SendBirdProviderConfig {
-  logLevel?: 'debug' | 'warning' | 'error' | 'info' | 'all' | string[];
+  logLevel?: 'debug' | 'warning' | 'error' | 'info' | 'all' | Array<string>;
 }
 interface RenderChannelProfileProps {
   channel: Sendbird.GroupChannel;
@@ -206,9 +225,9 @@ interface RenderUserProfileProps {
 }
 interface ApplicationUserListQuery {
   limit?: number;
-  userIdsFilter?: string[];
+  userIdsFilter?: Array<string>;
   metaDataKeyFilter?: string;
-  metaDataValuesFilter?: string[];
+  metaDataValuesFilter?: Array<string>;
 }
 interface ChannelSettingsQueries {
   applicationUserListQuery?: ApplicationUserListQuery;
@@ -217,14 +236,14 @@ interface GroupChannelListQuery {
   limit?: number;
   includeEmpty?: boolean;
   order?: 'latest_last_message' | 'chronological' | 'channel_name_alphabetical' | 'metadata_value_alphabetical';
-  userIdsExactFilter?: string[];
-  userIdsIncludeFilter?: string[];
+  userIdsExactFilter?: Array<string>;
+  userIdsIncludeFilter?: Array<string>;
   userIdsIncludeFilterQueryType?: 'AND' | 'OR';
   nicknameContainsFilter?: string;
   channelNameContainsFilter?: string;
-  customTypesFilter?: string[];
+  customTypesFilter?: Array<string>;
   customTypeStartsWithFilter?: string;
-  channelUrlsFilter?: string[];
+  channelUrlsFilter?: Array<string>;
   superChannelFilter?: 'all' | 'super' | 'nonsuper';
   publicChannelFilter?: 'all' | 'public' | 'private';
   metadataOrderKeyFilter?: string;
@@ -240,7 +259,7 @@ interface MessageListParams {
   shouldReverse?: boolean;
   messageType?: string;
   customType?: string;
-  senderUserIds?: string[];
+  senderUserIds?: Array<string>;
   includeMetaArray?: boolean;
   includeReactions?: boolean;
   includeReplies?: boolean;
@@ -284,6 +303,8 @@ interface RenderChatItemProps {
     failedMessage: SendBird.AdminMessage | SendBird.UserMessage | SendBird.FileMessage
   ) => void;
   emojiContainer: EmojiContainer;
+  chainTop: boolean;
+  chainBottom: boolean;
 }
 interface RenderChatHeaderProps {
   channel: Sendbird.GroupChannel;
@@ -313,7 +334,7 @@ interface SendBirdProviderProps {
 interface ChannelListProps {
   disableUserProfile?: boolean;
   allowProfileEdit?: boolean;
-  onBeforeCreateChannel?(users: string[]): Sendbird.GroupChannelParams;
+  onBeforeCreateChannel?(users: Array<string>): Sendbird.GroupChannelParams;
   onThemeChange?(theme: string): void;
   onProfileEditSuccess?(user: Sendbird.User): void;
   onChannelSelect?(channel: Sendbird.GroupChannel): void;
@@ -324,16 +345,18 @@ interface ChannelListProps {
 }
 interface ChannelProps {
   channelUrl: string;
-  disableUserProfile?: boolean,
-  useMessageGrouping?: boolean,
-  useReaction?: boolean,
+  disableUserProfile?: boolean;
+  useMessageGrouping?: boolean;
+  useReaction?: boolean;
+  showSearchIcon?: boolean;
+  onSearchClick?(): void;
   onBeforeSendUserMessage?(text: string): Sendbird.UserMessageParams;
   onBeforeSendFileMessage?(file: File): Sendbird.FileMessageParams;
   onBeforeUpdateUserMessage?(text: string): Sendbird.UserMessageParams;
   onChatHeaderActionClick?(event: React.MouseEvent<HTMLElement>): void;
   renderCustomMessage?: RenderCustomMessage;
   renderChatItem?: (props: RenderChatItemProps) => React.ReactNode;
-  renderMessageInput?: (props: RenderMessageInputProps) => React.ReactNode;
+  renderMessageInput?: (props: RenderGroupChannelMessageInputProps) => React.ReactNode;
   renderChatHeader?: (props: RenderChatHeaderProps) => React.ReactNode;
   renderUserProfile?: (props: RenderUserProfileProps) => React.ReactNode;
   queries?: ChannelQueries;
@@ -411,9 +434,11 @@ interface ClientMessage {
   _sender: Sendbird.User;
 }
 
-type RenderCustomMessage = (
+export type RenderCustomMessage = (
   message: EveryMessage,
   channel: Sendbird.OpenChannel | Sendbird.GroupChannel,
+  chainTop: boolean,
+  chainBottom: boolean,
 ) => RenderCustomMessageProps;
 
 type RenderCustomMessageProps = ({ message: EveryMessage }) => React.ReactElement;

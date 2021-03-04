@@ -1,5 +1,33 @@
 # Changelog
 
+## [2.1.0](Mar 04 2021)
+
+- Features:
+  * Change font-family to Roboto
+  * Update color set
+  * Add conditional search icon to Channel component
+  ```
+    <Channel
+      showSearchIcon: boolean
+      onSearchClick: function
+    />
+  ```
+  * Implement hook `useSendbirdStateContext` to
+    access UIKit global state
+  ```
+    const state = useSendbirdStateContext();
+    const sdk = sendbirdSelectors.getSdk(state);
+  ```
+
+- Bugfixes:
+  * Handle SVG file as thumbnail image
+  * Loader shouldnt show warning message
+  * Change type definition for array 'type[]' to Array<type>
+  * Add chainTop and chainBottom for custom message items
+  * Separate Open and GroupChannel renderMessageInput definition
+  * Cleanup SVG icons
+  * Various other style and stability fixes
+
 ## [2.0.2](Jan 28 2021)
 
 - Bugfixes:

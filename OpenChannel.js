@@ -1,10 +1,10 @@
-import { e as LocalizationContext, n as uuidv4, d as __spreadArrays, _ as __assign, w as withSendbirdContext } from './LocalizationContext-5c5b45a0.js';
+import { e as LocalizationContext, n as uuidv4, d as __spreadArrays, _ as __assign, w as withSendbirdContext } from './LocalizationContext-34316336.js';
 import React, { useContext, useRef, useState, useMemo, useEffect, useCallback, useReducer } from 'react';
 import 'prop-types';
-import { b as Label, c as LabelTypography, L as LabelStringSet, A as Avatar, I as Icon, a as IconTypes, g as IconColors, d as LabelColors, e as IconButton, n as UserProfileContext, C as ContextMenu, h as MenuItems, o as UserProfile, s as Loader, i as MenuItem, r as ImageRenderer, f as TextButton, M as Modal, P as PlaceHolder, t as PlaceHolderTypes, p as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, q as SEND_FILE_MESSAGE, U as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, l as UserProfileProvider } from './index-c97add1b.js';
+import { c as Label, d as LabelTypography, L as LabelStringSet, A as Avatar, I as Icon, a as IconTypes, b as IconColors, e as LabelColors, f as IconButton, n as UserProfileContext, C as ContextMenu, h as MenuItems, o as UserProfile, s as Loader, i as MenuItem, r as ImageRenderer, g as TextButton, M as Modal, P as PlaceHolder, t as PlaceHolderTypes, p as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, q as SEND_FILE_MESSAGE, U as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, l as UserProfileProvider } from './index-79d744e1.js';
 import format from 'date-fns/format';
 import 'react-dom';
-import { M as MessageInput, L as LinkLabel, i as isImage, a as isVideo, D as DateSeparator, F as FileViewer, c as compareIds } from './index-f48d282b.js';
+import { M as MessageInput, L as LinkLabel, i as isImage, a as isVideo, D as DateSeparator, F as FileViewer, c as compareIds } from './index-5b744991.js';
 import isSameDay from 'date-fns/isSameDay';
 
 var getMessageCreatedAt = function getMessageCreatedAt(message) {
@@ -170,13 +170,18 @@ function OpenchannelConversationHeader(_a) {
     alt: "channel cover image",
     width: "32px",
     height: "32px"
-  }) : React.createElement(Icon, {
+  }) : React.createElement("div", {
     className: COMPONENT_CLASS_NAME + "__left__cover-image--icon",
-    width: "32px",
-    height: "32px",
-    type: IconTypes.AVATAR_NO_IMAGE,
-    fillColor: IconColors.BACKGROUND_3
-  }), React.createElement(Label, {
+    style: {
+      width: 32,
+      height: 32
+    }
+  }, React.createElement(Icon, {
+    type: IconTypes.CHANNELS,
+    fillColor: IconColors.CONTENT,
+    width: "18px",
+    height: "18px"
+  })), React.createElement(Label, {
     className: COMPONENT_CLASS_NAME + "__left__title",
     type: LabelTypography.H_2,
     color: LabelColors.ONBACKGROUND_1
@@ -437,7 +442,7 @@ function OpenchannelUserMessage(_a) {
     height: "16px"
   }, React.createElement(Icon, {
     className: "sendbird-openchannel-user-message__right__tail__pending",
-    type: IconTypes.SPINNER_LARGE,
+    type: IconTypes.SPINNER,
     fillColor: IconColors.PRIMARY,
     width: "16px",
     height: "16px"
@@ -824,7 +829,7 @@ function OpenchannelOGMessage(_a) {
     }, React.createElement(Icon, {
       width: "56px",
       height: "56px",
-      type: IconTypes.NO_THUMBNAIL
+      type: IconTypes.THUMBNAIL_NONE
     }))
   }))), (isPending || isFailed) && React.createElement("div", {
     className: "sendbird-openchannel-og-message__top__right__tail"
@@ -835,7 +840,7 @@ function OpenchannelOGMessage(_a) {
     className: "sendbird-openchannel-og-message__top__right__tail__pending",
     width: "16px",
     height: "16px",
-    type: IconTypes.SPINNER_LARGE,
+    type: IconTypes.SPINNER,
     fillColor: IconColors.PRIMARY
   })), isFailed && React.createElement(Icon, {
     className: "sendbird-openchannel-og-message__top__right__tail__failed",
@@ -1013,7 +1018,7 @@ function OpenchannelThumbnailMessage(_a) {
     height: "16px"
   }, React.createElement(Icon, {
     className: "sendbird-openchannel-thumbnail-message__right__tail__pending",
-    type: IconTypes.SPINNER_LARGE,
+    type: IconTypes.SPINNER,
     fillColor: IconColors.PRIMARY,
     width: "16px",
     height: "16px"
@@ -1197,7 +1202,7 @@ function OpenchannelFileMessage(_a) {
     height: "16px"
   }, React.createElement(Icon, {
     className: "sendbird-openchannel-file-message__right__tail__pending",
-    type: IconTypes.SPINNER_LARGE,
+    type: IconTypes.SPINNER,
     fillColor: IconColors.PRIMARY,
     width: "16px",
     height: "16px"
@@ -1329,7 +1334,7 @@ function MessageHoc(_a) {
 
   var RenderedMessage = useMemo(function () {
     if (renderCustomMessage) {
-      return renderCustomMessage(message, channel);
+      return renderCustomMessage(message, channel, chainTop, chainBottom);
     }
 
     return null;
@@ -1509,11 +1514,11 @@ function OpenchannelConversationScroll(_a, ref) {
       setShowScrollDownButton(false);
     }
 
-    if (scrollTop === 0) {
-      if (!hasMore) {
-        return;
-      }
+    if (!hasMore) {
+      return;
+    }
 
+    if (scrollTop === 0) {
       var nodes = scrollRef.current.querySelectorAll('.sendbird-msg--scroll-ref');
       var first_1 = nodes && nodes[0];
       onScroll(function () {
@@ -1590,7 +1595,7 @@ function OpenchannelConversationScroll(_a, ref) {
   }, React.createElement(Icon, {
     width: "24px",
     height: "24px",
-    type: IconTypes.SHEVRON_DOWN,
+    type: IconTypes.CHEVRON_DOWN,
     fillColor: IconColors.CONTENT
   }))));
 }

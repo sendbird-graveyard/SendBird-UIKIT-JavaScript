@@ -1,29 +1,29 @@
-import { b as _slicedToArray } from './LocalizationContext-5c5b45a0.js';
+import { b as _slicedToArray } from './LocalizationContext-34316336.js';
 import Sendbird from './SendbirdProvider.js';
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import 'sendbird';
 import './actionTypes-a85c0eaa.js';
 import 'css-vars-ponyfill';
-import './index-c97add1b.js';
+import './index-79d744e1.js';
 import ChannelList from './ChannelList.js';
+import './index-cee71d44.js';
 import './utils-53ba1773.js';
-import './index-fa2a92d8.js';
-import './LeaveChannel-cf9903b4.js';
+import './LeaveChannel-42e6a67d.js';
 import 'date-fns/isToday';
 import 'date-fns/format';
 import 'date-fns/isYesterday';
 import './type-0296584d.js';
 import './utils-cfdeb084.js';
 import 'react-dom';
-import './index-2c17b4ed.js';
+import './index-49dfd24f.js';
 import Conversation from './Channel.js';
-import './index-f48d282b.js';
+import './index-5b744991.js';
 import 'date-fns/isSameDay';
 import './utils-d7f59026.js';
 import 'date-fns/formatDistanceToNowStrict';
 import ChannelSettings from './ChannelSettings.js';
-import './index-e492270c.js';
+import './index-cb09a8ab.js';
 
 function App(props) {
   var appId = props.appId,
@@ -88,11 +88,10 @@ function App(props) {
   }, React.createElement(Conversation, {
     channelUrl: currentChannelUrl,
     onChatHeaderActionClick: function onChatHeaderActionClick() {
-      if (showSettings) {
-        setShowSettings(false);
-      } else {
-        setShowSettings(true);
-      }
+      setShowSettings(!showSettings);
+    },
+    onSearchClick: function onSearchClick() {
+      setShowSettings(false);
     },
     useReaction: useReaction,
     useMessageGrouping: useMessageGrouping
