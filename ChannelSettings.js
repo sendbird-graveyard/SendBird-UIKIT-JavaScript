@@ -1,14 +1,15 @@
-import { b as _slicedToArray, e as LocalizationContext, d as __spreadArrays, _ as __assign, w as withSendbirdContext, u as uuidv4 } from './LocalizationContext-34316336.js';
+import { b as _slicedToArray, d as LocalizationContext, m as __spreadArrays, _ as __assign, w as withSendbirdContext, u as uuidv4, c as _toConsumableArray } from './LocalizationContext-12658c38.js';
 import React, { useRef, useState, useContext, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { M as Modal, T as Type, A as Avatar, g as TextButton, c as Label, d as LabelTypography, e as LabelColors, C as ContextMenu, f as IconButton, I as Icon, a as IconTypes, b as IconColors, h as MenuItems, i as MenuItem, n as UserProfileContext, o as UserProfile, B as Button, w as Size, z as getSdk, P as PlaceHolder, m as PlaceHolderTypes, l as UserProfileProvider } from './index-79d744e1.js';
-import { C as ChannelAvatar } from './index-cee71d44.js';
+import { M as Modal, T as Type, a as TextButton, C as ContextMenu, I as IconButton, b as MenuItems, c as MenuItem, f as UserProfileContext, g as UserProfile, B as Button, l as Size, n as getSdk, e as UserProfileProvider } from './index-711ec843.js';
+import { C as ChannelAvatar } from './index-4eb938ab.js';
+import { A as Avatar, L as Label, a as LabelTypography, b as LabelColors, I as Icon, c as IconTypes, d as IconColors, P as PlaceHolder, f as PlaceHolderTypes } from './index-ad616be9.js';
 import { n as noop } from './utils-53ba1773.js';
-import { I as InviteMembers$1, B as Badge, c as createDefaultUserListQuery, L as LeaveChannelModal } from './LeaveChannel-42e6a67d.js';
+import { I as InviteMembers$1, B as Badge, c as createDefaultUserListQuery, L as LeaveChannelModal } from './LeaveChannel-2c2f8e8e.js';
 import 'date-fns/format';
 import 'react-dom';
-import { I as InputLabel, a as Input, U as UserListItem$2, M as MutedAvatarOverlay } from './index-49dfd24f.js';
-import { A as AccordionGroup, a as Accordion } from './index-cb09a8ab.js';
+import { I as InputLabel, a as Input, U as UserListItem$2, M as MutedAvatarOverlay } from './index-5788a124.js';
+import { A as AccordionGroup, a as Accordion } from './index-70190ac9.js';
 
 var EditDetails = function EditDetails(props) {
   var _onSubmit = props.onSubmit,
@@ -121,7 +122,6 @@ var ChannelProfile = function ChannelProfile(props) {
       userId = props.userId,
       theme = props.theme,
       onChannelInfoChange = props.onChannelInfoChange;
-  var title = channel.name;
 
   var _useState = useState(false),
       _useState2 = _slicedToArray(_useState, 2),
@@ -130,6 +130,20 @@ var ChannelProfile = function ChannelProfile(props) {
 
   var _useContext = useContext(LocalizationContext),
       stringSet = _useContext.stringSet;
+
+  var getChannelName = function getChannelName() {
+    if (channel && channel.name && channel.name !== 'Group Channel') {
+      return channel.name;
+    }
+
+    if (channel && (channel.name === 'Group Channel' || !channel.name)) {
+      return channel.members.map(function (member) {
+        return member.nickname || stringSet.NO_NAME;
+      }).join(', ');
+    }
+
+    return stringSet.NO_TITLE;
+  };
 
   return React.createElement("div", {
     className: "sendbird-channel-profile"
@@ -144,10 +158,10 @@ var ChannelProfile = function ChannelProfile(props) {
     width: 80,
     height: 80
   })), React.createElement(Label, {
+    className: "sendbird-channel-profile__title",
     type: LabelTypography.SUBTITLE_2,
-    color: LabelColors.ONBACKGROUND_1,
-    className: "sendbird-channel-profile__title"
-  }, title), React.createElement(TextButton, {
+    color: LabelColors.ONBACKGROUND_1
+  }, getChannelName()), React.createElement(TextButton, {
     disabled: disabled,
     className: "sendbird-channel-profile__edit",
     onClick: function onClick() {
@@ -174,7 +188,10 @@ var ChannelProfile = function ChannelProfile(props) {
 
 ChannelProfile.propTypes = {
   channel: PropTypes.shape({
-    name: PropTypes.string
+    name: PropTypes.string,
+    members: PropTypes.arrayOf(PropTypes.shape({
+      nickname: PropTypes.string
+    }))
   }).isRequired,
   userId: PropTypes.string.isRequired,
   theme: PropTypes.string,
@@ -1741,12 +1758,15 @@ function AdminPannel(_a) {
   }))));
 }
 
+var COMPONENT_CLASS_NAME = 'sendbird-channel-settings';
+
 var kFormatter$1 = function kFormatter(num) {
   return Math.abs(num) > 999 ? "".concat((Math.abs(num) / 1000).toFixed(1), "K") : num;
 };
 
 function ChannelSettings(props) {
-  var onCloseClick = props.onCloseClick,
+  var className = props.className,
+      onCloseClick = props.onCloseClick,
       channelUrl = props.channelUrl,
       disableUserProfile = props.disableUserProfile,
       renderUserProfile = props.renderUserProfile,
@@ -1799,6 +1819,7 @@ function ChannelSettings(props) {
       showLeaveChannelModal = _useState10[0],
       setShowLeaveChannelModal = _useState10[1];
 
+  var componentClassNames = (Array.isArray(className) ? [COMPONENT_CLASS_NAME].concat(_toConsumableArray(className)) : [COMPONENT_CLASS_NAME, className]).join(' ');
   useEffect(function () {
     logger.info('ChannelSettings: Setting up');
 
@@ -1826,7 +1847,7 @@ function ChannelSettings(props) {
 
   if (!channel || invalidChannel) {
     return React.createElement("div", {
-      className: "sendbird-channel-settings"
+      className: componentClassNames
     }, React.createElement("div", {
       className: "sendbird-channel-settings__header"
     }, React.createElement(Label, {
@@ -1847,9 +1868,9 @@ function ChannelSettings(props) {
   }
 
   return React.createElement(UserProfileProvider, {
+    className: componentClassNames,
     disableUserProfile: userDefinedDisableUserProfile,
-    renderUserProfile: userDefinedRenderProfile,
-    className: "sendbird-channel-settings"
+    renderUserProfile: userDefinedRenderProfile
   }, React.createElement("div", {
     className: "sendbird-channel-settings__header"
   }, React.createElement(Label, {
@@ -1867,8 +1888,8 @@ function ChannelSettings(props) {
   }, React.createElement(Icon, {
     type: IconTypes.CLOSE,
     className: "sendbird-channel-settings__close-icon",
-    height: "24px",
-    width: "24px"
+    height: "22px",
+    width: "22px"
   })))), React.createElement("div", {
     className: "sendbird-channel-settings__scroll-area"
   }, renderChannelProfile ? renderChannelProfile({
@@ -1995,8 +2016,9 @@ function ChannelSettings(props) {
       setShowLeaveChannelModal(true);
     }
   }, React.createElement(Icon, {
-    type: IconTypes.LEAVE,
     className: ['sendbird-channel-settings__panel-icon-left', 'sendbird-channel-settings__panel-icon__leave'].join(' '),
+    type: IconTypes.LEAVE,
+    fillColor: IconColors.ERROR,
     height: "24px",
     width: "24px"
   }), React.createElement(Label, {
@@ -2017,6 +2039,7 @@ function ChannelSettings(props) {
 }
 
 ChannelSettings.propTypes = {
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   onCloseClick: PropTypes.func,
   onChannelModified: PropTypes.func,
   onBeforeUpdateChannel: PropTypes.func,
@@ -2058,6 +2081,7 @@ ChannelSettings.propTypes = {
   }).isRequired
 };
 ChannelSettings.defaultProps = {
+  className: '',
   onBeforeUpdateChannel: null,
   queries: {},
   disableUserProfile: false,

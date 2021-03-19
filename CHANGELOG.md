@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.2.0](Mar 19 2021)
+
+- Features:
+  * <MessageSearch /> - standalone message search component with props:
+    channelUrl: string;
+    searchString?: string;
+    messageSearchQuery?: SendbirdUIKit.MessageSearchQueryType;
+    renderSearchItem?({ message, onResultClick }: {
+      message: ClientSentMessages,
+      onResultClick?: (message: ClientSentMessages) => void,
+    }): JSX.Element;
+    onResultLoaded?(messages?: Array<ClientSentMessages>, error?: SendbirdError): void;
+    onResultClick?(message: ClientSentMessages): void;
+  * <App /> can enable or disable search using prop: `showSearchIcon`
+  * <Channel /> Add prop to highlight and navigate betweeen messages
+    highlightedMessage?: string | number;
+    startingPoint: number;
+
+- Bugfixes:
+  * Stability fixes
+
 ## [2.1.0](Mar 04 2021)
 
 - Features:

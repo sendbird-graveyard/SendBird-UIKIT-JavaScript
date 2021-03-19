@@ -1,14 +1,15 @@
-import { c as _toConsumableArray, a as _objectSpread2, u as uuidv4$1, b as _slicedToArray, l as _defineProperty, e as LocalizationContext, f as _inherits, h as _createClass, i as _classCallCheck, j as _possibleConstructorReturn, k as _getPrototypeOf, m as _assertThisInitialized, w as withSendbirdContext } from './LocalizationContext-34316336.js';
+import { c as _toConsumableArray, a as _objectSpread2, u as uuidv4$1, b as _slicedToArray, k as _defineProperty, d as LocalizationContext, e as _inherits, f as _createClass, h as _classCallCheck, i as _possibleConstructorReturn, j as _getPrototypeOf, l as _assertThisInitialized, w as withSendbirdContext } from './LocalizationContext-12658c38.js';
 import React, { useEffect, useCallback, useRef, useMemo, useState, useContext, useLayoutEffect, Component, useReducer } from 'react';
 import PropTypes from 'prop-types';
-import { p as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, q as SEND_FILE_MESSAGE, U as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, E as EmojiListItems, r as ImageRenderer, I as Icon, a as IconTypes, s as Loader, b as IconColors, c as Label, d as LabelTypography, e as LabelColors, C as ContextMenu, f as IconButton, h as MenuItems, i as MenuItem, n as UserProfileContext, A as Avatar, o as UserProfile, g as TextButton, M as Modal, P as PlaceHolder, t as PlaceHolderTypes, L as LabelStringSet, l as UserProfileProvider } from './index-79d744e1.js';
-import { C as ChannelAvatar } from './index-cee71d44.js';
+import { h as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, i as SEND_FILE_MESSAGE, U as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, E as EmojiListItems, C as ContextMenu, I as IconButton, b as MenuItems, c as MenuItem, f as UserProfileContext, g as UserProfile, a as TextButton, M as Modal, e as UserProfileProvider } from './index-711ec843.js';
+import { C as ChannelAvatar } from './index-4eb938ab.js';
+import { g as ImageRenderer, I as Icon, c as IconTypes, h as Loader, d as IconColors, L as Label, a as LabelTypography, b as LabelColors, A as Avatar, P as PlaceHolder, i as PlaceHolderTypes, e as LabelStringSet } from './index-ad616be9.js';
 import { a as getMessageCreatedAt$4, b as getSenderName$2, c as getSenderProfileUrl$2 } from './utils-53ba1773.js';
 import format from 'date-fns/format';
 import { M as MessageStatusType } from './type-0296584d.js';
 import { t as truncate, g as getIsSentFromStatus$3 } from './utils-cfdeb084.js';
 import 'react-dom';
-import { i as isImage, a as isVideo, c as compareIds, u as unSupported, L as LinkLabel, D as DateSeparator, M as MessageInput, F as FileViewer } from './index-5b744991.js';
+import { i as isImage, a as isVideo, c as compareIds, u as unSupported, L as LinkLabel, D as DateSeparator, M as MessageInput, F as FileViewer } from './index-aeef4ba5.js';
 import isSameDay from 'date-fns/isSameDay';
 import { c as copyToClipboard$1, g as getSenderProfileUrl$1, a as getSenderName$1, b as getMessageCreatedAt$5, d as getIsSentFromStatus$2 } from './utils-d7f59026.js';
 import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict';
@@ -895,45 +896,83 @@ function useInitialMessagesFetch(_ref, _ref2) {
 
       if (intialTimeStamp) {
         messageListParams.nextResultSize = NEXT_RESULT_SIZE;
-      }
+        currentGroupChannel.getMessagesByTimestamp(intialTimeStamp, messageListParams).then(function (messages) {
+          var hasMore = messages && messages.length > 0;
+          var lastMessageTimeStamp = hasMore ? messages[0].createdAt : null;
+          var latestFetchedMessageTimeStamp = getLatestMessageTimeStamp(messages); // to make sure there are no more messages below
 
-      currentGroupChannel.getMessagesByTimestamp(intialTimeStamp || new Date().getTime(), messageListParams).then(function (messages) {
-        var hasMore = messages && messages.length > 0;
-        var lastMessageTimeStamp = hasMore ? messages[0].createdAt : null;
-        var latestFetchedMessageTimeStamp = getLatestMessageTimeStamp(messages);
-        messagesDispatcher({
-          type: GET_PREV_MESSAGES_SUCESS,
-          payload: _objectSpread2({
-            messages: messages,
-            hasMore: hasMore,
-            lastMessageTimeStamp: lastMessageTimeStamp,
-            currentGroupChannel: currentGroupChannel,
-            latestFetchedMessageTimeStamp: latestFetchedMessageTimeStamp,
-            hasMoreToBottom: false
-          }, intialTimeStamp && {
-            hasMoreToBottom: true
-          })
-        });
-      }).catch(function (error) {
-        logger.error('Channel: Fetching messages failed', error);
-        messagesDispatcher({
-          type: GET_PREV_MESSAGES_SUCESS,
-          payload: {
-            messages: [],
-            hasMore: false,
-            lastMessageTimeStamp: 0,
-            currentGroupChannel: currentGroupChannel
-          }
-        });
-      }).finally(function () {
-        if (!intialTimeStamp) {
-          setTimeout(function () {
-            return scrollIntoLast();
+          var nextMessageListParams = new sdk.MessageListParams();
+          nextMessageListParams.nextResultSize = NEXT_RESULT_SIZE;
+          currentGroupChannel.getMessagesByTimestamp(latestFetchedMessageTimeStamp || new Date().getTime(), nextMessageListParams).then(function (nextMessages) {
+            messagesDispatcher({
+              type: GET_PREV_MESSAGES_SUCESS,
+              payload: {
+                messages: messages,
+                hasMore: hasMore,
+                lastMessageTimeStamp: lastMessageTimeStamp,
+                currentGroupChannel: currentGroupChannel,
+                latestFetchedMessageTimeStamp: latestFetchedMessageTimeStamp,
+                hasMoreToBottom: nextMessages && nextMessages.length > 0
+              }
+            });
           });
-        }
+        }).catch(function (error) {
+          logger.error('Channel: Fetching messages failed', error);
+          messagesDispatcher({
+            type: GET_PREV_MESSAGES_SUCESS,
+            payload: {
+              messages: [],
+              hasMore: false,
+              lastMessageTimeStamp: 0,
+              currentGroupChannel: currentGroupChannel
+            }
+          });
+        }).finally(function () {
+          if (!intialTimeStamp) {
+            setTimeout(function () {
+              return scrollIntoLast();
+            });
+          }
 
-        currentGroupChannel.markAsRead();
-      });
+          currentGroupChannel.markAsRead();
+        });
+      } else {
+        currentGroupChannel.getMessagesByTimestamp(new Date().getTime(), messageListParams).then(function (messages) {
+          var hasMore = messages && messages.length > 0;
+          var lastMessageTimeStamp = hasMore ? messages[0].createdAt : null;
+          var latestFetchedMessageTimeStamp = getLatestMessageTimeStamp(messages);
+          messagesDispatcher({
+            type: GET_PREV_MESSAGES_SUCESS,
+            payload: {
+              messages: messages,
+              hasMore: hasMore,
+              lastMessageTimeStamp: lastMessageTimeStamp,
+              currentGroupChannel: currentGroupChannel,
+              latestFetchedMessageTimeStamp: latestFetchedMessageTimeStamp,
+              hasMoreToBottom: false
+            }
+          });
+        }).catch(function (error) {
+          logger.error('Channel: Fetching messages failed', error);
+          messagesDispatcher({
+            type: GET_PREV_MESSAGES_SUCESS,
+            payload: {
+              messages: [],
+              hasMore: false,
+              lastMessageTimeStamp: 0,
+              currentGroupChannel: currentGroupChannel
+            }
+          });
+        }).finally(function () {
+          if (!intialTimeStamp) {
+            setTimeout(function () {
+              return scrollIntoLast();
+            });
+          }
+
+          currentGroupChannel.markAsRead();
+        });
+      }
     }
   }, [channelUrl, userFilledMessageListQuery, intialTimeStamp]);
 }
@@ -1745,7 +1784,8 @@ function MessageStatus(_ref) {
     }, React.createElement(Icon, {
       type: IconTypes.SPINNER,
       width: "16px",
-      height: "16px"
+      height: "16px",
+      fillColor: IconColors.PRIMARY
     })),
     SENT: React.createElement(Icon, {
       className: "sendbird-message-status__icon",
@@ -1772,7 +1812,8 @@ function MessageStatus(_ref) {
       className: "sendbird-message-status__icon",
       width: "16px",
       height: "16px",
-      type: IconTypes.ERROR
+      type: IconTypes.ERROR,
+      fillColor: IconColors.ERROR
     })
   };
   return React.createElement("div", {
@@ -2021,16 +2062,17 @@ EmojiReactions.defaultProps = {
   }
 };
 
-var WORD_TYPOGRAPHY = LabelTypography.BODY_1;
-var EDITED_COLOR = LabelColors.ONBACKGROUND_2;
 function useMemoizedMessageText(_ref) {
   var message = _ref.message,
       updatedAt = _ref.updatedAt,
-      className = _ref.className;
+      className = _ref.className,
+      incoming = _ref.incoming;
 
   var _useContext = useContext(LocalizationContext),
       stringSet = _useContext.stringSet;
 
+  var WORD_TYPOGRAPHY = LabelTypography.BODY_1;
+  var EDITED_COLOR = incoming ? LabelColors.ONBACKGROUND_2 : LabelColors.ONCONTENT_2;
   return useMemo(function () {
     return function () {
       var splitMessage = message.split(/\r/);
@@ -2106,10 +2148,16 @@ function Message(props) {
   if (!message) return null;
   var injectingClassName = Array.isArray(className) ? className : [className];
   injectingClassName.push("sendbird-message".concat(isByMe ? '--outgoing' : '--incoming'));
-  var memoizedMessageText = useMemoizedMessageText({
+  var outgoingMemoizedMessageText = useMemoizedMessageText({
     message: message.message,
     updatedAt: message.updatedAt,
     className: 'sendbird-user-message-word'
+  });
+  var incomingMemoizedMessageText = useMemoizedMessageText({
+    message: message.message,
+    updatedAt: message.updatedAt,
+    className: 'sendbird-user-message-word',
+    incoming: true
   });
   return React.createElement("div", {
     className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-message']).join(' ')
@@ -2125,7 +2173,7 @@ function Message(props) {
     emojiAllMap: emojiAllMap,
     membersMap: membersMap,
     toggleReaction: toggleReaction,
-    memoizedMessageText: memoizedMessageText,
+    memoizedMessageText: outgoingMemoizedMessageText,
     memoizedEmojiListItems: memoizedEmojiListItems,
     chainTop: chainTop,
     chainBottom: chainBottom
@@ -2136,7 +2184,7 @@ function Message(props) {
     emojiAllMap: emojiAllMap,
     membersMap: membersMap,
     toggleReaction: toggleReaction,
-    memoizedMessageText: memoizedMessageText,
+    memoizedMessageText: incomingMemoizedMessageText,
     memoizedEmojiListItems: memoizedEmojiListItems,
     chainTop: chainTop,
     chainBottom: chainBottom
@@ -2366,7 +2414,7 @@ function OutgoingUserMessage(_ref) {
   }, React.createElement(Label, {
     className: "sendbird-user-message__text-balloon__inner__text-place__text",
     type: LabelTypography.BODY_1,
-    color: LabelColors.ONBACKGROUND_1
+    color: LabelColors.ONCONTENT_1
   }, React.createElement(MemoizedMessageText, null))), useReaction && message.reactions && message.reactions.length > 0 && React.createElement(EmojiReactions, {
     className: "sendbird-user-message__text-balloon__inner__emoji-reactions",
     userId: userId,
@@ -2823,7 +2871,7 @@ function OutgoingThumbnailMessage(_ref2) {
         width: "24px",
         height: "24px",
         type: IconTypes.MORE,
-        color: IconColors.CONTENT_INVERSE
+        fillColor: IconColors.CONTENT_INVERSE
       }));
     },
     menuItems: function menuItems(close) {
@@ -2876,7 +2924,7 @@ function OutgoingThumbnailMessage(_ref2) {
         width: "24px",
         height: "24px",
         type: IconTypes.EMOJI_MORE,
-        color: IconColors.CONTENT_INVERSE
+        fillColor: IconColors.CONTENT_INVERSE
       }));
     },
     menuItems: function menuItems(close) {
@@ -2936,9 +2984,9 @@ function OutgoingThumbnailMessage(_ref2) {
     type: type
   })), React.createElement(Icon, {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__video-icon"),
+    type: IconTypes.PLAY,
     width: "56px",
-    height: "56px",
-    type: IconTypes.PLAY
+    height: "56px"
   })), isImage(type) && React.createElement(ImageRenderer, {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__img"),
     url: thumbnailUrl || url || localUrl,
@@ -3116,9 +3164,9 @@ function IncomingThumbnailMessage(_ref3) {
     type: type
   })), React.createElement(Icon, {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__video-icon"),
+    type: IconTypes.PLAY,
     width: "56px",
-    height: "56px",
-    type: IconTypes.PLAY
+    height: "56px"
   })), isImage(type) && React.createElement(ImageRenderer, {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__img"),
     url: thumbnailUrl || url || localUrl,
@@ -3169,10 +3217,10 @@ function IncomingThumbnailMessage(_ref3) {
           handleMoreIconBlur();
         }
       }, React.createElement(Icon, {
-        width: "24px",
-        height: "24px",
         type: IconTypes.EMOJI_MORE,
-        color: IconColors.CONTENT_INVERSE
+        fillColor: IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(close) {
@@ -3309,7 +3357,7 @@ function OutgoingFileMessage(_ref) {
       memoizedEmojiListItems = _ref.memoizedEmojiListItems,
       chainTop = _ref.chainTop,
       chainBottom = _ref.chainBottom;
-  var url = message.url;
+  var url = message.plainUrl || message.url;
 
   var openFileUrl = function openFileUrl() {
     window.open(url);
@@ -3381,9 +3429,10 @@ function OutgoingFileMessage(_ref) {
           handleMoreIconBlur();
         }
       }, React.createElement(Icon, {
+        type: IconTypes.MORE,
+        fillColor: IconColors.CONTENT_INVERSE,
         width: "24px",
-        height: "24px",
-        type: IconTypes.MORE
+        height: "24px"
       }));
     },
     menuItems: function menuItems(close) {
@@ -3464,18 +3513,22 @@ function OutgoingFileMessage(_ref) {
     className: "sendbird-file-message__tooltip"
   }, React.createElement("div", {
     className: "sendbird-file-message__tooltip__inner"
-  }, checkFileType(url) ? React.createElement(Icon, {
-    className: "sendbird-file-message__tooltip__icon",
-    width: "28px",
-    height: "28px",
-    type: checkFileType(url)
-  }) : null, React.createElement(TextButton, {
+  }, checkFileType(url) ? React.createElement("div", {
+    className: "sendbird-file-message__tooltip__icon-box"
+  }, React.createElement(Icon, {
+    className: "sendbird-file-message__tooltip__icon-box__icon",
+    type: checkFileType(url),
+    fillColor: IconColors.PRIMARY,
+    width: "24px",
+    height: "24px"
+  })) : null, React.createElement(TextButton, {
     className: "sendbird-file-message__tooltip__text",
-    onClick: openFileUrl
+    onClick: openFileUrl,
+    color: LabelColors.ONCONTENT_1
   }, React.createElement(Label, {
     type: LabelTypography.BODY_1,
-    color: LabelColors.ONBACKGROUND_1
-  }, truncate(message.url, MAX_TRUNCATE_LENGTH)))), showEmojiReactions && React.createElement(EmojiReactions, {
+    color: LabelColors.ONCONTENT_1
+  }, truncate(message.name || message.url, MAX_TRUNCATE_LENGTH)))), showEmojiReactions && React.createElement(EmojiReactions, {
     className: "sendbird-file-message__tooltip__emoji-reactions",
     userId: userId,
     message: message,
@@ -3596,18 +3649,21 @@ function IncomingFileMessage(_ref2) {
     className: "sendbird-file-message__tooltip"
   }, React.createElement("div", {
     className: "sendbird-file-message__tooltip__inner"
-  }, checkFileType(message.url) ? React.createElement(Icon, {
-    className: "sendbird-file-message__tooltip__icon",
-    width: "28px",
-    height: "28px",
-    type: checkFileType(message.url)
-  }) : null, React.createElement(TextButton, {
+  }, checkFileType(message.url) ? React.createElement("div", {
+    className: "sendbird-file-message__tooltip__icon-box"
+  }, React.createElement(Icon, {
+    className: "sendbird-file-message__tooltip__icon-box__icon",
+    type: checkFileType(message.url),
+    fillColor: IconColors.PRIMARY,
+    width: "24px",
+    height: "24px"
+  })) : null, React.createElement(TextButton, {
     className: "sendbird-file-message__tooltip__text",
     onClick: openFileUrl
   }, React.createElement(Label, {
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, truncate(message.url, MAX_TRUNCATE_LENGTH)))), useReaction && message.reactions && message.reactions.length > 0 && React.createElement(EmojiReactions, {
+  }, truncate(message.name || message.url, MAX_TRUNCATE_LENGTH)))), useReaction && message.reactions && message.reactions.length > 0 && React.createElement(EmojiReactions, {
     className: "sendbird-file-message__tooltip__emoji-reactions",
     userId: userId,
     message: message,
@@ -4158,18 +4214,20 @@ var checkOGIsEnalbed = function checkOGIsEnalbed(message) {
   return true;
 };
 
-var WORD_TYPOGRAPHY$1 = LabelTypography.BODY_1;
-var WORD_COLOR = LabelColors.ONBACKGROUND_1;
-var EDITED_COLOR$1 = LabelColors.ONBACKGROUND_2;
 var isUrl = createUrlTester(URL_REG);
 function useMemoizedMessageText$1(_ref) {
   var message = _ref.message,
       updatedAt = _ref.updatedAt,
-      className = _ref.className;
+      className = _ref.className,
+      _ref$incoming = _ref.incoming,
+      incoming = _ref$incoming === void 0 ? false : _ref$incoming;
 
   var _useContext = useContext(LocalizationContext),
       stringSet = _useContext.stringSet;
 
+  var WORD_TYPOGRAPHY = LabelTypography.BODY_1;
+  var WORD_COLOR = incoming ? LabelColors.ONBACKGROUND_1 : LabelColors.ONCONTENT_1;
+  var EDITED_COLOR = incoming ? LabelColors.ONBACKGROUND_2 : LabelColors.ONCONTENT_2;
   return useMemo(function () {
     return function () {
       var splitMessage = message.split(' ');
@@ -4178,12 +4236,12 @@ function useMemoizedMessageText$1(_ref) {
           key: uuidv4$1(),
           className: className,
           src: word,
-          type: WORD_TYPOGRAPHY$1,
+          type: WORD_TYPOGRAPHY,
           color: WORD_COLOR
         }, word) : React.createElement(Label, {
           key: uuidv4$1(),
           className: className,
-          type: WORD_TYPOGRAPHY$1,
+          type: WORD_TYPOGRAPHY,
           color: WORD_COLOR
         }, word);
       });
@@ -4192,8 +4250,8 @@ function useMemoizedMessageText$1(_ref) {
         matchedMessage.push(React.createElement(Label, {
           key: uuidv4$1(),
           className: className,
-          type: WORD_TYPOGRAPHY$1,
-          color: EDITED_COLOR$1
+          type: WORD_TYPOGRAPHY,
+          color: EDITED_COLOR
         }, stringSet.MESSAGE_EDITED));
       }
 
@@ -4224,11 +4282,6 @@ var OGMessageSwitch = function OGMessageSwitch(_ref) {
       memoizedEmojiListItems = _ref.memoizedEmojiListItems;
   var ogMetaData = message.ogMetaData;
   var injectingClassName = Array.isArray(className) ? className : [className];
-  var memoizedMessageText = useMemoizedMessageText$1({
-    message: message.message,
-    updatedAt: message.updatedAt,
-    className: 'sendbird-og-message-word'
-  });
 
   var openLink = function openLink() {
     if (checkOGIsEnalbed(message)) {
@@ -4237,6 +4290,17 @@ var OGMessageSwitch = function OGMessageSwitch(_ref) {
     }
   };
 
+  var outoingMemoizedMessageText = useMemoizedMessageText$1({
+    message: message.message,
+    updatedAt: message.updatedAt,
+    className: 'sendbird-og-message-word'
+  });
+  var incomingMemoizedMessageText = useMemoizedMessageText$1({
+    message: message.message,
+    updatedAt: message.updatedAt,
+    className: 'sendbird-og-message-word',
+    incoming: true
+  });
   return React.createElement("div", {
     className: "".concat(OG_MESSAGE, " ").concat(OG_MESSAGE).concat(isByMe ? '--outgoing' : '--incoming', " ").concat(injectingClassName.join(' '))
   }, isByMe ? React.createElement(OutgoingOGMessage, {
@@ -4254,7 +4318,7 @@ var OGMessageSwitch = function OGMessageSwitch(_ref) {
     emojiAllMap: emojiAllMap,
     resendMessage: resendMessage,
     toggleReaction: toggleReaction,
-    memoizedMessageText: memoizedMessageText,
+    memoizedMessageText: outoingMemoizedMessageText,
     memoizedEmojiListItems: memoizedEmojiListItems
   }) : React.createElement(IncomingOGMessage, {
     userId: userId,
@@ -4266,7 +4330,7 @@ var OGMessageSwitch = function OGMessageSwitch(_ref) {
     useReaction: useReaction,
     emojiAllMap: emojiAllMap,
     toggleReaction: toggleReaction,
-    memoizedMessageText: memoizedMessageText,
+    memoizedMessageText: incomingMemoizedMessageText,
     memoizedEmojiListItems: memoizedEmojiListItems
   }));
 };
@@ -4901,13 +4965,13 @@ function MessageHoc(_ref) {
   useLayoutEffect(function () {
     if (highLightedMessageId === message.messageId) {
       if (useMessageScrollRef && useMessageScrollRef.current) {
-        setTimeout(function () {
-          useMessageScrollRef.current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'end'
-          });
-          setIsAnimated(true);
+        useMessageScrollRef.current.scrollIntoView({
+          block: 'center',
+          inline: 'center'
         });
+        setTimeout(function () {
+          setIsAnimated(true);
+        }, 500);
       }
     } else {
       setIsAnimated(false);
@@ -5207,7 +5271,9 @@ function (_Component) {
           toggleReaction = _this$props2.toggleReaction,
           useMessageGrouping = _this$props2.useMessageGrouping,
           currentGroupChannel = _this$props2.currentGroupChannel,
-          memoizedEmojiListItems = _this$props2.memoizedEmojiListItems;
+          memoizedEmojiListItems = _this$props2.memoizedEmojiListItems,
+          showScrollBot = _this$props2.showScrollBot,
+          onClickScrollBot = _this$props2.onClickScrollBot;
 
       if (allMessages.length < 1) {
         return React.createElement(PlaceHolder, {
@@ -5280,7 +5346,18 @@ function (_Component) {
           toggleReaction: toggleReaction,
           memoizedEmojiListItems: memoizedEmojiListItems
         });
-      }))));
+      }))), showScrollBot && React.createElement("div", {
+        className: "sendbird-conversation__scroll-bottom-button",
+        onClick: onClickScrollBot,
+        onKeyDown: onClickScrollBot,
+        tabIndex: 0,
+        role: "button"
+      }, React.createElement(Icon, {
+        width: "24px",
+        height: "24px",
+        type: IconTypes.CHEVRON_DOWN,
+        fillColor: IconColors.CONTENT
+      })));
     }
   }]);
 
@@ -5313,6 +5390,8 @@ ConversationScroll.propTypes = {
   renderChatItem: PropTypes.element,
   renderCustomMessage: PropTypes.func,
   useReaction: PropTypes.bool,
+  showScrollBot: PropTypes.bool,
+  onClickScrollBot: PropTypes.func,
   emojiContainer: PropTypes.shape({}),
   emojiAllMap: PropTypes.instanceOf(Map),
   membersMap: PropTypes.instanceOf(Map),
@@ -5332,6 +5411,8 @@ ConversationScroll.defaultProps = {
   onScrollDown: null,
   useReaction: true,
   emojiContainer: {},
+  showScrollBot: false,
+  onClickScrollBot: function onClickScrollBot() {},
   emojiAllMap: new Map(),
   membersMap: new Map(),
   useMessageGrouping: true,
@@ -5755,7 +5836,15 @@ var ConversationPanel = function ConversationPanel(props) {
   useEffect(function () {
     setIntialTimeStamp(startingPoint);
   }, [startingPoint, channelUrl]);
-  var highLightedMessageId = highlightedMessage;
+
+  var _useState3 = useState(highlightedMessage),
+      _useState4 = _slicedToArray(_useState3, 2),
+      highLightedMessageId = _useState4[0],
+      setHighLightedMessageId = _useState4[1];
+
+  useEffect(function () {
+    setHighLightedMessageId(highlightedMessage);
+  }, [highlightedMessage]);
   var userFilledMessageListQuery = queries.messageListParams;
 
   var _useReducer = useReducer(reducer, messagesInitialState),
@@ -5786,6 +5875,7 @@ var ConversationPanel = function ConversationPanel(props) {
   var usingReaction = appInfo.isUsingReaction && !isBroadcast && !isSuper && useReaction;
   var userDefinedDisableUserProfile = disableUserProfile || config.disableUserProfile;
   var userDefinedRenderProfile = renderUserProfile || config.renderUserProfile;
+  var showScrollBot = hasMoreToBottom;
   var emojiAllMap = useMemo(function () {
     return usingReaction ? getAllEmojisMapFromEmojiContainer(emojiContainer) : new Map();
   }, [emojiContainer]);
@@ -5982,6 +6072,7 @@ var ConversationPanel = function ConversationPanel(props) {
     onClick: function onClick() {
       if (intialTimeStamp) {
         setIntialTimeStamp(null);
+        setHighLightedMessageId(null);
       } else {
         scrollIntoLast(); // there is no scroll
 
@@ -6019,6 +6110,11 @@ var ConversationPanel = function ConversationPanel(props) {
     toggleReaction: toggleReaction,
     emojiContainer: emojiContainer,
     renderChatItem: renderChatItem,
+    showScrollBot: showScrollBot,
+    onClickScrollBot: function onClickScrollBot() {
+      setIntialTimeStamp(null);
+      setHighLightedMessageId(null);
+    },
     renderCustomMessage: renderCustomMessage,
     useMessageGrouping: useMessageGrouping,
     messagesDispatcher: messagesDispatcher,

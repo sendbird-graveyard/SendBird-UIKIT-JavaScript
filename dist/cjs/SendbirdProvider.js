@@ -2,7 +2,7 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var LocalizationContext = require('./LocalizationContext-12a9343d.js');
+var LocalizationContext = require('./LocalizationContext-6447a7a3.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
@@ -15,7 +15,7 @@ var SET_SDK_LOADING = 'SET_SDK_LOADING';
 var RESET_SDK = 'RESET_SDK';
 var SDK_ERROR = 'SDK_ERROR';
 
-var APP_VERSION_STRING = '2.1.0';
+var APP_VERSION_STRING = '2.2.0';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,

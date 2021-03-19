@@ -1,14 +1,15 @@
-import { e as LocalizationContext, d as __spreadArrays, w as withSendbirdContext } from './LocalizationContext-34316336.js';
+import { d as LocalizationContext, m as __spreadArrays, w as withSendbirdContext } from './LocalizationContext-12658c38.js';
 import React, { useContext, useMemo, useRef, useState, useEffect } from 'react';
 import 'prop-types';
-import { A as Avatar, M as Modal, T as Type, g as TextButton, c as Label, d as LabelTypography, e as LabelColors, I as Icon, a as IconTypes, b as IconColors, B as Button, w as Size, n as UserProfileContext, C as ContextMenu, h as MenuItems, o as UserProfile, P as PlaceHolder, m as PlaceHolderTypes, F as selectors, l as UserProfileProvider } from './index-79d744e1.js';
+import { M as Modal, T as Type, a as TextButton, B as Button, l as Size, f as UserProfileContext, C as ContextMenu, b as MenuItems, g as UserProfile, s as selectors, e as UserProfileProvider } from './index-711ec843.js';
+import { A as Avatar, L as Label, a as LabelTypography, b as LabelColors, I as Icon, c as IconTypes, d as IconColors, P as PlaceHolder, f as PlaceHolderTypes } from './index-ad616be9.js';
 import { d as getOpenChannelAvatar, n as noop } from './utils-53ba1773.js';
 import 'date-fns/format';
 import './type-0296584d.js';
 import 'react-dom';
-import { I as InputLabel, a as Input, U as UserListItem$1 } from './index-49dfd24f.js';
+import { I as InputLabel, a as Input, U as UserListItem$1 } from './index-5788a124.js';
 import { c as copyToClipboard } from './utils-d7f59026.js';
-import { a as Accordion, A as AccordionGroup } from './index-cb09a8ab.js';
+import { a as Accordion, A as AccordionGroup } from './index-70190ac9.js';
 
 function ChannelAvatar(_a) {
   var channel = _a.channel,
