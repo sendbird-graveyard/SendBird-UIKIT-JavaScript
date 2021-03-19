@@ -112,15 +112,6 @@ function useSetChannel(_a, _b) {
   var sdk = _b.sdk,
       logger = _b.logger,
       messageSearchDispathcer = _b.messageSearchDispathcer;
-
-  var _c = React.useState(null),
-      groupInvalid = _c[0],
-      setGroupInvalid = _c[1];
-
-  var _d = React.useState(null),
-      openInvalid = _d[0],
-      setOpenInvalid = _d[1];
-
   React.useEffect(function () {
     if (channelUrl && sdkInit && sdk && (sdk.OpenChannel || sdk.GroupChannel)) {
       sdk.GroupChannel.getChannel(channelUrl, function (groupChannel, error) {
@@ -131,42 +122,14 @@ function useSetChannel(_a, _b) {
             payload: groupChannel
           });
         } else {
-          setGroupInvalid(true);
-        }
-      });
-      sdk.OpenChannel.getChannel(channelUrl, function (openChannel, error) {
-        if (!error) {
-          logger.info('MessageSearch | useSetChannel open channel', openChannel);
           messageSearchDispathcer({
-            type: SET_CURRENT_CHANNEL,
-            payload: openChannel
+            type: CHANNEL_INVALID,
+            payload: null
           });
-          openChannel.enter(function (_, error) {
-            logger.warning('MessageSearch | useSetChannel failed enter open channel', error);
-            messageSearchDispathcer({
-              type: CHANNEL_INVALID,
-              payload: null
-            });
-          });
-        } else {
-          setOpenInvalid(true);
         }
       });
     }
   }, [channelUrl, sdkInit]);
-  React.useEffect(function () {
-    if (groupInvalid && openInvalid) {
-      console.log('sheet');
-      logger.info('MessageSearch | useSetChannel failed get channel', {
-        errorGroupChannel: groupInvalid,
-        errorOpenChannel: openInvalid
-      });
-      messageSearchDispathcer({
-        type: CHANNEL_INVALID,
-        payload: null
-      });
-    }
-  }, [groupInvalid, openInvalid]);
 }
 
 function useGetSearchedMessages(_a, _b) {
@@ -185,7 +148,7 @@ function useGetSearchedMessages(_a, _b) {
       payload: null
     });
 
-    if (sdk && channelUrl && sdk.createMessageSearchQuery) {
+    if (sdk && channelUrl && sdk.createMessageSearchQuery && currentChannel) {
       if (searchString) {
         var inputSearchMessageQueryObject = LocalizationContext.__assign(LocalizationContext.__assign({}, messageSearchQuery), {
           channelUrl: channelUrl,

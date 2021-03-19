@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.2.0](Mar 19 2021)
+## [2.2.1](Mar 19 2021)
 
 - Features:
   * <MessageSearch /> - standalone message search component with props:
@@ -20,6 +20,8 @@
 
 - Bugfixes:
   * Stability fixes
+
+## [2.2.0](Mar 19 2021) Deprecated
 
 ## [2.1.0](Mar 04 2021)
 
