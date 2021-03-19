@@ -2,22 +2,23 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var LocalizationContext = require('./LocalizationContext-12a9343d.js');
+var LocalizationContext = require('./LocalizationContext-6447a7a3.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
 var actionTypes = require('./actionTypes-920b541f.js');
-var index = require('./index-2a2230b8.js');
-var index$1 = require('./index-9431d920.js');
+var index = require('./index-ab7d3759.js');
+var index$1 = require('./index-41dcefd9.js');
+var index$2 = require('./index-c0f812fc.js');
 var utils = require('./utils-6aedec02.js');
-var LeaveChannel = require('./LeaveChannel-c93b4597.js');
+var LeaveChannel = require('./LeaveChannel-f9ad4e8d.js');
 var isToday = _interopDefault(require('date-fns/isToday'));
 var format = _interopDefault(require('date-fns/format'));
 var isYesterday = _interopDefault(require('date-fns/isYesterday'));
 require('./type-c7a3bee7.js');
 var utils$1 = require('./utils-a8277ca2.js');
 require('react-dom');
-var index$2 = require('./index-a8367321.js');
+var index$3 = require('./index-e59fb746.js');
 
 var RESET_CHANNEL_LIST = 'RESET_CHANNEL_LIST';
 var CREATE_CHANNEL = 'CREATE_CHANNEL';
@@ -260,7 +261,7 @@ function reducer(state, action) {
 var getChannelTitle = function getChannelTitle() {
   var channel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var currentUserId = arguments.length > 1 ? arguments[1] : undefined;
-  var stringSet = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : index.LabelStringSet;
+  var stringSet = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : index$2.LabelStringSet;
 
   if (!channel || !channel.name && !channel.members) {
     return stringSet.NO_TITLE;
@@ -358,37 +359,37 @@ function ChannelPreview(_ref) {
     className: "sendbird-channel-preview__content__upper__header"
   }, isBroadcast && React__default.createElement("div", {
     className: "sendbird-channel-preview__broadcast-icon"
-  }, React__default.createElement(index.Icon, {
-    type: index.IconTypes.BROADCAST,
-    fillColor: index.IconColors.SECONDARY,
+  }, React__default.createElement(index$2.Icon, {
+    type: index$2.IconTypes.BROADCAST,
+    fillColor: index$2.IconColors.SECONDARY,
     height: "16px",
     width: "16px"
-  })), React__default.createElement(index.Label, {
+  })), React__default.createElement(index$2.Label, {
     className: "sendbird-channel-preview__content__upper__header__channel-name",
-    type: index.LabelTypography.SUBTITLE_2,
-    color: index.LabelColors.ONBACKGROUND_1
-  }, getChannelTitle(channel, userId, stringSet)), React__default.createElement(index.Label, {
+    type: index$2.LabelTypography.SUBTITLE_2,
+    color: index$2.LabelColors.ONBACKGROUND_1
+  }, getChannelTitle(channel, userId, stringSet)), React__default.createElement(index$2.Label, {
     className: "sendbird-channel-preview__content__upper__header__total-members",
-    type: index.LabelTypography.CAPTION_2,
-    color: index.LabelColors.ONBACKGROUND_2
+    type: index$2.LabelTypography.CAPTION_2,
+    color: index$2.LabelColors.ONBACKGROUND_2
   }, getTotalMembers(channel)), isFrozen && React__default.createElement("div", {
     title: "Frozen",
     className: "sendbird-channel-preview__frozen-icon"
-  }, React__default.createElement(index.Icon, {
-    type: index.IconTypes.FREEZE,
-    fillColor: index.IconColors.PRIMARY,
+  }, React__default.createElement(index$2.Icon, {
+    type: index$2.IconTypes.FREEZE,
+    fillColor: index$2.IconColors.PRIMARY,
     height: 12,
     width: 12
-  }))), React__default.createElement(index.Label, {
+  }))), React__default.createElement(index$2.Label, {
     className: "sendbird-channel-preview__content__upper__last-message-at",
-    type: index.LabelTypography.CAPTION_3,
-    color: index.LabelColors.ONBACKGROUND_2
+    type: index$2.LabelTypography.CAPTION_3,
+    color: index$2.LabelColors.ONBACKGROUND_2
   }, getLastMessageCreatedAt(channel))), React__default.createElement("div", {
     className: "sendbird-channel-preview__content__lower"
-  }, React__default.createElement(index.Label, {
+  }, React__default.createElement(index$2.Label, {
     className: "sendbird-channel-preview__content__lower__last-message",
-    type: index.LabelTypography.BODY_2,
-    color: index.LabelColors.ONBACKGROUND_3
+    type: index$2.LabelTypography.BODY_2,
+    color: index$2.LabelColors.ONBACKGROUND_3
   }, getLastMessage(channel)), React__default.createElement("div", {
     className: "sendbird-channel-preview__content__lower__unread-message-count"
   }, getChannelUnreadMessageCount(channel) ? React__default.createElement(LeaveChannel.Badge, {
@@ -442,21 +443,21 @@ function ChannelHeader(_ref) {
     tabIndex: "0"
   }, React__default.createElement("div", {
     className: "sendbird-channel-header__title--left"
-  }, React__default.createElement(index.Avatar, {
+  }, React__default.createElement(index$2.Avatar, {
     height: "32px",
     width: "32px",
     src: user.profileUrl,
     alt: user.nickname
   })), React__default.createElement("div", {
     className: "sendbird-channel-header__title--right"
-  }, React__default.createElement(index.Label, {
+  }, React__default.createElement(index$2.Label, {
     className: "sendbird-channel-header__title--name",
-    type: index.LabelTypography.SUBTITLE_2,
-    color: index.LabelColors.ONBACKGROUND_1
-  }, user.nickname || stringSet.NO_NAME), React__default.createElement(index.Label, {
+    type: index$2.LabelTypography.SUBTITLE_2,
+    color: index$2.LabelColors.ONBACKGROUND_1
+  }, user.nickname || stringSet.NO_NAME), React__default.createElement(index$2.Label, {
     className: "sendbird-channel-header__title--user-id",
-    type: index.LabelTypography.BODY_2,
-    color: index.LabelColors.ONBACKGROUND_2
+    type: index$2.LabelTypography.BODY_2,
+    color: index$2.LabelColors.ONBACKGROUND_2
   }, user.userId))), React__default.createElement("div", {
     className: "sendbird-channel-header__right-icon"
   }, iconButton));
@@ -529,9 +530,9 @@ function EditUserProfile(_a) {
     }
   }, React__default.createElement("section", {
     className: "sendbird__edit-user-profile__img"
-  }, React__default.createElement(index$2.InputLabel, null, stringSet.EDIT_PROFILE__IMAGE_LABEL), React__default.createElement("div", {
+  }, React__default.createElement(index$3.InputLabel, null, stringSet.EDIT_PROFILE__IMAGE_LABEL), React__default.createElement("div", {
     className: "sendbird__edit-user__avatar"
-  }, React__default.createElement(index.Avatar, {
+  }, React__default.createElement(index$2.Avatar, {
     height: "80px",
     width: "80px",
     src: currentImg || user.profileUrl
@@ -553,12 +554,12 @@ function EditUserProfile(_a) {
       return hiddenInputRef.current.click();
     },
     notUnderline: true
-  }, React__default.createElement(index.Label, {
-    type: index.LabelTypography.BUTTON_1,
-    color: index.LabelColors.PRIMARY
+  }, React__default.createElement(index$2.Label, {
+    type: index$2.LabelTypography.BUTTON_1,
+    color: index$2.LabelColors.PRIMARY
   }, stringSet.EDIT_PROFILE__IMAGE_UPLOAD))), React__default.createElement("section", {
     className: "sendbird__edit-user__name"
-  }, React__default.createElement(index$2.InputLabel, null, stringSet.EDIT_PROFILE__NICKNAME_LABEL), React__default.createElement(index$2.Input, {
+  }, React__default.createElement(index$3.InputLabel, null, stringSet.EDIT_PROFILE__NICKNAME_LABEL), React__default.createElement(index$3.Input, {
     required: user.nickname !== '',
     name: "sendbird__edit-user__name",
     ref: inputRef,
@@ -566,15 +567,15 @@ function EditUserProfile(_a) {
     placeHolder: stringSet.EDIT_PROFILE__NICKNAME_PLACEHOLDER
   })), React__default.createElement("section", {
     className: "sendbird__edit-user__userid"
-  }, React__default.createElement(index$2.InputLabel, null, stringSet.EDIT_PROFILE__USERID_LABEL), React__default.createElement(index$2.Input, {
+  }, React__default.createElement(index$3.InputLabel, null, stringSet.EDIT_PROFILE__USERID_LABEL), React__default.createElement(index$3.Input, {
     disabled: true,
     name: "sendbird__edit-user__userid",
     value: user.userId
   })), React__default.createElement("section", {
     className: "sendbird__edit-user__theme"
-  }, React__default.createElement(index$2.InputLabel, null, stringSet.EDIT_PROFILE__THEME_LABEL), React__default.createElement("div", {
+  }, React__default.createElement(index$3.InputLabel, null, stringSet.EDIT_PROFILE__THEME_LABEL), React__default.createElement("div", {
     className: "sendbird__edit-user__theme-icon"
-  }, theme === 'dark' ? React__default.createElement(index.Icon, {
+  }, theme === 'dark' ? React__default.createElement(index$2.Icon, {
     onClick: function onClick() {
       changeTheme('light');
 
@@ -582,10 +583,10 @@ function EditUserProfile(_a) {
         onThemeChange('light');
       }
     },
-    type: index.IconTypes.TOGGLE_ON,
+    type: index$2.IconTypes.TOGGLE_ON,
     width: 44,
     height: 24
-  }) : React__default.createElement(index.Icon, {
+  }) : React__default.createElement(index$2.Icon, {
     onClick: function onClick() {
       changeTheme('dark');
 
@@ -593,7 +594,7 @@ function EditUserProfile(_a) {
         onThemeChange('dark');
       }
     },
-    type: index.IconTypes.TOGGLE_OFF,
+    type: index$2.IconTypes.TOGGLE_OFF,
     width: 44,
     height: 24
   })))));
@@ -648,9 +649,9 @@ function AddChannel(_ref) {
       setShowModal(true);
     },
     disabled: disabled
-  }, React__default.createElement(index.Icon, {
-    type: index.IconTypes.CREATE,
-    fillColor: index.IconColors.PRIMARY,
+  }, React__default.createElement(index$2.Icon, {
+    type: index$2.IconTypes.CREATE,
+    fillColor: index$2.IconColors.PRIMARY,
     width: "24px",
     height: "24px"
   })), showModal && step === 0 && React__default.createElement(index.Modal, {
@@ -674,11 +675,15 @@ function AddChannel(_ref) {
       setType('group');
       setStep(1);
     }
-  }, React__default.createElement(index.Icon, {
-    type: index.IconTypes.CHAT
-  }), React__default.createElement(index.Label, {
-    type: index.LabelTypography.SUBTITLE_1,
-    color: index.LabelColors.ONBACKGROUND_1
+  }, React__default.createElement(index$2.Icon, {
+    className: "sendbird-add-channel__rectangle__chat-icon",
+    type: index$2.IconTypes.CHAT,
+    fillColor: index$2.IconColors.PRIMARY,
+    width: "28px",
+    height: "28px"
+  }), React__default.createElement(index$2.Label, {
+    type: index$2.LabelTypography.SUBTITLE_1,
+    color: index$2.LabelColors.ONBACKGROUND_1
   }, "Group")), isSupergroupAvailable && React__default.createElement("div", {
     className: "sendbird-add-channel__rectangle",
     onClick: function onClick() {
@@ -691,11 +696,15 @@ function AddChannel(_ref) {
       setType('supergroup');
       setStep(1);
     }
-  }, React__default.createElement(index.Icon, {
-    type: index.IconTypes.SUPERGROUP
-  }), React__default.createElement(index.Label, {
-    type: index.LabelTypography.SUBTITLE_1,
-    color: index.LabelColors.ONBACKGROUND_1
+  }, React__default.createElement(index$2.Icon, {
+    className: "sendbird-add-channel__rectangle__supergroup-icon",
+    type: index$2.IconTypes.SUPERGROUP,
+    fillColor: index$2.IconColors.PRIMARY,
+    width: "28px",
+    height: "28px"
+  }), React__default.createElement(index$2.Label, {
+    type: index$2.LabelTypography.SUBTITLE_1,
+    color: index$2.LabelColors.ONBACKGROUND_1
   }, "Super group")), isBroadcastAvailable && React__default.createElement("div", {
     className: "sendbird-add-channel__rectangle",
     onClick: function onClick() {
@@ -708,11 +717,15 @@ function AddChannel(_ref) {
       setType('broadcast');
       setStep(1);
     }
-  }, React__default.createElement(index.Icon, {
-    type: index.IconTypes.BROADCAST
-  }), React__default.createElement(index.Label, {
-    type: index.LabelTypography.SUBTITLE_1,
-    color: index.LabelColors.ONBACKGROUND_1
+  }, React__default.createElement(index$2.Icon, {
+    className: "sendbird-add-channel__rectangle__broadcast-icon",
+    type: index$2.IconTypes.BROADCAST,
+    fillColor: index$2.IconColors.PRIMARY,
+    width: "28px",
+    height: "28px"
+  }), React__default.createElement(index$2.Label, {
+    type: index$2.LabelTypography.SUBTITLE_1,
+    color: index$2.LabelColors.ONBACKGROUND_1
   }, "Broadcast")))), showModal && step === 1 && React__default.createElement(LeaveChannel.InviteMembers, {
     swapParams: sdk && sdk.getErrorFirstCallback && sdk.getErrorFirstCallback(),
     titleText: stringSet.MODAL__CREATE_CHANNEL__TITLE,
@@ -790,9 +803,9 @@ function ChannelPreviewAction(_ref) {
         onClick: toggleDropdown,
         height: "32px",
         width: "32px"
-      }, React__default.createElement(index.Icon, {
-        type: index.IconTypes.MORE,
-        fillColor: index.IconColors.PRIMARY,
+      }, React__default.createElement(index$2.Icon, {
+        type: index$2.IconTypes.MORE,
+        fillColor: index$2.IconColors.PRIMARY,
         width: "24px",
         height: "24px"
       }));
@@ -832,7 +845,7 @@ function ChannelsPlaceholder(_ref) {
   var type = _ref.type;
   return React__default.createElement("div", {
     className: "sendbird-channel-list"
-  }, React__default.createElement(index.PlaceHolder, {
+  }, React__default.createElement(index$2.PlaceHolder, {
     type: type
   }));
 }
@@ -1349,7 +1362,7 @@ function ChannelList(props) {
       }
     }
   }, sdkError && React__default.createElement(ChannelsPlaceholder, {
-    type: index.PlaceHolderTypes.WRONG
+    type: index$2.PlaceHolderTypes.WRONG
   }), React__default.createElement("div", null, sortedChannels && sortedChannels.map(function (channel, idx) {
     var _onLeaveChannel = function onLeaveChannel(c, cb) {
       logger.info('ChannelList: Leaving channel', c);
@@ -1409,10 +1422,10 @@ function ChannelList(props) {
       })
     });
   })), (!sdkIntialized || loading) && React__default.createElement(ChannelsPlaceholder, {
-    type: index.PlaceHolderTypes.LOADING
+    type: index$2.PlaceHolderTypes.LOADING
   }), //  placeholder
   (!allChannels || allChannels.length === 0) && React__default.createElement(ChannelsPlaceholder, {
-    type: index.PlaceHolderTypes.NO_CHANNELS
+    type: index$2.PlaceHolderTypes.NO_CHANNELS
   })));
 }
 

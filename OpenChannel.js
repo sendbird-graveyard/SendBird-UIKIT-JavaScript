@@ -1,10 +1,11 @@
-import { e as LocalizationContext, n as uuidv4, d as __spreadArrays, _ as __assign, w as withSendbirdContext } from './LocalizationContext-34316336.js';
+import { d as LocalizationContext, n as uuidv4, m as __spreadArrays, _ as __assign, w as withSendbirdContext } from './LocalizationContext-12658c38.js';
 import React, { useContext, useRef, useState, useMemo, useEffect, useCallback, useReducer } from 'react';
 import 'prop-types';
-import { c as Label, d as LabelTypography, L as LabelStringSet, A as Avatar, I as Icon, a as IconTypes, b as IconColors, e as LabelColors, f as IconButton, n as UserProfileContext, C as ContextMenu, h as MenuItems, o as UserProfile, s as Loader, i as MenuItem, r as ImageRenderer, g as TextButton, M as Modal, P as PlaceHolder, t as PlaceHolderTypes, p as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, q as SEND_FILE_MESSAGE, U as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, l as UserProfileProvider } from './index-79d744e1.js';
+import { I as IconButton, f as UserProfileContext, C as ContextMenu, b as MenuItems, g as UserProfile, c as MenuItem, a as TextButton, M as Modal, h as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, i as SEND_FILE_MESSAGE, U as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, e as UserProfileProvider } from './index-711ec843.js';
+import { L as Label, a as LabelTypography, A as Avatar, I as Icon, c as IconTypes, d as IconColors, b as LabelColors, h as Loader, g as ImageRenderer, P as PlaceHolder, i as PlaceHolderTypes } from './index-ad616be9.js';
 import format from 'date-fns/format';
 import 'react-dom';
-import { M as MessageInput, L as LinkLabel, i as isImage, a as isVideo, D as DateSeparator, F as FileViewer, c as compareIds } from './index-5b744991.js';
+import { M as MessageInput, L as LinkLabel, i as isImage, a as isVideo, D as DateSeparator, F as FileViewer, c as compareIds } from './index-aeef4ba5.js';
 import isSameDay from 'date-fns/isSameDay';
 
 var getMessageCreatedAt = function getMessageCreatedAt(message) {
@@ -154,12 +155,11 @@ var FrozenNotification = function FrozenNotification() {
 var COMPONENT_CLASS_NAME = 'sendbird-openchannel-conversation-header';
 function OpenchannelConversationHeader(_a) {
   var coverImage = _a.coverImage,
-      _b = _a.title,
-      title = _b === void 0 ? LabelStringSet.NO_TITLE : _b,
-      _c = _a.subTitle,
-      subTitle = _c === void 0 ? LabelStringSet.NO_TITLE : _c,
+      title = _a.title,
+      subTitle = _a.subTitle,
       amIOperator = _a.amIOperator,
       onActionClick = _a.onActionClick;
+  var stringSet = useContext(LocalizationContext).stringSet;
   return React.createElement("div", {
     className: COMPONENT_CLASS_NAME
   }, React.createElement("div", {
@@ -185,11 +185,11 @@ function OpenchannelConversationHeader(_a) {
     className: COMPONENT_CLASS_NAME + "__left__title",
     type: LabelTypography.H_2,
     color: LabelColors.ONBACKGROUND_1
-  }, title), React.createElement(Label, {
+  }, title || stringSet.NO_TITLE), React.createElement(Label, {
     className: COMPONENT_CLASS_NAME + "__left__sub-title",
     type: LabelTypography.BODY_2,
     color: LabelColors.ONBACKGROUND_2
-  }, subTitle)), React.createElement("div", {
+  }, subTitle || stringSet.NO_TITLE)), React.createElement("div", {
     className: COMPONENT_CLASS_NAME + "__right"
   }, React.createElement(IconButton, {
     className: COMPONENT_CLASS_NAME + "__right__trigger",
@@ -1185,10 +1185,10 @@ function OpenchannelFileMessage(_a) {
     className: "sendbird-openchannel-file-message__right__body"
   }, checkFileType(message.url) && React.createElement(Icon, {
     className: "sendbird-openchannel-file-message__right__body__icon",
-    width: "48px",
-    height: "48px",
     type: checkFileType(message.url),
-    color: IconColors.PRIMARY
+    fillColor: IconColors.PRIMARY,
+    width: "48px",
+    height: "48px"
   }), React.createElement(TextButton, {
     className: "sendbird-openchannel-file-message__right__body__file-name",
     onClick: openFileUrl

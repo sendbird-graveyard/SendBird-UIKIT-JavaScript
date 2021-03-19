@@ -18,6 +18,7 @@ export const ChannelList: React.FunctionComponent<ChannelListProps>
 export const Channel: React.FunctionComponent<ChannelProps>
 export const OpenChannel: React.FunctionComponent<OpenChannelProps>
 export const OpenChannelSettings: React.FunctionComponent<OpenChannelSettingsProps>
+export const MessageSearch: React.FunctionComponent<MessageSearchProps>
 export function withSendBird(
   ChildComp: React.Component | React.ElementType,
   mapStoreToProps?: (store: SendBirdState) => unknown
@@ -106,9 +107,29 @@ export type Logger = {
   warning?(title?: unknown, description?: unknown): void;
 };
 
+export type SendbirdError = Sendbird.SendBirdError;
+
 export interface RenderOpenChannelTitleProps {
   channel: Sendbird.OpenChannel;
   user: Sendbird.User;
+}
+
+export interface MessageSearchProps {
+  // message search props
+  channelUrl: string;
+  searchString?: string;
+  messageSearchQuery?: SendbirdUIKit.MessageSearchQueryType;
+  renderSearchItem?(
+    {
+      message,
+      onResultClick,
+    }: {
+      message: ClientSentMessages,
+      onResultClick?: (message: ClientSentMessages) => void,
+    }
+  ): JSX.Element;
+  onResultLoaded?(messages?: Array<ClientSentMessages>, error?: SendbirdError): void;
+  onResultClick?(message: ClientSentMessages): void;
 }
 
 export interface OpenChannelProps {
@@ -144,6 +165,11 @@ export interface RenderGroupChannelMessageInputProps {
   channel: Sendbird.GroupChannel;
   user: Sendbird.User;
   disabled: boolean;
+}
+
+export interface ClientMessageSearchQuery extends SendBird.MessageSearchQuery {
+  key?(): string;
+  channelUrl?(): string;
 }
 
 // to be used with OpenChannel.renderMessageInput
@@ -350,6 +376,8 @@ interface ChannelProps {
   useReaction?: boolean;
   showSearchIcon?: boolean;
   onSearchClick?(): void;
+  highlightedMessage?: string | number;
+  startingPoint?: number;
   onBeforeSendUserMessage?(text: string): Sendbird.UserMessageParams;
   onBeforeSendFileMessage?(file: File): Sendbird.FileMessageParams;
   onBeforeUpdateUserMessage?(text: string): Sendbird.UserMessageParams;
@@ -408,6 +436,7 @@ interface AppProps {
   profileUrl?: string;
   allowProfileEdit?: boolean;
   disableUserProfile?: boolean;
+  showSearchIcon?: boolean;
   renderUserProfile?: (props: RenderUserProfileProps) => React.ReactNode;
   onProfileEditSuccess?(user: Sendbird.User): void;
   config?: SendBirdProviderConfig;
@@ -422,17 +451,17 @@ interface AppProps {
   };
 }
 
-export type EveryMessage = ClientUserMessage | ClientFileMessage | ClientAdminMessage;
-
-export interface ClientUserMessage extends Sendbird.UserMessage, ClientMessage { }
-export interface ClientFileMessage extends Sendbird.FileMessage, ClientMessage { }
-export interface ClientAdminMessage extends Sendbird.AdminMessage, ClientMessage { }
 interface ClientMessage {
   reqId: string;
   file?: File;
   localUrl?: string;
   _sender: Sendbird.User;
 }
+export interface ClientUserMessage extends Sendbird.UserMessage, ClientMessage { }
+export interface ClientFileMessage extends Sendbird.FileMessage, ClientMessage { }
+export interface ClientAdminMessage extends Sendbird.AdminMessage, ClientMessage { }
+export type EveryMessage = ClientUserMessage | ClientFileMessage | ClientAdminMessage;
+export type ClientSentMessages = ClientUserMessage | ClientFileMessage;
 
 export type RenderCustomMessage = (
   message: EveryMessage,
