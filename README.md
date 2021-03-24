@@ -23,7 +23,7 @@ Try it only if you want to test OpenChannel
 
 **Sendbird UIKit** for React is a development kit that enables fast and easy integration of standard chat features into new or existing applications. From the overall theme to individual styles such as colors and fonts, components can be fully customized to create an in-app chat experience unique to your brand identity.
 
-> **Note**: Currently, UIKit for React supports group channels only.
+> **Note**: Currently, UIKit for React now supports both group channels and open channels.
 
 ### Benefits
 
