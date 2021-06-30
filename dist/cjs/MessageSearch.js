@@ -2,11 +2,11 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var LocalizationContext = require('./LocalizationContext-6447a7a3.js');
+var LocalizationContext = require('./LocalizationContext-96132df1.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 require('prop-types');
-var index$2 = require('./index-c0f812fc.js');
+var index$2 = require('./index-944fbc98.js');
 var isToday = _interopDefault(require('date-fns/isToday'));
 var format = _interopDefault(require('date-fns/format'));
 var isYesterday = _interopDefault(require('date-fns/isYesterday'));
@@ -251,23 +251,16 @@ var getCreatedAt = (function (createdAt) {
 function MessageSearchItem(_a) {
   var className = _a.className,
       message = _a.message,
-      _onClick = _a.onClick,
-      selected = _a.selected;
+      selected = _a.selected,
+      _onClick = _a.onClick;
   var createdAt = message.createdAt;
   var messageText = message.message;
   var sender = message.sender || message._sender;
   var profileUrl = sender.profileUrl,
       nickname = sender.nickname;
   var stringSet = React.useContext(LocalizationContext.LocalizationContext).stringSet;
-  var injectingClassNames = Array.isArray(className) ? className : [className];
-  injectingClassNames.push('sendbird-message-search-item');
-
-  if (selected) {
-    injectingClassNames.push('sendbird-message-search-item--selected');
-  }
-
   return React__default.createElement("div", {
-    className: injectingClassNames.join(' '),
+    className: LocalizationContext.__spreadArrays(Array.isArray(className) ? className : [className], ['sendbird-message-search-item', selected ? 'sendbird-message-search-item--selected' : '']).join(' '),
     onClick: function onClick(e) {
       e.stopPropagation();
 
@@ -346,8 +339,8 @@ function truncate(fullText, textLimit) {
 function MessageSearchFileItem(props) {
   var className = props.className,
       message = props.message,
-      _onClick = props.onClick,
-      selected = props.selected;
+      selected = props.selected,
+      _onClick = props.onClick;
   var createdAt = message.createdAt,
       plainUrl = message.plainUrl,
       url = message.url,
@@ -357,15 +350,8 @@ function MessageSearchFileItem(props) {
   var profileUrl = sender.profileUrl,
       nickname = sender.nickname;
   var stringSet = React.useContext(LocalizationContext.LocalizationContext).stringSet;
-  var injectingClassNames = Array.isArray(className) ? className : [className];
-  injectingClassNames.push('sendbird-message-search-file-item');
-
-  if (selected) {
-    injectingClassNames.push('sendbird-message-search-file-item--selected');
-  }
-
   return React__default.createElement("div", {
-    className: injectingClassNames.join(' '),
+    className: LocalizationContext.__spreadArrays(Array.isArray(className) ? className : [className], ['sendbird-message-search-file-item', selected ? 'sendbird-message-search-file-item--selected' : '']).join(' '),
     onClick: function onClick(e) {
       e.stopPropagation();
 

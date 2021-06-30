@@ -2,19 +2,19 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var LocalizationContext = require('./LocalizationContext-6447a7a3.js');
+var LocalizationContext = require('./LocalizationContext-96132df1.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 require('prop-types');
-var index$1 = require('./index-ab7d3759.js');
-var index$2 = require('./index-c0f812fc.js');
+var index$1 = require('./index-7bb6095b.js');
+var index$2 = require('./index-944fbc98.js');
 var utils = require('./utils-6aedec02.js');
 require('date-fns/format');
 require('./type-c7a3bee7.js');
 require('react-dom');
-var index$3 = require('./index-e59fb746.js');
+var index$3 = require('./index-f441aa10.js');
 var utils$2 = require('./utils-c8e36c68.js');
-var index$4 = require('./index-5a7f699c.js');
+var index$4 = require('./index-c092ddb7.js');
 
 function ChannelAvatar(_a) {
   var channel = _a.channel,
@@ -355,8 +355,8 @@ function ParticipantsAccordion(_a) {
         className: "sendbird-participants-accordion__footer"
       }, React__default.createElement(index$1.Button, {
         className: "sendbird-participants-accordion__footer__all-participants",
-        type: index$1.Type.SECONDARY,
-        size: index$1.Size.SMALL,
+        type: index$1.ButtonTypes.SECONDARY,
+        size: index$1.ButtonSizes.SMALL,
         onClick: function onClick() {
           return setShowMoreModal(true);
         }
@@ -579,17 +579,17 @@ function OpenChannelSettings(props) {
   }
 
   return React__default.createElement(index$1.UserProfileProvider, {
+    className: "sendbird-openchannel-settings",
     disableUserProfile: disableUserProfile,
-    renderUserProfile: renderUserProfile,
-    className: "sendbird-openchannel-settings"
+    renderUserProfile: renderUserProfile
   }, channel.isOperator(user) ? React__default.createElement(React__default.Fragment, null, React__default.createElement("div", {
     className: "sendbird-openchannel-settings__header"
   }, React__default.createElement(index$2.Label, {
     type: index$2.LabelTypography.H_2,
     color: index$2.LabelColors.ONBACKGROUND_1
   }, stringSet.CHANNEL_SETTING__HEADER__TITLE), React__default.createElement(index$2.Icon, {
-    type: index$2.IconTypes.CLOSE,
     className: "sendbird-openchannel-settings__close-icon",
+    type: index$2.IconTypes.CLOSE,
     height: "24px",
     width: "24px",
     onClick: function onClick() {
@@ -629,20 +629,20 @@ function OpenChannelSettings(props) {
   })), React__default.createElement("div", {
     className: "sendbird-openchannel-settings__url"
   }, React__default.createElement(index$2.Icon, {
-    type: index$2.IconTypes.COPY,
     className: "sendbird-openchannel-settings__copy-icon",
+    type: index$2.IconTypes.COPY,
     height: "22px",
     width: "22px",
     onClick: function onClick() {
       utils$2.copyToClipboard(channel.url);
     }
   }), React__default.createElement(index$2.Label, {
+    className: "sendbird-openchannel-settings__url-label",
     type: index$2.LabelTypography.CAPTION_2,
-    color: index$2.LabelColors.ONBACKGROUND_2,
-    className: "sendbird-openchannel-settings__url-label"
+    color: index$2.LabelColors.ONBACKGROUND_2
   }, stringSet.OPEN_CHANNEL_SETTINGS__OPERATOR_URL), React__default.createElement(index$2.Label, {
-    type: index$2.LabelTypography.SUBTITLE_2,
-    className: "sendbird-openchannel-settings__url-value"
+    className: "sendbird-openchannel-settings__url-value",
+    type: index$2.LabelTypography.SUBTITLE_2
   }, channel.url)), React__default.createElement(index$4.AccordionGroup, null, React__default.createElement(ParticipantsAccordion, {
     channel: channel,
     currentUser: currentUser

@@ -36,7 +36,7 @@ Try it only if you want to test OpenChannel
 
 ### More about Sendbird UIKit for React
 
-Find out more about Sendbird UIKit for React on [UIKit for React doc](https://sendbird.com/docs/uikit/v1/javascript/getting-started/about-uikit). If you have any comments or questions regarding bugs and feature requests, visit [Sendbird community](https://community.sendbird.com). 
+Find out more about Sendbird UIKit for React on [UIKit for React doc](https://sendbird.com/docs/uikit/v1/javascript/getting-started/about-uikit). If you have any comments or questions regarding bugs and feature requests, visit [Sendbird community](https://community.sendbird.com).
 
 <br />
 
@@ -44,7 +44,7 @@ Find out more about Sendbird UIKit for React on [UIKit for React doc](https://se
 
 This section shows the prerequisites you need to check to use Sendbird UIKit for React.
 
-### Requirements 
+### Requirements
 
 The minimum requirements for Sendbird UIKit for React are:
 

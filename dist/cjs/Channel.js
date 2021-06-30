@@ -4,22 +4,22 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var LocalizationContext = require('./LocalizationContext-6447a7a3.js');
+var LocalizationContext = require('./LocalizationContext-96132df1.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
-var index = require('./index-ab7d3759.js');
-var index$1 = require('./index-41dcefd9.js');
-var index$2 = require('./index-c0f812fc.js');
+var index = require('./index-7bb6095b.js');
+var index$1 = require('./index-733abb37.js');
+var index$2 = require('./index-944fbc98.js');
 var utils = require('./utils-6aedec02.js');
 var format = _interopDefault(require('date-fns/format'));
 var type = require('./type-c7a3bee7.js');
 var utils$1 = require('./utils-a8277ca2.js');
 require('react-dom');
-var index$3 = require('./index-8f99370c.js');
+var index$3 = require('./index-04d33fe2.js');
 var isSameDay = _interopDefault(require('date-fns/isSameDay'));
 var utils$2 = require('./utils-c8e36c68.js');
-var formatDistanceToNowStrict = _interopDefault(require('date-fns/formatDistanceToNowStrict'));
+require('date-fns/formatDistanceToNowStrict');
 
 var RESET_MESSAGES = 'RESET_MESSAGES';
 var RESET_STATE = 'RESET_STATE';
@@ -344,6 +344,9 @@ var messagesInitialState = {
   hasMore: false,
   lastMessageTimeStamp: 0,
   // for scroll down
+  // onScrollDownCallback is added for navigation to different timestamps on messageSearch
+  // hasMoreToBottom, onScrollDownCallback -> scroll down
+  // hasMore, onScrollCallback -> scroll up(default behavior)
   hasMoreToBottom: false,
   latestFetchedMessageTimeStamp: 0,
   emojiContainer: {},
@@ -880,7 +883,7 @@ function useInitialMessagesFetch(_ref, _ref2) {
       type: RESET_MESSAGES
     });
 
-    if (sdk && sdk.MessageListParams && currentGroupChannel && currentGroupChannel.getMessagesByMessageId) {
+    if (sdk && sdk.MessageListParams && currentGroupChannel && currentGroupChannel.getMessagesByTimestamp) {
       var messageListParams = new sdk.MessageListParams();
       messageListParams.prevResultSize = PREV_RESULT_SIZE;
       messageListParams.isInclusive = true;
@@ -982,6 +985,14 @@ function useInitialMessagesFetch(_ref, _ref2) {
       }
     }
   }, [channelUrl, userFilledMessageListQuery, intialTimeStamp]);
+  /**
+   * Note - useEffect(() => {}, [currentGroupChannel])
+   * was buggy, that is why we did
+   * const channelUrl = currentGroupChannel && currentGroupChannel.url;
+   * useEffect(() => {}, [channelUrl])
+   * Again, this hook is supposed to execute when currentGroupChannel changes
+   * The 'channelUrl' here is not the same memory reference from Conversation.props
+   */
 }
 
 function useHandleReconnect(_ref, _ref2) {
@@ -1635,16 +1646,16 @@ function useSetReadStatus(_ref, _ref2) {
 }
 
 var ReactionButton = React__default.forwardRef(function (props, ref) {
-  var children = props.children,
+  var className = props.className,
       width = props.width,
       height = props.height,
-      _onClick = props.onClick,
       selected = props.selected,
-      className = props.className;
-  var injectingClassName = Array.isArray(className) ? className : [className];
+      _onClick = props.onClick,
+      children = props.children;
   return React__default.createElement("div", {
+    className: [].concat(LocalizationContext._toConsumableArray(Array.isArray(className) ? className : [className]), ["sendbird-reaction-button".concat(selected ? '--selected' : '')]).join(' '),
     ref: ref,
-    className: "sendbird-reaction-button".concat(selected ? '--selected' : '', " ").concat(injectingClassName.join(' ')),
+    role: "button",
     style: {
       width: typeof width === 'string' ? "".concat(width.slice(0, -2) - 2, "px") : "".concat(width - 2, "px"),
       height: typeof height === 'string' ? "".concat(height.slice(0, -2) - 2, "px") : "".concat(height - 2, "px")
@@ -1652,7 +1663,6 @@ var ReactionButton = React__default.forwardRef(function (props, ref) {
     onClick: function onClick(e) {
       return _onClick(e);
     },
-    role: "button",
     onKeyDown: function onKeyDown(e) {
       return _onClick(e);
     },
@@ -1662,19 +1672,19 @@ var ReactionButton = React__default.forwardRef(function (props, ref) {
   }, children));
 });
 ReactionButton.propTypes = {
-  children: PropTypes.element.isRequired,
-  onClick: PropTypes.func,
-  selected: PropTypes.bool,
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
+  selected: PropTypes.bool,
+  onClick: PropTypes.func,
+  children: PropTypes.element.isRequired
 };
 ReactionButton.defaultProps = {
-  selected: false,
+  className: '',
   width: '36px',
   height: '36px',
-  onClick: function onClick() {},
-  className: ''
+  selected: false,
+  onClick: function onClick() {}
 };
 
 function useMemoizedEmojiListItems(_ref, _ref2) {
@@ -1754,10 +1764,9 @@ function useToggleReactionCallback(_ref, _ref2) {
 }
 
 function MessageStatus(_ref) {
-  var message = _ref.message,
-      status = _ref.status,
-      className = _ref.className;
-  var injectingClassName = Array.isArray(className) ? className : [className];
+  var className = _ref.className,
+      message = _ref.message,
+      status = _ref.status;
 
   var label = function label() {
     switch (status) {
@@ -1790,52 +1799,60 @@ function MessageStatus(_ref) {
       height: "16px"
     }, React__default.createElement(index$2.Icon, {
       type: index$2.IconTypes.SPINNER,
+      fillColor: index$2.IconColors.PRIMARY,
       width: "16px",
-      height: "16px",
-      fillColor: index$2.IconColors.PRIMARY
+      height: "16px"
     })),
     SENT: React__default.createElement(index$2.Icon, {
       className: "sendbird-message-status__icon",
-      width: "16px",
-      height: "16px",
       type: index$2.IconTypes.DONE,
-      fillColor: index$2.IconColors.SENT
+      fillColor: index$2.IconColors.SENT,
+      width: "16px",
+      height: "16px"
     }),
     DELIVERED: React__default.createElement(index$2.Icon, {
       className: "sendbird-message-status__icon",
-      width: "16px",
-      height: "16px",
       type: index$2.IconTypes.DONE_ALL,
-      fillColor: index$2.IconColors.SENT
+      fillColor: index$2.IconColors.SENT,
+      width: "16px",
+      height: "16px"
     }),
     READ: React__default.createElement(index$2.Icon, {
       className: "sendbird-message-status__icon",
-      width: "16px",
-      height: "16px",
       type: index$2.IconTypes.DONE_ALL,
-      fillColor: index$2.IconColors.READ
+      fillColor: index$2.IconColors.READ,
+      width: "16px",
+      height: "16px"
     }),
     FAILED: React__default.createElement(index$2.Icon, {
       className: "sendbird-message-status__icon",
-      width: "16px",
-      height: "16px",
       type: index$2.IconTypes.ERROR,
-      fillColor: index$2.IconColors.ERROR
+      fillColor: index$2.IconColors.ERROR,
+      width: "16px",
+      height: "16px"
     })
   };
   return React__default.createElement("div", {
-    className: [].concat(LocalizationContext._toConsumableArray(injectingClassName), ['sendbird-message-status']).join(' ')
+    className: [].concat(LocalizationContext._toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-message-status']).join(' ')
   }, icon[status], React__default.createElement("br", null), label());
 }
 MessageStatus.propTypes = {
-  message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])),
-  status: PropTypes.string,
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  message: PropTypes.shape({
+    createdAt: PropTypes.number,
+    sender: PropTypes.shape({
+      friendName: PropTypes.string,
+      nickname: PropTypes.string,
+      userId: PropTypes.string,
+      profileUrl: PropTypes.string
+    })
+  }),
+  status: PropTypes.string
 };
 MessageStatus.defaultProps = {
+  className: '',
   message: null,
-  status: '',
-  className: ''
+  status: ''
 };
 
 var ReactionBadge = React__default.forwardRef(function (props, ref) {
@@ -1845,38 +1862,41 @@ var ReactionBadge = React__default.forwardRef(function (props, ref) {
       selected = props.selected,
       isAdd = props.isAdd,
       onClick = props.onClick;
-  var injectingClassName = Array.isArray(className) ? className : [className];
 
-  if (selected && !isAdd) {
-    injectingClassName.unshift('sendbird-reaction-badge--selected');
-  } else if (isAdd) {
-    injectingClassName.push('sendbird-reaction-badge--is-add');
-  } else {
-    injectingClassName.unshift('sendbird-reaction-badge');
-  }
+  var getClassNameTail = function getClassNameTail() {
+    if (selected && !isAdd) {
+      return '--selected';
+    }
+
+    if (isAdd) {
+      return '--is-add';
+    }
+
+    return '';
+  };
 
   return React__default.createElement("div", {
-    ref: ref,
-    tabIndex: 0,
+    className: [].concat(LocalizationContext._toConsumableArray(Array.isArray(className) ? className : [className]), ["sendbird-reaction-badge".concat(getClassNameTail())]).join(' '),
     role: "button",
-    className: injectingClassName.join(' '),
+    ref: ref,
     onClick: onClick,
-    onKeyDown: onClick
+    onKeyDown: onClick,
+    tabIndex: 0
   }, React__default.createElement("div", {
     className: "sendbird-reaction-badge__inner"
   }, React__default.createElement("div", {
     className: "sendbird-reaction-badge__inner__icon"
   }, children), React__default.createElement(index$2.Label, {
-    className: children && count ? 'sendbird-reaction-badge__inner__count' : '',
+    className: children && count && 'sendbird-reaction-badge__inner__count',
     type: index$2.LabelTypography.CAPTION_3,
     color: index$2.LabelColors.ONBACKGROUND_1
   }, count)));
 });
 ReactionBadge.propTypes = {
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   children: PropTypes.element.isRequired,
   count: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   selected: PropTypes.bool,
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   isAdd: PropTypes.bool,
   onClick: PropTypes.func
 };
@@ -1888,16 +1908,15 @@ ReactionBadge.defaultProps = {
   onClick: function onClick() {}
 };
 
-var CLASS_NAME = 'sendbird-tooltip';
 function Tooltip(_ref) {
   var className = _ref.className,
       children = _ref.children;
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.unshift(CLASS_NAME);
   return React__default.createElement("div", {
-    className: injectingClassName.join(' ')
+    className: [].concat(LocalizationContext._toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-tooltip']).join(' ')
   }, React__default.createElement(index$2.Label, {
-    className: "".concat(CLASS_NAME, "__text")
+    className: "sendbird-tooltip__text",
+    type: index$2.LabelTypography.CAPTION_2,
+    color: index$2.LabelColors.ONCONTENT_1
   }, children));
 }
 Tooltip.propTypes = {
@@ -1909,13 +1928,11 @@ Tooltip.defaultProps = {
   children: ''
 };
 
-var CLASS_NAME$1 = 'sendbird-tooltip-wrapper';
 var SPACE_FROM_TRIGGER = 8;
 function TooltipWrapper(_ref) {
   var className = _ref.className,
       children = _ref.children,
       hoverTooltip = _ref.hoverTooltip;
-  var injectingClassName = Array.isArray(className) ? [CLASS_NAME$1].concat(LocalizationContext._toConsumableArray(className)) : [CLASS_NAME$1, className];
 
   var _useState = React.useState(false),
       _useState2 = LocalizationContext._slicedToArray(_useState, 2),
@@ -1924,7 +1941,7 @@ function TooltipWrapper(_ref) {
 
   var childrenRef = React.useRef(null);
   return React__default.createElement("div", {
-    className: injectingClassName.join(' '),
+    className: [].concat(LocalizationContext._toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-tooltip-wrapper']).join(' '),
     onMouseOver: function onMouseOver() {
       setShowHoverTooltip(true);
     },
@@ -1938,17 +1955,17 @@ function TooltipWrapper(_ref) {
       setShowHoverTooltip(false);
     }
   }, React__default.createElement("div", {
-    className: "".concat(CLASS_NAME$1, "__children"),
+    className: "sendbird-tooltip-wrapper__children",
     ref: childrenRef
   }, children), showHoverTooltip && React__default.createElement("div", {
-    className: "".concat(CLASS_NAME$1, "__hover-tooltip"),
+    className: "sendbird-tooltip-wrapper__hover-tooltip",
     style: {
       bottom: "calc(100% + ".concat(SPACE_FROM_TRIGGER, "px)")
     }
   }, React__default.createElement("div", {
-    className: "".concat(CLASS_NAME$1, "__hover-tooltip__inner")
+    className: "sendbird-tooltip-wrapper__hover-tooltip__inner"
   }, React__default.createElement("div", {
-    className: "".concat(CLASS_NAME$1, "__hover-tooltip__inner__tooltip-container"),
+    className: "sendbird-tooltip-wrapper__hover-tooltip__inner__tooltip-container",
     style: {
       left: childrenRef.current && "calc(".concat(childrenRef.current.offsetWidth / 2, "px - 50%)")
     }
@@ -1971,8 +1988,6 @@ function EmojiReactions(_ref) {
       membersMap = _ref.membersMap,
       toggleReaction = _ref.toggleReaction,
       memoizedEmojiListItems = _ref.memoizedEmojiListItems;
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.unshift('sendbird-emoji-reactions');
   var MemoizedEmojiListItems = memoizedEmojiListItems;
   var imageWidth = '20px';
   var imageHeight = '20px';
@@ -1985,10 +2000,11 @@ function EmojiReactions(_ref) {
       stringSet = _useContext.stringSet;
 
   return React__default.createElement("div", {
-    className: injectingClassName.join(' ')
+    className: [].concat(LocalizationContext._toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-emoji-reactions']).join(' ')
   }, React__default.createElement("div", {
     className: "sendbird-emoji-reactions--inner"
   }, messageReactions && messageReactions.map(function (reaction) {
+    // function component
     var _reaction$userIds = reaction.userIds,
         userIds = _reaction$userIds === void 0 ? [] : _reaction$userIds;
     var emojiUrl = emojiAllMap.get(reaction.key) || '';
@@ -2024,9 +2040,9 @@ function EmojiReactions(_ref) {
   }), messageReactions.length < emojiAllMap.size && React__default.createElement(index.ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React__default.createElement(ReactionBadge, {
+        className: "sendbird-emoji-reactions__emoji-reaction-add",
         isAdd: true,
         onClick: toggleDropdown,
-        className: "sendbird-emoji-reactions__emoji-reaction-add",
         ref: emojiReactionAddRef
       }, React__default.createElement(index$2.Icon, {
         width: imageWidth,
@@ -2049,8 +2065,8 @@ function EmojiReactions(_ref) {
   })));
 }
 EmojiReactions.propTypes = {
-  userId: PropTypes.string,
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  userId: PropTypes.string,
   message: PropTypes.shape({
     reactions: PropTypes.arrayOf(PropTypes.shape({}))
   }).isRequired,
@@ -2061,8 +2077,8 @@ EmojiReactions.propTypes = {
 };
 EmojiReactions.defaultProps = {
   className: '',
-  membersMap: new Map(),
   userId: '',
+  membersMap: new Map(),
   toggleReaction: function toggleReaction() {},
   memoizedEmojiListItems: function memoizedEmojiListItems() {
     return '';
@@ -2136,10 +2152,10 @@ var noop = function noop() {};
 var GROUPING_PADDING = '1px';
 var NORMAL_PADDING = '8px';
 function Message(props) {
-  var isByMe = props.isByMe,
-      userId = props.userId,
+  var className = props.className,
       message = props.message,
-      className = props.className,
+      isByMe = props.isByMe,
+      userId = props.userId,
       resendMessage = props.resendMessage,
       disabled = props.disabled,
       showEdit = props.showEdit,
@@ -2153,21 +2169,19 @@ function Message(props) {
       chainTop = props.chainTop,
       chainBottom = props.chainBottom;
   if (!message) return null;
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.push("sendbird-message".concat(isByMe ? '--outgoing' : '--incoming'));
   var outgoingMemoizedMessageText = useMemoizedMessageText({
+    className: 'sendbird-user-message-word',
     message: message.message,
-    updatedAt: message.updatedAt,
-    className: 'sendbird-user-message-word'
+    updatedAt: message.updatedAt
   });
   var incomingMemoizedMessageText = useMemoizedMessageText({
+    className: 'sendbird-user-message-word',
     message: message.message,
     updatedAt: message.updatedAt,
-    className: 'sendbird-user-message-word',
     incoming: true
   });
   return React__default.createElement("div", {
-    className: [].concat(LocalizationContext._toConsumableArray(injectingClassName), ['sendbird-message']).join(' ')
+    className: [].concat(LocalizationContext._toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-message', "sendbird-message".concat(isByMe ? '--outgoing' : '--incoming')]).join(' ')
   }, isByMe ? React__default.createElement(OutgoingUserMessage, {
     userId: userId,
     message: message,
@@ -2316,10 +2330,10 @@ function OutgoingUserMessage(_ref) {
           handleMoreIconBlur();
         }
       }, React__default.createElement(index$2.Icon, {
-        width: "24px",
-        height: "24px",
         type: index$2.IconTypes.MORE,
-        fillColor: index$2.IconColors.CONTENT_INVERSE
+        fillColor: index$2.IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(close) {
@@ -2703,14 +2717,12 @@ function AdminMessage(_ref) {
   var className = _ref.className,
       message = _ref.message;
 
-  if (!message.messageType || message.messageType !== 'admin') {
-    // change to use message.isAdminMessage()
+  if (!(message.isAdminMessage || message.messageType) || !message.isAdminMessage() || message.messageType !== 'admin') {
     return null;
   }
 
-  var injectingClassName = Array.isArray(className) ? className : [className];
   return React__default.createElement("div", {
-    className: [].concat(LocalizationContext._toConsumableArray(injectingClassName), ['sendbird-admin-message']).join(' ')
+    className: [].concat(LocalizationContext._toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-admin-message']).join(' ')
   }, React__default.createElement(index$2.Label, {
     className: "sendbird-admin-message__text",
     type: index$2.LabelTypography.CAPTION_2,
@@ -2718,7 +2730,11 @@ function AdminMessage(_ref) {
   }, message.message));
 }
 AdminMessage.propTypes = {
-  message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])),
+  message: PropTypes.shape({
+    message: PropTypes.string,
+    messageType: PropTypes.string,
+    isAdminMessage: PropTypes.func
+  }),
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
 };
 AdminMessage.defaultProps = {
@@ -2875,10 +2891,10 @@ function OutgoingThumbnailMessage(_ref2) {
           handleMoreIconBlur();
         }
       }, React__default.createElement(index$2.Icon, {
-        width: "24px",
-        height: "24px",
         type: index$2.IconTypes.MORE,
-        fillColor: index$2.IconColors.CONTENT_INVERSE
+        fillColor: index$2.IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(close) {
@@ -2928,10 +2944,10 @@ function OutgoingThumbnailMessage(_ref2) {
           handleMoreIconBlur();
         }
       }, React__default.createElement(index$2.Icon, {
-        width: "24px",
-        height: "24px",
         type: index$2.IconTypes.EMOJI_MORE,
-        fillColor: index$2.IconColors.CONTENT_INVERSE
+        fillColor: index$2.IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(close) {
@@ -2951,23 +2967,23 @@ function OutgoingThumbnailMessage(_ref2) {
       });
     }
   })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React__default.createElement(MessageStatus, {
+    className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-left-padding__status"),
     message: message,
-    status: status,
-    className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-left-padding__status")
+    status: status
   })), React__default.createElement("div", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "__body")
   }, React__default.createElement("div", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__wrap")
   }, React__default.createElement("div", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__wrap--inner"),
+    role: "button",
     onClick: isMessageSent ? function () {
       return onClick(true);
     } : function () {},
     onKeyDown: isMessageSent ? function () {
       return onClick(true);
     } : function () {},
-    tabIndex: 0,
-    role: "button"
+    tabIndex: 0
   }, index$3.isVideo(type) && React__default.createElement(React__default.Fragment, null, thumbnailUrl ? React__default.createElement(index$2.ImageRenderer, {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__video"),
     url: thumbnailUrl,
@@ -3104,13 +3120,13 @@ function IncomingThumbnailMessage(_ref3) {
   }, !chainBottom && React__default.createElement(index.ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React__default.createElement(index$2.Avatar, {
+        className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__avatar"),
         ref: avatarRef,
         onClick: function onClick() {
           if (!disableUserProfile) {
             toggleDropdown();
           }
         },
-        className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__avatar"),
         src: utils.getSenderProfileUrl(message),
         width: "28px",
         height: "28px"
@@ -3141,13 +3157,13 @@ function IncomingThumbnailMessage(_ref3) {
   }), React__default.createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "-body__wrap--inner"),
     role: "button",
-    tabIndex: 0,
     onClick: isMessageSent ? function () {
       return onClick(true);
     } : function () {},
     onKeyDown: isMessageSent ? function () {
       return onClick(true);
-    } : function () {}
+    } : function () {},
+    tabIndex: 0
   }, index$3.isVideo(type) && React__default.createElement(React__default.Fragment, null, thumbnailUrl ? React__default.createElement(index$2.ImageRenderer, {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__video"),
     url: thumbnailUrl,
@@ -3170,8 +3186,8 @@ function IncomingThumbnailMessage(_ref3) {
     src: url || localUrl,
     type: type
   })), React__default.createElement(index$2.Icon, {
-    className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__video-icon"),
     type: index$2.IconTypes.PLAY,
+    className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__video-icon"),
     width: "56px",
     height: "56px"
   })), index$3.isImage(type) && React__default.createElement(index$2.ImageRenderer, {
@@ -3350,12 +3366,13 @@ function checkFileType(fileUrl) {
   return result;
 }
 
-function OutgoingFileMessage(_ref) {
+var MessageSwitch = function MessageSwitch(_ref) {
   var message = _ref.message,
       userId = _ref.userId,
-      status = _ref.status,
-      showRemove = _ref.showRemove,
       disabled = _ref.disabled,
+      isByMe = _ref.isByMe,
+      showRemove = _ref.showRemove,
+      status = _ref.status,
       resendMessage = _ref.resendMessage,
       useReaction = _ref.useReaction,
       emojiAllMap = _ref.emojiAllMap,
@@ -3364,6 +3381,81 @@ function OutgoingFileMessage(_ref) {
       memoizedEmojiListItems = _ref.memoizedEmojiListItems,
       chainTop = _ref.chainTop,
       chainBottom = _ref.chainBottom;
+  return React__default.createElement("div", {
+    className: "sendbird-file-message".concat(isByMe ? '--outgoing' : '--incoming')
+  }, isByMe ? React__default.createElement(OutgoingFileMessage, {
+    message: message,
+    userId: userId,
+    disabled: disabled,
+    showRemove: showRemove,
+    status: status,
+    resendMessage: resendMessage,
+    useReaction: useReaction,
+    emojiAllMap: emojiAllMap,
+    membersMap: membersMap,
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems,
+    chainTop: chainTop,
+    chainBottom: chainBottom
+  }) : React__default.createElement(IncomingFileMessage, {
+    userId: userId,
+    message: message,
+    useReaction: useReaction,
+    emojiAllMap: emojiAllMap,
+    membersMap: membersMap,
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems,
+    chainTop: chainTop,
+    chainBottom: chainBottom
+  }));
+};
+
+MessageSwitch.propTypes = {
+  message: PropTypes.shape({}),
+  userId: PropTypes.string,
+  isByMe: PropTypes.bool,
+  disabled: PropTypes.bool,
+  showRemove: PropTypes.func,
+  resendMessage: PropTypes.func,
+  status: PropTypes.string.isRequired,
+  useReaction: PropTypes.bool.isRequired,
+  emojiAllMap: PropTypes.instanceOf(Map),
+  membersMap: PropTypes.instanceOf(Map),
+  toggleReaction: PropTypes.func,
+  memoizedEmojiListItems: PropTypes.func,
+  chainTop: PropTypes.bool,
+  chainBottom: PropTypes.bool
+};
+MessageSwitch.defaultProps = {
+  message: {},
+  isByMe: false,
+  disabled: false,
+  showRemove: noop$2,
+  resendMessage: noop$2,
+  userId: '',
+  emojiAllMap: new Map(),
+  membersMap: new Map(),
+  toggleReaction: noop$2,
+  memoizedEmojiListItems: function memoizedEmojiListItems() {
+    return '';
+  },
+  chainTop: false,
+  chainBottom: false
+};
+function OutgoingFileMessage(_ref2) {
+  var message = _ref2.message,
+      userId = _ref2.userId,
+      status = _ref2.status,
+      showRemove = _ref2.showRemove,
+      disabled = _ref2.disabled,
+      resendMessage = _ref2.resendMessage,
+      useReaction = _ref2.useReaction,
+      emojiAllMap = _ref2.emojiAllMap,
+      membersMap = _ref2.membersMap,
+      toggleReaction = _ref2.toggleReaction,
+      memoizedEmojiListItems = _ref2.memoizedEmojiListItems,
+      chainTop = _ref2.chainTop,
+      chainBottom = _ref2.chainBottom;
   var url = message.plainUrl || message.url;
 
   var openFileUrl = function openFileUrl() {
@@ -3415,11 +3507,11 @@ function OutgoingFileMessage(_ref) {
       paddingBottom: chainBottom ? GROUPAING_PADDING : NORMAL_PADDING$2
     }
   }, React__default.createElement("div", {
-    className: "sendbird-file-message--inner"
+    className: "sendbird-file-message__outgoing--inner"
   }, React__default.createElement("div", {
-    className: "sendbird-file-message__left-padding"
+    className: "sendbird-file-message__outgoing__left-padding"
   }, React__default.createElement("div", {
-    className: "sendbird-file-message__more",
+    className: "sendbird-file-message__outgoing__left-padding__more",
     ref: parentContainRef
   }, React__default.createElement(index.ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
@@ -3489,10 +3581,10 @@ function OutgoingFileMessage(_ref) {
           handleMoreIconBlur();
         }
       }, React__default.createElement(index$2.Icon, {
-        width: "24px",
-        height: "24px",
         type: index$2.IconTypes.EMOJI_MORE,
-        fillColor: index$2.IconColors.CONTENT_INVERSE
+        fillColor: index$2.IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(close) {
@@ -3512,31 +3604,31 @@ function OutgoingFileMessage(_ref) {
       });
     }
   })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React__default.createElement("div", {
-    className: "sendbird-file-message__status"
+    className: "sendbird-file-message__outgoing__left-padding__status"
   }, React__default.createElement(MessageStatus, {
     message: message,
     status: status
   }))), React__default.createElement("div", {
-    className: "sendbird-file-message__tooltip"
+    className: "sendbird-file-message__outgoing__tooltip"
   }, React__default.createElement("div", {
-    className: "sendbird-file-message__tooltip__inner"
+    className: "sendbird-file-message__outgoing__tooltip__inner"
   }, checkFileType(url) ? React__default.createElement("div", {
-    className: "sendbird-file-message__tooltip__icon-box"
+    className: "sendbird-file-message__outgoing__tooltip__icon-box"
   }, React__default.createElement(index$2.Icon, {
-    className: "sendbird-file-message__tooltip__icon-box__icon",
+    className: "sendbird-file-message__outgoing__tooltip__icon-box__icon",
     type: checkFileType(url),
     fillColor: index$2.IconColors.PRIMARY,
     width: "24px",
     height: "24px"
   })) : null, React__default.createElement(index.TextButton, {
-    className: "sendbird-file-message__tooltip__text",
+    className: "sendbird-file-message__outgoing__tooltip__text",
     onClick: openFileUrl,
     color: index$2.LabelColors.ONCONTENT_1
   }, React__default.createElement(index$2.Label, {
     type: index$2.LabelTypography.BODY_1,
     color: index$2.LabelColors.ONCONTENT_1
   }, utils$1.truncate(message.name || message.url, MAX_TRUNCATE_LENGTH)))), showEmojiReactions && React__default.createElement(EmojiReactions, {
-    className: "sendbird-file-message__tooltip__emoji-reactions",
+    className: "sendbird-file-message__outgoing__tooltip__emoji-reactions",
     userId: userId,
     message: message,
     emojiAllMap: emojiAllMap,
@@ -3545,16 +3637,16 @@ function OutgoingFileMessage(_ref) {
     memoizedEmojiListItems: memoizedEmojiListItems
   }))));
 }
-function IncomingFileMessage(_ref2) {
-  var message = _ref2.message,
-      userId = _ref2.userId,
-      useReaction = _ref2.useReaction,
-      emojiAllMap = _ref2.emojiAllMap,
-      membersMap = _ref2.membersMap,
-      toggleReaction = _ref2.toggleReaction,
-      memoizedEmojiListItems = _ref2.memoizedEmojiListItems,
-      chainTop = _ref2.chainTop,
-      chainBottom = _ref2.chainBottom;
+function IncomingFileMessage(_ref3) {
+  var message = _ref3.message,
+      userId = _ref3.userId,
+      useReaction = _ref3.useReaction,
+      emojiAllMap = _ref3.emojiAllMap,
+      membersMap = _ref3.membersMap,
+      toggleReaction = _ref3.toggleReaction,
+      memoizedEmojiListItems = _ref3.memoizedEmojiListItems,
+      chainTop = _ref3.chainTop,
+      chainBottom = _ref3.chainBottom;
 
   var openFileUrl = function openFileUrl() {
     window.open(message.url);
@@ -3608,9 +3700,9 @@ function IncomingFileMessage(_ref2) {
       paddingBottom: chainBottom ? GROUPAING_PADDING : NORMAL_PADDING$2
     }
   }, React__default.createElement("div", {
-    className: "sendbird-file-message--inner"
+    className: "sendbird-file-message__incoming--inner"
   }, React__default.createElement("div", {
-    className: "sendbird-file-message__body"
+    className: "sendbird-file-message__incoming__body"
   }, !chainBottom && React__default.createElement(index.ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React__default.createElement(index$2.Avatar, {
@@ -3620,7 +3712,7 @@ function IncomingFileMessage(_ref2) {
             toggleDropdown();
           }
         },
-        className: "sendbird-file-message__avatar",
+        className: "sendbird-file-message__incoming__body__avatar",
         src: utils.getSenderProfileUrl(message),
         width: "28px",
         height: "28px"
@@ -3649,29 +3741,29 @@ function IncomingFileMessage(_ref2) {
       }));
     }
   }), !chainTop && React__default.createElement(index$2.Label, {
-    className: "sendbird-file-message__sender-name",
+    className: "sendbird-file-message__incoming__body__sender-name",
     type: index$2.LabelTypography.CAPTION_2,
     color: index$2.LabelColors.ONBACKGROUND_2
   }, utils.getSenderName(message)), React__default.createElement("div", {
-    className: "sendbird-file-message__tooltip"
+    className: "sendbird-file-message__incoming__body__tooltip"
   }, React__default.createElement("div", {
-    className: "sendbird-file-message__tooltip__inner"
+    className: "sendbird-file-message__incoming__body__tooltip__inner"
   }, checkFileType(message.url) ? React__default.createElement("div", {
-    className: "sendbird-file-message__tooltip__icon-box"
+    className: "sendbird-file-message__incoming__body__tooltip__icon-box"
   }, React__default.createElement(index$2.Icon, {
-    className: "sendbird-file-message__tooltip__icon-box__icon",
+    className: "sendbird-file-message__incoming__body__tooltip__icon-box__icon",
     type: checkFileType(message.url),
     fillColor: index$2.IconColors.PRIMARY,
     width: "24px",
     height: "24px"
   })) : null, React__default.createElement(index.TextButton, {
-    className: "sendbird-file-message__tooltip__text",
+    className: "sendbird-file-message__incoming__body__tooltip__text",
     onClick: openFileUrl
   }, React__default.createElement(index$2.Label, {
     type: index$2.LabelTypography.BODY_1,
     color: index$2.LabelColors.ONBACKGROUND_1
   }, utils$1.truncate(message.name || message.url, MAX_TRUNCATE_LENGTH)))), useReaction && message.reactions && message.reactions.length > 0 && React__default.createElement(EmojiReactions, {
-    className: "sendbird-file-message__tooltip__emoji-reactions",
+    className: "sendbird-file-message__incoming__body__tooltip__emoji-reactions",
     userId: userId,
     message: message,
     emojiAllMap: emojiAllMap,
@@ -3679,10 +3771,13 @@ function IncomingFileMessage(_ref2) {
     toggleReaction: toggleReaction,
     memoizedEmojiListItems: memoizedEmojiListItems
   }))), React__default.createElement("div", {
-    className: "sendbird-file-message__right-padding"
+    className: "sendbird-file-message__incoming__right-padding"
   }, React__default.createElement("div", {
-    className: "sendbird-file-message__more",
-    ref: parentContainRef
+    className: "sendbird-file-message__incoming__right-padding__more",
+    ref: parentContainRef,
+    style: {
+      top: chainTop ? 6 : 18
+    }
   }, showReactionAddButton && React__default.createElement(index.ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React__default.createElement(index.IconButton, {
@@ -3721,7 +3816,7 @@ function IncomingFileMessage(_ref2) {
       });
     }
   })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React__default.createElement(index$2.Label, {
-    className: "sendbird-file-message__sent-at",
+    className: "sendbird-file-message__incoming__right-padding__sent-at",
     type: index$2.LabelTypography.CAPTION_3,
     color: index$2.LabelColors.ONBACKGROUND_2
   }, utils.getMessageCreatedAt(message)))));
@@ -3777,83 +3872,6 @@ IncomingFileMessage.defaultProps = {
   }
 };
 
-var MessageSwitch = function MessageSwitch(_ref3) {
-  var message = _ref3.message,
-      userId = _ref3.userId,
-      disabled = _ref3.disabled,
-      isByMe = _ref3.isByMe,
-      showRemove = _ref3.showRemove,
-      status = _ref3.status,
-      resendMessage = _ref3.resendMessage,
-      useReaction = _ref3.useReaction,
-      emojiAllMap = _ref3.emojiAllMap,
-      membersMap = _ref3.membersMap,
-      toggleReaction = _ref3.toggleReaction,
-      memoizedEmojiListItems = _ref3.memoizedEmojiListItems,
-      chainTop = _ref3.chainTop,
-      chainBottom = _ref3.chainBottom;
-  return React__default.createElement("div", {
-    className: "sendbird-file-message".concat(isByMe ? '--outgoing' : '--incoming')
-  }, isByMe ? React__default.createElement(OutgoingFileMessage, {
-    message: message,
-    userId: userId,
-    disabled: disabled,
-    showRemove: showRemove,
-    status: status,
-    resendMessage: resendMessage,
-    useReaction: useReaction,
-    emojiAllMap: emojiAllMap,
-    membersMap: membersMap,
-    toggleReaction: toggleReaction,
-    memoizedEmojiListItems: memoizedEmojiListItems,
-    chainTop: chainTop,
-    chainBottom: chainBottom
-  }) : React__default.createElement(IncomingFileMessage, {
-    userId: userId,
-    message: message,
-    useReaction: useReaction,
-    emojiAllMap: emojiAllMap,
-    membersMap: membersMap,
-    toggleReaction: toggleReaction,
-    memoizedEmojiListItems: memoizedEmojiListItems,
-    chainTop: chainTop,
-    chainBottom: chainBottom
-  }));
-};
-
-MessageSwitch.propTypes = {
-  message: PropTypes.shape({}),
-  userId: PropTypes.string,
-  isByMe: PropTypes.bool,
-  disabled: PropTypes.bool,
-  showRemove: PropTypes.func,
-  resendMessage: PropTypes.func,
-  status: PropTypes.string.isRequired,
-  useReaction: PropTypes.bool.isRequired,
-  emojiAllMap: PropTypes.instanceOf(Map),
-  membersMap: PropTypes.instanceOf(Map),
-  toggleReaction: PropTypes.func,
-  memoizedEmojiListItems: PropTypes.func,
-  chainTop: PropTypes.bool,
-  chainBottom: PropTypes.bool
-};
-MessageSwitch.defaultProps = {
-  message: {},
-  isByMe: false,
-  disabled: false,
-  showRemove: noop$2,
-  resendMessage: noop$2,
-  userId: '',
-  emojiAllMap: new Map(),
-  membersMap: new Map(),
-  toggleReaction: noop$2,
-  memoizedEmojiListItems: function memoizedEmojiListItems() {
-    return '';
-  },
-  chainTop: false,
-  chainBottom: false
-};
-
 var RemoveMessage = function RemoveMessage(props) {
   var onCloseModal = props.onCloseModal,
       onDeleteMessage = props.onDeleteMessage;
@@ -3878,7 +3896,6 @@ var getMessageCreatedAt$2 = function getMessageCreatedAt(message) {
   return format(message.createdAt, 'p');
 };
 
-var CLASS_NAME$2 = 'sendbird-unknown-message';
 var GROUPING_PADDING$2 = '1px';
 var NORMAL_PADDING$3 = '8px';
 function UnknownMessage(_ref) {
@@ -3889,11 +3906,8 @@ function UnknownMessage(_ref) {
       showRemove = _ref.showRemove,
       chainTop = _ref.chainTop,
       chainBottom = _ref.chainBottom;
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.unshift(CLASS_NAME$2);
-  injectingClassName.push("".concat(CLASS_NAME$2).concat(isByMe ? '--outgoing' : '--incoming'));
   return React__default.createElement("div", {
-    className: injectingClassName.join(' ')
+    className: [].concat(LocalizationContext._toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-unknown-message', "sendbird-unknown-message".concat(isByMe ? '--outgoing' : '--incoming')]).join(' ')
   }, isByMe ? React__default.createElement(OutgoingUnknownMessage, {
     status: status,
     message: message,
@@ -3930,7 +3944,6 @@ function OutgoingUnknownMessage(_ref2) {
       showRemove = _ref2.showRemove,
       chainTop = _ref2.chainTop,
       chainBottom = _ref2.chainBottom;
-  var className = 'sendbird-outgoing-unknown-message';
   var messageRef = React.useRef(null);
   var parentContainRef = React.useRef(null);
   var menuRef = React.useRef(null);
@@ -3966,23 +3979,23 @@ function OutgoingUnknownMessage(_ref2) {
     setHover: setMousehover
   });
   return React__default.createElement("div", {
+    className: "sendbird-outgoing-unknown-message",
     ref: messageRef,
-    className: className,
     style: {
       paddingTop: chainTop ? GROUPING_PADDING$2 : NORMAL_PADDING$3,
       paddingBottom: chainBottom ? GROUPING_PADDING$2 : NORMAL_PADDING$3
     }
   }, React__default.createElement("div", {
-    className: "".concat(className, "--inner")
+    className: "sendbird-outgoing-unknown-message--inner"
   }, React__default.createElement("div", {
-    className: "".concat(className, "--left-padding")
+    className: "sendbird-outgoing-unknown-message--left-padding"
   }, React__default.createElement("div", {
-    className: "".concat(className, "__more"),
+    className: "sendbird-outgoing-unknown-message__more",
     ref: parentContainRef
   }, React__default.createElement(index.ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React__default.createElement(index.IconButton, {
-        className: "".concat(className, "__more__menu"),
+        className: "sendbird-outgoing-unknown-message__more__menu",
         ref: menuRef,
         width: "32px",
         height: "32px",
@@ -3995,10 +4008,10 @@ function OutgoingUnknownMessage(_ref2) {
           handleMoreIconBlur();
         }
       }, React__default.createElement(index$2.Icon, {
-        width: "24px",
-        height: "24px",
         type: index$2.IconTypes.MORE,
-        fillColor: index$2.IconColors.CONTENT_INVERSE
+        fillColor: index$2.IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(close) {
@@ -4025,20 +4038,20 @@ function OutgoingUnknownMessage(_ref2) {
       }, "Delete"));
     }
   })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React__default.createElement("div", {
-    className: "".concat(className, "__message-status")
+    className: "sendbird-outgoing-unknown-message__message-status"
   }, React__default.createElement(MessageStatus, {
     message: message,
     status: status
   }))), React__default.createElement("div", {
-    className: "".concat(className, "__body")
+    className: "sendbird-outgoing-unknown-message__body"
   }, React__default.createElement("div", {
-    className: "".concat(className, "__body__text-balloon")
+    className: "sendbird-outgoing-unknown-message__body__text-balloon"
   }, React__default.createElement(index$2.Label, {
-    className: "".concat(className, "__body__text-balloon__header"),
+    className: "sendbird-outgoing-unknown-message__body__text-balloon__header",
     type: index$2.LabelTypography.BODY_1,
     color: index$2.LabelColors.ONBACKGROUND_1
   }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React__default.createElement(index$2.Label, {
-    className: "".concat(className, "__body__text-balloon__description"),
+    className: "sendbird-outgoing-unknown-message__body__text-balloon__description",
     type: index$2.LabelTypography.BODY_1,
     color: index$2.LabelColors.ONBACKGROUND_2
   }, stringSet.UNKNOWN__CANNOT_READ_MESSAGE)))));
@@ -4048,7 +4061,6 @@ function IncomingUnknownMessage(_ref3) {
   var message = _ref3.message,
       chainTop = _ref3.chainTop,
       chainBottom = _ref3.chainBottom;
-  var className = 'sendbird-incoming-unknown-message';
   var sender = message.sender;
   var avatarRef = React.useRef(null);
 
@@ -4060,29 +4072,29 @@ function IncomingUnknownMessage(_ref3) {
       renderUserProfile = _React$useContext.renderUserProfile;
 
   return React__default.createElement("div", {
-    className: className,
+    className: "sendbird-incoming-unknown-message",
     style: {
       paddingTop: chainTop ? GROUPING_PADDING$2 : NORMAL_PADDING$3,
       paddingBottom: chainBottom ? GROUPING_PADDING$2 : NORMAL_PADDING$3
     }
   }, React__default.createElement("div", {
-    className: "".concat(className, "--inner")
+    className: "sendbird-incoming-unknown-message--inner"
   }, React__default.createElement("div", {
-    className: "".concat(className, "__left")
+    className: "sendbird-incoming-unknown-message__left"
   }, !chainBottom && React__default.createElement(index.ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React__default.createElement(index$2.Avatar, {
+        className: "sendbird-incoming-unknown-message__left__sender-profile-image",
         ref: avatarRef,
+        src: sender.profileUrl,
+        alt: "sender-profile-image",
+        width: "28px",
+        height: "28px",
         onClick: function onClick() {
           if (!disableUserProfile) {
             toggleDropdown();
           }
-        },
-        className: "".concat(className, "__left__sender-profile-image"),
-        src: sender.profileUrl,
-        width: "28px",
-        height: "28px",
-        alt: "sender-profile-image"
+        }
       });
     },
     menuItems: function menuItems(closeDropdown) {
@@ -4108,25 +4120,25 @@ function IncomingUnknownMessage(_ref3) {
       }));
     }
   })), React__default.createElement("div", {
-    className: "".concat(className, "__body")
+    className: "sendbird-incoming-unknown-message__body"
   }, !chainTop && React__default.createElement(index$2.Label, {
-    className: "".concat(className, "__body__sender-name"),
+    className: "sendbird-incoming-unknown-message__body__sender-name",
     type: index$2.LabelTypography.CAPTION_2,
     color: index$2.LabelColors.ONBACKGROUND_2
   }, sender.nickname || stringSet.NO_NAME), React__default.createElement("div", {
-    className: "".concat(className, "__body__text-balloon")
+    className: "sendbird-incoming-unknown-message__body__text-balloon"
   }, React__default.createElement(index$2.Label, {
-    className: "".concat(className, "__body__text-balloon__header"),
+    className: "sendbird-incoming-unknown-message__body__text-balloon__header",
     type: index$2.LabelTypography.BODY_1,
     color: index$2.LabelColors.ONBACKGROUND_1
   }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React__default.createElement(index$2.Label, {
-    className: "".concat(className, "__body__text-balloon__description"),
+    className: "sendbird-incoming-unknown-message__body__text-balloon__description",
     type: index$2.LabelTypography.BODY_1,
     color: index$2.LabelColors.ONBACKGROUND_2
   }, stringSet.UNKNOWN__CANNOT_READ_MESSAGE))), React__default.createElement("div", {
-    className: "".concat(className, "--right-padding")
+    className: "sendbird-incoming-unknown-message--right-padding"
   }, !chainBottom && React__default.createElement(index$2.Label, {
-    className: "".concat(className, "__sent-at"),
+    className: "sendbird-incoming-unknown-message__sent-at",
     type: index$2.LabelTypography.CAPTION_3,
     color: index$2.LabelColors.ONBACKGROUND_2
   }, getMessageCreatedAt$2(message)))));
@@ -4152,11 +4164,6 @@ IncomingUnknownMessage.propTypes = {
   chainTop: PropTypes.bool.isRequired,
   chainBottom: PropTypes.bool.isRequired
 };
-
-var URL_REG = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
-var OG_MESSAGE = 'sendbird-og-message';
-var OUTGOING_OG_MESSAGE = 'sendbird-outgoing-og-message';
-var INCOMING_OG_MESSAGE = 'sendbird-incoming-og-message';
 
 var createUrlTester = function createUrlTester(regexp) {
   return function (text) {
@@ -4221,6 +4228,8 @@ var checkOGIsEnalbed = function checkOGIsEnalbed(message) {
   return true;
 };
 
+var URL_REG = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
+
 var isUrl = createUrlTester(URL_REG);
 function useMemoizedMessageText$1(_ref) {
   var message = _ref.message,
@@ -4271,14 +4280,14 @@ var GROUPING_PADDING$3 = '1px';
 var NORAML_PADDING = '8px';
 
 var OGMessageSwitch = function OGMessageSwitch(_ref) {
-  var isByMe = _ref.isByMe,
+  var className = _ref.className,
+      isByMe = _ref.isByMe,
       userId = _ref.userId,
       status = _ref.status,
       message = _ref.message,
       disabled = _ref.disabled,
       showEdit = _ref.showEdit,
       chainTop = _ref.chainTop,
-      className = _ref.className,
       membersMap = _ref.membersMap,
       showRemove = _ref.showRemove,
       useReaction = _ref.useReaction,
@@ -4288,7 +4297,6 @@ var OGMessageSwitch = function OGMessageSwitch(_ref) {
       toggleReaction = _ref.toggleReaction,
       memoizedEmojiListItems = _ref.memoizedEmojiListItems;
   var ogMetaData = message.ogMetaData;
-  var injectingClassName = Array.isArray(className) ? className : [className];
 
   var openLink = function openLink() {
     if (checkOGIsEnalbed(message)) {
@@ -4309,7 +4317,7 @@ var OGMessageSwitch = function OGMessageSwitch(_ref) {
     incoming: true
   });
   return React__default.createElement("div", {
-    className: "".concat(OG_MESSAGE, " ").concat(OG_MESSAGE).concat(isByMe ? '--outgoing' : '--incoming', " ").concat(injectingClassName.join(' '))
+    className: [].concat(LocalizationContext._toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-og-message', "sendbird-og-message".concat(isByMe ? '--outgoing' : '--incoming')]).join(' ')
   }, isByMe ? React__default.createElement(OutgoingOGMessage, {
     status: status,
     userId: userId,
@@ -4361,17 +4369,18 @@ function OutgoingOGMessage(props) {
       memoizedEmojiListItems = props.memoizedEmojiListItems;
   var ogMetaData = message.ogMetaData;
   var defaultImage = ogMetaData.defaultImage;
+  var MemoizedMessageText = memoizedMessageText;
+  var MemoizedEmojiListItems = memoizedEmojiListItems;
 
   var _useContext = React.useContext(LocalizationContext.LocalizationContext),
       stringSet = _useContext.stringSet;
 
-  var MemoizedMessageText = memoizedMessageText;
-  var MemoizedEmojiListItems = memoizedEmojiListItems;
-  var messageRef = React.useRef(null);
-  var parentRefReactions = React.useRef(null);
-  var parentRefMenus = React.useRef(null);
-  var parentContainRef = React.useRef(null);
   var isMessageSent = getIsSentFromStatus$1(status);
+  var showEmojiReactions = useReaction && message.reactions && message.reactions.length > 0;
+  var messageRef = React.useRef(null);
+  var parentContainRef = React.useRef(null);
+  var parentRefMenus = React.useRef(null);
+  var parentRefReactions = React.useRef(null);
 
   var _useState = React.useState(false),
       _useState2 = LocalizationContext._slicedToArray(_useState, 2),
@@ -4382,8 +4391,6 @@ function OutgoingOGMessage(props) {
       _useState4 = LocalizationContext._slicedToArray(_useState3, 2),
       moreActive = _useState4[0],
       setMoreActive = _useState4[1];
-
-  var showEmojiReactions = useReaction && message.reactions && message.reactions.length > 0;
 
   var handleMoreIconClick = function handleMoreIconClick() {
     setMoreActive(true);
@@ -4398,23 +4405,23 @@ function OutgoingOGMessage(props) {
     setHover: setMousehover
   });
   return React__default.createElement("div", {
+    className: "sendbird-outgoing-og-message",
     ref: messageRef,
-    className: OUTGOING_OG_MESSAGE,
     style: {
       paddingTop: chainTop ? GROUPING_PADDING$3 : NORAML_PADDING,
       paddingBottom: chainBottom ? GROUPING_PADDING$3 : NORAML_PADDING
     }
   }, React__default.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "--inner")
+    className: "sendbird-outgoing-og-message--inner"
   }, React__default.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "--left-padding")
+    className: "sendbird-outgoing-og-message--left-padding"
   }, React__default.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__more"),
+    className: "sendbird-outgoing-og-message__more",
     ref: parentContainRef
   }, React__default.createElement(index.ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React__default.createElement(index.IconButton, {
-        className: "".concat(OUTGOING_OG_MESSAGE, "__more__menu"),
+        className: "sendbird-outgoing-og-message__more__menu",
         ref: parentRefMenus,
         width: "32px",
         height: "32px",
@@ -4426,10 +4433,10 @@ function OutgoingOGMessage(props) {
           handleMoreIconBlur();
         }
       }, React__default.createElement(index$2.Icon, {
-        width: "24px",
-        height: "24px",
         type: index$2.IconTypes.MORE,
-        fillColor: index$2.IconColors.CONTENT_INVERSE
+        fillColor: index$2.IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(closeDropdown) {
@@ -4441,7 +4448,7 @@ function OutgoingOGMessage(props) {
         closeDropdown: closeDropdown,
         openLeft: true
       }, isMessageSent && React__default.createElement(index.MenuItem, {
-        className: "".concat(OUTGOING_OG_MESSAGE, "__more__menu__copy"),
+        className: "sendbird-outgoing-og-message__more__menu__copy",
         onClick: function onClick() {
           copyToClipboard(message.message);
           closeDropdown();
@@ -4474,16 +4481,16 @@ function OutgoingOGMessage(props) {
   }), isMessageSent && useReaction && emojiAllMap.size > 0 && React__default.createElement(index.ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React__default.createElement(index.IconButton, {
-        className: "".concat(OUTGOING_OG_MESSAGE, "__more__add-reaction"),
+        className: "sendbird-outgoing-og-message__more__add-reaction",
         ref: parentRefReactions,
         width: "32px",
         height: "32px",
         onClick: toggleDropdown
       }, React__default.createElement(index$2.Icon, {
-        width: "24px",
-        height: "24px",
         type: index$2.IconTypes.EMOJI_MORE,
-        fillColor: index$2.IconColors.CONTENT_INVERSE
+        fillColor: index$2.IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(closeDropdown) {
@@ -4498,66 +4505,66 @@ function OutgoingOGMessage(props) {
       });
     }
   })), !chainBottom && !(mousehover || moreActive) && React__default.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__message-status")
+    className: "sendbird-outgoing-og-message__message-status"
   }, React__default.createElement(MessageStatus, {
     message: message,
     status: status
   }))), React__default.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "--body")
+    className: "sendbird-outgoing-og-message--body"
   }, React__default.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__text-balloon")
+    className: "sendbird-outgoing-og-message__text-balloon"
   }, React__default.createElement(MemoizedMessageText, null)), React__default.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__thumbnail ").concat(checkOGIsEnalbed(message) ? '' : "".concat(OUTGOING_OG_MESSAGE, "__thumbnail--disabled")),
+    className: ['sendbird-outgoing-og-message__thumbnail', checkOGIsEnalbed(message) ? '' : 'sendbird-outgoing-og-message__thumbnail--disabled'].join(' '),
+    role: "button",
     onClick: openLink,
     onKeyDown: openLink,
-    role: "button",
     tabIndex: 0
   }, defaultImage && React__default.createElement(index$2.ImageRenderer, {
+    className: "sendbird-outgoing-og-message__thumbnail__image",
     url: defaultImage.url || '',
     alt: defaultImage.alt,
-    className: "".concat(OUTGOING_OG_MESSAGE, "__thumbnail__image"),
     width: "320px",
     height: "180px",
     defaultComponent: React__default.createElement("div", {
-      className: "".concat(OUTGOING_OG_MESSAGE, "__thumbnail__image__placeholder")
+      className: "sendbird-outgoing-og-message__thumbnail__image__placeholder"
     }, React__default.createElement(index$2.Icon, {
+      type: index$2.IconTypes.THUMBNAIL_NONE,
       width: "56px",
-      height: "56px",
-      type: index$2.IconTypes.THUMBNAIL_NONE
+      height: "56px"
     }))
   })), React__default.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__og-tag ").concat(checkOGIsEnalbed(message) ? '' : "".concat(OUTGOING_OG_MESSAGE, "__og-tag--disabled")),
+    className: ['sendbird-outgoing-og-message__og-tag', checkOGIsEnalbed(message) ? '' : 'sendbird-outgoing-og-message__og-tag--disabled'].join(' '),
+    role: "button",
     onClick: openLink,
     onKeyDown: openLink,
-    role: "button",
     tabIndex: 0
   }, ogMetaData.title && React__default.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__og-tag__title")
+    className: "sendbird-outgoing-og-message__og-tag__title"
   }, React__default.createElement(index$2.Label, {
     type: index$2.LabelTypography.SUBTITLE_2,
     color: index$2.LabelColors.ONBACKGROUND_1
   }, ogMetaData.title)), ogMetaData.description && React__default.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__og-tag__description")
+    className: "sendbird-outgoing-og-message__og-tag__description"
   }, React__default.createElement(index$2.Label, {
+    className: "sendbird-outgoing-og-message__og-tag__description__label",
     type: index$2.LabelTypography.BODY_2,
-    color: index$2.LabelColors.ONBACKGROUND_1,
-    className: "".concat(OUTGOING_OG_MESSAGE, "__og-tag__description__label")
+    color: index$2.LabelColors.ONBACKGROUND_1
   }, ogMetaData.description)), ogMetaData.url && React__default.createElement(index$2.Label, {
+    className: "sendbird-outgoing-og-message__og-tag__url",
     type: index$2.LabelTypography.CAPTION_3,
-    color: index$2.LabelColors.ONBACKGROUND_2,
-    className: "".concat(OUTGOING_OG_MESSAGE, "__og-tag__url")
+    color: index$2.LabelColors.ONBACKGROUND_2
   }, ogMetaData.url), showEmojiReactions && React__default.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__og-tag__emoji-reactions--wrapper"),
+    className: "sendbird-outgoing-og-message__og-tag__emoji-reactions--wrapper",
+    role: "button",
     onClick: function onClick(event) {
       return event.stopPropagation();
     },
     onKeyDown: function onKeyDown(event) {
       return event.stopPropagation();
     },
-    role: "button",
     tabIndex: 0
   }, React__default.createElement(EmojiReactions, {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__og-tag__emoji-reactions"),
+    className: "sendbird-outgoing-og-message__og-tag__emoji-reactions",
     userId: userId,
     message: message,
     membersMap: membersMap,
@@ -4587,6 +4594,8 @@ function IncomingOGMessage(props) {
 
   var MemoizedMessageText = memoizedMessageText;
   var MemoizedEmojiListItems = memoizedEmojiListItems;
+  var showEmojiReactions = useReaction && message.reactions && message.reactions.length > 0;
+  var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
   var messageRef = React.useRef(null);
   var avatarRef = React.useRef(null);
   var parentRefReactions = React.useRef(null);
@@ -4607,9 +4616,6 @@ function IncomingOGMessage(props) {
       moreActive = _useState8[0],
       setMoreActive = _useState8[1];
 
-  var showEmojiReactions = useReaction && message.reactions && message.reactions.length > 0;
-  var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
-
   var handleMoreIconClick = function handleMoreIconClick() {
     setMoreActive(true);
   };
@@ -4623,16 +4629,16 @@ function IncomingOGMessage(props) {
     setHover: setMousehover
   });
   return React__default.createElement("div", {
+    className: "sendbird-incoming-og-message",
     ref: messageRef,
-    className: INCOMING_OG_MESSAGE,
     style: {
       paddingTop: chainTop ? GROUPING_PADDING$3 : NORAML_PADDING,
       paddingBottom: chainBottom ? GROUPING_PADDING$3 : NORAML_PADDING
     }
   }, React__default.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "--inner")
+    className: "sendbird-incoming-og-message--inner"
   }, React__default.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "--body")
+    className: "sendbird-incoming-og-message--body"
   }, !chainBottom && React__default.createElement(index.ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return React__default.createElement(index$2.Avatar, {
@@ -4642,11 +4648,11 @@ function IncomingOGMessage(props) {
             toggleDropdown();
           }
         },
-        className: "".concat(INCOMING_OG_MESSAGE, "__avatar"),
+        className: "sendbird-incoming-og-message__avatar",
         src: getSenderProfileUrl(message),
+        alt: "sender-profile-image",
         width: "28px",
-        height: "28px",
-        alt: "sender-profile-image"
+        height: "28px"
       });
     },
     menuItems: function menuItems(closeDropdown) {
@@ -4669,65 +4675,65 @@ function IncomingOGMessage(props) {
       }));
     }
   }), !chainTop && React__default.createElement(index$2.Label, {
-    className: "".concat(INCOMING_OG_MESSAGE, "__sender-name"),
+    className: "sendbird-incoming-og-message__sender-name",
     type: index$2.LabelTypography.CAPTION_2,
     color: index$2.LabelColors.ONBACKGROUND_2
   }, getSenderName(message)), React__default.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__text-balloon")
+    className: "sendbird-incoming-og-message__text-balloon"
   }, React__default.createElement(MemoizedMessageText, null)), React__default.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__thumbnail ").concat(checkOGIsEnalbed(message) ? '' : "".concat(INCOMING_OG_MESSAGE, "__thumbnail--disabled")),
+    className: ['sendbird-incoming-og-message__thumbnail', checkOGIsEnalbed(message) ? '' : 'sendbird-incoming-og-message__thumbnail--disabled'].join(' '),
+    role: "button",
     onClick: openLink,
     onKeyDown: openLink,
-    role: "button",
     tabIndex: 0
   }, defaultImage && React__default.createElement(index$2.ImageRenderer, {
     url: defaultImage.url || '',
     alt: defaultImage.alt || '',
-    className: "".concat(INCOMING_OG_MESSAGE, "__thumbnail__image"),
+    className: "sendbird-incoming-og-message__thumbnail__image",
     width: "320px",
     height: "180px",
     defaultComponent: React__default.createElement("div", {
-      className: "".concat(INCOMING_OG_MESSAGE, "__thumbnail__image__placeholder")
+      className: "sendbird-incoming-og-message__thumbnail__image__placeholder"
     }, React__default.createElement(index$2.Icon, {
+      type: index$2.IconTypes.THUMBNAIL_NONE,
       width: "56px",
-      height: "56px",
-      type: index$2.IconTypes.THUMBNAIL_NONE
+      height: "56px"
     }))
   })), React__default.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag ").concat(checkOGIsEnalbed(message) ? '' : "".concat(INCOMING_OG_MESSAGE, "__og-tag--disabled")),
+    className: ['sendbird-incoming-og-message__og-tag', checkOGIsEnalbed(message) ? '' : 'sendbird-incoming-og-message__og-tag--disabled'].join(' '),
+    role: "button",
     onClick: openLink,
     onKeyDown: openLink,
-    role: "button",
     tabIndex: 0
   }, ogMetaData.title && React__default.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag__title")
+    className: "sendbird-incoming-og-message__og-tag__title"
   }, React__default.createElement(index$2.Label, {
     type: index$2.LabelTypography.SUBTITLE_2,
     color: index$2.LabelColors.ONBACKGROUND_1
   }, ogMetaData.title)), ogMetaData.description && React__default.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag__description")
+    className: "sendbird-incoming-og-message__og-tag__description"
   }, React__default.createElement(index$2.Label, {
+    className: "sendbird-incoming-og-message__og-tag__description__label",
     type: index$2.LabelTypography.BODY_2,
-    color: index$2.LabelColors.ONBACKGROUND_1,
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag__description__label")
+    color: index$2.LabelColors.ONBACKGROUND_1
   }, ogMetaData.description)), ogMetaData.url && React__default.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag__url")
+    className: "sendbird-incoming-og-message__og-tag__url"
   }, React__default.createElement(index$2.Label, {
+    className: "sendbird-incoming-og-message__og-tag__url__label",
     type: index$2.LabelTypography.CAPTION_3,
-    color: index$2.LabelColors.ONBACKGROUND_2,
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag__url__label")
+    color: index$2.LabelColors.ONBACKGROUND_2
   }, ogMetaData.url)), showEmojiReactions && React__default.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag__emoji-reactions--wrapper"),
+    className: "sendbird-incoming-og-message__og-tag__emoji-reactions--wrapper",
+    role: "button",
     onClick: function onClick(event) {
       return event.stopPropagation();
     },
     onKeyDown: function onKeyDown(event) {
       return event.stopPropagation();
     },
-    role: "button",
     tabIndex: 0
   }, React__default.createElement(EmojiReactions, {
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag__emoji-reactions"),
+    className: "sendbird-incoming-og-message__og-tag__emoji-reactions",
     userId: userId,
     message: message,
     membersMap: membersMap,
@@ -4735,13 +4741,13 @@ function IncomingOGMessage(props) {
     toggleReaction: toggleReaction,
     memoizedEmojiListItems: memoizedEmojiListItems
   })))), React__default.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "--right-padding")
+    className: "sendbird-incoming-og-message--right-padding"
   }, !chainBottom && !(mousehover || moreActive) && React__default.createElement(index$2.Label, {
-    className: "".concat(INCOMING_OG_MESSAGE, "__sent-at"),
+    className: "sendbird-incoming-og-message__sent-at",
     type: index$2.LabelTypography.CAPTION_3,
     color: index$2.LabelColors.ONBACKGROUND_2
   }, getMessageCreatedAt$3(message)), React__default.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__more"),
+    className: "sendbird-incoming-og-message__more",
     ref: parentContainRef
   }, showReactionAddButton && React__default.createElement(index.ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
@@ -4757,10 +4763,10 @@ function IncomingOGMessage(props) {
           handleMoreIconBlur();
         }
       }, React__default.createElement(index$2.Icon, {
-        width: "24px",
-        height: "24px",
         type: index$2.IconTypes.EMOJI_MORE,
-        fillColor: index$2.IconColors.CONTENT_INVERSE
+        fillColor: index$2.IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(closeDropdown) {
@@ -4788,10 +4794,10 @@ function IncomingOGMessage(props) {
           handleMoreIconBlur();
         }
       }, React__default.createElement(index$2.Icon, {
-        width: "24px",
-        height: "24px",
         type: index$2.IconTypes.MORE,
-        fillColor: index$2.IconColors.CONTENT_INVERSE
+        fillColor: index$2.IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(closeDropdown) {
@@ -4800,7 +4806,7 @@ function IncomingOGMessage(props) {
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown
       }, React__default.createElement(index.MenuItem, {
-        className: "".concat(INCOMING_OG_MESSAGE, "__more__menu__copy"),
+        className: "sendbird-incoming-og-message__more__menu__copy",
         onClick: function onClick() {
           copyToClipboard(message.message);
           closeDropdown();
@@ -5363,7 +5369,7 @@ function (_Component) {
         width: "24px",
         height: "24px",
         type: index$2.IconTypes.CHEVRON_DOWN,
-        fillColor: index$2.IconColors.CONTENT
+        fillColor: index$2.IconColors.PRIMARY
       })));
     }
   }]);
@@ -5606,38 +5612,18 @@ function ConnectionStatus() {
       stringSet = _useContext.stringSet;
 
   return React__default.createElement("div", {
-    className: "sendbird-conversation__connection-status"
+    className: "sendbird-connection-status"
   }, React__default.createElement(index$2.Label, {
     type: index$2.LabelTypography.BODY_2,
     color: index$2.LabelColors.ONBACKGROUND_2
   }, stringSet.TRYING_TO_CONNECT), React__default.createElement(index$2.Icon, {
     type: index$2.IconTypes.DISCONNECTED,
     fillColor: index$2.IconColors.SENT,
-    height: "14px",
-    width: "14px"
+    width: "14px",
+    height: "14px"
   }));
 }
 
-var prettyDate = function prettyDate(date) {
-  return formatDistanceToNowStrict(date, {
-    addSuffix: true
-  });
-};
-var getOthersLastSeenAt = function getOthersLastSeenAt(channel) {
-  if (!channel || !channel.getReadStatus || !channel.members || channel.members.length !== 2) {
-    return '';
-  }
-
-  var lastSeenList = LocalizationContext._toConsumableArray(Object.values(channel.getReadStatus()));
-
-  var lastSeenAt = lastSeenList.length > 0 ? lastSeenList[0].last_seen_at : 0;
-
-  if (lastSeenAt === 0) {
-    return '';
-  }
-
-  return prettyDate(lastSeenAt);
-};
 var getChannelTitle = function getChannelTitle() {
   var channel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var currentUserId = arguments.length > 1 ? arguments[1] : undefined;
@@ -5664,32 +5650,6 @@ var getChannelTitle = function getChannelTitle() {
   }).join(', ');
 };
 
-function AutoRefresh(_ref) {
-  var repeatFunc = _ref.repeatFunc;
-
-  var _useState = React.useState(repeatFunc()),
-      _useState2 = LocalizationContext._slicedToArray(_useState, 2),
-      label = _useState2[0],
-      setLabel = _useState2[1];
-
-  React.useEffect(function () {
-    var interval = setInterval(function () {
-      if (label !== repeatFunc()) {
-        setLabel(repeatFunc());
-      }
-    }, 10000);
-    return function () {
-      clearInterval(interval);
-    };
-  }, []);
-  return React__default.createElement("div", {
-    className: "sendbird-repeat-text"
-  }, label);
-}
-AutoRefresh.propTypes = {
-  repeatFunc: PropTypes.func.isRequired
-};
-
 var noop$4 = function noop() {};
 
 function ChatHeader(props) {
@@ -5697,12 +5657,11 @@ function ChatHeader(props) {
       currentUser = props.currentUser,
       title = props.title,
       subTitle = props.subTitle,
-      isActive = props.isActive,
       isMuted = props.isMuted,
+      theme = props.theme,
       showSearchIcon = props.showSearchIcon,
       onSearchClick = props.onSearchClick,
-      onActionClick = props.onActionClick,
-      theme = props.theme;
+      onActionClick = props.onActionClick;
   var userId = currentUser.userId;
 
   var _useContext = React.useContext(LocalizationContext.LocalizationContext),
@@ -5719,28 +5678,22 @@ function ChatHeader(props) {
     height: 32,
     width: 32
   }), React__default.createElement(index$2.Label, {
-    className: "sendbird-chat-header__title",
+    className: "sendbird-chat-header__left__title",
     type: index$2.LabelTypography.H_2,
     color: index$2.LabelColors.ONBACKGROUND_1
-  }, title || getChannelTitle(currentGroupChannel, userId, stringSet)), typeof isActive === 'string' && isActive === 'true' || typeof isActive === 'boolean' && isActive ? React__default.createElement("div", {
-    className: "sendbird-chat-header__active"
-  }) : null, React__default.createElement(index$2.Label, {
-    className: "sendbird-chat-header__subtitle",
+  }, title || getChannelTitle(currentGroupChannel, userId, stringSet)), React__default.createElement(index$2.Label, {
+    className: "sendbird-chat-header__left__subtitle",
     type: index$2.LabelTypography.BODY_1,
     color: index$2.LabelColors.ONBACKGROUND_2
-  }, subTitle || React__default.createElement(AutoRefresh, {
-    repeatFunc: function repeatFunc() {
-      return getOthersLastSeenAt(currentGroupChannel);
-    }
-  }))), React__default.createElement("div", {
+  }, subTitle)), React__default.createElement("div", {
     className: "sendbird-chat-header__right"
-  }, typeof isMuted === 'string' && isMuted === 'true' || typeof isMuted === 'boolean' && isMuted ? React__default.createElement(index$2.Icon, {
-    className: "sendbird-chat-header__mute",
+  }, (typeof isMuted === 'string' && isMuted === 'true' || typeof isMuted === 'boolean' && isMuted) && React__default.createElement(index$2.Icon, {
+    className: "sendbird-chat-header__right__mute",
     type: index$2.IconTypes.NOTIFICATIONS_OFF_FILLED,
     width: "24px",
     height: "24px"
-  }) : null, showSearchIcon && React__default.createElement(index.IconButton, {
-    className: "sendbird-chat-header__search",
+  }), showSearchIcon && React__default.createElement(index.IconButton, {
+    className: "sendbird-chat-header__right__search",
     width: "32px",
     height: "32px",
     onClick: onSearchClick
@@ -5750,7 +5703,7 @@ function ChatHeader(props) {
     width: "24px",
     height: "24px"
   })), React__default.createElement(index.IconButton, {
-    className: "sendbird-chat-header__info",
+    className: "sendbird-chat-header__right__info",
     width: "32px",
     height: "32px",
     onClick: onActionClick
@@ -5766,29 +5719,27 @@ ChatHeader.propTypes = {
     members: PropTypes.arrayOf(PropTypes.shape({})),
     coverUrl: PropTypes.string
   }),
-  theme: PropTypes.string,
   currentUser: PropTypes.shape({
     userId: PropTypes.string
   }),
-  onSearchClick: PropTypes.func,
-  showSearchIcon: PropTypes.bool,
   title: PropTypes.string,
   subTitle: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
-  isActive: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
   isMuted: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  theme: PropTypes.string,
+  showSearchIcon: PropTypes.bool,
+  onSearchClick: PropTypes.func,
   onActionClick: PropTypes.func
 };
 ChatHeader.defaultProps = {
   currentGroupChannel: {},
-  title: '',
-  theme: 'light',
-  subTitle: '',
-  isActive: false,
-  onSearchClick: noop$4,
-  showSearchIcon: false,
-  isMuted: false,
   currentUser: {},
-  onActionClick: function onActionClick() {}
+  title: '',
+  subTitle: '',
+  isMuted: false,
+  theme: 'light',
+  showSearchIcon: false,
+  onSearchClick: noop$4,
+  onActionClick: noop$4
 };
 
 var noop$5 = function noop() {};
@@ -5891,7 +5842,8 @@ var ConversationPanel = function ConversationPanel(props) {
   }, [emojiContainer]);
   var nicknamesMap = React.useMemo(function () {
     return usingReaction ? getNicknamesMapFromMembers(currentGroupChannel.members) : new Map();
-  }, [currentGroupChannel.members]);
+  }, [currentGroupChannel.members]); // Scrollup is default scroll for channel
+
   var onScrollCallback = useScrollCallback({
     currentGroupChannel: currentGroupChannel,
     lastMessageTimeStamp: lastMessageTimeStamp,
@@ -5901,7 +5853,10 @@ var ConversationPanel = function ConversationPanel(props) {
     logger: logger,
     messagesDispatcher: messagesDispatcher,
     sdk: sdk
-  });
+  }); // onScrollDownCallback is added for navigation to different timestamps on messageSearch
+  // hasMoreToBottom, onScrollDownCallback -> scroll down
+  // hasMore, onScrollCallback -> scroll up(default behavior)
+
   var onScrollDownCallback = useScrollDownCallback({
     currentGroupChannel: currentGroupChannel,
     latestFetchedMessageTimeStamp: latestFetchedMessageTimeStamp,
@@ -5926,6 +5881,7 @@ var ConversationPanel = function ConversationPanel(props) {
     userId: userId,
     emojiAllList: emojiAllList
   }); // to create message-datasource
+  // this hook sets currentGroupChannel asynchronously
 
   useSetChannel({
     channelUrl: channelUrl,
@@ -5945,7 +5901,11 @@ var ConversationPanel = function ConversationPanel(props) {
     sdk: sdk,
     logger: logger,
     scrollRef: scrollRef
-  });
+  }); // hook that fetches messages when channel changes
+  // to be clear here useGetChannel sets currentGroupChannel
+  // and useInitialMessagesFetch executes when currentGroupChannel changes
+  // p.s This one executes on intialTimeStamp change too
+
   useInitialMessagesFetch({
     currentGroupChannel: currentGroupChannel,
     userFilledMessageListQuery: userFilledMessageListQuery,
@@ -5980,7 +5940,8 @@ var ConversationPanel = function ConversationPanel(props) {
     currentGroupChannel: currentGroupChannel,
     messagesDispatcher: messagesDispatcher,
     userFilledMessageListQuery: userFilledMessageListQuery
-  });
+  }); // callbacks for Message CURD actions
+
   var deleteMessage = useDeleteMessageCallback({
     currentGroupChannel: currentGroupChannel,
     messagesDispatcher: messagesDispatcher
@@ -6072,7 +6033,6 @@ var ConversationPanel = function ConversationPanel(props) {
     onSearchClick: onSearchClick,
     onActionClick: onChatHeaderActionClick,
     subTitle: currentGroupChannel.members && currentGroupChannel.members.length !== 2,
-    isActive: false,
     isMuted: false
   }), isFrozen && React__default.createElement(FrozenNotification, null), unreadCount > 0 && React__default.createElement(Notification, {
     count: unreadCount,

@@ -2,7 +2,7 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var LocalizationContext = require('./LocalizationContext-6447a7a3.js');
+var LocalizationContext = require('./LocalizationContext-96132df1.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
@@ -382,6 +382,9 @@ function useConnectionStatus(sdk, logger) {
   return isOnline;
 }
 
+// Logger, pretty much explains it
+// in SendbirdProvider
+// const [logger, setLogger] = useState(LoggerFactory(logLevel));
 var LOG_LEVELS = {
   DEBUG: 'debug',
   WARNING: 'warning',
@@ -465,6 +468,10 @@ var LoggerFactory = function LoggerFactory(lvl, customInterface) {
 };
 
 // https://davidwalsh.name/pubsub-javascript
+// we use pubsub to sync events between multiple smartcomponents
+// for example, if customer sends a message from their custom component
+// without pubsub,we would not be able to listen to it
+// in our ChannelList or Conversation
 var pubSubFactory = (function () {
   var topics = {};
   var hOP = topics.hasOwnProperty;

@@ -2,19 +2,19 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var LocalizationContext = require('./LocalizationContext-6447a7a3.js');
+var LocalizationContext = require('./LocalizationContext-96132df1.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
-var index = require('./index-ab7d3759.js');
-var index$1 = require('./index-41dcefd9.js');
-var index$2 = require('./index-c0f812fc.js');
+var index = require('./index-7bb6095b.js');
+var index$1 = require('./index-733abb37.js');
+var index$2 = require('./index-944fbc98.js');
 var utils = require('./utils-6aedec02.js');
-var LeaveChannel = require('./LeaveChannel-f9ad4e8d.js');
+var LeaveChannel = require('./LeaveChannel-8f107f63.js');
 require('date-fns/format');
 require('react-dom');
-var index$3 = require('./index-e59fb746.js');
-var index$4 = require('./index-5a7f699c.js');
+var index$3 = require('./index-f441aa10.js');
+var index$4 = require('./index-c092ddb7.js');
 
 var EditDetails = function EditDetails(props) {
   var _onSubmit = props.onSubmit,
@@ -436,12 +436,12 @@ UserListItem.propTypes = {
   currentUser: PropTypes.string.isRequired
 };
 
-var MemebersAccordion = function MemebersAccordion(_ref2) {
+var MembersAccordion = function MembersAccordion(_ref2) {
   var channel = _ref2.channel,
       disabled = _ref2.disabled,
       currentUser = _ref2.currentUser,
       userQueryCreator = _ref2.userQueryCreator,
-      onInviteMemebers = _ref2.onInviteMemebers,
+      onInviteMembers = _ref2.onInviteMembers,
       swapParams = _ref2.swapParams;
   var members = channel.members || [];
 
@@ -472,8 +472,8 @@ var MemebersAccordion = function MemebersAccordion(_ref2) {
     className: "sendbird-members-accordion__footer"
   }, members.length >= SHOWN_MEMBER_MAX && React__default.createElement(index.Button, {
     className: "sendbird-members-accordion__footer__all-members",
-    type: index.Type.SECONDARY,
-    size: index.Size.SMALL,
+    type: index.ButtonTypes.SECONDARY,
+    size: index.ButtonSizes.SMALL,
     onClick: function onClick() {
       return setShowMoreModal(true);
     }
@@ -485,8 +485,8 @@ var MemebersAccordion = function MemebersAccordion(_ref2) {
     channel: channel
   }), React__default.createElement(index.Button, {
     className: "sendbird-members-accordion__footer__invite-users",
-    type: index.Type.SECONDARY,
-    size: index.Size.SMALL,
+    type: index.ButtonTypes.SECONDARY,
+    size: index.ButtonSizes.SMALL,
     disabled: disabled,
     onClick: function onClick() {
       if (disabled) {
@@ -506,11 +506,11 @@ var MemebersAccordion = function MemebersAccordion(_ref2) {
       return member.userId;
     }),
     userQueryCreator: userQueryCreator,
-    onSubmit: onInviteMemebers
+    onSubmit: onInviteMembers
   })));
 };
 
-MemebersAccordion.propTypes = {
+MembersAccordion.propTypes = {
   swapParams: PropTypes.bool,
   disabled: PropTypes.bool,
   channel: PropTypes.shape({
@@ -518,9 +518,9 @@ MemebersAccordion.propTypes = {
   }),
   currentUser: PropTypes.string,
   userQueryCreator: PropTypes.func.isRequired,
-  onInviteMemebers: PropTypes.func.isRequired
+  onInviteMembers: PropTypes.func.isRequired
 };
-MemebersAccordion.defaultProps = {
+MembersAccordion.defaultProps = {
   swapParams: false,
   currentUser: '',
   disabled: false,
@@ -900,14 +900,14 @@ var OperatorList = function OperatorList(_a) {
   }), hasNext && React__default.createElement("div", {
     className: "sendbird-channel-settings-accordion__footer"
   }, React__default.createElement(index.Button, {
-    type: index.Type.SECONDARY,
-    size: index.Size.SMALL,
+    type: index.ButtonTypes.SECONDARY,
+    size: index.ButtonSizes.SMALL,
     onClick: function onClick() {
       setShowMore(true);
     }
   }, stringSet.CHANNEL_SETTING__OPERATORS__TITLE_ALL), React__default.createElement(index.Button, {
-    type: index.Type.SECONDARY,
-    size: index.Size.SMALL,
+    type: index.ButtonTypes.SECONDARY,
+    size: index.ButtonSizes.SMALL,
     onClick: function onClick() {
       setShowAdd(true);
     }
@@ -1151,14 +1151,14 @@ var MemberList = function MemberList(_a) {
   }), React__default.createElement("div", {
     className: "sendbird-channel-settings-accordion__footer"
   }, hasNext && React__default.createElement(index.Button, {
-    type: index.Type.SECONDARY,
-    size: index.Size.SMALL,
+    type: index.ButtonTypes.SECONDARY,
+    size: index.ButtonSizes.SMALL,
     onClick: function onClick() {
       return setShowAllMembers(true);
     }
   }, "All members"), React__default.createElement(index.Button, {
-    type: index.Type.SECONDARY,
-    size: index.Size.SMALL,
+    type: index.ButtonTypes.SECONDARY,
+    size: index.ButtonSizes.SMALL,
     onClick: function onClick() {
       return setShowInviteMembers(true);
     }
@@ -1171,8 +1171,8 @@ var MemberList = function MemberList(_a) {
     }
   }), showInviteMembers && React__default.createElement(InviteMembers, {
     userQueryCreator: userQueryCreator,
-    onSubmit: function onSubmit(selectedMemebers) {
-      channel.inviteWithUserIds(selectedMemebers, function () {
+    onSubmit: function onSubmit(selectedMembers) {
+      channel.inviteWithUserIds(selectedMembers, function () {
         setShowInviteMembers(false);
         refershList();
       });
@@ -1378,8 +1378,8 @@ var BannedMemberList = function BannedMemberList(_a) {
   }, "No banned members yet"), hasNext && React__default.createElement("div", {
     className: "sendbird-channel-settings-accordion__footer"
   }, React__default.createElement(index.Button, {
-    type: index.Type.SECONDARY,
-    size: index.Size.SMALL,
+    type: index.ButtonTypes.SECONDARY,
+    size: index.ButtonSizes.SMALL,
     onClick: function onClick() {
       setShowModal(true);
     }
@@ -1596,8 +1596,8 @@ var MutedMemberList = function MutedMemberList(_a) {
   }, "No muted members yet"), hasNext && React__default.createElement("div", {
     className: "sendbird-channel-settings-accordion__footer"
   }, React__default.createElement(index.Button, {
-    type: index.Type.SECONDARY,
-    size: index.Size.SMALL,
+    type: index.ButtonTypes.SECONDARY,
+    size: index.ButtonSizes.SMALL,
     onClick: function onClick() {
       setShowModal(true);
     }
@@ -1859,8 +1859,8 @@ function ChannelSettings(props) {
       type: index$2.LabelTypography.H_2,
       color: index$2.LabelColors.ONBACKGROUND_1
     }, stringSet.CHANNEL_SETTING__HEADER__TITLE), React__default.createElement(index$2.Icon, {
-      type: index$2.IconTypes.CLOSE,
       className: "sendbird-channel-settings__close-icon",
+      type: index$2.IconTypes.CLOSE,
       height: "24px",
       width: "24px",
       onClick: function onClick() {
@@ -1891,8 +1891,8 @@ function ChannelSettings(props) {
       onCloseClick();
     }
   }, React__default.createElement(index$2.Icon, {
-    type: index$2.IconTypes.CLOSE,
     className: "sendbird-channel-settings__close-icon",
+    type: index$2.IconTypes.CLOSE,
     height: "22px",
     width: "22px"
   })))), React__default.createElement("div", {
@@ -1953,33 +1953,33 @@ function ChannelSettings(props) {
       });
     }
   }) : React__default.createElement(React__default.Fragment, null, React__default.createElement("div", {
+    className: ['sendbird-channel-settings__panel-item', 'sendbird-channel-settings__members'].join(' '),
     role: "switch",
     "aria-checked": showAccordion,
-    tabIndex: 0,
     onKeyDown: function onKeyDown() {
       return setShowAccordion(!showAccordion);
     },
-    className: "\n                    sendbird-channel-settings__panel-item\n                    sendbird-channel-settings__members\n                  ",
     onClick: function onClick() {
       return setShowAccordion(!showAccordion);
-    }
+    },
+    tabIndex: 0
   }, React__default.createElement(index$2.Icon, {
-    type: index$2.IconTypes.MEMBERS,
     className: "sendbird-channel-settings__panel-icon-left",
+    type: index$2.IconTypes.MEMBERS,
+    fillColor: index$2.IconColors.PRIMARY,
     height: "24px",
-    width: "24px",
-    fillColor: index$2.IconColors.PRIMARY
+    width: "24px"
   }), React__default.createElement(index$2.Label, {
     type: index$2.LabelTypography.SUBTITLE_1,
     color: index$2.LabelColors.ONBACKGROUND_1
-  }, "".concat(stringSet.CHANNEL_SETTING__MEMBERS__TITLE), React__default.createElement(LeaveChannel.Badge, {
+  }, stringSet.CHANNEL_SETTING__MEMBERS__TITLE, React__default.createElement(LeaveChannel.Badge, {
     count: kFormatter$1(channel.memberCount)
   })), React__default.createElement(index$2.Icon, {
-    type: index$2.IconTypes.CHEVRON_RIGHT,
     className: ['sendbird-channel-settings__panel-icon-right', 'sendbird-channel-settings__panel-icon--chevron', showAccordion ? 'sendbird-channel-settings__panel-icon--open' : ''].join(' '),
+    type: index$2.IconTypes.CHEVRON_RIGHT,
     height: "24px",
     width: "24px"
-  })), showAccordion && React__default.createElement(MemebersAccordion, {
+  })), showAccordion && React__default.createElement(MembersAccordion, {
     currentUser: userId,
     disabled: !isOnline // eslint-disable-next-line
     ,
@@ -1992,9 +1992,9 @@ function ChannelSettings(props) {
     swapParams: sdk && sdk.getErrorFirstCallback && sdk.getErrorFirstCallback(),
     channel: channel,
     members: channel.members,
-    onInviteMemebers: function onInviteMemebers(selectedMemebers) {
+    onInviteMembers: function onInviteMembers(selectedMembers) {
       logger.info('ChannelSettings: Inviting new users');
-      channel.inviteWithUserIds(selectedMemebers).then(function (res) {
+      channel.inviteWithUserIds(selectedMembers).then(function (res) {
         _onChannelModified(res);
 
         setChannelUpdateId(LocalizationContext.uuidv4());
@@ -2002,9 +2002,8 @@ function ChannelSettings(props) {
       });
     }
   })), React__default.createElement("div", {
-    className: "sendbird-channel-settings__panel-item\n              sendbird-channel-settings__leave-channel\n              ".concat(!isOnline ? 'sendbird-channel-settings__panel-item__disabled' : ''),
+    className: ['sendbird-channel-settings__panel-item', 'sendbird-channel-settings__leave-channel', !isOnline ? 'sendbird-channel-settings__panel-item__disabled' : ''].join(' '),
     role: "button",
-    tabIndex: 0,
     disabled: true,
     onKeyDown: function onKeyDown() {
       if (!isOnline) {
@@ -2019,7 +2018,8 @@ function ChannelSettings(props) {
       }
 
       setShowLeaveChannelModal(true);
-    }
+    },
+    tabIndex: 0
   }, React__default.createElement(index$2.Icon, {
     className: ['sendbird-channel-settings__panel-icon-left', 'sendbird-channel-settings__panel-icon__leave'].join(' '),
     type: index$2.IconTypes.LEAVE,

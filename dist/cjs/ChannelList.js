@@ -2,23 +2,23 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var LocalizationContext = require('./LocalizationContext-6447a7a3.js');
+var LocalizationContext = require('./LocalizationContext-96132df1.js');
 var React = require('react');
 var React__default = _interopDefault(React);
 var PropTypes = _interopDefault(require('prop-types'));
 var actionTypes = require('./actionTypes-920b541f.js');
-var index = require('./index-ab7d3759.js');
-var index$1 = require('./index-41dcefd9.js');
-var index$2 = require('./index-c0f812fc.js');
+var index = require('./index-7bb6095b.js');
+var index$1 = require('./index-733abb37.js');
+var index$2 = require('./index-944fbc98.js');
 var utils = require('./utils-6aedec02.js');
-var LeaveChannel = require('./LeaveChannel-f9ad4e8d.js');
+var LeaveChannel = require('./LeaveChannel-8f107f63.js');
 var isToday = _interopDefault(require('date-fns/isToday'));
 var format = _interopDefault(require('date-fns/format'));
 var isYesterday = _interopDefault(require('date-fns/isYesterday'));
 require('./type-c7a3bee7.js');
 var utils$1 = require('./utils-a8277ca2.js');
 require('react-dom');
-var index$3 = require('./index-e59fb746.js');
+var index$3 = require('./index-f441aa10.js');
 
 var RESET_CHANNEL_LIST = 'RESET_CHANNEL_LIST';
 var CREATE_CHANNEL = 'CREATE_CHANNEL';
@@ -326,12 +326,12 @@ var getChannelUnreadMessageCount = function getChannelUnreadMessageCount(channel
 
 function ChannelPreview(_ref) {
   var channel = _ref.channel,
+      currentUser = _ref.currentUser,
       isActive = _ref.isActive,
       ChannelAction = _ref.ChannelAction,
       theme = _ref.theme,
       onClick = _ref.onClick,
-      tabIndex = _ref.tabIndex,
-      currentUser = _ref.currentUser;
+      tabIndex = _ref.tabIndex;
   var userId = currentUser.userId;
   var isBroadcast = channel.isBroadcast,
       isFrozen = channel.isFrozen;
@@ -340,11 +340,11 @@ function ChannelPreview(_ref) {
       stringSet = _useContext.stringSet;
 
   return React__default.createElement("div", {
+    className: ['sendbird-channel-preview', isActive ? 'sendbird-channel-preview--active' : ''].join(' '),
     role: "link",
-    tabIndex: tabIndex,
     onClick: onClick,
     onKeyPress: onClick,
-    className: "\n        sendbird-channel-preview\n        ".concat(isActive ? 'sendbird-channel-preview--active' : null, "\n      ")
+    tabIndex: tabIndex
   }, React__default.createElement("div", {
     className: "sendbird-channel-preview__avatar"
   }, React__default.createElement(index$1.ChannelAvatar, {
@@ -358,7 +358,7 @@ function ChannelPreview(_ref) {
   }, React__default.createElement("div", {
     className: "sendbird-channel-preview__content__upper__header"
   }, isBroadcast && React__default.createElement("div", {
-    className: "sendbird-channel-preview__broadcast-icon"
+    className: "sendbird-channel-preview__content__upper__header__broadcast-icon"
   }, React__default.createElement(index$2.Icon, {
     type: index$2.IconTypes.BROADCAST,
     fillColor: index$2.IconColors.SECONDARY,
@@ -374,7 +374,7 @@ function ChannelPreview(_ref) {
     color: index$2.LabelColors.ONBACKGROUND_2
   }, getTotalMembers(channel)), isFrozen && React__default.createElement("div", {
     title: "Frozen",
-    className: "sendbird-channel-preview__frozen-icon"
+    className: "sendbird-channel-preview__content__upper__header__frozen-icon"
   }, React__default.createElement(index$2.Icon, {
     type: index$2.IconTypes.FREEZE,
     fillColor: index$2.IconColors.PRIMARY,
@@ -392,70 +392,70 @@ function ChannelPreview(_ref) {
     color: index$2.LabelColors.ONBACKGROUND_3
   }, getLastMessage(channel)), React__default.createElement("div", {
     className: "sendbird-channel-preview__content__lower__unread-message-count"
-  }, getChannelUnreadMessageCount(channel) ? React__default.createElement(LeaveChannel.Badge, {
+  }, getChannelUnreadMessageCount(channel) && React__default.createElement(LeaveChannel.Badge, {
     count: getChannelUnreadMessageCount(channel)
-  }) : null))), React__default.createElement("div", {
+  })))), React__default.createElement("div", {
     className: "sendbird-channel-preview__action"
   }, ChannelAction));
 }
 ChannelPreview.propTypes = {
-  isActive: PropTypes.bool,
-  theme: PropTypes.string,
   channel: PropTypes.shape({
     members: PropTypes.arrayOf(PropTypes.shape({})),
     coverUrl: PropTypes.string,
     isBroadcast: PropTypes.bool,
     isFrozen: PropTypes.bool
   }),
-  ChannelAction: PropTypes.element.isRequired,
-  onClick: PropTypes.func,
-  tabIndex: PropTypes.number,
   currentUser: PropTypes.shape({
     userId: PropTypes.string
-  })
+  }),
+  isActive: PropTypes.bool,
+  ChannelAction: PropTypes.element.isRequired,
+  theme: PropTypes.string,
+  onClick: PropTypes.func,
+  tabIndex: PropTypes.number
 };
 ChannelPreview.defaultProps = {
   channel: {},
+  currentUser: {},
   isActive: false,
   theme: 'light',
   onClick: function onClick() {},
-  tabIndex: 0,
-  currentUser: {}
+  tabIndex: 0
 };
 
 function ChannelHeader(_ref) {
   var user = _ref.user,
+      renderHeader = _ref.renderHeader,
       iconButton = _ref.iconButton,
       onEdit = _ref.onEdit,
-      renderHeader = _ref.renderHeader,
       allowProfileEdit = _ref.allowProfileEdit;
 
   var _useContext = React.useContext(LocalizationContext.LocalizationContext),
       stringSet = _useContext.stringSet;
 
   return React__default.createElement("div", {
-    className: "\n        ".concat(allowProfileEdit && 'sendbird-channel-header--allow-edit', "\n        sendbird-channel-header\n      ")
+    className: ['sendbird-channel-header', allowProfileEdit ? 'sendbird-channel-header--allow-edit' : ''].join(' ')
   }, renderHeader ? renderHeader() : React__default.createElement("div", {
     className: "sendbird-channel-header__title",
     role: "button",
-    onKeyDown: onEdit,
     onClick: onEdit,
+    onKeyDown: onEdit,
     tabIndex: "0"
   }, React__default.createElement("div", {
-    className: "sendbird-channel-header__title--left"
+    className: "sendbird-channel-header__title__left"
   }, React__default.createElement(index$2.Avatar, {
-    height: "32px",
     width: "32px",
+    height: "32px",
     src: user.profileUrl,
     alt: user.nickname
   })), React__default.createElement("div", {
-    className: "sendbird-channel-header__title--right"
+    className: "sendbird-channel-header__title__right"
   }, React__default.createElement(index$2.Label, {
-    className: "sendbird-channel-header__title--name",
+    className: "sendbird-channel-header__title__right__name",
     type: index$2.LabelTypography.SUBTITLE_2,
     color: index$2.LabelColors.ONBACKGROUND_1
   }, user.nickname || stringSet.NO_NAME), React__default.createElement(index$2.Label, {
-    className: "sendbird-channel-header__title--user-id",
+    className: "sendbird-channel-header__title__right__user-id",
     type: index$2.LabelTypography.BODY_2,
     color: index$2.LabelColors.ONBACKGROUND_2
   }, user.userId))), React__default.createElement("div", {
@@ -469,27 +469,27 @@ ChannelHeader.propTypes = {
     userId: PropTypes.string
   }),
   renderHeader: PropTypes.func,
-  allowProfileEdit: PropTypes.bool,
+  iconButton: PropTypes.oneOfType([PropTypes.element, PropTypes.instanceOf(index.IconButton)]),
   onEdit: PropTypes.func.isRequired,
-  iconButton: PropTypes.oneOfType([PropTypes.element, PropTypes.instanceOf(index.IconButton)])
+  allowProfileEdit: PropTypes.bool
 };
 ChannelHeader.defaultProps = {
   user: {},
   renderHeader: null,
-  allowProfileEdit: false,
-  iconButton: null
+  iconButton: null,
+  allowProfileEdit: false
 };
 
 function EditUserProfile(_a) {
   var user = _a.user,
+      _b = _a.theme,
+      theme = _b === void 0 ? 'light' : _b,
       onCancel = _a.onCancel,
       _onSubmit = _a.onSubmit,
-      _b = _a.onThemeChange,
-      onThemeChange = _b === void 0 ? null : _b,
-      _c = _a.theme,
-      theme = _c === void 0 ? 'light' : _c,
-      _d = _a.changeTheme,
-      changeTheme = _d === void 0 ? utils.noop : _d;
+      _c = _a.changeTheme,
+      changeTheme = _c === void 0 ? utils.noop : _c,
+      _d = _a.onThemeChange,
+      onThemeChange = _d === void 0 ? null : _d;
   var hiddenInputRef = React.useRef(null);
   var inputRef = React.useRef(null);
   var formRef = React.useRef(null);
@@ -506,6 +506,7 @@ function EditUserProfile(_a) {
   return React__default.createElement(index.Modal, {
     titleText: stringSet.EDIT_PROFILE__TITLE,
     submitText: stringSet.BUTTON__SAVE,
+    type: index.Type.PRIMARY,
     onCancel: onCancel,
     onSubmit: function onSubmit() {
       if (user.nickname !== '' && !inputRef.current.value) {
@@ -520,18 +521,17 @@ function EditUserProfile(_a) {
       _onSubmit(inputRef.current.value, newFile);
 
       onCancel();
-    },
-    type: index.Type.PRIMARY
+    }
   }, React__default.createElement("form", {
-    className: "sendbird__edit-user-profile",
+    className: "sendbird-edit-user-profile",
     ref: formRef,
     onSubmit: function onSubmit(e) {
       e.preventDefault();
     }
   }, React__default.createElement("section", {
-    className: "sendbird__edit-user-profile__img"
+    className: "sendbird-edit-user-profile__img"
   }, React__default.createElement(index$3.InputLabel, null, stringSet.EDIT_PROFILE__IMAGE_LABEL), React__default.createElement("div", {
-    className: "sendbird__edit-user__avatar"
+    className: "sendbird-edit-user-profile__img__avatar"
   }, React__default.createElement(index$2.Avatar, {
     height: "80px",
     width: "80px",
@@ -549,7 +549,7 @@ function EditUserProfile(_a) {
       hiddenInputRef.current.value = '';
     }
   }), React__default.createElement(index.TextButton, {
-    className: "sendbird__edit-user__avatar-button",
+    className: "sendbird-edit-user-profile__img__avatar-button",
     onClick: function onClick() {
       return hiddenInputRef.current.click();
     },
@@ -558,23 +558,23 @@ function EditUserProfile(_a) {
     type: index$2.LabelTypography.BUTTON_1,
     color: index$2.LabelColors.PRIMARY
   }, stringSet.EDIT_PROFILE__IMAGE_UPLOAD))), React__default.createElement("section", {
-    className: "sendbird__edit-user__name"
+    className: "sendbird-edit-user-profile__name"
   }, React__default.createElement(index$3.InputLabel, null, stringSet.EDIT_PROFILE__NICKNAME_LABEL), React__default.createElement(index$3.Input, {
     required: user.nickname !== '',
-    name: "sendbird__edit-user__name",
+    name: "sendbird-edit-user-profile__name__input",
     ref: inputRef,
     value: user.nickname,
     placeHolder: stringSet.EDIT_PROFILE__NICKNAME_PLACEHOLDER
   })), React__default.createElement("section", {
-    className: "sendbird__edit-user__userid"
+    className: "sendbird-edit-user-profile__userid"
   }, React__default.createElement(index$3.InputLabel, null, stringSet.EDIT_PROFILE__USERID_LABEL), React__default.createElement(index$3.Input, {
     disabled: true,
-    name: "sendbird__edit-user__userid",
+    name: "sendbird-edit-user-profile__userid__input",
     value: user.userId
   })), React__default.createElement("section", {
-    className: "sendbird__edit-user__theme"
+    className: "sendbird-edit-user-profile__theme"
   }, React__default.createElement(index$3.InputLabel, null, stringSet.EDIT_PROFILE__THEME_LABEL), React__default.createElement("div", {
-    className: "sendbird__edit-user__theme-icon"
+    className: "sendbird-edit-user-profile__theme__theme-icon"
   }, theme === 'dark' ? React__default.createElement(index$2.Icon, {
     onClick: function onClick() {
       changeTheme('light');
@@ -980,7 +980,7 @@ var createEventHandler = function createEventHandler(_ref) {
   sdk.addChannelHandler(sdkChannelHandlerId, ChannelHandler);
 };
 
-var createApplicationUserListQuery = function createApplicationUserListQuery(_ref2) {
+var createChannelListQuery = function createChannelListQuery(_ref2) {
   var sdk = _ref2.sdk,
       _ref2$userFilledChann = _ref2.userFilledChannelListQuery,
       userFilledChannelListQuery = _ref2$userFilledChann === void 0 ? {} : _ref2$userFilledChann;
@@ -1023,7 +1023,7 @@ function setupChannelList(_ref3) {
   logger.info('ChannelList - creating query', {
     userFilledChannelListQuery: userFilledChannelListQuery
   });
-  var channelListQuery = createApplicationUserListQuery({
+  var channelListQuery = createChannelListQuery({
     sdk: sdk,
     userFilledChannelListQuery: userFilledChannelListQuery
   });
@@ -1169,15 +1169,6 @@ function ChannelList(props) {
   var userFilledChannelListQuery = queries.channelListQuery;
   var userFilledApplicationUserListQuery = queries.applicationUserListQuery;
   var sdkError = sdkStore.error;
-
-  var _useState = React.useState({}),
-      _useState2 = LocalizationContext._slicedToArray(_useState, 2),
-      user = _useState2[0],
-      setUser = _useState2[1];
-
-  React.useEffect(function () {
-    setUser(userStore.user);
-  }, [userStore.user]);
   var sdkIntialized = sdkStore.initialized;
 
   var _useReducer = React.useReducer(reducer, channelListInitialState),
@@ -1185,23 +1176,31 @@ function ChannelList(props) {
       channelListStore = _useReducer2[0],
       channelListDispatcher = _useReducer2[1];
 
+  var _useState = React.useState({}),
+      _useState2 = LocalizationContext._slicedToArray(_useState, 2),
+      user = _useState2[0],
+      setUser = _useState2[1];
+
   var _useState3 = React.useState({}),
       _useState4 = LocalizationContext._slicedToArray(_useState3, 2),
       channelSource = _useState4[0],
       setChannelSource = _useState4[1];
 
-  var _useState5 = React.useState(null),
+  var _useState5 = React.useState(false),
       _useState6 = LocalizationContext._slicedToArray(_useState5, 2),
-      sdkChannelHandlerId = _useState6[0],
-      setSdkChannelHandlerId = _useState6[1];
+      showProfileEdit = _useState6[0],
+      setShowProfileEdit = _useState6[1];
 
-  var _useState7 = React.useState(false),
+  var _useState7 = React.useState(null),
       _useState8 = LocalizationContext._slicedToArray(_useState7, 2),
-      showProfileEdit = _useState8[0],
-      setShowProfileEdit = _useState8[1];
+      sdkChannelHandlerId = _useState8[0],
+      setSdkChannelHandlerId = _useState8[1];
 
   var loading = channelListStore.loading,
       currentChannel = channelListStore.currentChannel;
+  React.useEffect(function () {
+    setUser(userStore.user);
+  }, [userStore.user]);
   React.useEffect(function () {
     var subscriber = pubSubHandler(pubSub, channelListDispatcher);
     return function () {
@@ -1276,9 +1275,9 @@ function ChannelList(props) {
     });
   }, [currentChannel]);
   return React__default.createElement(index.UserProfileProvider, {
+    className: "sendbird-channel-list",
     disableUserProfile: userDefinedDisableUserProfile,
-    renderUserProfile: userDefinedRenderProfile,
-    className: "sendbird-channel-list"
+    renderUserProfile: userDefinedRenderProfile
   }, React__default.createElement("div", {
     className: "sendbird-channel-list__header"
   }, React__default.createElement(ChannelHeader, {
