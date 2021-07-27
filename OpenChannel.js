@@ -1,12 +1,11 @@
-import { d as LocalizationContext, n as uuidv4, m as __spreadArrays, _ as __assign, w as withSendbirdContext } from './LocalizationContext-12658c38.js';
-import React, { useContext, useRef, useState, useMemo, useEffect, useCallback, useReducer } from 'react';
+import React__default, { useContext, useRef, useState, useMemo, useEffect, useCallback, useReducer } from 'react';
+import { g as format, L as Label, a as LabelTypography, A as Avatar, I as Icon, c as IconTypes, d as IconColors, b as LabelColors, e as Loader, i as ImageRenderer, P as PlaceHolder, j as PlaceHolderTypes } from './index-4fb99a01.js';
+import { c as LocalizationContext, u as uuidv4, d as __spreadArray, _ as __assign, w as withSendbirdContext } from './LocalizationContext-5502b61d.js';
+import { M as MessageInput, L as LinkLabel, i as isImage, a as isVideo, D as DateSeparator, F as FileViewer, c as compareIds } from './index-586eeef1.js';
+import { I as IconButton, U as UserProfileContext, C as ContextMenu, b as MenuItems, f as ConnectedUserProfile, c as MenuItem, a as TextButton, M as Modal, k as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, l as SEND_FILE_MESSAGE, j as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, h as UserProfileProvider } from './index-bd743b97.js';
+import { i as isSameDay } from './index-0a658dd3.js';
 import 'prop-types';
-import { I as IconButton, f as UserProfileContext, C as ContextMenu, b as MenuItems, g as UserProfile, c as MenuItem, a as TextButton, M as Modal, h as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, i as SEND_FILE_MESSAGE, U as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, e as UserProfileProvider } from './index-711ec843.js';
-import { L as Label, a as LabelTypography, A as Avatar, I as Icon, c as IconTypes, d as IconColors, b as LabelColors, h as Loader, g as ImageRenderer, P as PlaceHolder, i as PlaceHolderTypes } from './index-ad616be9.js';
-import format from 'date-fns/format';
 import 'react-dom';
-import { M as MessageInput, L as LinkLabel, i as isImage, a as isVideo, D as DateSeparator, F as FileViewer, c as compareIds } from './index-aeef4ba5.js';
-import isSameDay from 'date-fns/isSameDay';
 
 var getMessageCreatedAt = function getMessageCreatedAt(message) {
   return format(message.createdAt, 'p');
@@ -128,9 +127,9 @@ var MessageInputWrapper = function MessageInputWrapper(_a, ref) {
     });
   }
 
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-footer"
-  }, React.createElement(MessageInput, {
+  }, /*#__PURE__*/React__default.createElement(MessageInput, {
     ref: ref,
     disabled: disabled,
     onSendMessage: onSendMessage,
@@ -140,19 +139,18 @@ var MessageInputWrapper = function MessageInputWrapper(_a, ref) {
   }));
 };
 
-var MessageInputWrapper$1 = React.forwardRef(MessageInputWrapper);
+var MessageInputWrapper$1 = /*#__PURE__*/React__default.forwardRef(MessageInputWrapper);
 
 var FrozenNotification = function FrozenNotification() {
   var stringSet = useContext(LocalizationContext).stringSet;
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-frozen-channel-notification"
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-frozen-channel-notification__text",
     type: LabelTypography.CAPTION_2
   }, stringSet.CHANNEL_FROZEN));
 };
 
-var COMPONENT_CLASS_NAME = 'sendbird-openchannel-conversation-header';
 function OpenchannelConversationHeader(_a) {
   var coverImage = _a.coverImage,
       title = _a.title,
@@ -160,43 +158,43 @@ function OpenchannelConversationHeader(_a) {
       amIOperator = _a.amIOperator,
       onActionClick = _a.onActionClick;
   var stringSet = useContext(LocalizationContext).stringSet;
-  return React.createElement("div", {
-    className: COMPONENT_CLASS_NAME
-  }, React.createElement("div", {
-    className: COMPONENT_CLASS_NAME + "__left"
-  }, coverImage ? React.createElement(Avatar, {
-    className: COMPONENT_CLASS_NAME + "__left__cover-image",
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-openchannel-conversation-header"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-openchannel-conversation-header__left"
+  }, coverImage ? /*#__PURE__*/React__default.createElement(Avatar, {
+    className: "sendbird-openchannel-conversation-header__left__cover-image",
     src: coverImage,
     alt: "channel cover image",
     width: "32px",
     height: "32px"
-  }) : React.createElement("div", {
-    className: COMPONENT_CLASS_NAME + "__left__cover-image--icon",
+  }) : /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-openchannel-conversation-header__left__cover-image--icon",
     style: {
       width: 32,
       height: 32
     }
-  }, React.createElement(Icon, {
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     type: IconTypes.CHANNELS,
     fillColor: IconColors.CONTENT,
     width: "18px",
     height: "18px"
-  })), React.createElement(Label, {
-    className: COMPONENT_CLASS_NAME + "__left__title",
+  })), /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-openchannel-conversation-header__left__title",
     type: LabelTypography.H_2,
     color: LabelColors.ONBACKGROUND_1
-  }, title || stringSet.NO_TITLE), React.createElement(Label, {
-    className: COMPONENT_CLASS_NAME + "__left__sub-title",
+  }, title || stringSet.NO_TITLE), /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-openchannel-conversation-header__left__sub-title",
     type: LabelTypography.BODY_2,
     color: LabelColors.ONBACKGROUND_2
-  }, subTitle || stringSet.NO_TITLE)), React.createElement("div", {
-    className: COMPONENT_CLASS_NAME + "__right"
-  }, React.createElement(IconButton, {
-    className: COMPONENT_CLASS_NAME + "__right__trigger",
+  }, subTitle || stringSet.NO_TITLE)), /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-openchannel-conversation-header__right"
+  }, /*#__PURE__*/React__default.createElement(IconButton, {
+    className: "sendbird-openchannel-conversation-header__right__trigger",
     width: "32px",
     height: "32px",
     onClick: onActionClick
-  }, React.createElement(Icon, {
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     type: amIOperator ? IconTypes.INFO : IconTypes.MEMBERS,
     fillColor: IconColors.PRIMARY,
     width: "24px",
@@ -312,8 +310,8 @@ var showMenuTrigger = function showMenuTrigger(props) {
 };
 
 function OpenchannelUserMessage(_a) {
-  var message = _a.message,
-      className = _a.className,
+  var className = _a.className,
+      message = _a.message,
       userId = _a.userId,
       resendMessage = _a.resendMessage,
       disabled = _a.disabled,
@@ -342,8 +340,6 @@ function OpenchannelUserMessage(_a) {
       setContextStyle = _c[1]; // consts
 
 
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.push("sendbird-openchannel-user-message");
   var isByMe = checkIsByMe(message, userId);
   var isPending = checkIsPending(status);
   var isFailed = checkIsFailed(status);
@@ -352,11 +348,11 @@ function OpenchannelUserMessage(_a) {
     return function () {
       var splitMessage = message.message.split(/\r/);
       var matchedMessage = splitMessage.map(function (word) {
-        return word !== '' ? word : React.createElement("br", null);
+        return word !== '' ? word : /*#__PURE__*/React__default.createElement("br", null);
       });
 
       if (message.updatedAt > 0) {
-        matchedMessage.push(React.createElement(Label, {
+        matchedMessage.push( /*#__PURE__*/React__default.createElement(Label, {
           key: uuidv4(),
           type: LabelTypography.BODY_1,
           color: LabelColors.ONBACKGROUND_2,
@@ -369,7 +365,9 @@ function OpenchannelUserMessage(_a) {
   }, [message, message.updatedAt]); // place context menu top depending clientHeight of message component
 
   useEffect(function () {
-    if (messageRef.current.clientHeight > 36) {
+    var _a;
+
+    if (((_a = messageRef === null || messageRef === void 0 ? void 0 : messageRef.current) === null || _a === void 0 ? void 0 : _a.clientHeight) > 36) {
       setContextStyle({
         top: '8px '
       });
@@ -379,14 +377,14 @@ function OpenchannelUserMessage(_a) {
       });
     }
   }, [window.innerWidth]);
-  return React.createElement("div", {
-    className: injectingClassName.join(' '),
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: __spreadArray(__spreadArray([], Array.isArray(className) ? className : [className]), ['sendbird-openchannel-user-message']).join(' '),
     ref: messageRef
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-user-message__left"
-  }, !chainTop && React.createElement(ContextMenu, {
+  }, !chainTop && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(Avatar, {
+      return /*#__PURE__*/React__default.createElement(Avatar, {
         className: "sendbird-openchannel-user-message__left__avatar",
         src: sender.profileUrl || '',
         ref: avatarRef,
@@ -400,7 +398,7 @@ function OpenchannelUserMessage(_a) {
       });
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
+      return /*#__PURE__*/React__default.createElement(MenuItems, {
         parentRef: avatarRef,
         parentContainRef: avatarRef,
         closeDropdown: closeDropdown,
@@ -411,72 +409,72 @@ function OpenchannelUserMessage(_a) {
       }, renderUserProfile ? renderUserProfile({
         user: sender,
         close: closeDropdown
-      }) : React.createElement(UserProfile, {
+      }) : /*#__PURE__*/React__default.createElement(ConnectedUserProfile, {
         user: sender,
         onSuccess: closeDropdown,
         disableMessaging: true
       }));
     }
-  })), React.createElement("div", {
+  })), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-user-message__right"
-  }, !chainTop && React.createElement("div", {
+  }, !chainTop && /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-user-message__right__top"
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-openchannel-user-message__right__top__sender-name",
     type: LabelTypography.CAPTION_2,
     color: isByMe ? LabelColors.SECONDARY_3 : LabelColors.ONBACKGROUND_2
-  }, sender && (sender.friendName || sender.nickname || sender.userId)), React.createElement(Label, {
+  }, sender && (sender.friendName || sender.nickname || sender.userId)), /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-openchannel-user-message__right__top__sent-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_3
-  }, message.createdAt && format(message.createdAt, 'p'))), React.createElement("div", {
+  }, message.createdAt && format(message.createdAt, 'p'))), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-user-message__right__bottom"
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-openchannel-user-message__right__bottom__message",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, MemoizedMessageText())), (isPending || isFailed) && React.createElement("div", {
+  }, MemoizedMessageText())), (isPending || isFailed) && /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-user-message__right__tail"
-  }, isPending && React.createElement(Loader, {
+  }, isPending && /*#__PURE__*/React__default.createElement(Loader, {
     width: "16px",
     height: "16px"
-  }, React.createElement(Icon, {
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     className: "sendbird-openchannel-user-message__right__tail__pending",
     type: IconTypes.SPINNER,
     fillColor: IconColors.PRIMARY,
     width: "16px",
     height: "16px"
-  })), isFailed && React.createElement(Icon, {
+  })), isFailed && /*#__PURE__*/React__default.createElement(Icon, {
     className: "sendbird-openchannel-user-message__right__tail__failed",
     type: IconTypes.ERROR,
     width: "16px",
     height: "16px"
-  }))), React.createElement("div", {
+  }))), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-user-message__context-menu",
     ref: contextMenuRef,
     style: contextStyle
-  }, React.createElement(ContextMenu, {
+  }, /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return showMenuTrigger({
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(IconButton, {
+      }) && /*#__PURE__*/React__default.createElement(IconButton, {
         className: "sendbird-openchannel-user-message__context-menu--icon",
         width: "32px",
         height: "32px",
         onClick: function onClick() {
           toggleDropdown();
         }
-      }, React.createElement(Icon, {
-        width: "24px",
-        height: "24px",
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.MORE,
-        fillColor: IconColors.CONTENT_INVERSE
+        fillColor: IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
+      return /*#__PURE__*/React__default.createElement(MenuItems, {
         parentRef: contextMenuRef,
         parentContainRef: contextMenuRef,
         closeDropdown: closeDropdown,
@@ -485,7 +483,7 @@ function OpenchannelUserMessage(_a) {
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(MenuItem, {
+      }) && /*#__PURE__*/React__default.createElement(MenuItem, {
         className: "sendbird-openchannel-user-message__context-menu__copy",
         onClick: function onClick() {
           copyToClipboard(message.message);
@@ -495,7 +493,7 @@ function OpenchannelUserMessage(_a) {
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(MenuItem, {
+      }) && /*#__PURE__*/React__default.createElement(MenuItem, {
         className: "sendbird-openchannel-user-message__context-menu__edit",
         onClick: function onClick() {
           if (disabled) {
@@ -509,7 +507,7 @@ function OpenchannelUserMessage(_a) {
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(MenuItem, {
+      }) && /*#__PURE__*/React__default.createElement(MenuItem, {
         className: "sendbird-openchannel-user-message__context-menu__resend",
         onClick: function onClick() {
           resendMessage(message);
@@ -519,7 +517,7 @@ function OpenchannelUserMessage(_a) {
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(MenuItem, {
+      }) && /*#__PURE__*/React__default.createElement(MenuItem, {
         className: "sendbird-openchannel-user-message__context-menu__delete",
         onClick: function onClick() {
           if (disabled) {
@@ -535,13 +533,11 @@ function OpenchannelUserMessage(_a) {
 }
 
 function OpenChannelAdminMessage(_a) {
-  var message = _a.message,
-      className = _a.className;
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.push('sendbird-openchannel-admin-message');
-  return React.createElement("div", {
-    className: __spreadArrays(injectingClassName).join(' ')
-  }, React.createElement(Label, {
+  var className = _a.className,
+      message = _a.message;
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: __spreadArray(__spreadArray([], Array.isArray(className) ? className : [className]), ['sendbird-openchannel-admin-message']).join(' ')
+  }, /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-openchannel-admin-message__text",
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
@@ -601,8 +597,6 @@ function OpenchannelOGMessage(_a) {
   var contextMenuRef = useRef(null);
   var avatarRef = useRef(null);
   var isUrl = createUrlTester(URL_REG);
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.push('sendbird-openchannel-og-message');
   var isByMe = checkIsByMe(message, userId);
   var isPending = checkIsPending(status);
   var isFailed = checkIsFailed(status);
@@ -612,13 +606,13 @@ function OpenchannelOGMessage(_a) {
       var wordClassName = 'sendbird-openchannel-og-message--word';
       var splitMessage = message.message.split(' ');
       var matchedMessage = splitMessage.map(function (word) {
-        return isUrl(word) ? React.createElement(LinkLabel, {
+        return isUrl(word) ? /*#__PURE__*/React__default.createElement(LinkLabel, {
           key: uuidv4(),
           className: [wordClassName, 'sendbird-openchannel-og-message--word--link'],
           src: word,
           type: LabelTypography.BODY_1,
           color: LabelColors.PRIMARY
-        }, word) : React.createElement(Label, {
+        }, word) : /*#__PURE__*/React__default.createElement(Label, {
           key: uuidv4(),
           className: wordClassName,
           type: LabelTypography.BODY_1,
@@ -627,7 +621,7 @@ function OpenchannelOGMessage(_a) {
       });
 
       if (message.updatedAt > 0) {
-        matchedMessage.push(React.createElement(Label, {
+        matchedMessage.push( /*#__PURE__*/React__default.createElement(Label, {
           key: uuidv4(),
           className: wordClassName,
           type: LabelTypography.BODY_1,
@@ -648,7 +642,9 @@ function OpenchannelOGMessage(_a) {
 
 
   useEffect(function () {
-    if (messageComponentRef.current.clientHeight > 36) {
+    var _a;
+
+    if (((_a = messageComponentRef === null || messageComponentRef === void 0 ? void 0 : messageComponentRef.current) === null || _a === void 0 ? void 0 : _a.clientHeight) > 36) {
       setContextStyle({
         top: '8px '
       });
@@ -658,16 +654,16 @@ function OpenchannelOGMessage(_a) {
       });
     }
   }, [window.innerWidth]);
-  return React.createElement("div", {
-    className: injectingClassName.join(' '),
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: __spreadArray(__spreadArray([], Array.isArray(className) ? className : [className]), ['sendbird-openchannel-og-message']).join(' '),
     ref: messageComponentRef
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-og-message__top"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-og-message__top__left"
-  }, !chainTop && React.createElement(ContextMenu, {
+  }, !chainTop && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(Avatar, {
+      return /*#__PURE__*/React__default.createElement(Avatar, {
         className: "sendbird-openchannel-og-message__top__left__avatar",
         src: sender.profileUrl || '',
         ref: avatarRef,
@@ -681,7 +677,7 @@ function OpenchannelOGMessage(_a) {
       });
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
+      return /*#__PURE__*/React__default.createElement(MenuItems, {
         parentRef: avatarRef,
         parentContainRef: avatarRef,
         closeDropdown: closeDropdown,
@@ -692,56 +688,56 @@ function OpenchannelOGMessage(_a) {
       }, renderUserProfile ? renderUserProfile({
         user: sender,
         close: closeDropdown
-      }) : React.createElement(UserProfile, {
+      }) : /*#__PURE__*/React__default.createElement(ConnectedUserProfile, {
         user: sender,
         onSuccess: closeDropdown,
         disableMessaging: true
       }));
     }
-  })), React.createElement("div", {
+  })), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-og-message__top__right"
-  }, !chainTop && React.createElement("div", {
+  }, !chainTop && /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-og-message__top__right__title"
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-openchannel-og-message__top__right__title__sender-name",
     type: LabelTypography.CAPTION_2,
     color: isByMe ? LabelColors.SECONDARY_3 : LabelColors.ONBACKGROUND_2
-  }, sender && (sender.friendName || sender.nickname || sender.userId)), React.createElement(Label, {
+  }, sender && (sender.friendName || sender.nickname || sender.userId)), /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-openchannel-og-message__top__right__title__sent-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_3
-  }, message.createdAt && format(message.createdAt, 'p'))), React.createElement("div", {
+  }, message.createdAt && format(message.createdAt, 'p'))), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-og-message__top__right__description"
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-openchannel-og-message__top__right__description__message",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, MemoizedMessageText()))), React.createElement("div", {
+  }, MemoizedMessageText()))), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-og-message__top__context-menu",
     ref: contextMenuRef,
     style: contextStyle
-  }, React.createElement(ContextMenu, {
+  }, /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return showMenuTrigger({
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(IconButton, {
+      }) && /*#__PURE__*/React__default.createElement(IconButton, {
         className: "sendbird-openchannel-og-message__top__context-menu--icon",
         width: "32px",
         height: "32px",
         onClick: function onClick() {
           toggleDropdown();
         }
-      }, React.createElement(Icon, {
-        width: "24px",
-        height: "24px",
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.MORE,
-        fillColor: IconColors.CONTENT_INVERSE
+        fillColor: IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
+      return /*#__PURE__*/React__default.createElement(MenuItems, {
         parentRef: contextMenuRef,
         parentContainRef: contextMenuRef,
         closeDropdown: closeDropdown,
@@ -750,7 +746,7 @@ function OpenchannelOGMessage(_a) {
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(MenuItem, {
+      }) && /*#__PURE__*/React__default.createElement(MenuItem, {
         className: "sendbird-openchannel-og-message__top__context-menu__copy",
         onClick: function onClick() {
           copyToClipboard(message.message);
@@ -760,7 +756,7 @@ function OpenchannelOGMessage(_a) {
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(MenuItem, {
+      }) && /*#__PURE__*/React__default.createElement(MenuItem, {
         className: "sendbird-openchannel-og-message__top__context-menu__edit",
         onClick: function onClick() {
           if (disabled) {
@@ -774,7 +770,7 @@ function OpenchannelOGMessage(_a) {
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(MenuItem, {
+      }) && /*#__PURE__*/React__default.createElement(MenuItem, {
         className: "sendbird-openchannel-og-message__top__context-menu__resend",
         onClick: function onClick() {
           resendMessage(message);
@@ -784,7 +780,7 @@ function OpenchannelOGMessage(_a) {
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(MenuItem, {
+      }) && /*#__PURE__*/React__default.createElement(MenuItem, {
         className: "sendbird-openchannel-og-message__top__context-menu__delete",
         onClick: function onClick() {
           if (disabled) {
@@ -796,57 +792,57 @@ function OpenchannelOGMessage(_a) {
         }
       }, stringSet.CONTEXT_MENU_DROPDOWN__DELETE));
     }
-  }))), React.createElement("div", {
+  }))), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-og-message__bottom"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-og-message__bottom__og-tag"
-  }, ogMetaData.url && React.createElement(Label, {
+  }, ogMetaData.url && /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-openchannel-og-message__bottom__og-tag__url",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
-  }, ogMetaData.url), ogMetaData.title && React.createElement(LinkLabel, {
+  }, ogMetaData.url), ogMetaData.title && /*#__PURE__*/React__default.createElement(LinkLabel, {
     className: "sendbird-openchannel-og-message__bottom__og-tag__title",
+    src: ogMetaData.url,
     type: LabelTypography.SUBTITLE_2,
-    color: LabelColors.PRIMARY,
-    src: ogMetaData.url
-  }, ogMetaData.title), ogMetaData.description && React.createElement(Label, {
+    color: LabelColors.PRIMARY
+  }, ogMetaData.title), ogMetaData.description && /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-openchannel-og-message__bottom__og-tag__description",
     type: LabelTypography.BODY_2,
     color: LabelColors.ONBACKGROUND_1
-  }, ogMetaData.description), ogMetaData.url && React.createElement("div", {
+  }, ogMetaData.description), ogMetaData.url && /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-og-message__bottom__og-tag__thumbnail",
+    role: "button",
     onClick: openLink,
     onKeyDown: openLink,
-    role: "button",
     tabIndex: 0
-  }, defaultImage && React.createElement(ImageRenderer, {
+  }, defaultImage && /*#__PURE__*/React__default.createElement(ImageRenderer, {
+    className: "sendbird-openchannel-og-message__bottom__og-tag__thumbnail__image",
     url: defaultImage.url || '',
     alt: defaultImage.alt || '',
-    className: "sendbird-openchannel-og-message__bottom__og-tag__thumbnail__image",
     height: "189px",
-    defaultComponent: React.createElement("div", {
+    defaultComponent: /*#__PURE__*/React__default.createElement("div", {
       className: "sendbird-openchannel-og-message__bottom__og-tag__thumbnail__image--placeholder"
-    }, React.createElement(Icon, {
+    }, /*#__PURE__*/React__default.createElement(Icon, {
+      type: IconTypes.THUMBNAIL_NONE,
       width: "56px",
-      height: "56px",
-      type: IconTypes.THUMBNAIL_NONE
+      height: "56px"
     }))
-  }))), (isPending || isFailed) && React.createElement("div", {
+  }))), (isPending || isFailed) && /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-og-message__top__right__tail"
-  }, isPending && React.createElement(Loader, {
+  }, isPending && /*#__PURE__*/React__default.createElement(Loader, {
     width: "16px",
     height: "16px"
-  }, React.createElement(Icon, {
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     className: "sendbird-openchannel-og-message__top__right__tail__pending",
-    width: "16px",
-    height: "16px",
     type: IconTypes.SPINNER,
-    fillColor: IconColors.PRIMARY
-  })), isFailed && React.createElement(Icon, {
-    className: "sendbird-openchannel-og-message__top__right__tail__failed",
+    fillColor: IconColors.PRIMARY,
     width: "16px",
-    height: "16px",
-    type: IconTypes.ERROR
+    height: "16px"
+  })), isFailed && /*#__PURE__*/React__default.createElement(Icon, {
+    className: "sendbird-openchannel-og-message__top__right__tail__failed",
+    type: IconTypes.ERROR,
+    width: "16px",
+    height: "16px"
   }))));
 }
 
@@ -874,8 +870,8 @@ var getSupportingFileType = function getSupportingFileType(type) {
 function OpenchannelThumbnailMessage(_a) {
   var _b;
 
-  var message = _a.message,
-      className = _a.className,
+  var className = _a.className,
+      message = _a.message,
       disabled = _a.disabled,
       userId = _a.userId,
       status = _a.status,
@@ -894,22 +890,51 @@ function OpenchannelThumbnailMessage(_a) {
       disableUserProfile = _c.disableUserProfile,
       renderUserProfile = _c.renderUserProfile;
 
+  var _d = useState(360),
+      messageWidth = _d[0],
+      setMessageWidth = _d[1];
+
+  var messageRef = useRef(null);
   var contextMenuRef = useRef(null);
   var avatarRef = useRef(null);
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.push('sendbird-openchannel-thumbnail-message');
+  var memorizedThumbnailPlaceHolder = useMemo(function () {
+    return function (type) {
+      return function (_a) {
+        var style = _a.style;
+        return (
+          /*#__PURE__*/
+          // eslint-disable-line
+          React__default.createElement("div", {
+            style: style
+          }, /*#__PURE__*/React__default.createElement(Icon, {
+            type: type,
+            fillColor: IconColors.ON_BACKGROUND_2,
+            width: "56px",
+            height: "56px"
+          }))
+        );
+      };
+    };
+  }, []);
   var isByMe = checkIsByMe(message, userId);
   var isMessageSent = checkIsSent(status);
   var isPending = checkIsPending(status);
   var isFailed = checkIsFailed(status);
   var sender = getSenderFromMessage(message);
-  return React.createElement("div", {
-    className: injectingClassName.join(' ')
-  }, React.createElement("div", {
+  useEffect(function () {
+    var _a;
+
+    var thumbnailWidth = ((_a = messageRef === null || messageRef === void 0 ? void 0 : messageRef.current) === null || _a === void 0 ? void 0 : _a.clientWidth) - 80;
+    setMessageWidth(thumbnailWidth > 360 ? 360 : thumbnailWidth);
+  }, []);
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: __spreadArray(__spreadArray([], Array.isArray(className) ? className : [className]), ['sendbird-openchannel-thumbnail-message']).join(' '),
+    ref: messageRef
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-thumbnail-message__left"
-  }, !chainTop && React.createElement(ContextMenu, {
+  }, !chainTop && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(Avatar, {
+      return /*#__PURE__*/React__default.createElement(Avatar, {
         className: "sendbird-openchannel-thumbnail-message__left__avatar",
         src: sender.profileUrl || '',
         ref: avatarRef,
@@ -923,7 +948,7 @@ function OpenchannelThumbnailMessage(_a) {
       });
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
+      return /*#__PURE__*/React__default.createElement(MenuItems, {
         parentRef: avatarRef,
         parentContainRef: avatarRef,
         closeDropdown: closeDropdown,
@@ -934,28 +959,29 @@ function OpenchannelThumbnailMessage(_a) {
       }, renderUserProfile ? renderUserProfile({
         user: sender,
         close: closeDropdown
-      }) : React.createElement(UserProfile, {
+      }) : /*#__PURE__*/React__default.createElement(ConnectedUserProfile, {
         user: sender,
         onSuccess: closeDropdown,
         disableMessaging: true
       }));
     }
-  })), React.createElement("div", {
+  })), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-thumbnail-message__right"
-  }, !chainTop && React.createElement("div", {
+  }, !chainTop && /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-thumbnail-message__right__title"
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-openchannel-thumbnail-message__right__title__sender-name",
     type: LabelTypography.CAPTION_2,
     color: isByMe ? LabelColors.SECONDARY_3 : LabelColors.ONBACKGROUND_2
-  }, sender && (sender.friendName || sender.nickname || sender.userId)), React.createElement(Label, {
+  }, sender && (sender.friendName || sender.nickname || sender.userId)), /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-openchannel-thumbnail-message__right__title__sent-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_3
-  }, message.createdAt && format(message.createdAt, 'p'))), React.createElement("div", {
+  }, message.createdAt && format(message.createdAt, 'p'))), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-thumbnail-message__right__body"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-thumbnail-message__right__body__wrap",
+    role: "button",
     onClick: function onClick() {
       if (isMessageSent) {
         _onClick(true);
@@ -966,90 +992,93 @@ function OpenchannelThumbnailMessage(_a) {
         _onClick(true);
       }
     },
-    tabIndex: 0,
-    role: "button"
-  }, React.createElement("div", {
+    tabIndex: 0
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-thumbnail-message__right__body__wrap__overlay"
-  }), (_b = {}, _b[SUPPORTING_TYPES.VIDEO] = url || localUrl ? React.createElement("div", {
+  }), (_b = {}, _b[SUPPORTING_TYPES.VIDEO] = url || localUrl ? /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-thumbnail-message__right__body__wrap__video"
-  }, thumbnailUrl ? React.createElement(ImageRenderer, {
+  }, thumbnailUrl ? /*#__PURE__*/React__default.createElement(ImageRenderer, {
     className: "sendbird-openchannel-thumbnail-message__right__body__wrap__video",
     url: thumbnailUrl,
+    width: messageWidth,
     height: "270px",
-    alt: "image"
-  }) : React.createElement("video", {
+    alt: "image",
+    placeHolder: memorizedThumbnailPlaceHolder(IconTypes.PLAY)
+  }) : /*#__PURE__*/React__default.createElement("video", {
     className: "sendbird-openchannel-thumbnail-message__right__body__wrap__video__video"
-  }, React.createElement("source", {
+  }, /*#__PURE__*/React__default.createElement("source", {
     src: url || localUrl,
     type: type
-  })), React.createElement(Icon, {
+  })), /*#__PURE__*/React__default.createElement(Icon, {
     className: "sendbird-openchannel-thumbnail-message__right__body__wrap__video__icon",
+    type: IconTypes.PLAY,
+    fillColor: IconColors.ON_BACKGROUND_2,
     width: "56px",
-    height: "56px",
-    type: IconTypes.PLAY
-  })) : React.createElement(Icon, {
+    height: "56px"
+  })) : /*#__PURE__*/React__default.createElement(Icon, {
     className: "sendbird-openchannel-thumbnail-message__right__body__wrap__video--icon",
-    width: "56px",
-    height: "56px",
     type: IconTypes.PHOTO,
-    fillColor: IconColors.ON_BACKGROUND_2
-  }), _b[SUPPORTING_TYPES.IMAGE] = url || localUrl ? React.createElement(ImageRenderer, {
+    fillColor: IconColors.ON_BACKGROUND_2,
+    width: "56px",
+    height: "56px"
+  }), _b[SUPPORTING_TYPES.IMAGE] = url || localUrl ? /*#__PURE__*/React__default.createElement(ImageRenderer, {
     className: "sendbird-openchannel-thumbnail-message__right__body__wrap__image",
     url: thumbnailUrl || url || localUrl,
-    width: "360px",
+    alt: "image",
+    width: messageWidth,
     height: "270px",
-    alt: "image"
-  }) : React.createElement(Icon, {
+    placeHolder: memorizedThumbnailPlaceHolder(IconTypes.PHOTO)
+  }) : /*#__PURE__*/React__default.createElement(Icon, {
     className: "sendbird-openchannel-thumbnail-message__right__body__wrap__image--icon",
-    width: "56px",
-    height: "56px",
     type: IconTypes.PHOTO,
-    fillColor: IconColors.ON_BACKGROUND_2
-  }), _b[SUPPORTING_TYPES.UNSUPPORTED] = React.createElement(Icon, {
+    fillColor: IconColors.ON_BACKGROUND_2,
+    width: "56px",
+    height: "56px"
+  }), _b[SUPPORTING_TYPES.UNSUPPORTED] = /*#__PURE__*/React__default.createElement(Icon, {
     className: "sendbird-openchannel-thumbnail-message__right__body__wrap__unknown",
-    width: "56px",
-    height: "56px",
     type: IconTypes.PHOTO,
-    fillColor: IconColors.ON_BACKGROUND_2
-  }), _b)[getSupportingFileType(type)])), (isPending || isFailed) && React.createElement("div", {
+    fillColor: IconColors.ON_BACKGROUND_2,
+    width: "56px",
+    height: "56px"
+  }), _b)[getSupportingFileType(type)])), (isPending || isFailed) && /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-thumbnail-message__right__tail"
-  }, isPending && React.createElement(Loader, {
+  }, isPending && /*#__PURE__*/React__default.createElement(Loader, {
     width: "16px",
     height: "16px"
-  }, React.createElement(Icon, {
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     className: "sendbird-openchannel-thumbnail-message__right__tail__pending",
     type: IconTypes.SPINNER,
     fillColor: IconColors.PRIMARY,
     width: "16px",
     height: "16px"
-  })), isFailed && React.createElement(Icon, {
+  })), isFailed && /*#__PURE__*/React__default.createElement(Icon, {
     className: "sendbird-openchannel-thumbnail-message__right__tail__failed",
     type: IconTypes.ERROR,
     width: "16px",
     height: "16px"
-  }))), React.createElement("div", {
+  }))), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-thumbnail-message__context-menu",
     ref: contextMenuRef
-  }, React.createElement(ContextMenu, {
+  }, /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return showMenuTrigger({
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(IconButton, {
+      }) && /*#__PURE__*/React__default.createElement(IconButton, {
         className: "sendbird-openchannel-thumbnail-message__context-menu--icon",
         width: "32px",
         height: "32px",
         onClick: toggleDropdown
-      }, React.createElement(Icon, {
-        width: "24px",
-        height: "24px",
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.MORE,
-        fillColor: IconColors.CONTENT_INVERSE
+        fillColor: IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
+      return /*#__PURE__*/React__default.createElement(MenuItems, {
         parentRef: contextMenuRef,
         parentContainRef: contextMenuRef,
         closeDropdown: closeDropdown,
@@ -1058,7 +1087,7 @@ function OpenchannelThumbnailMessage(_a) {
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(MenuItem, {
+      }) && /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           resendMessage(message);
           closeDropdown();
@@ -1067,7 +1096,7 @@ function OpenchannelThumbnailMessage(_a) {
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(MenuItem, {
+      }) && /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           if (disabled) {
             return;
@@ -1082,17 +1111,18 @@ function OpenchannelThumbnailMessage(_a) {
 }
 
 var checkFileType = function checkFileType(fileUrl) {
-  var result = null;
-  var imageFile = /(\.gif|\.jpg|\.jpeg|\.txt|\.pdf)$/i;
   var audioFile = /(\.mp3)$/i;
+  var gifFile = /(\.gif)$/i;
 
-  if (imageFile.test(fileUrl)) {
-    result = IconTypes.FILE_DOCUMENT;
-  } else if (audioFile.test(fileUrl)) {
-    result = IconTypes.FILE_AUDIO;
+  if (audioFile.test(fileUrl)) {
+    return IconTypes.FILE_AUDIO;
   }
 
-  return result;
+  if (gifFile.test(fileUrl)) {
+    return IconTypes.GIF;
+  }
+
+  return IconTypes.FILE_DOCUMENT;
 };
 var truncate = function truncate(fullStr, strLen) {
   if (fullStr === null || fullStr === undefined) return '';
@@ -1106,8 +1136,8 @@ var truncate = function truncate(fullStr, strLen) {
 };
 
 function OpenchannelFileMessage(_a) {
-  var message = _a.message,
-      className = _a.className,
+  var className = _a.className,
+      message = _a.message,
       userId = _a.userId,
       disabled = _a.disabled,
       chainTop = _a.chainTop,
@@ -1126,19 +1156,17 @@ function OpenchannelFileMessage(_a) {
     window.open(message.url);
   };
 
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.push('sendbird-openchannel-file-message');
   var isByMe = checkIsByMe(message, userId);
   var isPending = checkIsPending(status);
   var isFailed = checkIsFailed(status);
   var sender = getSenderFromMessage(message);
-  return React.createElement("div", {
-    className: injectingClassName.join(' ')
-  }, React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: __spreadArray(__spreadArray([], Array.isArray(className) ? className : [className]), ['sendbird-openchannel-file-message']).join(' ')
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-file-message__left"
-  }, !chainTop && React.createElement(ContextMenu, {
+  }, !chainTop && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(Avatar, {
+      return /*#__PURE__*/React__default.createElement(Avatar, {
         className: "sendbird-openchannel-file-message__left__avatar",
         src: sender.profileUrl || '',
         ref: avatarRef,
@@ -1152,7 +1180,7 @@ function OpenchannelFileMessage(_a) {
       });
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
+      return /*#__PURE__*/React__default.createElement(MenuItems, {
         parentRef: avatarRef,
         parentContainRef: avatarRef,
         closeDropdown: closeDropdown,
@@ -1163,76 +1191,76 @@ function OpenchannelFileMessage(_a) {
       }, renderUserProfile ? renderUserProfile({
         user: sender,
         close: closeDropdown
-      }) : React.createElement(UserProfile, {
+      }) : /*#__PURE__*/React__default.createElement(ConnectedUserProfile, {
         user: sender,
         onSuccess: closeDropdown,
         disableMessaging: true
       }));
     }
-  })), React.createElement("div", {
+  })), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-file-message__right"
-  }, !chainTop && React.createElement("div", {
+  }, !chainTop && /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-file-message__right__title"
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-openchannel-file-message__right__title__sender-name",
     type: LabelTypography.CAPTION_2,
     color: isByMe ? LabelColors.SECONDARY_3 : LabelColors.ONBACKGROUND_2
-  }, sender && (sender.friendName || sender.nickname || sender.userId)), React.createElement(Label, {
+  }, sender && (sender.friendName || sender.nickname || sender.userId)), /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-openchannel-file-message__right__title__sent-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_3
-  }, message.createdAt && format(message.createdAt, 'p'))), React.createElement("div", {
+  }, message.createdAt && format(message.createdAt, 'p'))), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-file-message__right__body"
-  }, checkFileType(message.url) && React.createElement(Icon, {
+  }, checkFileType(message.url) && /*#__PURE__*/React__default.createElement(Icon, {
     className: "sendbird-openchannel-file-message__right__body__icon",
     type: checkFileType(message.url),
     fillColor: IconColors.PRIMARY,
     width: "48px",
     height: "48px"
-  }), React.createElement(TextButton, {
+  }), /*#__PURE__*/React__default.createElement(TextButton, {
     className: "sendbird-openchannel-file-message__right__body__file-name",
     onClick: openFileUrl
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, truncate(message.name || message.url, 40)))), (isPending || isFailed) && React.createElement("div", {
+  }, truncate(message.name || message.url, 40)))), (isPending || isFailed) && /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-file-message__right__tail"
-  }, isPending && React.createElement(Loader, {
+  }, isPending && /*#__PURE__*/React__default.createElement(Loader, {
     width: "16px",
     height: "16px"
-  }, React.createElement(Icon, {
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     className: "sendbird-openchannel-file-message__right__tail__pending",
     type: IconTypes.SPINNER,
     fillColor: IconColors.PRIMARY,
     width: "16px",
     height: "16px"
-  })), isFailed && React.createElement(Icon, {
+  })), isFailed && /*#__PURE__*/React__default.createElement(Icon, {
     className: "sendbird-openchannel-file-message__right__tail__failed",
     type: IconTypes.ERROR,
     width: "16px",
     height: "16px"
-  }))), React.createElement("div", {
+  }))), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-file-message__context-menu",
     ref: contextMenuRef
-  }, React.createElement(ContextMenu, {
+  }, /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
       return showMenuTrigger({
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(IconButton, {
+      }) && /*#__PURE__*/React__default.createElement(IconButton, {
         className: "sendbird-openchannel-file-message__context-menu__icon",
         width: "32px",
         height: "32px",
         onClick: toggleDropdown
-      }, React.createElement(Icon, {
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.MORE,
         width: "24px",
         height: "24px"
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
+      return /*#__PURE__*/React__default.createElement(MenuItems, {
         parentRef: contextMenuRef,
         parentContainRef: contextMenuRef,
         closeDropdown: closeDropdown,
@@ -1241,7 +1269,7 @@ function OpenchannelFileMessage(_a) {
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(MenuItem, {
+      }) && /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           if (disabled) {
             return;
@@ -1254,7 +1282,7 @@ function OpenchannelFileMessage(_a) {
         message: message,
         userId: userId,
         status: status
-      }) && React.createElement(MenuItem, {
+      }) && /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           if (disabled) {
             return;
@@ -1272,7 +1300,7 @@ function RemoveMessageModal(_a) {
   var onCloseModal = _a.onCloseModal,
       onDeleteMessage = _a.onDeleteMessage;
   var stringSet = useContext(LocalizationContext).stringSet;
-  return React.createElement(Modal, {
+  return /*#__PURE__*/React__default.createElement(Modal, {
     onCancel: onCloseModal,
     onSubmit: onDeleteMessage,
     submitText: "Delete",
@@ -1361,15 +1389,15 @@ function MessageHoc(_a) {
   }
 
   if (RenderedMessage) {
-    return React.createElement("div", {
+    return /*#__PURE__*/React__default.createElement("div", {
       className: "sendbird-msg-hoc sendbird-msg--scroll-ref"
-    }, React.createElement(RenderedMessage, {
+    }, /*#__PURE__*/React__default.createElement(RenderedMessage, {
       message: message
     }));
   }
 
   if (message.messageType === 'user' && showEdit) {
-    return React.createElement(MessageInput, {
+    return /*#__PURE__*/React__default.createElement(MessageInput, {
       isEdit: true,
       disabled: editDisabled,
       ref: editMessageInputRef,
@@ -1382,20 +1410,20 @@ function MessageHoc(_a) {
     });
   }
 
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-msg-hoc sendbird-msg--scroll-ref"
-  }, hasSeperator && React.createElement(DateSeparator, null, React.createElement(Label, {
+  }, hasSeperator && /*#__PURE__*/React__default.createElement(DateSeparator, null, /*#__PURE__*/React__default.createElement(Label, {
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
   }, format(message.createdAt, 'MMMM dd, yyyy'))), (_b = {}, _b[MessageTypes.ADMIN] = function () {
     if (message.messageType === 'admin') {
-      return React.createElement(OpenChannelAdminMessage, {
+      return /*#__PURE__*/React__default.createElement(OpenChannelAdminMessage, {
         message: message
       });
     }
   }(), _b[MessageTypes.FILE] = function () {
     if (message.messageType === 'file') {
-      return React.createElement(OpenchannelFileMessage, {
+      return /*#__PURE__*/React__default.createElement(OpenchannelFileMessage, {
         message: message,
         disabled: disabled,
         userId: userId,
@@ -1410,7 +1438,7 @@ function MessageHoc(_a) {
     return;
   }(), _b[MessageTypes.OG] = function () {
     if (message.messageType === 'user') {
-      return React.createElement(OpenchannelOGMessage, {
+      return /*#__PURE__*/React__default.createElement(OpenchannelOGMessage, {
         message: message,
         status: status,
         userId: userId,
@@ -1426,7 +1454,7 @@ function MessageHoc(_a) {
     return;
   }(), _b[MessageTypes.THUMBNAIL] = function () {
     if (message.messageType === 'file') {
-      return React.createElement(OpenchannelThumbnailMessage, {
+      return /*#__PURE__*/React__default.createElement(OpenchannelThumbnailMessage, {
         message: message,
         disabled: disabled,
         userId: userId,
@@ -1442,7 +1470,7 @@ function MessageHoc(_a) {
     return;
   }(), _b[MessageTypes.USER] = function () {
     if (message.messageType === 'user') {
-      return React.createElement(OpenchannelUserMessage, {
+      return /*#__PURE__*/React__default.createElement(OpenchannelUserMessage, {
         message: message,
         userId: userId,
         disabled: disabled,
@@ -1460,7 +1488,7 @@ function MessageHoc(_a) {
     return; // return (
     //   <OpenChannelUnknownMessage message={message} />
     // );
-  }(), _b)[getMessageType(message)], showRemove && React.createElement(RemoveMessageModal, {
+  }(), _b)[getMessageType(message)], showRemove && /*#__PURE__*/React__default.createElement(RemoveMessageModal, {
     onCloseModal: function onCloseModal() {
       return setShowRemove(false);
     },
@@ -1469,7 +1497,7 @@ function MessageHoc(_a) {
         deleteMessage(message);
       }
     }
-  }), showFileViewer && message.messageType === 'file' && React.createElement(FileViewer, {
+  }), showFileViewer && message.messageType === 'file' && /*#__PURE__*/React__default.createElement(FileViewer, {
     onClose: function onClose() {
       return setShowFileViewer(false);
     },
@@ -1539,15 +1567,15 @@ function OpenchannelConversationScroll(_a, ref) {
   var hasMessage = useMemo(function () {
     return allMessages.length > 0;
   }, [allMessages.length]);
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-conversation-scroll",
     onScroll: handleOnScroll,
     ref: scrollRef
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-conversation-scroll__container"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-conversation-scroll__container__padding"
-  }), React.createElement("div", {
+  }), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-conversation-scroll__container__item-container" + (hasMessage ? '' : '--no-messages')
   }, hasMessage ? allMessages.map(function (message, index) {
     var status;
@@ -1567,7 +1595,7 @@ function OpenchannelConversationScroll(_a, ref) {
         chainTop = _a[0],
         chainBottom = _a[1];
 
-    return React.createElement(MessageHoc, {
+    return /*#__PURE__*/React__default.createElement(MessageHoc, {
       renderCustomMessage: renderCustomMessage,
       channel: openchannel,
       key: message.messageId,
@@ -1583,16 +1611,16 @@ function OpenchannelConversationScroll(_a, ref) {
       updateMessage: updateMessage,
       resendMessage: resendMessage
     });
-  }) : React.createElement(PlaceHolder, {
+  }) : /*#__PURE__*/React__default.createElement(PlaceHolder, {
     className: "sendbird-openchannel-conversation-scroll__container__place-holder",
     type: PlaceHolderTypes.NO_MESSAGES
-  })), showScrollDownButton && React.createElement("div", {
+  })), showScrollDownButton && /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-openchannel-conversation-scroll__container__scroll-bottom-button",
     onClick: scrollToBottom,
     onKeyDown: scrollToBottom,
     tabIndex: 0,
     role: "button"
-  }, React.createElement(Icon, {
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     width: "24px",
     height: "24px",
     type: IconTypes.CHEVRON_DOWN,
@@ -1600,7 +1628,7 @@ function OpenchannelConversationScroll(_a, ref) {
   }))));
 }
 
-var OpenchannelConversationScroll$1 = React.forwardRef(OpenchannelConversationScroll);
+var OpenchannelConversationScroll$1 = /*#__PURE__*/React__default.forwardRef(OpenchannelConversationScroll);
 
 var SET_CURRENT_CHANNEL = 'SET_CURRENT_CHANNEL';
 var SET_CHANNEL_INVALID = 'SET_CHANNEL_INVALID';
@@ -1754,7 +1782,7 @@ function reducer(state, action) {
           initialized: true,
           hasMore: _hasMore,
           lastMessageTimestamp: _lastMessageTimestamp,
-          allMessages: __spreadArrays(receivedMessages_1, filteredAllMessages)
+          allMessages: __spreadArray(__spreadArray([], receivedMessages_1), filteredAllMessages)
         });
       }
 
@@ -1769,7 +1797,7 @@ function reducer(state, action) {
         }
 
         return __assign(__assign({}, state), {
-          allMessages: __spreadArrays(state.allMessages, [__assign({}, message)])
+          allMessages: __spreadArray(__spreadArray([], state.allMessages), [__assign({}, message)])
         });
       }
 
@@ -1820,7 +1848,7 @@ function reducer(state, action) {
         }
 
         return __assign(__assign({}, state), {
-          participants: __spreadArrays(state.participants, fetchedParticipantList)
+          participants: __spreadArray(__spreadArray([], state.participants), fetchedParticipantList)
         });
       }
 
@@ -1836,7 +1864,7 @@ function reducer(state, action) {
         }
 
         return __assign(__assign({}, state), {
-          bannedParticipantIds: __spreadArrays(state.bannedParticipantIds, fetchedBannedUserList.map(function (user) {
+          bannedParticipantIds: __spreadArray(__spreadArray([], state.bannedParticipantIds), fetchedBannedUserList.map(function (user) {
             return user.userId;
           }))
         });
@@ -1854,7 +1882,7 @@ function reducer(state, action) {
         }
 
         return __assign(__assign({}, state), {
-          mutedParticipantIds: __spreadArrays(state.bannedParticipantIds, fetchedMutedUserList.map(function (user) {
+          mutedParticipantIds: __spreadArray(__spreadArray([], state.bannedParticipantIds), fetchedMutedUserList.map(function (user) {
             return user.userId;
           }))
         });
@@ -1874,7 +1902,7 @@ function reducer(state, action) {
         }
 
         return __assign(__assign({}, state), {
-          allMessages: __spreadArrays(state.allMessages, [receivedMessage])
+          allMessages: __spreadArray(__spreadArray([], state.allMessages), [receivedMessage])
         });
       }
 
@@ -1950,7 +1978,7 @@ function reducer(state, action) {
         }
 
         return __assign(__assign({}, state), {
-          participants: __spreadArrays(state.participants, [enteredUser])
+          participants: __spreadArray(__spreadArray([], state.participants), [enteredUser])
         });
       }
 
@@ -1982,7 +2010,7 @@ function reducer(state, action) {
         }
 
         return __assign(__assign({}, state), {
-          mutedParticipantIds: __spreadArrays(state.mutedParticipantIds, [mutedUser.userId])
+          mutedParticipantIds: __spreadArray(__spreadArray([], state.mutedParticipantIds), [mutedUser.userId])
         });
       }
 
@@ -2014,7 +2042,7 @@ function reducer(state, action) {
         }
 
         return __assign(__assign({}, state), {
-          bannedParticipantIds: __spreadArrays(state.bannedParticipantIds, [bannedUser.userId])
+          bannedParticipantIds: __spreadArray(__spreadArray([], state.bannedParticipantIds), [bannedUser.userId])
         });
       }
 
@@ -3053,7 +3081,12 @@ function useDeleteMessageCallback(_a, _b) {
         callback();
       }
     } else {
-      currentOpenChannel.deleteMessage(message, function (error) {
+      if (!(message.messageType === 'file' || message.messageType === 'user')) {
+        return;
+      }
+
+      var messageToDelete = message;
+      currentOpenChannel.deleteMessage(messageToDelete, function (error) {
         logger.info('OpenChannel | useDeleteMessageCallback: Deleting message on server', sendingStatus);
 
         if (callback) {
@@ -3147,13 +3180,14 @@ function useResendMessageCallback(_a, _b) {
   }, [currentOpenChannel]);
 }
 
-var COMPONENT_CLASS_NAME$1 = 'sendbird-openchannel-conversation';
+var COMPONENT_CLASS_NAME = 'sendbird-openchannel-conversation';
 var OpenchannelConversation = function OpenchannelConversation(props) {
-  // props
-  var useMessageGrouping = props.useMessageGrouping,
-      channelUrl = props.channelUrl,
-      stores = props.stores,
+  var // internal props
+  stores = props.stores,
       config = props.config,
+      // normal props
+  useMessageGrouping = props.useMessageGrouping,
+      channelUrl = props.channelUrl,
       _a = props.queries,
       queries = _a === void 0 ? {} : _a,
       disableUserProfile = props.disableUserProfile,
@@ -3379,43 +3413,43 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
   }, [channelUrl, sdkInit]);
 
   if (!currentOpenChannel || !currentOpenChannel.url || amIBanned) {
-    return React.createElement("div", {
-      className: COMPONENT_CLASS_NAME$1
-    }, React.createElement(PlaceHolder, {
+    return /*#__PURE__*/React__default.createElement("div", {
+      className: COMPONENT_CLASS_NAME
+    }, /*#__PURE__*/React__default.createElement(PlaceHolder, {
       type: PlaceHolderTypes.NO_CHANNELS
     }));
   }
 
   if (loading) {
-    return React.createElement("div", {
-      className: COMPONENT_CLASS_NAME$1
-    }, React.createElement(PlaceHolder, {
+    return /*#__PURE__*/React__default.createElement("div", {
+      className: COMPONENT_CLASS_NAME
+    }, /*#__PURE__*/React__default.createElement(PlaceHolder, {
       type: PlaceHolderTypes.LOADING
     }));
   }
 
   if (isInvalid) {
-    return React.createElement("div", {
-      className: COMPONENT_CLASS_NAME$1
-    }, React.createElement(PlaceHolder, {
+    return /*#__PURE__*/React__default.createElement("div", {
+      className: COMPONENT_CLASS_NAME
+    }, /*#__PURE__*/React__default.createElement(PlaceHolder, {
       type: PlaceHolderTypes.WRONG
     }));
   }
 
-  return React.createElement(UserProfileProvider, {
-    className: COMPONENT_CLASS_NAME$1,
+  return /*#__PURE__*/React__default.createElement(UserProfileProvider, {
+    className: COMPONENT_CLASS_NAME,
     disableUserProfile: userDefinedDisableUserProfile,
     renderUserProfile: userDefinedRenderProfile
   }, renderChannelTitle ? renderChannelTitle({
     channel: currentOpenChannel,
     user: user
-  }) : React.createElement(OpenchannelConversationHeader, {
+  }) : /*#__PURE__*/React__default.createElement(OpenchannelConversationHeader, {
     title: currentOpenChannel.name,
     subTitle: kFormatter(currentOpenChannel.participantCount) + " " + stringSet.OPEN_CHANNEL_CONVERSATION__TITLE_PARTICIPANTS,
     coverImage: currentOpenChannel.coverUrl,
     onActionClick: onChatHeaderActionClick,
     amIOperator: amIOperator
-  }), currentOpenChannel.isFrozen && React.createElement(FrozenNotification, null), React.createElement(OpenchannelConversationScroll$1, {
+  }), currentOpenChannel.isFrozen && /*#__PURE__*/React__default.createElement(FrozenNotification, null), /*#__PURE__*/React__default.createElement(OpenchannelConversationScroll$1, {
     ref: conversationScrollRef,
     renderCustomMessage: renderCustomMessage,
     openchannel: currentOpenChannel,
@@ -3432,7 +3466,7 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
     channel: currentOpenChannel,
     user: user,
     disabled: disabled
-  }) : React.createElement(MessageInputWrapper$1, {
+  }) : /*#__PURE__*/React__default.createElement(MessageInputWrapper$1, {
     channel: currentOpenChannel,
     user: user,
     ref: messageInputRef,

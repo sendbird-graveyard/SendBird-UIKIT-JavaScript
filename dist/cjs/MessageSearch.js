@@ -1,15 +1,15 @@
 'use strict';
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var LocalizationContext = require('./LocalizationContext-6447a7a3.js');
 var React = require('react');
-var React__default = _interopDefault(React);
+var LocalizationContext = require('./LocalizationContext-253833e3.js');
+var index$1 = require('./index-b36bb0d8.js');
+var index = require('./index-4cbbd5f7.js');
 require('prop-types');
-var index$2 = require('./index-c0f812fc.js');
-var isToday = _interopDefault(require('date-fns/isToday'));
-var format = _interopDefault(require('date-fns/format'));
-var isYesterday = _interopDefault(require('date-fns/isYesterday'));
+require('./index-478e7242.js');
+
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
 var GET_SEARCHED_MESSAGES = 'GET_SEARCHED_MESSAGES';
 var GET_NEXT_SEARCHED_MESSAGES = 'GET_NEXT_SEARCHED_MESSAGES';
@@ -48,7 +48,7 @@ function reducer(state, action) {
           return LocalizationContext.__assign(LocalizationContext.__assign({}, state), {
             loading: false,
             isInvalid: false,
-            allMessages: LocalizationContext.__spreadArrays(messages),
+            allMessages: LocalizationContext.__spreadArray([], messages),
             hasMoreResult: state.currentMessageSearchQuery.hasNext
           });
         }
@@ -84,7 +84,7 @@ function reducer(state, action) {
       {
         var messages = action.payload;
         return LocalizationContext.__assign(LocalizationContext.__assign({}, state), {
-          allMessages: LocalizationContext.__spreadArrays(state.allMessages, messages),
+          allMessages: LocalizationContext.__spreadArray(LocalizationContext.__spreadArray([], state.allMessages), messages),
           hasMoreResult: state.currentMessageSearchQuery.hasNext
         });
       }
@@ -232,105 +232,97 @@ function useScrollCallback(_a, _b) {
   }, [currentMessageSearchQuery, hasMoreResult]);
 }
 
-var getCreatedAt = (function (createdAt) {
+var getCreatedAt$1 = (function (createdAt) {
   if (!createdAt) {
     return '';
   }
 
-  if (isToday(createdAt)) {
-    return format(createdAt, 'p');
+  if (index.isToday(createdAt)) {
+    return index$1.format(createdAt, 'p');
   }
 
-  if (isYesterday(createdAt)) {
+  if (index.isYesterday(createdAt)) {
     return 'Yesterday';
   }
 
-  return format(createdAt, 'MMM dd');
+  return index$1.format(createdAt, 'MMM dd');
 });
 
 function MessageSearchItem(_a) {
   var className = _a.className,
       message = _a.message,
-      _onClick = _a.onClick,
-      selected = _a.selected;
+      selected = _a.selected,
+      _onClick = _a.onClick;
   var createdAt = message.createdAt;
   var messageText = message.message;
   var sender = message.sender || message._sender;
   var profileUrl = sender.profileUrl,
       nickname = sender.nickname;
   var stringSet = React.useContext(LocalizationContext.LocalizationContext).stringSet;
-  var injectingClassNames = Array.isArray(className) ? className : [className];
-  injectingClassNames.push('sendbird-message-search-item');
-
-  if (selected) {
-    injectingClassNames.push('sendbird-message-search-item--selected');
-  }
-
-  return React__default.createElement("div", {
-    className: injectingClassNames.join(' '),
+  return /*#__PURE__*/React__default['default'].createElement("div", {
+    className: LocalizationContext.__spreadArray(LocalizationContext.__spreadArray([], Array.isArray(className) ? className : [className]), ['sendbird-message-search-item', selected ? 'sendbird-message-search-item--selected' : '']).join(' '),
     onClick: function onClick(e) {
       e.stopPropagation();
 
       _onClick(message);
     }
-  }, React__default.createElement("div", {
+  }, /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-message-search-item__left"
-  }, React__default.createElement(index$2.Avatar, {
+  }, /*#__PURE__*/React__default['default'].createElement(index$1.Avatar, {
     className: "sendbird-message-search-item__left__sender-avatar",
     src: profileUrl,
     alt: "profile image",
     width: "56px",
     height: "56px"
-  })), React__default.createElement("div", {
+  })), /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-message-search-item__right"
-  }, React__default.createElement(index$2.Label, {
+  }, /*#__PURE__*/React__default['default'].createElement(index$1.Label, {
     className: "sendbird-message-search-item__right__sender-name",
-    type: index$2.LabelTypography.SUBTITLE_2,
-    color: index$2.LabelColors.ONBACKGROUND_1
-  }, nickname || stringSet.NO_NAME), React__default.createElement(index$2.Label, {
+    type: index$1.LabelTypography.SUBTITLE_2,
+    color: index$1.LabelColors.ONBACKGROUND_1
+  }, nickname || stringSet.NO_NAME), /*#__PURE__*/React__default['default'].createElement(index$1.Label, {
     className: "sendbird-message-search-item__right__message-text",
-    type: index$2.LabelTypography.BODY_2,
-    color: index$2.LabelColors.ONBACKGROUND_3
-  }, messageText), React__default.createElement(index$2.Label, {
+    type: index$1.LabelTypography.BODY_2,
+    color: index$1.LabelColors.ONBACKGROUND_3
+  }, messageText), /*#__PURE__*/React__default['default'].createElement(index$1.Label, {
     className: "sendbird-message-search-item__right__message-created-at",
-    type: index$2.LabelTypography.CAPTION_3,
-    color: index$2.LabelColors.ONBACKGROUND_2
-  }, getCreatedAt(createdAt))), React__default.createElement("div", {
+    type: index$1.LabelTypography.CAPTION_3,
+    color: index$1.LabelColors.ONBACKGROUND_2
+  }, getCreatedAt$1(createdAt))), /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-message-search-item__right-footer"
   }));
 }
 
-function getCreatedAt$1(createdAt) {
+function getCreatedAt(createdAt) {
   if (!createdAt) {
     return '';
   }
 
-  if (isToday(createdAt)) {
-    return format(createdAt, 'p');
+  if (index.isToday(createdAt)) {
+    return index$1.format(createdAt, 'p');
   }
 
-  if (isYesterday(createdAt)) {
+  if (index.isYesterday(createdAt)) {
     return 'Yesterday';
   }
 
-  return format(createdAt, 'MMM dd');
+  return index$1.format(createdAt, 'MMM dd');
 }
 function getIconOfFileType(message) {
-  var plainUrl = message.plainUrl,
-      url = message.url;
-  var fileMessageUrl = plainUrl || url;
+  var url = message.url;
+  var fileMessageUrl = url;
   var fileExtension = fileMessageUrl.match(/\.([^.]*?)(?=\?|#|$)/)[1];
 
   if (/(jpg|jpeg|png)$/i.test(fileExtension)) {
-    return index$2.IconTypes.PHOTO;
+    return index$1.IconTypes.PHOTO;
   } else if (/mp4$/i.test(fileExtension)) {
-    return index$2.IconTypes.PLAY;
+    return index$1.IconTypes.PLAY;
   } else if (/mp3/i.test(fileExtension)) {
-    return index$2.IconTypes.FILE_AUDIO;
+    return index$1.IconTypes.FILE_AUDIO;
   } else if (/gif/i.test(fileExtension)) {
-    return index$2.IconTypes.GIF;
+    return index$1.IconTypes.GIF;
   } else {
-    return index$2.IconTypes.FILE_DOCUMENT;
+    return index$1.IconTypes.FILE_DOCUMENT;
   }
 }
 function truncate(fullText, textLimit) {
@@ -346,63 +338,55 @@ function truncate(fullText, textLimit) {
 function MessageSearchFileItem(props) {
   var className = props.className,
       message = props.message,
-      _onClick = props.onClick,
-      selected = props.selected;
+      selected = props.selected,
+      _onClick = props.onClick;
   var createdAt = message.createdAt,
-      plainUrl = message.plainUrl,
       url = message.url,
       name = message.name;
-  var fileMessageUrl = plainUrl || url;
+  var fileMessageUrl = url;
   var sender = message.sender || message._sender;
   var profileUrl = sender.profileUrl,
       nickname = sender.nickname;
   var stringSet = React.useContext(LocalizationContext.LocalizationContext).stringSet;
-  var injectingClassNames = Array.isArray(className) ? className : [className];
-  injectingClassNames.push('sendbird-message-search-file-item');
-
-  if (selected) {
-    injectingClassNames.push('sendbird-message-search-file-item--selected');
-  }
-
-  return React__default.createElement("div", {
-    className: injectingClassNames.join(' '),
+  return /*#__PURE__*/React__default['default'].createElement("div", {
+    className: LocalizationContext.__spreadArray(LocalizationContext.__spreadArray([], Array.isArray(className) ? className : [className]), ['sendbird-message-search-file-item', selected ? 'sendbird-message-search-file-item--selected' : '']).join(' '),
     onClick: function onClick(e) {
       e.stopPropagation();
 
       _onClick(message);
     }
-  }, React__default.createElement("div", {
+  }, /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-message-search-file-item__left"
-  }, React__default.createElement(index$2.Avatar, {
+  }, /*#__PURE__*/React__default['default'].createElement(index$1.Avatar, {
     className: "sendbird-message-search-file-item__left__sender-avatar",
     src: profileUrl,
     alt: "profile image",
     width: "56px",
     height: "56px"
-  })), React__default.createElement("div", {
+  })), /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-message-search-file-item__right"
-  }, React__default.createElement(index$2.Label, {
+  }, /*#__PURE__*/React__default['default'].createElement(index$1.Label, {
     className: "sendbird-message-search-file-item__right__sender-name",
-    type: index$2.LabelTypography.SUBTITLE_2,
-    color: index$2.LabelColors.ONBACKGROUND_1
-  }, nickname || stringSet.NO_NAME), React__default.createElement("div", {
+    type: index$1.LabelTypography.SUBTITLE_2,
+    color: index$1.LabelColors.ONBACKGROUND_1
+  }, nickname || stringSet.NO_NAME), /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-message-search-file-item__right__content"
-  }, React__default.createElement("div", {
+  }, /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-message-search-file-item__right__content__type-icon"
-  }, React__default.createElement(index$2.Icon, {
+  }, /*#__PURE__*/React__default['default'].createElement(index$1.Icon, {
     type: getIconOfFileType(message),
-    fillColor: index$2.IconColors.PRIMARY,
+    fillColor: index$1.IconColors.PRIMARY,
     width: "18px",
     height: "18px"
-  })), React__default.createElement(index$2.Label, {
+  })), /*#__PURE__*/React__default['default'].createElement(index$1.Label, {
     className: "sendbird-message-search-file-item__right__content__url",
-    type: index$2.LabelTypography.BODY_2,
-    color: index$2.LabelColors.ONBACKGROUND_1
-  }, truncate(name || fileMessageUrl, 28)))), React__default.createElement(index$2.Label, {
+    type: index$1.LabelTypography.BODY_2,
+    color: index$1.LabelColors.ONBACKGROUND_1
+  }, truncate(name || fileMessageUrl, 28)))), /*#__PURE__*/React__default['default'].createElement(index$1.Label, {
     className: "sendbird-message-search-file-item__message-created-at",
-    type: index$2.LabelTypography.CAPTION_3,
-    color: index$2.LabelColors.ONBACKGROUND_2
-  }, getCreatedAt$1(createdAt)), React__default.createElement("div", {
+    type: index$1.LabelTypography.CAPTION_3,
+    color: index$1.LabelColors.ONBACKGROUND_2
+  }, getCreatedAt(createdAt)), /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-message-search-file-item__right-footer"
   }));
 }
@@ -514,32 +498,32 @@ function MessageSearch(props) {
   };
 
   if (isInvalid && searchString) {
-    return React__default.createElement("div", {
+    return /*#__PURE__*/React__default['default'].createElement("div", {
       className: COMPONENT_CLASS_NAME
-    }, React__default.createElement(index$2.PlaceHolder, {
-      type: index$2.PlaceHolderTypes$1.WRONG,
+    }, /*#__PURE__*/React__default['default'].createElement(index$1.PlaceHolder, {
+      type: index$1.PlaceHolderTypes$1.WRONG,
       retryToConnect: handleRetryToConnect
     }));
   }
 
   if (loading && searchString) {
-    return React__default.createElement("div", {
+    return /*#__PURE__*/React__default['default'].createElement("div", {
       className: COMPONENT_CLASS_NAME
-    }, React__default.createElement(index$2.PlaceHolder, {
-      type: index$2.PlaceHolderTypes$1.SEARCHING
+    }, /*#__PURE__*/React__default['default'].createElement(index$1.PlaceHolder, {
+      type: index$1.PlaceHolderTypes$1.SEARCHING
     }));
   }
 
   if (!searchString) {
-    return React__default.createElement("div", {
+    return /*#__PURE__*/React__default['default'].createElement("div", {
       className: COMPONENT_CLASS_NAME
-    }, React__default.createElement(index$2.PlaceHolder, {
-      type: index$2.PlaceHolderTypes$1.SEARCH_IN,
+    }, /*#__PURE__*/React__default['default'].createElement(index$1.PlaceHolder, {
+      type: index$1.PlaceHolderTypes$1.SEARCH_IN,
       searchInString: getChannelName()
     }));
   }
 
-  return React__default.createElement("div", {
+  return /*#__PURE__*/React__default['default'].createElement("div", {
     className: COMPONENT_CLASS_NAME,
     onScroll: handleOnScroll,
     ref: scrollRef
@@ -552,7 +536,7 @@ function MessageSearch(props) {
     }
 
     if (message.messageType === 'file') {
-      return React__default.createElement(MessageSearchFileItem, {
+      return /*#__PURE__*/React__default['default'].createElement(MessageSearchFileItem, {
         className: COMPONENT_CLASS_NAME + "__message-search-item",
         message: message,
         key: message.messageId,
@@ -564,7 +548,7 @@ function MessageSearch(props) {
       });
     }
 
-    return React__default.createElement(MessageSearchItem, {
+    return /*#__PURE__*/React__default['default'].createElement(MessageSearchItem, {
       className: COMPONENT_CLASS_NAME + "__message-search-item",
       message: message,
       key: message.messageId,
@@ -574,8 +558,8 @@ function MessageSearch(props) {
         setSelectedMessageId(message.messageId);
       }
     });
-  }) : React__default.createElement(index$2.PlaceHolder, {
-    type: index$2.PlaceHolderTypes$1.NO_RESULTS
+  }) : /*#__PURE__*/React__default['default'].createElement(index$1.PlaceHolder, {
+    type: index$1.PlaceHolderTypes$1.NO_RESULTS
   }));
 }
 

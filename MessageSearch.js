@@ -1,10 +1,9 @@
-import { _ as __assign, m as __spreadArrays, d as LocalizationContext, w as withSendbirdContext } from './LocalizationContext-12658c38.js';
-import React, { useEffect, useCallback, useContext, useState, useReducer, useRef } from 'react';
+import React__default, { useEffect, useCallback, useContext, useState, useReducer, useRef } from 'react';
+import { _ as __assign, d as __spreadArray, c as LocalizationContext, w as withSendbirdContext } from './LocalizationContext-5502b61d.js';
+import { g as format, A as Avatar, L as Label, a as LabelTypography, b as LabelColors, c as IconTypes, I as Icon, d as IconColors, P as PlaceHolder, j as PlaceHolderTypes } from './index-4fb99a01.js';
+import { i as isToday, a as isYesterday } from './index-786e1490.js';
 import 'prop-types';
-import { A as Avatar, L as Label, a as LabelTypography, b as LabelColors, c as IconTypes, I as Icon, d as IconColors, P as PlaceHolder, i as PlaceHolderTypes } from './index-ad616be9.js';
-import isToday from 'date-fns/isToday';
-import format from 'date-fns/format';
-import isYesterday from 'date-fns/isYesterday';
+import './index-0a658dd3.js';
 
 var GET_SEARCHED_MESSAGES = 'GET_SEARCHED_MESSAGES';
 var GET_NEXT_SEARCHED_MESSAGES = 'GET_NEXT_SEARCHED_MESSAGES';
@@ -43,7 +42,7 @@ function reducer(state, action) {
           return __assign(__assign({}, state), {
             loading: false,
             isInvalid: false,
-            allMessages: __spreadArrays(messages),
+            allMessages: __spreadArray([], messages),
             hasMoreResult: state.currentMessageSearchQuery.hasNext
           });
         }
@@ -79,7 +78,7 @@ function reducer(state, action) {
       {
         var messages = action.payload;
         return __assign(__assign({}, state), {
-          allMessages: __spreadArrays(state.allMessages, messages),
+          allMessages: __spreadArray(__spreadArray([], state.allMessages), messages),
           hasMoreResult: state.currentMessageSearchQuery.hasNext
         });
       }
@@ -227,7 +226,7 @@ function useScrollCallback(_a, _b) {
   }, [currentMessageSearchQuery, hasMoreResult]);
 }
 
-var getCreatedAt = (function (createdAt) {
+var getCreatedAt$1 = (function (createdAt) {
   if (!createdAt) {
     return '';
   }
@@ -246,56 +245,49 @@ var getCreatedAt = (function (createdAt) {
 function MessageSearchItem(_a) {
   var className = _a.className,
       message = _a.message,
-      _onClick = _a.onClick,
-      selected = _a.selected;
+      selected = _a.selected,
+      _onClick = _a.onClick;
   var createdAt = message.createdAt;
   var messageText = message.message;
   var sender = message.sender || message._sender;
   var profileUrl = sender.profileUrl,
       nickname = sender.nickname;
   var stringSet = useContext(LocalizationContext).stringSet;
-  var injectingClassNames = Array.isArray(className) ? className : [className];
-  injectingClassNames.push('sendbird-message-search-item');
-
-  if (selected) {
-    injectingClassNames.push('sendbird-message-search-item--selected');
-  }
-
-  return React.createElement("div", {
-    className: injectingClassNames.join(' '),
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: __spreadArray(__spreadArray([], Array.isArray(className) ? className : [className]), ['sendbird-message-search-item', selected ? 'sendbird-message-search-item--selected' : '']).join(' '),
     onClick: function onClick(e) {
       e.stopPropagation();
 
       _onClick(message);
     }
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-message-search-item__left"
-  }, React.createElement(Avatar, {
+  }, /*#__PURE__*/React__default.createElement(Avatar, {
     className: "sendbird-message-search-item__left__sender-avatar",
     src: profileUrl,
     alt: "profile image",
     width: "56px",
     height: "56px"
-  })), React.createElement("div", {
+  })), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-message-search-item__right"
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-message-search-item__right__sender-name",
     type: LabelTypography.SUBTITLE_2,
     color: LabelColors.ONBACKGROUND_1
-  }, nickname || stringSet.NO_NAME), React.createElement(Label, {
+  }, nickname || stringSet.NO_NAME), /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-message-search-item__right__message-text",
     type: LabelTypography.BODY_2,
     color: LabelColors.ONBACKGROUND_3
-  }, messageText), React.createElement(Label, {
+  }, messageText), /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-message-search-item__right__message-created-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
-  }, getCreatedAt(createdAt))), React.createElement("div", {
+  }, getCreatedAt$1(createdAt))), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-message-search-item__right-footer"
   }));
 }
 
-function getCreatedAt$1(createdAt) {
+function getCreatedAt(createdAt) {
   if (!createdAt) {
     return '';
   }
@@ -311,9 +303,8 @@ function getCreatedAt$1(createdAt) {
   return format(createdAt, 'MMM dd');
 }
 function getIconOfFileType(message) {
-  var plainUrl = message.plainUrl,
-      url = message.url;
-  var fileMessageUrl = plainUrl || url;
+  var url = message.url;
+  var fileMessageUrl = url;
   var fileExtension = fileMessageUrl.match(/\.([^.]*?)(?=\?|#|$)/)[1];
 
   if (/(jpg|jpeg|png)$/i.test(fileExtension)) {
@@ -341,63 +332,55 @@ function truncate(fullText, textLimit) {
 function MessageSearchFileItem(props) {
   var className = props.className,
       message = props.message,
-      _onClick = props.onClick,
-      selected = props.selected;
+      selected = props.selected,
+      _onClick = props.onClick;
   var createdAt = message.createdAt,
-      plainUrl = message.plainUrl,
       url = message.url,
       name = message.name;
-  var fileMessageUrl = plainUrl || url;
+  var fileMessageUrl = url;
   var sender = message.sender || message._sender;
   var profileUrl = sender.profileUrl,
       nickname = sender.nickname;
   var stringSet = useContext(LocalizationContext).stringSet;
-  var injectingClassNames = Array.isArray(className) ? className : [className];
-  injectingClassNames.push('sendbird-message-search-file-item');
-
-  if (selected) {
-    injectingClassNames.push('sendbird-message-search-file-item--selected');
-  }
-
-  return React.createElement("div", {
-    className: injectingClassNames.join(' '),
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: __spreadArray(__spreadArray([], Array.isArray(className) ? className : [className]), ['sendbird-message-search-file-item', selected ? 'sendbird-message-search-file-item--selected' : '']).join(' '),
     onClick: function onClick(e) {
       e.stopPropagation();
 
       _onClick(message);
     }
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-message-search-file-item__left"
-  }, React.createElement(Avatar, {
+  }, /*#__PURE__*/React__default.createElement(Avatar, {
     className: "sendbird-message-search-file-item__left__sender-avatar",
     src: profileUrl,
     alt: "profile image",
     width: "56px",
     height: "56px"
-  })), React.createElement("div", {
+  })), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-message-search-file-item__right"
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-message-search-file-item__right__sender-name",
     type: LabelTypography.SUBTITLE_2,
     color: LabelColors.ONBACKGROUND_1
-  }, nickname || stringSet.NO_NAME), React.createElement("div", {
+  }, nickname || stringSet.NO_NAME), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-message-search-file-item__right__content"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-message-search-file-item__right__content__type-icon"
-  }, React.createElement(Icon, {
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     type: getIconOfFileType(message),
     fillColor: IconColors.PRIMARY,
     width: "18px",
     height: "18px"
-  })), React.createElement(Label, {
+  })), /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-message-search-file-item__right__content__url",
     type: LabelTypography.BODY_2,
     color: LabelColors.ONBACKGROUND_1
-  }, truncate(name || fileMessageUrl, 28)))), React.createElement(Label, {
+  }, truncate(name || fileMessageUrl, 28)))), /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-message-search-file-item__message-created-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
-  }, getCreatedAt$1(createdAt)), React.createElement("div", {
+  }, getCreatedAt(createdAt)), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-message-search-file-item__right-footer"
   }));
 }
@@ -509,32 +492,32 @@ function MessageSearch(props) {
   };
 
   if (isInvalid && searchString) {
-    return React.createElement("div", {
+    return /*#__PURE__*/React__default.createElement("div", {
       className: COMPONENT_CLASS_NAME
-    }, React.createElement(PlaceHolder, {
+    }, /*#__PURE__*/React__default.createElement(PlaceHolder, {
       type: PlaceHolderTypes.WRONG,
       retryToConnect: handleRetryToConnect
     }));
   }
 
   if (loading && searchString) {
-    return React.createElement("div", {
+    return /*#__PURE__*/React__default.createElement("div", {
       className: COMPONENT_CLASS_NAME
-    }, React.createElement(PlaceHolder, {
+    }, /*#__PURE__*/React__default.createElement(PlaceHolder, {
       type: PlaceHolderTypes.SEARCHING
     }));
   }
 
   if (!searchString) {
-    return React.createElement("div", {
+    return /*#__PURE__*/React__default.createElement("div", {
       className: COMPONENT_CLASS_NAME
-    }, React.createElement(PlaceHolder, {
+    }, /*#__PURE__*/React__default.createElement(PlaceHolder, {
       type: PlaceHolderTypes.SEARCH_IN,
       searchInString: getChannelName()
     }));
   }
 
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     className: COMPONENT_CLASS_NAME,
     onScroll: handleOnScroll,
     ref: scrollRef
@@ -547,7 +530,7 @@ function MessageSearch(props) {
     }
 
     if (message.messageType === 'file') {
-      return React.createElement(MessageSearchFileItem, {
+      return /*#__PURE__*/React__default.createElement(MessageSearchFileItem, {
         className: COMPONENT_CLASS_NAME + "__message-search-item",
         message: message,
         key: message.messageId,
@@ -559,7 +542,7 @@ function MessageSearch(props) {
       });
     }
 
-    return React.createElement(MessageSearchItem, {
+    return /*#__PURE__*/React__default.createElement(MessageSearchItem, {
       className: COMPONENT_CLASS_NAME + "__message-search-item",
       message: message,
       key: message.messageId,
@@ -569,7 +552,7 @@ function MessageSearch(props) {
         setSelectedMessageId(message.messageId);
       }
     });
-  }) : React.createElement(PlaceHolder, {
+  }) : /*#__PURE__*/React__default.createElement(PlaceHolder, {
     type: PlaceHolderTypes.NO_RESULTS
   }));
 }

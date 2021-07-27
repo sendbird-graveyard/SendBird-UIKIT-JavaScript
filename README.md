@@ -4,11 +4,6 @@
 ![Languages](https://img.shields.io/badge/language-JAVASCRIPT-orange.svg)
 [![npm](https://img.shields.io/npm/v/sendbird.svg?style=popout&colorB=red)](https://www.npmjs.com/package/sendbird)
 
-## Note
-
-v2.0.0-alpha.x is still under QA. Please donot use it for production
-Try it only if you want to test OpenChannel
-
 ## Table of contents
 
   1. [Introduction](#introduction)

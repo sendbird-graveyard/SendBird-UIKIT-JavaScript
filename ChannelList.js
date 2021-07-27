@@ -1,19 +1,18 @@
-import { a as _objectSpread2, c as _toConsumableArray, d as LocalizationContext, w as withSendbirdContext, b as _slicedToArray, u as uuidv4 } from './LocalizationContext-12658c38.js';
-import React, { useContext, useRef, useState, useEffect, useReducer } from 'react';
+import { a as _objectSpread2, e as _toConsumableArray, c as LocalizationContext, w as withSendbirdContext, b as _slicedToArray, u as uuidv4 } from './LocalizationContext-5502b61d.js';
+import React__default, { useContext, useRef, useState, useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { U as UPDATE_USER_INFO } from './actionTypes-a85c0eaa.js';
-import { I as IconButton, M as Modal, T as Type, a as TextButton, C as ContextMenu, b as MenuItems, c as MenuItem, d as CREATE_CHANNEL$1, U as UPDATE_USER_MESSAGE, L as LEAVE_CHANNEL, S as SEND_MESSAGE_START, e as UserProfileProvider } from './index-711ec843.js';
-import { C as ChannelAvatar } from './index-4eb938ab.js';
-import { e as LabelStringSet, I as Icon, c as IconTypes, d as IconColors, L as Label, a as LabelTypography, b as LabelColors, A as Avatar, P as PlaceHolder, f as PlaceHolderTypes } from './index-ad616be9.js';
-import { n as noop$1 } from './utils-53ba1773.js';
-import { B as Badge, i as isBroadcastChannelEnabled, a as isSuperGroupChannelEnabled, I as InviteMembers, c as createDefaultUserListQuery, b as createChannel, L as LeaveChannelModal } from './LeaveChannel-2c2f8e8e.js';
-import isToday from 'date-fns/isToday';
-import format from 'date-fns/format';
-import isYesterday from 'date-fns/isYesterday';
-import './type-0296584d.js';
-import { t as truncate } from './utils-cfdeb084.js';
+import { U as UPDATE_USER_INFO } from './actionTypes-fc3fc1c2.js';
+import { I as IconButton, M as Modal, T as Type, a as TextButton, C as ContextMenu, b as MenuItems, c as MenuItem, i as CREATE_CHANNEL$1, j as UPDATE_USER_MESSAGE, L as LEAVE_CHANNEL, S as SEND_MESSAGE_START, h as UserProfileProvider } from './index-bd743b97.js';
+import { C as ChannelAvatar } from './index-cbd77cfb.js';
+import { B as Badge, i as isBroadcastChannelEnabled, a as isSuperGroupChannelEnabled, I as InviteMembers, c as createDefaultUserListQuery, b as createChannel, L as LeaveChannel } from './LeaveChannel-352fa9f0.js';
+import { g as format, h as LabelStringSet, I as Icon, c as IconTypes, d as IconColors, L as Label, a as LabelTypography, b as LabelColors, A as Avatar, P as PlaceHolder, f as PlaceHolderTypes } from './index-4fb99a01.js';
+import { i as isToday, a as isYesterday } from './index-786e1490.js';
+import { t as truncate } from './utils-3464ac37.js';
+import { I as InputLabel, a as Input } from './index-66022763.js';
+import { n as noop$1 } from './utils-9606270f.js';
 import 'react-dom';
-import { I as InputLabel, a as Input } from './index-5788a124.js';
+import './index-0a658dd3.js';
+import './type-cfe68896.js';
 
 var RESET_CHANNEL_LIST = 'RESET_CHANNEL_LIST';
 var CREATE_CHANNEL = 'CREATE_CHANNEL';
@@ -51,7 +50,7 @@ var channelListInitialState = {
 function reducer(state, action) {
   switch (action.type) {
     case INIT_CHANNELS_START:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         loading: true
       });
 
@@ -59,7 +58,7 @@ function reducer(state, action) {
       return channelListInitialState;
 
     case INIT_CHANNELS_SUCCESS:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         initialized: true,
         loading: false,
         allChannels: action.payload,
@@ -77,14 +76,14 @@ function reducer(state, action) {
             return c === url;
           });
         });
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
           allChannels: [].concat(_toConsumableArray(state.allChannels), _toConsumableArray(filteredChannels))
         });
       }
 
     case CREATE_CHANNEL:
       {
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
           allChannels: [action.payload].concat(_toConsumableArray(state.allChannels.filter(function (channel) {
             return channel.url !== action.payload.url;
           }))),
@@ -105,7 +104,7 @@ function reducer(state, action) {
         var currentChannel = leftCurrentChannel ? function () {
           return newAllChannels.length > 0 ? newAllChannels[0].url : '';
         }() : state.currentChannel;
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
           currentChannel: currentChannel,
           allChannels: newAllChannels
         });
@@ -129,7 +128,7 @@ function reducer(state, action) {
             return _newAllChannels2.length > 0 ? _newAllChannels2[0].url : '';
           }() : state.currentChannel;
 
-          return _objectSpread2({}, state, {
+          return _objectSpread2(_objectSpread2({}, state), {}, {
             currentChannel: _currentChannel,
             allChannels: _newAllChannels2
           });
@@ -140,7 +139,7 @@ function reducer(state, action) {
           return c.url === url ? channel : c;
         });
 
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
           allChannels: _newAllChannels
         });
       }
@@ -169,7 +168,7 @@ function reducer(state, action) {
           var currentUnReadCount = _currentChannel2 && _currentChannel2.unreadMessageCount;
 
           if (currentUnReadCount === 0) {
-            return _objectSpread2({}, state, {
+            return _objectSpread2(_objectSpread2({}, state), {}, {
               allChannels: allChannels.map(function (c) {
                 if (c.url === _channel.url) {
                   return _channel;
@@ -181,7 +180,7 @@ function reducer(state, action) {
           }
         }
 
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
           allChannels: [action.payload].concat(_toConsumableArray(state.allChannels.filter(function (_ref4) {
             var url = _ref4.url;
             return url !== action.payload.url;
@@ -190,22 +189,22 @@ function reducer(state, action) {
       }
 
     case SET_CURRENT_CHANNEL:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         currentChannel: action.payload
       });
 
     case SHOW_CHANNEL_SETTINGS:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         showSettings: true
       });
 
     case HIDE_CHANNEL_SETTINGS:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         showSettings: false
       });
 
     case ON_LAST_MESSAGE_UPDATED:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         allChannels: state.allChannels.map(function (channel) {
           if (channel.url === action.payload.url) {
             return action.payload;
@@ -216,7 +215,7 @@ function reducer(state, action) {
       });
 
     case ON_CHANNEL_FROZEN:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         allChannels: state.allChannels.map(function (channel) {
           if (channel.url === action.payload.url) {
             // eslint-disable-next-line no-param-reassign
@@ -229,7 +228,7 @@ function reducer(state, action) {
       });
 
     case ON_CHANNEL_UNFROZEN:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         allChannels: state.allChannels.map(function (channel) {
           if (channel.url === action.payload.url) {
             // eslint-disable-next-line no-param-reassign
@@ -242,7 +241,7 @@ function reducer(state, action) {
       });
 
     case CHANNEL_REPLACED_TO_TOP:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         allChannels: [action.payload].concat(_toConsumableArray(state.allChannels.filter(function (channel) {
           return channel.url !== action.payload.url;
         })))
@@ -321,12 +320,12 @@ var getChannelUnreadMessageCount = function getChannelUnreadMessageCount(channel
 
 function ChannelPreview(_ref) {
   var channel = _ref.channel,
+      currentUser = _ref.currentUser,
       isActive = _ref.isActive,
       ChannelAction = _ref.ChannelAction,
       theme = _ref.theme,
       onClick = _ref.onClick,
-      tabIndex = _ref.tabIndex,
-      currentUser = _ref.currentUser;
+      tabIndex = _ref.tabIndex;
   var userId = currentUser.userId;
   var isBroadcast = channel.isBroadcast,
       isFrozen = channel.isFrozen;
@@ -334,126 +333,129 @@ function ChannelPreview(_ref) {
   var _useContext = useContext(LocalizationContext),
       stringSet = _useContext.stringSet;
 
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: ['sendbird-channel-preview', isActive ? 'sendbird-channel-preview--active' : ''].join(' '),
     role: "link",
-    tabIndex: tabIndex,
     onClick: onClick,
     onKeyPress: onClick,
-    className: "\n        sendbird-channel-preview\n        ".concat(isActive ? 'sendbird-channel-preview--active' : null, "\n      ")
-  }, React.createElement("div", {
+    tabIndex: tabIndex
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-channel-preview__avatar"
-  }, React.createElement(ChannelAvatar, {
+  }, /*#__PURE__*/React__default.createElement(ChannelAvatar, {
     channel: channel,
     userId: userId,
     theme: theme
-  })), React.createElement("div", {
+  })), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-channel-preview__content"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-channel-preview__content__upper"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-channel-preview__content__upper__header"
-  }, isBroadcast && React.createElement("div", {
-    className: "sendbird-channel-preview__broadcast-icon"
-  }, React.createElement(Icon, {
+  }, isBroadcast && /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-channel-preview__content__upper__header__broadcast-icon"
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     type: IconTypes.BROADCAST,
     fillColor: IconColors.SECONDARY,
     height: "16px",
     width: "16px"
-  })), React.createElement(Label, {
+  })), /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-channel-preview__content__upper__header__channel-name",
     type: LabelTypography.SUBTITLE_2,
     color: LabelColors.ONBACKGROUND_1
-  }, getChannelTitle(channel, userId, stringSet)), React.createElement(Label, {
+  }, getChannelTitle(channel, userId, stringSet)), /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-channel-preview__content__upper__header__total-members",
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
-  }, getTotalMembers(channel)), isFrozen && React.createElement("div", {
+  }, getTotalMembers(channel)), isFrozen && /*#__PURE__*/React__default.createElement("div", {
     title: "Frozen",
-    className: "sendbird-channel-preview__frozen-icon"
-  }, React.createElement(Icon, {
+    className: "sendbird-channel-preview__content__upper__header__frozen-icon"
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     type: IconTypes.FREEZE,
     fillColor: IconColors.PRIMARY,
     height: 12,
     width: 12
-  }))), React.createElement(Label, {
+  }))), /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-channel-preview__content__upper__last-message-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
-  }, getLastMessageCreatedAt(channel))), React.createElement("div", {
+  }, getLastMessageCreatedAt(channel))), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-channel-preview__content__lower"
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-channel-preview__content__lower__last-message",
     type: LabelTypography.BODY_2,
     color: LabelColors.ONBACKGROUND_3
-  }, getLastMessage(channel)), React.createElement("div", {
+  }, getLastMessage(channel)), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-channel-preview__content__lower__unread-message-count"
-  }, getChannelUnreadMessageCount(channel) ? React.createElement(Badge, {
+  }, getChannelUnreadMessageCount(channel) // return number
+  ?
+  /*#__PURE__*/
+  React__default.createElement(Badge, {
     count: getChannelUnreadMessageCount(channel)
-  }) : null))), React.createElement("div", {
+  }) : null))), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-channel-preview__action"
   }, ChannelAction));
 }
 ChannelPreview.propTypes = {
-  isActive: PropTypes.bool,
-  theme: PropTypes.string,
   channel: PropTypes.shape({
     members: PropTypes.arrayOf(PropTypes.shape({})),
     coverUrl: PropTypes.string,
     isBroadcast: PropTypes.bool,
     isFrozen: PropTypes.bool
   }),
-  ChannelAction: PropTypes.element.isRequired,
-  onClick: PropTypes.func,
-  tabIndex: PropTypes.number,
   currentUser: PropTypes.shape({
     userId: PropTypes.string
-  })
+  }),
+  isActive: PropTypes.bool,
+  ChannelAction: PropTypes.element.isRequired,
+  theme: PropTypes.string,
+  onClick: PropTypes.func,
+  tabIndex: PropTypes.number
 };
 ChannelPreview.defaultProps = {
   channel: {},
+  currentUser: {},
   isActive: false,
   theme: 'light',
   onClick: function onClick() {},
-  tabIndex: 0,
-  currentUser: {}
+  tabIndex: 0
 };
 
 function ChannelHeader(_ref) {
   var user = _ref.user,
+      renderHeader = _ref.renderHeader,
       iconButton = _ref.iconButton,
       onEdit = _ref.onEdit,
-      renderHeader = _ref.renderHeader,
       allowProfileEdit = _ref.allowProfileEdit;
 
   var _useContext = useContext(LocalizationContext),
       stringSet = _useContext.stringSet;
 
-  return React.createElement("div", {
-    className: "\n        ".concat(allowProfileEdit && 'sendbird-channel-header--allow-edit', "\n        sendbird-channel-header\n      ")
-  }, renderHeader ? renderHeader() : React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: ['sendbird-channel-header', allowProfileEdit ? 'sendbird-channel-header--allow-edit' : ''].join(' ')
+  }, renderHeader ? renderHeader() : /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-channel-header__title",
     role: "button",
-    onKeyDown: onEdit,
     onClick: onEdit,
+    onKeyDown: onEdit,
     tabIndex: "0"
-  }, React.createElement("div", {
-    className: "sendbird-channel-header__title--left"
-  }, React.createElement(Avatar, {
-    height: "32px",
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-channel-header__title__left"
+  }, /*#__PURE__*/React__default.createElement(Avatar, {
     width: "32px",
+    height: "32px",
     src: user.profileUrl,
     alt: user.nickname
-  })), React.createElement("div", {
-    className: "sendbird-channel-header__title--right"
-  }, React.createElement(Label, {
-    className: "sendbird-channel-header__title--name",
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-channel-header__title__right"
+  }, /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-channel-header__title__right__name",
     type: LabelTypography.SUBTITLE_2,
     color: LabelColors.ONBACKGROUND_1
-  }, user.nickname || stringSet.NO_NAME), React.createElement(Label, {
-    className: "sendbird-channel-header__title--user-id",
+  }, user.nickname || stringSet.NO_NAME), /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-channel-header__title__right__user-id",
     type: LabelTypography.BODY_2,
     color: LabelColors.ONBACKGROUND_2
-  }, user.userId))), React.createElement("div", {
+  }, user.userId))), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-channel-header__right-icon"
   }, iconButton));
 }
@@ -464,27 +466,27 @@ ChannelHeader.propTypes = {
     userId: PropTypes.string
   }),
   renderHeader: PropTypes.func,
-  allowProfileEdit: PropTypes.bool,
+  iconButton: PropTypes.oneOfType([PropTypes.element, PropTypes.instanceOf(IconButton)]),
   onEdit: PropTypes.func.isRequired,
-  iconButton: PropTypes.oneOfType([PropTypes.element, PropTypes.instanceOf(IconButton)])
+  allowProfileEdit: PropTypes.bool
 };
 ChannelHeader.defaultProps = {
   user: {},
   renderHeader: null,
-  allowProfileEdit: false,
-  iconButton: null
+  iconButton: null,
+  allowProfileEdit: false
 };
 
 function EditUserProfile(_a) {
   var user = _a.user,
+      _b = _a.theme,
+      theme = _b === void 0 ? 'light' : _b,
       onCancel = _a.onCancel,
       _onSubmit = _a.onSubmit,
-      _b = _a.onThemeChange,
-      onThemeChange = _b === void 0 ? null : _b,
-      _c = _a.theme,
-      theme = _c === void 0 ? 'light' : _c,
-      _d = _a.changeTheme,
-      changeTheme = _d === void 0 ? noop$1 : _d;
+      _c = _a.changeTheme,
+      changeTheme = _c === void 0 ? noop$1 : _c,
+      _d = _a.onThemeChange,
+      onThemeChange = _d === void 0 ? null : _d;
   var hiddenInputRef = useRef(null);
   var inputRef = useRef(null);
   var formRef = useRef(null);
@@ -498,9 +500,10 @@ function EditUserProfile(_a) {
       newFile = _f[0],
       setNewFile = _f[1];
 
-  return React.createElement(Modal, {
+  return /*#__PURE__*/React__default.createElement(Modal, {
     titleText: stringSet.EDIT_PROFILE__TITLE,
     submitText: stringSet.BUTTON__SAVE,
+    type: Type.PRIMARY,
     onCancel: onCancel,
     onSubmit: function onSubmit() {
       if (user.nickname !== '' && !inputRef.current.value) {
@@ -515,23 +518,22 @@ function EditUserProfile(_a) {
       _onSubmit(inputRef.current.value, newFile);
 
       onCancel();
-    },
-    type: Type.PRIMARY
-  }, React.createElement("form", {
-    className: "sendbird__edit-user-profile",
+    }
+  }, /*#__PURE__*/React__default.createElement("form", {
+    className: "sendbird-edit-user-profile",
     ref: formRef,
     onSubmit: function onSubmit(e) {
       e.preventDefault();
     }
-  }, React.createElement("section", {
-    className: "sendbird__edit-user-profile__img"
-  }, React.createElement(InputLabel, null, stringSet.EDIT_PROFILE__IMAGE_LABEL), React.createElement("div", {
-    className: "sendbird__edit-user__avatar"
-  }, React.createElement(Avatar, {
-    height: "80px",
+  }, /*#__PURE__*/React__default.createElement("section", {
+    className: "sendbird-edit-user-profile__img"
+  }, /*#__PURE__*/React__default.createElement(InputLabel, null, stringSet.EDIT_PROFILE__IMAGE_LABEL), /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-edit-user-profile__img__avatar"
+  }, /*#__PURE__*/React__default.createElement(Avatar, {
     width: "80px",
+    height: "80px",
     src: currentImg || user.profileUrl
-  })), React.createElement("input", {
+  })), /*#__PURE__*/React__default.createElement("input", {
     ref: hiddenInputRef,
     type: "file",
     accept: "image/gif, image/jpeg, image/png",
@@ -543,34 +545,34 @@ function EditUserProfile(_a) {
       setNewFile(e.target.files[0]);
       hiddenInputRef.current.value = '';
     }
-  }), React.createElement(TextButton, {
-    className: "sendbird__edit-user__avatar-button",
+  }), /*#__PURE__*/React__default.createElement(TextButton, {
+    className: "sendbird-edit-user-profile__img__avatar-button",
+    notUnderline: true,
     onClick: function onClick() {
       return hiddenInputRef.current.click();
-    },
-    notUnderline: true
-  }, React.createElement(Label, {
+    }
+  }, /*#__PURE__*/React__default.createElement(Label, {
     type: LabelTypography.BUTTON_1,
     color: LabelColors.PRIMARY
-  }, stringSet.EDIT_PROFILE__IMAGE_UPLOAD))), React.createElement("section", {
-    className: "sendbird__edit-user__name"
-  }, React.createElement(InputLabel, null, stringSet.EDIT_PROFILE__NICKNAME_LABEL), React.createElement(Input, {
+  }, stringSet.EDIT_PROFILE__IMAGE_UPLOAD))), /*#__PURE__*/React__default.createElement("section", {
+    className: "sendbird-edit-user-profile__name"
+  }, /*#__PURE__*/React__default.createElement(InputLabel, null, stringSet.EDIT_PROFILE__NICKNAME_LABEL), /*#__PURE__*/React__default.createElement(Input, {
     required: user.nickname !== '',
-    name: "sendbird__edit-user__name",
+    name: "sendbird-edit-user-profile__name__input",
     ref: inputRef,
     value: user.nickname,
     placeHolder: stringSet.EDIT_PROFILE__NICKNAME_PLACEHOLDER
-  })), React.createElement("section", {
-    className: "sendbird__edit-user__userid"
-  }, React.createElement(InputLabel, null, stringSet.EDIT_PROFILE__USERID_LABEL), React.createElement(Input, {
+  })), /*#__PURE__*/React__default.createElement("section", {
+    className: "sendbird-edit-user-profile__userid"
+  }, /*#__PURE__*/React__default.createElement(InputLabel, null, stringSet.EDIT_PROFILE__USERID_LABEL), /*#__PURE__*/React__default.createElement(Input, {
     disabled: true,
-    name: "sendbird__edit-user__userid",
+    name: "sendbird-edit-user-profile__userid__input",
     value: user.userId
-  })), React.createElement("section", {
-    className: "sendbird__edit-user__theme"
-  }, React.createElement(InputLabel, null, stringSet.EDIT_PROFILE__THEME_LABEL), React.createElement("div", {
-    className: "sendbird__edit-user__theme-icon"
-  }, theme === 'dark' ? React.createElement(Icon, {
+  })), /*#__PURE__*/React__default.createElement("section", {
+    className: "sendbird-edit-user-profile__theme"
+  }, /*#__PURE__*/React__default.createElement(InputLabel, null, stringSet.EDIT_PROFILE__THEME_LABEL), /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-edit-user-profile__theme__theme-icon"
+  }, theme === 'dark' ? /*#__PURE__*/React__default.createElement(Icon, {
     onClick: function onClick() {
       changeTheme('light');
 
@@ -581,7 +583,7 @@ function EditUserProfile(_a) {
     type: IconTypes.TOGGLE_ON,
     width: 44,
     height: 24
-  }) : React.createElement(Icon, {
+  }) : /*#__PURE__*/React__default.createElement(Icon, {
     onClick: function onClick() {
       changeTheme('dark');
 
@@ -637,28 +639,28 @@ function AddChannel(_ref) {
 
   var isBroadcastAvailable = isBroadcastChannelEnabled(sdk);
   var isSupergroupAvailable = isSuperGroupChannelEnabled(sdk);
-  return React.createElement(React.Fragment, null, React.createElement(IconButton, {
+  return /*#__PURE__*/React__default.createElement(React__default.Fragment, null, /*#__PURE__*/React__default.createElement(IconButton, {
     height: "32px",
     width: "32px",
     onClick: function onClick() {
       setShowModal(true);
     },
     disabled: disabled
-  }, React.createElement(Icon, {
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     type: IconTypes.CREATE,
     fillColor: IconColors.PRIMARY,
     width: "24px",
     height: "24px"
-  })), showModal && step === 0 && React.createElement(Modal, {
+  })), showModal && step === 0 && /*#__PURE__*/React__default.createElement(Modal, {
     titleText: "New channel",
     hideFooter: true,
     onCancel: function onCancel() {
       setShowModal(false);
     },
     onSubmit: function onSubmit() {}
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-add-channel__rectangle-wrap"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-add-channel__rectangle",
     onClick: function onClick() {
       setType('group');
@@ -670,16 +672,16 @@ function AddChannel(_ref) {
       setType('group');
       setStep(1);
     }
-  }, React.createElement(Icon, {
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     className: "sendbird-add-channel__rectangle__chat-icon",
     type: IconTypes.CHAT,
     fillColor: IconColors.PRIMARY,
     width: "28px",
     height: "28px"
-  }), React.createElement(Label, {
+  }), /*#__PURE__*/React__default.createElement(Label, {
     type: LabelTypography.SUBTITLE_1,
     color: LabelColors.ONBACKGROUND_1
-  }, "Group")), isSupergroupAvailable && React.createElement("div", {
+  }, "Group")), isSupergroupAvailable && /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-add-channel__rectangle",
     onClick: function onClick() {
       setType('supergroup');
@@ -691,16 +693,16 @@ function AddChannel(_ref) {
       setType('supergroup');
       setStep(1);
     }
-  }, React.createElement(Icon, {
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     className: "sendbird-add-channel__rectangle__supergroup-icon",
     type: IconTypes.SUPERGROUP,
     fillColor: IconColors.PRIMARY,
     width: "28px",
     height: "28px"
-  }), React.createElement(Label, {
+  }), /*#__PURE__*/React__default.createElement(Label, {
     type: LabelTypography.SUBTITLE_1,
     color: LabelColors.ONBACKGROUND_1
-  }, "Super group")), isBroadcastAvailable && React.createElement("div", {
+  }, "Super group")), isBroadcastAvailable && /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-add-channel__rectangle",
     onClick: function onClick() {
       setType('broadcast');
@@ -712,16 +714,16 @@ function AddChannel(_ref) {
       setType('broadcast');
       setStep(1);
     }
-  }, React.createElement(Icon, {
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     className: "sendbird-add-channel__rectangle__broadcast-icon",
     type: IconTypes.BROADCAST,
     fillColor: IconColors.PRIMARY,
     width: "28px",
     height: "28px"
-  }), React.createElement(Label, {
+  }), /*#__PURE__*/React__default.createElement(Label, {
     type: LabelTypography.SUBTITLE_1,
     color: LabelColors.ONBACKGROUND_1
-  }, "Broadcast")))), showModal && step === 1 && React.createElement(InviteMembers, {
+  }, "Broadcast")))), showModal && step === 1 && /*#__PURE__*/React__default.createElement(InviteMembers, {
     swapParams: sdk && sdk.getErrorFirstCallback && sdk.getErrorFirstCallback(),
     titleText: stringSet.MODAL__CREATE_CHANNEL__TITLE,
     submitText: stringSet.BUTTON__CREATE,
@@ -779,7 +781,7 @@ function ChannelPreviewAction(_ref) {
   var _useContext = useContext(LocalizationContext),
       stringSet = _useContext.stringSet;
 
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     role: "button",
     style: {
       display: 'inline-block'
@@ -791,14 +793,14 @@ function ChannelPreviewAction(_ref) {
     onClick: function onClick(e) {
       e.stopPropagation();
     }
-  }, React.createElement(ContextMenu, {
+  }, /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
+      return /*#__PURE__*/React__default.createElement(IconButton, {
         ref: parentRef,
         onClick: toggleDropdown,
         height: "32px",
         width: "32px"
-      }, React.createElement(Icon, {
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.MORE,
         fillColor: IconColors.PRIMARY,
         width: "24px",
@@ -806,11 +808,11 @@ function ChannelPreviewAction(_ref) {
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
+      return /*#__PURE__*/React__default.createElement(MenuItems, {
         parentRef: parentRef,
         parentContainRef: parentRef,
         closeDropdown: closeDropdown
-      }, React.createElement(MenuItem, {
+      }, /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           if (disabled) {
             return;
@@ -821,7 +823,7 @@ function ChannelPreviewAction(_ref) {
         }
       }, stringSet.CHANNEL_SETTING__LEAVE_CHANNEL__TITLE));
     }
-  }), showModal && React.createElement(LeaveChannelModal, {
+  }), showModal && /*#__PURE__*/React__default.createElement(LeaveChannel, {
     onCloseModal: function onCloseModal() {
       return setShowModal(false);
     },
@@ -838,9 +840,9 @@ ChannelPreviewAction.defaultProps = {
 
 function ChannelsPlaceholder(_ref) {
   var type = _ref.type;
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-channel-list"
-  }, React.createElement(PlaceHolder, {
+  }, /*#__PURE__*/React__default.createElement(PlaceHolder, {
     type: type
   }));
 }
@@ -975,7 +977,7 @@ var createEventHandler = function createEventHandler(_ref) {
   sdk.addChannelHandler(sdkChannelHandlerId, ChannelHandler);
 };
 
-var createApplicationUserListQuery = function createApplicationUserListQuery(_ref2) {
+var createChannelListQuery = function createChannelListQuery(_ref2) {
   var sdk = _ref2.sdk,
       _ref2$userFilledChann = _ref2.userFilledChannelListQuery,
       userFilledChannelListQuery = _ref2$userFilledChann === void 0 ? {} : _ref2$userFilledChann;
@@ -1018,7 +1020,7 @@ function setupChannelList(_ref3) {
   logger.info('ChannelList - creating query', {
     userFilledChannelListQuery: userFilledChannelListQuery
   });
-  var channelListQuery = createApplicationUserListQuery({
+  var channelListQuery = createChannelListQuery({
     sdk: sdk,
     userFilledChannelListQuery: userFilledChannelListQuery
   });
@@ -1164,15 +1166,6 @@ function ChannelList(props) {
   var userFilledChannelListQuery = queries.channelListQuery;
   var userFilledApplicationUserListQuery = queries.applicationUserListQuery;
   var sdkError = sdkStore.error;
-
-  var _useState = useState({}),
-      _useState2 = _slicedToArray(_useState, 2),
-      user = _useState2[0],
-      setUser = _useState2[1];
-
-  useEffect(function () {
-    setUser(userStore.user);
-  }, [userStore.user]);
   var sdkIntialized = sdkStore.initialized;
 
   var _useReducer = useReducer(reducer, channelListInitialState),
@@ -1180,23 +1173,31 @@ function ChannelList(props) {
       channelListStore = _useReducer2[0],
       channelListDispatcher = _useReducer2[1];
 
+  var _useState = useState({}),
+      _useState2 = _slicedToArray(_useState, 2),
+      user = _useState2[0],
+      setUser = _useState2[1];
+
   var _useState3 = useState({}),
       _useState4 = _slicedToArray(_useState3, 2),
       channelSource = _useState4[0],
       setChannelSource = _useState4[1];
 
-  var _useState5 = useState(null),
+  var _useState5 = useState(false),
       _useState6 = _slicedToArray(_useState5, 2),
-      sdkChannelHandlerId = _useState6[0],
-      setSdkChannelHandlerId = _useState6[1];
+      showProfileEdit = _useState6[0],
+      setShowProfileEdit = _useState6[1];
 
-  var _useState7 = useState(false),
+  var _useState7 = useState(null),
       _useState8 = _slicedToArray(_useState7, 2),
-      showProfileEdit = _useState8[0],
-      setShowProfileEdit = _useState8[1];
+      sdkChannelHandlerId = _useState8[0],
+      setSdkChannelHandlerId = _useState8[1];
 
   var loading = channelListStore.loading,
       currentChannel = channelListStore.currentChannel;
+  useEffect(function () {
+    setUser(userStore.user);
+  }, [userStore.user]);
   useEffect(function () {
     var subscriber = pubSubHandler(pubSub, channelListDispatcher);
     return function () {
@@ -1270,13 +1271,13 @@ function ChannelList(props) {
       }
     });
   }, [currentChannel]);
-  return React.createElement(UserProfileProvider, {
+  return /*#__PURE__*/React__default.createElement(UserProfileProvider, {
+    className: "sendbird-channel-list",
     disableUserProfile: userDefinedDisableUserProfile,
-    renderUserProfile: userDefinedRenderProfile,
-    className: "sendbird-channel-list"
-  }, React.createElement("div", {
+    renderUserProfile: userDefinedRenderProfile
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-channel-list__header"
-  }, React.createElement(ChannelHeader, {
+  }, /*#__PURE__*/React__default.createElement(ChannelHeader, {
     renderHeader: renderHeader,
     user: user,
     onEdit: function onEdit() {
@@ -1285,7 +1286,7 @@ function ChannelList(props) {
       }
     },
     allowProfileEdit: enableEditProfile,
-    iconButton: React.createElement(AddChannel, {
+    iconButton: /*#__PURE__*/React__default.createElement(AddChannel, {
       disabled: !isOnline,
       userListQuery: userListQuery,
       sdk: sdk,
@@ -1294,7 +1295,7 @@ function ChannelList(props) {
       userFilledApplicationUserListQuery: userFilledApplicationUserListQuery,
       onBeforeCreateChannel: onBeforeCreateChannel
     })
-  })), showProfileEdit && React.createElement(ConnectedEditUserProfile, {
+  })), showProfileEdit && /*#__PURE__*/React__default.createElement(ConnectedEditUserProfile, {
     onThemeChange: onThemeChange,
     user: user,
     onCancel: function onCancel() {
@@ -1312,7 +1313,7 @@ function ChannelList(props) {
         }
       });
     }
-  }), React.createElement("div", {
+  }), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-channel-list__body",
     onScroll: function onScroll(e) {
       var fetchMore = e.target.clientHeight + e.target.scrollTop === e.target.scrollHeight;
@@ -1356,9 +1357,9 @@ function ChannelList(props) {
         });
       }
     }
-  }, sdkError && React.createElement(ChannelsPlaceholder, {
+  }, sdkError && /*#__PURE__*/React__default.createElement(ChannelsPlaceholder, {
     type: PlaceHolderTypes.WRONG
-  }), React.createElement("div", null, sortedChannels && sortedChannels.map(function (channel, idx) {
+  }), /*#__PURE__*/React__default.createElement("div", null, sortedChannels && sortedChannels.map(function (channel, idx) {
     var _onLeaveChannel = function onLeaveChannel(c, cb) {
       logger.info('ChannelList: Leaving channel', c);
       c.leave().then(function (res) {
@@ -1393,14 +1394,16 @@ function ChannelList(props) {
       });
     };
 
-    return renderChannelPreview ? // eslint-disable-next-line
-    React.createElement("div", {
+    return renderChannelPreview ?
+    /*#__PURE__*/
+    // eslint-disable-next-line
+    React__default.createElement("div", {
       key: channel.url,
       onClick: onClick
     }, renderChannelPreview({
       channel: channel,
       onLeaveChannel: _onLeaveChannel
-    })) : React.createElement(ChannelPreview, {
+    })) : /*#__PURE__*/React__default.createElement(ChannelPreview, {
       key: channel.url,
       tabIndex: idx,
       onClick: onClick,
@@ -1409,17 +1412,17 @@ function ChannelList(props) {
       theme: theme,
       isActive: channel.url === currentChannel // todo - potential performance hit refactor
       ,
-      ChannelAction: React.createElement(ChannelPreviewAction, {
+      ChannelAction: /*#__PURE__*/React__default.createElement(ChannelPreviewAction, {
         disabled: !isOnline,
         onLeaveChannel: function onLeaveChannel() {
           return _onLeaveChannel(channel);
         }
       })
     });
-  })), (!sdkIntialized || loading) && React.createElement(ChannelsPlaceholder, {
+  })), (!sdkIntialized || loading) && /*#__PURE__*/React__default.createElement(ChannelsPlaceholder, {
     type: PlaceHolderTypes.LOADING
   }), //  placeholder
-  (!allChannels || allChannels.length === 0) && React.createElement(ChannelsPlaceholder, {
+  (!allChannels || allChannels.length === 0) && /*#__PURE__*/React__default.createElement(ChannelsPlaceholder, {
     type: PlaceHolderTypes.NO_CHANNELS
   })));
 }

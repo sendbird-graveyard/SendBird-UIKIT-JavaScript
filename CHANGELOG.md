@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.3.0](Jul 27 2021)
+
+- Bugfix:
+  * Thumbnail image url fix
+
+## [2.3.0.alpha](Jul 27 2021)
+
+- Internal tooling changes:
+  * npm v7 peer dependency fix
+  * storybook 6
+  * jest 27
+  * typescript 4
+  * React 17
+  * rollup 2
+
 ## [2.2.1](Mar 19 2021)
 
 - Features:

@@ -1,8 +1,8 @@
-import { _ as __assign, a as _objectSpread2, b as _slicedToArray, u as uuidv4, g as getStringSet, S as SendbirdSdkContext, L as LocalizationProvider } from './LocalizationContext-12658c38.js';
-import React, { useLayoutEffect, useState, useEffect, useReducer } from 'react';
+import { _ as __assign, a as _objectSpread2, b as _slicedToArray, u as uuidv4, g as getStringSet, S as SendbirdSdkContext, L as LocalizationProvider } from './LocalizationContext-5502b61d.js';
+import React__default, { useLayoutEffect, useState, useEffect, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import Sb from 'sendbird';
-import { R as RESET_USER, I as INIT_USER, U as UPDATE_USER_INFO } from './actionTypes-a85c0eaa.js';
+import { R as RESET_USER, I as INIT_USER, U as UPDATE_USER_INFO } from './actionTypes-fc3fc1c2.js';
 import cssVars from 'css-vars-ponyfill';
 
 var INIT_SDK = 'INIT_SDK';
@@ -10,7 +10,7 @@ var SET_SDK_LOADING = 'SET_SDK_LOADING';
 var RESET_SDK = 'RESET_SDK';
 var SDK_ERROR = 'SDK_ERROR';
 
-var APP_VERSION_STRING = '2.2.1';
+var APP_VERSION_STRING = '2.3.0';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -233,16 +233,16 @@ var sdkInitialState = {
   error: false
 };
 
-function reducer(state, action) {
+function reducer$1(state, action) {
   switch (action.type) {
     case SET_SDK_LOADING:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         initialized: false,
         loading: action.payload
       });
 
     case SDK_ERROR:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         initialized: false,
         loading: false,
         error: true
@@ -270,7 +270,7 @@ var userInitialState = {
   user: {}
 };
 
-function reducer$1(state, action) {
+function reducer(state, action) {
   switch (action.type) {
     case INIT_USER:
       return {
@@ -283,7 +283,7 @@ function reducer$1(state, action) {
       return userInitialState;
 
     case UPDATE_USER_INFO:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         user: action.payload
       });
 
@@ -377,6 +377,9 @@ function useConnectionStatus(sdk, logger) {
   return isOnline;
 }
 
+// Logger, pretty much explains it
+// in SendbirdProvider
+// const [logger, setLogger] = useState(LoggerFactory(logLevel));
 var LOG_LEVELS = {
   DEBUG: 'debug',
   WARNING: 'warning',
@@ -429,7 +432,7 @@ var LoggerFactory = function LoggerFactory(lvl, customInterface) {
 
   var logger = lvlArray.reduce(function (accumulator, currentLvl) {
     if (currentLvl === LOG_LEVELS.DEBUG || currentLvl === LOG_LEVELS.ALL) {
-      return _objectSpread2({}, accumulator, {
+      return _objectSpread2(_objectSpread2({}, accumulator), {}, {
         info: applyLog(LOG_LEVELS.INFO),
         error: applyLog(LOG_LEVELS.ERROR),
         warning: applyLog(LOG_LEVELS.WARNING)
@@ -437,19 +440,19 @@ var LoggerFactory = function LoggerFactory(lvl, customInterface) {
     }
 
     if (currentLvl === LOG_LEVELS.INFO) {
-      return _objectSpread2({}, accumulator, {
+      return _objectSpread2(_objectSpread2({}, accumulator), {}, {
         info: applyLog(LOG_LEVELS.INFO)
       });
     }
 
     if (currentLvl === LOG_LEVELS.ERROR) {
-      return _objectSpread2({}, accumulator, {
+      return _objectSpread2(_objectSpread2({}, accumulator), {}, {
         error: applyLog(LOG_LEVELS.ERROR)
       });
     }
 
     if (currentLvl === LOG_LEVELS.WARNING) {
-      return _objectSpread2({}, accumulator, {
+      return _objectSpread2(_objectSpread2({}, accumulator), {}, {
         warning: applyLog(LOG_LEVELS.WARNING)
       });
     }
@@ -460,6 +463,10 @@ var LoggerFactory = function LoggerFactory(lvl, customInterface) {
 };
 
 // https://davidwalsh.name/pubsub-javascript
+// we use pubsub to sync events between multiple components(example - ChannelList, Channel)
+// for example, if customer sends a message from their custom component
+// without pubsub,we would not be able to listen to it
+// in our ChannelList or Conversation
 var pubSubFactory = (function () {
   var topics = {};
   var hOP = topics.hasOwnProperty;
@@ -548,12 +555,12 @@ function Sendbird(props) {
       pubSub = _useState4[0],
       setPubSub = _useState4[1];
 
-  var _useReducer = useReducer(reducer, sdkInitialState),
+  var _useReducer = useReducer(reducer$1, sdkInitialState),
       _useReducer2 = _slicedToArray(_useReducer, 2),
       sdkStore = _useReducer2[0],
       sdkDispatcher = _useReducer2[1];
 
-  var _useReducer3 = useReducer(reducer$1, userInitialState),
+  var _useReducer3 = useReducer(reducer, userInitialState),
       _useReducer4 = _slicedToArray(_useReducer3, 2),
       userStore = _useReducer4[0],
       userDispatcher = _useReducer4[1];
@@ -619,14 +626,14 @@ function Sendbird(props) {
     };
   }, [currenttheme]);
   var isOnline = useConnectionStatus(sdkStore.sdk, logger);
-  var localeStringSet = React.useMemo(function () {
+  var localeStringSet = React__default.useMemo(function () {
     if (!stringSet) {
       return getStringSet('en');
     }
 
-    return _objectSpread2({}, getStringSet('en'), {}, stringSet);
+    return _objectSpread2(_objectSpread2({}, getStringSet('en')), stringSet);
   }, [stringSet]);
-  return React.createElement(SendbirdSdkContext.Provider, {
+  return /*#__PURE__*/React__default.createElement(SendbirdSdkContext.Provider, {
     value: {
       stores: {
         sdkStore: sdkStore,
@@ -667,7 +674,7 @@ function Sendbird(props) {
         imageCompression: imageCompression
       }
     }
-  }, React.createElement(LocalizationProvider, {
+  }, /*#__PURE__*/React__default.createElement(LocalizationProvider, {
     stringSet: localeStringSet
   }, children));
 }

@@ -1,36 +1,35 @@
 'use strict';
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var LocalizationContext = require('./LocalizationContext-6447a7a3.js');
-var SendbirdProvider = require('./SendbirdProvider.js');
+var LocalizationContext = require('./LocalizationContext-253833e3.js');
 var React = require('react');
-var React__default = _interopDefault(React);
-var PropTypes = _interopDefault(require('prop-types'));
-require('sendbird');
-require('./actionTypes-920b541f.js');
-require('css-vars-ponyfill');
-var index = require('./index-ab7d3759.js');
+var PropTypes = require('prop-types');
+var SendbirdProvider = require('./SendbirdProvider.js');
 var ChannelList = require('./ChannelList.js');
-require('./index-41dcefd9.js');
-var index$2 = require('./index-c0f812fc.js');
-require('./utils-6aedec02.js');
-require('./LeaveChannel-f9ad4e8d.js');
-require('date-fns/isToday');
-require('date-fns/format');
-require('date-fns/isYesterday');
-require('./type-c7a3bee7.js');
-require('./utils-a8277ca2.js');
-require('react-dom');
-require('./index-e59fb746.js');
 var Channel = require('./Channel.js');
-require('./index-8f99370c.js');
-require('date-fns/isSameDay');
-require('./utils-c8e36c68.js');
-require('date-fns/formatDistanceToNowStrict');
 var ChannelSettings = require('./ChannelSettings.js');
-require('./index-5a7f699c.js');
 var MessageSearch = require('./MessageSearch.js');
+var index = require('./index-b36bb0d8.js');
+var index$1 = require('./index-ba566fa2.js');
+require('sendbird');
+require('./actionTypes-5d643716.js');
+require('css-vars-ponyfill');
+require('./index-d30bcb18.js');
+require('./utils-34763613.js');
+require('./LeaveChannel-8e141138.js');
+require('./index-8f452e47.js');
+require('./index-4cbbd5f7.js');
+require('./index-478e7242.js');
+require('./utils-7a073a7a.js');
+require('./type-a2e61165.js');
+require('./index-c74bfd29.js');
+require('react-dom');
+require('./utils-26f911d4.js');
+require('./index-c7e62984.js');
+
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
+var PropTypes__default = /*#__PURE__*/_interopDefaultLegacy(PropTypes);
 
 var COMPONENT_CLASS_NAME = 'sendbird-message-search-pannel';
 
@@ -79,58 +78,58 @@ function MessageSearchPannel(props) {
     setSearchString('');
   };
 
-  return React__default.createElement("div", {
+  return /*#__PURE__*/React__default['default'].createElement("div", {
     className: COMPONENT_CLASS_NAME
-  }, React__default.createElement("div", {
+  }, /*#__PURE__*/React__default['default'].createElement("div", {
     className: COMPONENT_CLASS_NAME + "__header"
-  }, React__default.createElement(index$2.Label, {
+  }, /*#__PURE__*/React__default['default'].createElement(index.Label, {
     className: COMPONENT_CLASS_NAME + "__header__title",
-    type: index$2.LabelTypography.H_2,
-    color: index$2.LabelColors.ONBACKGROUND_1
-  }, stringSet.SEARCH_IN_CHANNEL), React__default.createElement(index.IconButton, {
+    type: index.LabelTypography.H_2,
+    color: index.LabelColors.ONBACKGROUND_1
+  }, stringSet.SEARCH_IN_CHANNEL), /*#__PURE__*/React__default['default'].createElement(index$1.IconButton, {
     className: COMPONENT_CLASS_NAME + "__header__close-button",
     width: "32px",
     height: "32px",
     onClick: onCloseClick
-  }, React__default.createElement(index$2.Icon, {
-    type: index$2.IconTypes.CLOSE,
-    fillColor: index$2.IconColors.ON_BACKGROUND_1,
+  }, /*#__PURE__*/React__default['default'].createElement(index.Icon, {
+    type: index.IconTypes.CLOSE,
+    fillColor: index.IconColors.ON_BACKGROUND_1,
     width: "22px",
     height: "22px"
-  }))), React__default.createElement("div", {
+  }))), /*#__PURE__*/React__default['default'].createElement("div", {
     className: COMPONENT_CLASS_NAME + "__input"
-  }, React__default.createElement("div", {
+  }, /*#__PURE__*/React__default['default'].createElement("div", {
     className: COMPONENT_CLASS_NAME + "__input__container"
-  }, React__default.createElement(index$2.Icon, {
+  }, /*#__PURE__*/React__default['default'].createElement(index.Icon, {
     className: COMPONENT_CLASS_NAME + "__input__container__search-icon",
-    type: index$2.IconTypes.SEARCH,
-    fillColor: index$2.IconColors.ON_BACKGROUND_3,
+    type: index.IconTypes.SEARCH,
+    fillColor: index.IconColors.ON_BACKGROUND_3,
     width: "24px",
     height: "24px"
-  }), React__default.createElement("input", {
+  }), /*#__PURE__*/React__default['default'].createElement("input", {
     className: COMPONENT_CLASS_NAME + "__input__container__input-area",
     placeholder: stringSet.SEARCH,
     value: inputString,
     onChange: handleOnChangeInputString
-  }), inputString && loading && React__default.createElement(index$2.Loader, {
+  }), inputString && loading && /*#__PURE__*/React__default['default'].createElement(index.Loader, {
     className: COMPONENT_CLASS_NAME + "__input__container__spinner",
     width: "20px",
     height: "20px"
-  }, React__default.createElement(index$2.Icon, {
-    type: index$2.IconTypes.SPINNER,
-    fillColor: index$2.IconColors.PRIMARY,
+  }, /*#__PURE__*/React__default['default'].createElement(index.Icon, {
+    type: index.IconTypes.SPINNER,
+    fillColor: index.IconColors.PRIMARY,
     width: "20px",
     height: "20px"
-  })), !loading && inputString && React__default.createElement(index$2.Icon, {
+  })), !loading && inputString && /*#__PURE__*/React__default['default'].createElement(index.Icon, {
     className: COMPONENT_CLASS_NAME + "__input__container__reset-input-button",
-    type: index$2.IconTypes.REMOVE,
-    fillColor: index$2.IconColors.ON_BACKGROUND_3,
+    type: index.IconTypes.REMOVE,
+    fillColor: index.IconColors.ON_BACKGROUND_3,
     width: "20px",
     height: "20px",
     onClick: handleOnClickResetStringButton
-  }))), React__default.createElement("div", {
+  }))), /*#__PURE__*/React__default['default'].createElement("div", {
     className: COMPONENT_CLASS_NAME + "__message-search"
-  }, React__default.createElement(MessageSearch, {
+  }, /*#__PURE__*/React__default['default'].createElement(MessageSearch, {
     channelUrl: channelUrl,
     searchString: searchString,
     onResultClick: onResultClick,
@@ -184,7 +183,7 @@ function App(props) {
       startingPoint = _useState10[0],
       setStartingPoint = _useState10[1];
 
-  return React__default.createElement(SendbirdProvider, {
+  return /*#__PURE__*/React__default['default'].createElement(SendbirdProvider, {
     stringSet: stringSet,
     appId: appId,
     userId: userId,
@@ -198,11 +197,11 @@ function App(props) {
     disableUserProfile: disableUserProfile,
     renderUserProfile: renderUserProfile,
     imageCompression: imageCompression
-  }, React__default.createElement("div", {
+  }, /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-app__wrap"
-  }, React__default.createElement("div", {
+  }, /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-app__channellist-wrap"
-  }, React__default.createElement(ChannelList, {
+  }, /*#__PURE__*/React__default['default'].createElement(ChannelList, {
     allowProfileEdit: allowProfileEdit,
     onProfileEditSuccess: onProfileEditSuccess,
     onChannelSelect: function onChannelSelect(channel) {
@@ -215,9 +214,9 @@ function App(props) {
         setCurrentChannelUrl('');
       }
     }
-  })), React__default.createElement("div", {
+  })), /*#__PURE__*/React__default['default'].createElement("div", {
     className: "\n            ".concat(showSettings ? 'sendbird-app__conversation--settings-open' : '', "\n            ").concat(showSearch ? 'sendbird-app__conversation--search-open' : '', "\n            sendbird-app__conversation-wrap\n          ")
-  }, React__default.createElement(Channel.default, {
+  }, /*#__PURE__*/React__default['default'].createElement(Channel['default'], {
     channelUrl: currentChannelUrl,
     onChatHeaderActionClick: function onChatHeaderActionClick() {
       setShowSearch(false);
@@ -232,17 +231,17 @@ function App(props) {
     highlightedMessage: highlightedMessage,
     useReaction: useReaction,
     useMessageGrouping: useMessageGrouping
-  })), showSettings && React__default.createElement("div", {
+  })), showSettings && /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-app__settingspanel-wrap"
-  }, React__default.createElement(ChannelSettings, {
+  }, /*#__PURE__*/React__default['default'].createElement(ChannelSettings, {
     className: "sendbird-channel-settings",
     channelUrl: currentChannelUrl,
     onCloseClick: function onCloseClick() {
       setShowSettings(false);
     }
-  })), showSearch && React__default.createElement("div", {
+  })), showSearch && /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-app__searchpanel-wrap"
-  }, React__default.createElement(MessageSearchPannel, {
+  }, /*#__PURE__*/React__default['default'].createElement(MessageSearchPannel, {
     channelUrl: currentChannelUrl,
     onResultClick: function onResultClick(message) {
       if (message.messageId === highlightedMessage) {
@@ -261,30 +260,30 @@ function App(props) {
   }))));
 }
 App.propTypes = {
-  appId: PropTypes.string.isRequired,
-  userId: PropTypes.string.isRequired,
-  accessToken: PropTypes.string,
-  theme: PropTypes.string,
-  userListQuery: PropTypes.func,
-  nickname: PropTypes.string,
-  profileUrl: PropTypes.string,
-  allowProfileEdit: PropTypes.bool,
-  disableUserProfile: PropTypes.bool,
-  renderUserProfile: PropTypes.func,
-  onProfileEditSuccess: PropTypes.func,
-  config: PropTypes.shape({
+  appId: PropTypes__default['default'].string.isRequired,
+  userId: PropTypes__default['default'].string.isRequired,
+  accessToken: PropTypes__default['default'].string,
+  theme: PropTypes__default['default'].string,
+  userListQuery: PropTypes__default['default'].func,
+  nickname: PropTypes__default['default'].string,
+  profileUrl: PropTypes__default['default'].string,
+  allowProfileEdit: PropTypes__default['default'].bool,
+  disableUserProfile: PropTypes__default['default'].bool,
+  renderUserProfile: PropTypes__default['default'].func,
+  onProfileEditSuccess: PropTypes__default['default'].func,
+  config: PropTypes__default['default'].shape({
     // None Error Warning Info 'All/Debug'
-    logLevel: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
+    logLevel: PropTypes__default['default'].oneOfType([PropTypes__default['default'].string, PropTypes__default['default'].arrayOf(PropTypes__default['default'].string)])
   }),
-  useReaction: PropTypes.bool,
-  showSearchIcon: PropTypes.bool,
-  useMessageGrouping: PropTypes.bool,
-  stringSet: PropTypes.objectOf(PropTypes.string),
-  colorSet: PropTypes.objectOf(PropTypes.string),
-  imageCompression: PropTypes.shape({
-    compressionRate: PropTypes.number,
-    resizingWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    resizingHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+  useReaction: PropTypes__default['default'].bool,
+  showSearchIcon: PropTypes__default['default'].bool,
+  useMessageGrouping: PropTypes__default['default'].bool,
+  stringSet: PropTypes__default['default'].objectOf(PropTypes__default['default'].string),
+  colorSet: PropTypes__default['default'].objectOf(PropTypes__default['default'].string),
+  imageCompression: PropTypes__default['default'].shape({
+    compressionRate: PropTypes__default['default'].number,
+    resizingWidth: PropTypes__default['default'].oneOfType([PropTypes__default['default'].number, PropTypes__default['default'].string]),
+    resizingHeight: PropTypes__default['default'].oneOfType([PropTypes__default['default'].number, PropTypes__default['default'].string])
   })
 };
 App.defaultProps = {

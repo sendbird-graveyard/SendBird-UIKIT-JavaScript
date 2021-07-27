@@ -1,21 +1,25 @@
 'use strict';
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var LocalizationContext = require('./LocalizationContext-6447a7a3.js');
+var LocalizationContext = require('./LocalizationContext-253833e3.js');
 var React = require('react');
-var React__default = _interopDefault(React);
-var PropTypes = _interopDefault(require('prop-types'));
-var Sb = _interopDefault(require('sendbird'));
-var actionTypes = require('./actionTypes-920b541f.js');
-var cssVars = _interopDefault(require('css-vars-ponyfill'));
+var PropTypes = require('prop-types');
+var Sb = require('sendbird');
+var actionTypes = require('./actionTypes-5d643716.js');
+var cssVars = require('css-vars-ponyfill');
+
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
+var PropTypes__default = /*#__PURE__*/_interopDefaultLegacy(PropTypes);
+var Sb__default = /*#__PURE__*/_interopDefaultLegacy(Sb);
+var cssVars__default = /*#__PURE__*/_interopDefaultLegacy(cssVars);
 
 var INIT_SDK = 'INIT_SDK';
 var SET_SDK_LOADING = 'SET_SDK_LOADING';
 var RESET_SDK = 'RESET_SDK';
 var SDK_ERROR = 'SDK_ERROR';
 
-var APP_VERSION_STRING = '2.2.1';
+var APP_VERSION_STRING = '2.3.0';
 var disconnectSdk = function disconnectSdk(_ref) {
   var sdkDispatcher = _ref.sdkDispatcher,
       userDispatcher = _ref.userDispatcher,
@@ -64,7 +68,7 @@ var handleConnection = function handleConnection(_ref2, dispatchers) {
       });
 
       if (userId && appId) {
-        var newSdk = new Sb({
+        var newSdk = new Sb__default['default']({
           appId: appId
         }); // to check if code is released version from rollup and *not from storybook*
         // see rollup config file
@@ -147,7 +151,7 @@ var isEmpty = function isEmpty(obj) {
 var useTheme = function useTheme(overrides) {
   React.useLayoutEffect(function () {
     if (!isEmpty(overrides)) {
-      cssVars({
+      cssVars__default['default']({
         variables: LocalizationContext.__assign({
           '--sendbird-dark-primary-500': '#4d2aa6',
           '--sendbird-dark-primary-400': '#6440C4',
@@ -238,16 +242,16 @@ var sdkInitialState = {
   error: false
 };
 
-function reducer(state, action) {
+function reducer$1(state, action) {
   switch (action.type) {
     case SET_SDK_LOADING:
-      return LocalizationContext._objectSpread2({}, state, {
+      return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
         initialized: false,
         loading: action.payload
       });
 
     case SDK_ERROR:
-      return LocalizationContext._objectSpread2({}, state, {
+      return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
         initialized: false,
         loading: false,
         error: true
@@ -275,7 +279,7 @@ var userInitialState = {
   user: {}
 };
 
-function reducer$1(state, action) {
+function reducer(state, action) {
   switch (action.type) {
     case actionTypes.INIT_USER:
       return {
@@ -288,7 +292,7 @@ function reducer$1(state, action) {
       return userInitialState;
 
     case actionTypes.UPDATE_USER_INFO:
-      return LocalizationContext._objectSpread2({}, state, {
+      return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
         user: action.payload
       });
 
@@ -382,6 +386,9 @@ function useConnectionStatus(sdk, logger) {
   return isOnline;
 }
 
+// Logger, pretty much explains it
+// in SendbirdProvider
+// const [logger, setLogger] = useState(LoggerFactory(logLevel));
 var LOG_LEVELS = {
   DEBUG: 'debug',
   WARNING: 'warning',
@@ -434,7 +441,7 @@ var LoggerFactory = function LoggerFactory(lvl, customInterface) {
 
   var logger = lvlArray.reduce(function (accumulator, currentLvl) {
     if (currentLvl === LOG_LEVELS.DEBUG || currentLvl === LOG_LEVELS.ALL) {
-      return LocalizationContext._objectSpread2({}, accumulator, {
+      return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, accumulator), {}, {
         info: applyLog(LOG_LEVELS.INFO),
         error: applyLog(LOG_LEVELS.ERROR),
         warning: applyLog(LOG_LEVELS.WARNING)
@@ -442,19 +449,19 @@ var LoggerFactory = function LoggerFactory(lvl, customInterface) {
     }
 
     if (currentLvl === LOG_LEVELS.INFO) {
-      return LocalizationContext._objectSpread2({}, accumulator, {
+      return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, accumulator), {}, {
         info: applyLog(LOG_LEVELS.INFO)
       });
     }
 
     if (currentLvl === LOG_LEVELS.ERROR) {
-      return LocalizationContext._objectSpread2({}, accumulator, {
+      return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, accumulator), {}, {
         error: applyLog(LOG_LEVELS.ERROR)
       });
     }
 
     if (currentLvl === LOG_LEVELS.WARNING) {
-      return LocalizationContext._objectSpread2({}, accumulator, {
+      return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, accumulator), {}, {
         warning: applyLog(LOG_LEVELS.WARNING)
       });
     }
@@ -465,6 +472,10 @@ var LoggerFactory = function LoggerFactory(lvl, customInterface) {
 };
 
 // https://davidwalsh.name/pubsub-javascript
+// we use pubsub to sync events between multiple components(example - ChannelList, Channel)
+// for example, if customer sends a message from their custom component
+// without pubsub,we would not be able to listen to it
+// in our ChannelList or Conversation
 var pubSubFactory = (function () {
   var topics = {};
   var hOP = topics.hasOwnProperty;
@@ -553,12 +564,12 @@ function Sendbird(props) {
       pubSub = _useState4[0],
       setPubSub = _useState4[1];
 
-  var _useReducer = React.useReducer(reducer, sdkInitialState),
+  var _useReducer = React.useReducer(reducer$1, sdkInitialState),
       _useReducer2 = LocalizationContext._slicedToArray(_useReducer, 2),
       sdkStore = _useReducer2[0],
       sdkDispatcher = _useReducer2[1];
 
-  var _useReducer3 = React.useReducer(reducer$1, userInitialState),
+  var _useReducer3 = React.useReducer(reducer, userInitialState),
       _useReducer4 = LocalizationContext._slicedToArray(_useReducer3, 2),
       userStore = _useReducer4[0],
       userDispatcher = _useReducer4[1];
@@ -624,14 +635,14 @@ function Sendbird(props) {
     };
   }, [currenttheme]);
   var isOnline = useConnectionStatus(sdkStore.sdk, logger);
-  var localeStringSet = React__default.useMemo(function () {
+  var localeStringSet = React__default['default'].useMemo(function () {
     if (!stringSet) {
       return LocalizationContext.getStringSet('en');
     }
 
-    return LocalizationContext._objectSpread2({}, LocalizationContext.getStringSet('en'), {}, stringSet);
+    return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, LocalizationContext.getStringSet('en')), stringSet);
   }, [stringSet]);
-  return React__default.createElement(LocalizationContext.SendbirdSdkContext.Provider, {
+  return /*#__PURE__*/React__default['default'].createElement(LocalizationContext.SendbirdSdkContext.Provider, {
     value: {
       stores: {
         sdkStore: sdkStore,
@@ -672,36 +683,36 @@ function Sendbird(props) {
         imageCompression: imageCompression
       }
     }
-  }, React__default.createElement(LocalizationContext.LocalizationProvider, {
+  }, /*#__PURE__*/React__default['default'].createElement(LocalizationContext.LocalizationProvider, {
     stringSet: localeStringSet
   }, children));
 }
 Sendbird.propTypes = {
-  userId: PropTypes.string.isRequired,
-  appId: PropTypes.string.isRequired,
-  accessToken: PropTypes.string,
-  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element), PropTypes.any]).isRequired,
-  theme: PropTypes.string,
-  nickname: PropTypes.string,
-  profileUrl: PropTypes.string,
-  disableUserProfile: PropTypes.bool,
-  renderUserProfile: PropTypes.func,
-  allowProfileEdit: PropTypes.bool,
-  userListQuery: PropTypes.func,
-  config: PropTypes.shape({
+  userId: PropTypes__default['default'].string.isRequired,
+  appId: PropTypes__default['default'].string.isRequired,
+  accessToken: PropTypes__default['default'].string,
+  children: PropTypes__default['default'].oneOfType([PropTypes__default['default'].element, PropTypes__default['default'].arrayOf(PropTypes__default['default'].element), PropTypes__default['default'].any]).isRequired,
+  theme: PropTypes__default['default'].string,
+  nickname: PropTypes__default['default'].string,
+  profileUrl: PropTypes__default['default'].string,
+  disableUserProfile: PropTypes__default['default'].bool,
+  renderUserProfile: PropTypes__default['default'].func,
+  allowProfileEdit: PropTypes__default['default'].bool,
+  userListQuery: PropTypes__default['default'].func,
+  config: PropTypes__default['default'].shape({
     // None Error Warning Info 'All/Debug'
-    logLevel: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-    pubSub: PropTypes.shape({
-      subscribe: PropTypes.func,
-      publish: PropTypes.func
+    logLevel: PropTypes__default['default'].oneOfType([PropTypes__default['default'].string, PropTypes__default['default'].arrayOf(PropTypes__default['default'].string)]),
+    pubSub: PropTypes__default['default'].shape({
+      subscribe: PropTypes__default['default'].func,
+      publish: PropTypes__default['default'].func
     })
   }),
-  stringSet: PropTypes.objectOf(PropTypes.string),
-  colorSet: PropTypes.objectOf(PropTypes.string),
-  imageCompression: PropTypes.shape({
-    compressionRate: PropTypes.number,
-    resizingWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    resizingHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+  stringSet: PropTypes__default['default'].objectOf(PropTypes__default['default'].string),
+  colorSet: PropTypes__default['default'].objectOf(PropTypes__default['default'].string),
+  imageCompression: PropTypes__default['default'].shape({
+    compressionRate: PropTypes__default['default'].number,
+    resizingWidth: PropTypes__default['default'].oneOfType([PropTypes__default['default'].number, PropTypes__default['default'].string]),
+    resizingHeight: PropTypes__default['default'].oneOfType([PropTypes__default['default'].number, PropTypes__default['default'].string])
   })
 };
 Sendbird.defaultProps = {
