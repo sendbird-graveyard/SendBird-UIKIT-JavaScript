@@ -1,18 +1,16 @@
-import { c as _toConsumableArray, a as _objectSpread2, u as uuidv4$1, b as _slicedToArray, k as _defineProperty, d as LocalizationContext, e as _inherits, f as _createClass, h as _classCallCheck, i as _possibleConstructorReturn, j as _getPrototypeOf, l as _assertThisInitialized, w as withSendbirdContext } from './LocalizationContext-12658c38.js';
-import React, { useEffect, useCallback, useRef, useMemo, useState, useContext, useLayoutEffect, Component, useReducer } from 'react';
+import { e as _toConsumableArray, a as _objectSpread2, u as uuidv4, b as _slicedToArray, f as _defineProperty, c as LocalizationContext, h as _inherits, i as _createSuper, j as _createClass, k as _classCallCheck, l as _assertThisInitialized, w as withSendbirdContext } from './LocalizationContext-5502b61d.js';
+import React__default, { useEffect, useCallback, useRef, useMemo, useState, useContext, useLayoutEffect, Component, useReducer } from 'react';
 import PropTypes from 'prop-types';
-import { h as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, i as SEND_FILE_MESSAGE, U as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, E as EmojiListItems, C as ContextMenu, I as IconButton, b as MenuItems, c as MenuItem, f as UserProfileContext, g as UserProfile, a as TextButton, M as Modal, e as UserProfileProvider } from './index-711ec843.js';
-import { C as ChannelAvatar } from './index-4eb938ab.js';
-import { g as ImageRenderer, I as Icon, c as IconTypes, h as Loader, d as IconColors, L as Label, a as LabelTypography, b as LabelColors, A as Avatar, P as PlaceHolder, i as PlaceHolderTypes, e as LabelStringSet } from './index-ad616be9.js';
-import { a as getMessageCreatedAt$4, b as getSenderName$2, c as getSenderProfileUrl$2 } from './utils-53ba1773.js';
-import format from 'date-fns/format';
-import { M as MessageStatusType } from './type-0296584d.js';
-import { t as truncate, g as getIsSentFromStatus$3 } from './utils-cfdeb084.js';
+import { g as format, i as ImageRenderer, I as Icon, c as IconTypes, e as Loader, d as IconColors, L as Label, a as LabelTypography, b as LabelColors, A as Avatar, P as PlaceHolder, j as PlaceHolderTypes, h as LabelStringSet } from './index-4fb99a01.js';
+import { M as MessageStatusType } from './type-cfe68896.js';
+import { k as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, l as SEND_FILE_MESSAGE, j as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, E as EmojiListItems, C as ContextMenu, I as IconButton, b as MenuItems, c as MenuItem, U as UserProfileContext, f as ConnectedUserProfile, a as TextButton, M as Modal, h as UserProfileProvider } from './index-bd743b97.js';
+import { i as isImage, a as isVideo, c as compareIds, b as isGif, u as unSupported, L as LinkLabel, D as DateSeparator, M as MessageInput, F as FileViewer } from './index-586eeef1.js';
+import { i as isSameDay } from './index-0a658dd3.js';
+import { g as getMessageCreatedAt$4, a as getSenderName$2, b as getSenderProfileUrl$2 } from './utils-9606270f.js';
+import { g as getIsSentFromSendingStatus$2, c as copyToClipboard$1, a as getSenderProfileUrl$1, b as getSenderName$1, d as getMessageCreatedAt$5, e as getIsSentFromStatus$2 } from './utils-9ee7329c.js';
+import { g as getIsSentFromSendingStatus$3, t as truncate, a as getIsSentFromStatus$3 } from './utils-3464ac37.js';
+import { C as ChannelAvatar } from './index-cbd77cfb.js';
 import 'react-dom';
-import { i as isImage, a as isVideo, c as compareIds, u as unSupported, L as LinkLabel, D as DateSeparator, M as MessageInput, F as FileViewer } from './index-aeef4ba5.js';
-import isSameDay from 'date-fns/isSameDay';
-import { c as copyToClipboard$1, g as getSenderProfileUrl$1, a as getSenderName$1, b as getMessageCreatedAt$5, d as getIsSentFromStatus$2 } from './utils-d7f59026.js';
-import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict';
 
 var RESET_MESSAGES = 'RESET_MESSAGES';
 var RESET_STATE = 'RESET_STATE';
@@ -67,9 +65,9 @@ var getMessageType = function getMessageType(message) {
 };
 
 var UNDEFINED = 'undefined';
-var SUCCEEDED = SendingMessageStatus.SUCCEEDED,
-    FAILED = SendingMessageStatus.FAILED,
-    PENDING = SendingMessageStatus.PENDING;
+var SUCCEEDED$1 = SendingMessageStatus.SUCCEEDED,
+    FAILED$1 = SendingMessageStatus.FAILED,
+    PENDING$1 = SendingMessageStatus.PENDING;
 var scrollIntoLast = function scrollIntoLast() {
   var intialTry = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
   var MAX_TRIES = 10;
@@ -164,15 +162,15 @@ var pubSubHandler = function pubSubHandler(channelUrl, pubSub, dispatcher) {
   return subscriber;
 };
 var getParsedStatus = function getParsedStatus(message, currentGroupChannel) {
-  if (message.requestState === FAILED) {
+  if (message.requestState === FAILED$1) {
     return MessageStatusType.FAILED;
   }
 
-  if (message.requestState === PENDING) {
+  if (message.requestState === PENDING$1) {
     return MessageStatusType.PENDING;
   }
 
-  if (message.requestState === SUCCEEDED) {
+  if (message.requestState === SUCCEEDED$1) {
     if (!currentGroupChannel) {
       return MessageStatusType.SENT;
     }
@@ -209,11 +207,11 @@ var isDisabledBecauseMuted = function isDisabledBecauseMuted() {
   var myMutedState = groupChannel.myMutedState;
   return myMutedState === 'muted';
 };
-var getEmojiCategoriesFromEmojiContainer = function getEmojiCategoriesFromEmojiContainer() {
+var getEmojiCategoriesFromEmojiContainer$1 = function getEmojiCategoriesFromEmojiContainer() {
   var emojiContainer = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   return emojiContainer.emojiCategories ? emojiContainer.emojiCategories : [];
 };
-var getAllEmojisFromEmojiContainer = function getAllEmojisFromEmojiContainer() {
+var getAllEmojisFromEmojiContainer$1 = function getAllEmojisFromEmojiContainer() {
   var emojiContainer = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var _emojiContainer$emoji = emojiContainer.emojiCategories,
       emojiCategories = _emojiContainer$emoji === void 0 ? [] : _emojiContainer$emoji;
@@ -229,7 +227,7 @@ var getAllEmojisFromEmojiContainer = function getAllEmojisFromEmojiContainer() {
 
   return allEmojis;
 };
-var getEmojisFromEmojiContainer = function getEmojisFromEmojiContainer() {
+var getEmojisFromEmojiContainer$1 = function getEmojisFromEmojiContainer() {
   var emojiContainer = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var emojiCategoryId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
   return emojiContainer.emojiCategories ? emojiContainer.emojiCategories.filter(function (emojiCategory) {
@@ -268,7 +266,7 @@ var getNicknamesMapFromMembers = function getNicknamesMapFromMembers() {
 
   return nicknamesMap;
 };
-var getMessageCreatedAt = function getMessageCreatedAt(message) {
+var getMessageCreatedAt$3 = function getMessageCreatedAt(message) {
   return format(message.createdAt, 'p');
 };
 var isSameGroup = function isSameGroup(message, comparingMessage) {
@@ -276,7 +274,7 @@ var isSameGroup = function isSameGroup(message, comparingMessage) {
     return false;
   }
 
-  return message.sendingStatus === comparingMessage.sendingStatus && message.sender.userId === comparingMessage.sender.userId && getMessageCreatedAt(message) === getMessageCreatedAt(comparingMessage);
+  return message.sendingStatus === comparingMessage.sendingStatus && message.sender.userId === comparingMessage.sender.userId && getMessageCreatedAt$3(message) === getMessageCreatedAt$3(comparingMessage);
 };
 var compareMessagesForGrouping = function compareMessagesForGrouping(prevMessage, currMessage, nextMessage) {
   return [isSameGroup(prevMessage, currMessage), isSameGroup(currMessage, nextMessage)];
@@ -295,10 +293,10 @@ var passUnsuccessfullMessages = function passUnsuccessfullMessages(allMessages, 
   var _newMessage$sendingSt = newMessage.sendingStatus,
       sendingStatus = _newMessage$sendingSt === void 0 ? UNDEFINED : _newMessage$sendingSt;
 
-  if (sendingStatus === SUCCEEDED || sendingStatus === PENDING) {
+  if (sendingStatus === SUCCEEDED$1 || sendingStatus === PENDING$1) {
     var lastIndexOfSucceededMessage = allMessages.map(function (message) {
-      return message.sendingStatus || (message.isAdminMessage && message.isAdminMessage() ? SUCCEEDED : UNDEFINED);
-    }).lastIndexOf(SUCCEEDED);
+      return message.sendingStatus || (message.isAdminMessage && message.isAdminMessage() ? SUCCEEDED$1 : UNDEFINED);
+    }).lastIndexOf(SUCCEEDED$1);
 
     if (lastIndexOfSucceededMessage + 1 < allMessages.length) {
       var messages = _toConsumableArray(allMessages);
@@ -337,6 +335,9 @@ var messagesInitialState = {
   hasMore: false,
   lastMessageTimeStamp: 0,
   // for scroll down
+  // onScrollDownCallback is added for navigation to different timestamps on messageSearch
+  // hasMoreToBottom, onScrollDownCallback -> scroll down
+  // hasMore, onScrollCallback -> scroll up(default behavior)
   hasMoreToBottom: false,
   latestFetchedMessageTimeStamp: 0,
   emojiContainer: {},
@@ -346,16 +347,16 @@ var messagesInitialState = {
   isInvalid: false
 };
 
-var SUCCEEDED$1 = SendingMessageStatus.SUCCEEDED,
-    FAILED$1 = SendingMessageStatus.FAILED,
-    PENDING$1 = SendingMessageStatus.PENDING;
+var SUCCEEDED = SendingMessageStatus.SUCCEEDED,
+    FAILED = SendingMessageStatus.FAILED,
+    PENDING = SendingMessageStatus.PENDING;
 function reducer(state, action) {
   switch (action.type) {
     case RESET_STATE:
       return messagesInitialState;
 
     case RESET_MESSAGES:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         // when user switches channel, if the previous channel `hasMore`
         // the onScroll gets called twice, setting hasMore false prevents this
         hasMore: false,
@@ -363,14 +364,14 @@ function reducer(state, action) {
       });
 
     case GET_PREV_MESSAGES_START:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         loading: true
       });
 
     case CLEAR_SENT_MESSAGES:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         allMessages: _toConsumableArray(state.allMessages.filter(function (m) {
-          return m.sendingStatus !== SUCCEEDED$1;
+          return m.sendingStatus !== SUCCEEDED;
         }))
       });
 
@@ -396,16 +397,16 @@ function reducer(state, action) {
         });
         var hasHasMoreToBottom = hasOwnProperty('hasMoreToBottom')(action.payload);
         var hasLatestFetchedMessageTimeStamp = hasOwnProperty('latestFetchedMessageTimeStamp')(action.payload);
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, state), {}, {
           loading: false,
           initialized: true,
           hasMore: action.payload.hasMore,
           lastMessageTimeStamp: action.payload.lastMessageTimeStamp
         }, hasHasMoreToBottom && {
           hasMoreToBottom: action.payload.hasMoreToBottom
-        }, {}, hasLatestFetchedMessageTimeStamp && {
+        }), hasLatestFetchedMessageTimeStamp && {
           latestFetchedMessageTimeStamp: action.payload.latestFetchedMessageTimeStamp
-        }, {
+        }), {}, {
           allMessages: [].concat(_toConsumableArray(receivedMessages), _toConsumableArray(filteredAllMessages))
         });
       }
@@ -434,7 +435,7 @@ function reducer(state, action) {
           });
         });
 
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
           loading: false,
           initialized: true,
           hasMore: action.payload.hasMore,
@@ -451,7 +452,7 @@ function reducer(state, action) {
       }
 
     case SEND_MESSAGEGE_START:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         allMessages: [].concat(_toConsumableArray(state.allMessages), [_objectSpread2({}, action.payload)])
       });
 
@@ -462,10 +463,10 @@ function reducer(state, action) {
         });
 
         _toConsumableArray(newMessages).sort(function (a, b) {
-          return a.sendingStatus && b.sendingStatus && a.sendingStatus === SUCCEEDED$1 && (b.sendingStatus === PENDING$1 || b.sendingStatus === FAILED$1) ? -1 : 1;
+          return a.sendingStatus && b.sendingStatus && a.sendingStatus === SUCCEEDED && (b.sendingStatus === PENDING || b.sendingStatus === FAILED) ? -1 : 1;
         });
 
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
           allMessages: newMessages
         });
       }
@@ -474,7 +475,7 @@ function reducer(state, action) {
       {
         // eslint-disable-next-line no-param-reassign
         action.payload.failed = true;
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
           allMessages: state.allMessages.map(function (m) {
             return compareIds(m.reqId, action.payload.reqId) ? action.payload : m;
           })
@@ -483,7 +484,7 @@ function reducer(state, action) {
 
     case SET_CURRENT_CHANNEL:
       {
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
           currentGroupChannel: action.payload,
           isInvalid: false
         });
@@ -491,7 +492,7 @@ function reducer(state, action) {
 
     case SET_CHANNEL_INVALID:
       {
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
           isInvalid: true
         });
       }
@@ -510,7 +511,7 @@ function reducer(state, action) {
           return state;
         }
 
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
           unreadSince: unreadCount + 1
         });
       }
@@ -547,12 +548,12 @@ function reducer(state, action) {
         }
 
         if (message.isAdminMessage && message.isAdminMessage()) {
-          return _objectSpread2({}, state, {
+          return _objectSpread2(_objectSpread2({}, state), {}, {
             allMessages: passUnsuccessfullMessages(state.allMessages, message)
           });
         }
 
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
           unreadCount: _unreadCount,
           unreadSince: _unreadCount === 1 ? format(new Date(), 'p MMM dd') : unreadSince,
           allMessages: passUnsuccessfullMessages(state.allMessages, message)
@@ -560,34 +561,34 @@ function reducer(state, action) {
       }
 
     case ON_MESSAGE_UPDATED:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         allMessages: state.allMessages.map(function (m) {
           return compareIds(m.messageId, action.payload.message.messageId) ? action.payload.message : m;
         })
       });
 
     case RESEND_MESSAGEGE_START:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         allMessages: state.allMessages.map(function (m) {
           return compareIds(m.reqId, action.payload.reqId) ? action.payload : m;
         })
       });
 
     case MARK_AS_READ:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         unreadCount: 0,
         unreadSince: null
       });
 
     case ON_MESSAGE_DELETED:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         allMessages: state.allMessages.filter(function (m) {
           return !compareIds(m.messageId, action.payload);
         })
       });
 
     case ON_MESSAGE_DELETED_BY_REQ_ID:
-      return _objectSpread2({}, state, {
+      return _objectSpread2(_objectSpread2({}, state), {}, {
         allMessages: state.allMessages.filter(function (m) {
           return !compareIds(m.reqId, action.payload);
         })
@@ -595,21 +596,21 @@ function reducer(state, action) {
 
     case SET_EMOJI_CONTAINER:
       {
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
           emojiContainer: action.payload
         });
       }
 
     case SET_READ_STATUS:
       {
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
           readStatus: action.payload
         });
       }
 
     case ON_REACTION_UPDATED:
       {
-        return _objectSpread2({}, state, {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
           allMessages: state.allMessages.map(function (m) {
             if (compareIds(m.messageId, action.payload.messageId)) {
               if (m.applyReactionEvent && typeof m.applyReactionEvent === 'function') {
@@ -648,7 +649,7 @@ function useHandleChannelEvents(_ref, _ref2) {
       scrollRef = _ref2.scrollRef;
   var channelUrl = currentGroupChannel && currentGroupChannel.url;
   useEffect(function () {
-    var messageReceiverId = uuidv4$1();
+    var messageReceiverId = uuidv4();
 
     if (channelUrl && sdk && sdk.ChannelHandler) {
       var ChannelHandler = new sdk.ChannelHandler();
@@ -873,7 +874,7 @@ function useInitialMessagesFetch(_ref, _ref2) {
       type: RESET_MESSAGES
     });
 
-    if (sdk && sdk.MessageListParams && currentGroupChannel && currentGroupChannel.getMessagesByMessageId) {
+    if (sdk && sdk.MessageListParams && currentGroupChannel && currentGroupChannel.getMessagesByTimestamp) {
       var messageListParams = new sdk.MessageListParams();
       messageListParams.prevResultSize = PREV_RESULT_SIZE;
       messageListParams.isInclusive = true;
@@ -975,6 +976,14 @@ function useInitialMessagesFetch(_ref, _ref2) {
       }
     }
   }, [channelUrl, userFilledMessageListQuery, intialTimeStamp]);
+  /**
+   * Note - useEffect(() => {}, [currentGroupChannel])
+   * was buggy, that is why we did
+   * const channelUrl = currentGroupChannel && currentGroupChannel.url;
+   * useEffect(() => {}, [channelUrl])
+   * Again, this hook is supposed to execute when currentGroupChannel changes
+   * The 'channelUrl' here is not the same memory reference from Conversation.props
+   */
 }
 
 function useHandleReconnect(_ref, _ref2) {
@@ -1486,7 +1495,10 @@ function useSendFileMessageCallback(_ref, _ref2) {
               if (error) {
                 // sending params instead of pending message
                 // to make sure that we can resend the message once it fails
-                logger.error('Channel: Sending file message failed!', message);
+                logger.error('Channel: Sending file message failed!', {
+                  message: message,
+                  error: error
+                });
                 message.localUrl = URL.createObjectURL(compressedFile);
                 message.file = compressedFile;
                 messagesDispatcher({
@@ -1505,7 +1517,7 @@ function useSendFileMessageCallback(_ref, _ref2) {
             pubSub.publish(SEND_MESSAGE_START, {
               /* pubSub is used instead of messagesDispatcher
                 to avoid redundantly calling `messageActionTypes.SEND_MESSAGEGE_START` */
-              message: _objectSpread2({}, pendingMessage, {
+              message: _objectSpread2(_objectSpread2({}, pendingMessage), {}, {
                 url: URL.createObjectURL(compressedFile),
                 // pending thumbnail message seems to be failed
                 requestState: 'pending'
@@ -1518,7 +1530,7 @@ function useSendFileMessageCallback(_ref, _ref2) {
           }, file.type, compressionRate);
         };
       } catch (error) {
-        logger.error('Channel: Sending file message failed!');
+        logger.error('Channel: Sending file message failed!', error);
       }
     } else {
       // Not using image compression
@@ -1539,7 +1551,10 @@ function useSendFileMessageCallback(_ref, _ref2) {
         if (error) {
           // sending params instead of pending message
           // to make sure that we can resend the message once it fails
-          logger.error('Channel: Sending file message failed!', message);
+          logger.error('Channel: Sending file message failed!', {
+            message: message,
+            error: error
+          });
           message.localUrl = URL.createObjectURL(file);
           message.file = file;
           messagesDispatcher({
@@ -1558,7 +1573,7 @@ function useSendFileMessageCallback(_ref, _ref2) {
       pubSub.publish(SEND_MESSAGE_START, {
         /* pubSub is used instead of messagesDispatcher
           to avoid redundantly calling `messageActionTypes.SEND_MESSAGEGE_START` */
-        message: _objectSpread2({}, pendingMsg, {
+        message: _objectSpread2(_objectSpread2({}, pendingMsg), {}, {
           url: URL.createObjectURL(file),
           // pending thumbnail message seems to be failed
           requestState: 'pending'
@@ -1588,7 +1603,7 @@ function useSetReadStatus(_ref, _ref2) {
     var setReadStatus = function setReadStatus() {
       var allReadStatus = allMessages.reduce(function (accumulator, msg) {
         if (msg.messageId !== 0) {
-          return _objectSpread2({}, accumulator, _defineProperty({}, msg.messageId, getParsedStatus(msg, currentGroupChannel)));
+          return _objectSpread2(_objectSpread2({}, accumulator), {}, _defineProperty({}, msg.messageId, getParsedStatus(msg, currentGroupChannel)));
         }
 
         return accumulator;
@@ -1615,7 +1630,7 @@ function useSetReadStatus(_ref, _ref2) {
     handler.onDeliveryReceiptUpdated = handleMessageStatus;
     handler.onReadReceiptUpdated = handleMessageStatus; // Add this channel event handler to the SendBird object.
 
-    var handlerId = uuidv4$1();
+    var handlerId = uuidv4();
     logger.info('Channel | useSetReadStatus: Removing message reciver handler', handlerId);
     sdk.addChannelHandler(handlerId, handler);
     return function () {
@@ -1627,17 +1642,17 @@ function useSetReadStatus(_ref, _ref2) {
   }, [allMessages, currentGroupChannel]);
 }
 
-var ReactionButton = React.forwardRef(function (props, ref) {
-  var children = props.children,
+var ReactionButton = /*#__PURE__*/React__default.forwardRef(function (props, ref) {
+  var className = props.className,
       width = props.width,
       height = props.height,
-      _onClick = props.onClick,
       selected = props.selected,
-      className = props.className;
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  return React.createElement("div", {
+      _onClick = props.onClick,
+      children = props.children;
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: [].concat(_toConsumableArray(Array.isArray(className) ? className : [className]), ["sendbird-reaction-button".concat(selected ? '--selected' : '')]).join(' '),
     ref: ref,
-    className: "sendbird-reaction-button".concat(selected ? '--selected' : '', " ").concat(injectingClassName.join(' ')),
+    role: "button",
     style: {
       width: typeof width === 'string' ? "".concat(width.slice(0, -2) - 2, "px") : "".concat(width - 2, "px"),
       height: typeof height === 'string' ? "".concat(height.slice(0, -2) - 2, "px") : "".concat(height - 2, "px")
@@ -1645,29 +1660,28 @@ var ReactionButton = React.forwardRef(function (props, ref) {
     onClick: function onClick(e) {
       return _onClick(e);
     },
-    role: "button",
     onKeyDown: function onKeyDown(e) {
       return _onClick(e);
     },
     tabIndex: 0
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-reaction-button__inner"
   }, children));
 });
 ReactionButton.propTypes = {
-  children: PropTypes.element.isRequired,
-  onClick: PropTypes.func,
-  selected: PropTypes.bool,
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
+  selected: PropTypes.bool,
+  onClick: PropTypes.func,
+  children: PropTypes.element.isRequired
 };
 ReactionButton.defaultProps = {
-  selected: false,
+  className: '',
   width: '36px',
   height: '36px',
-  onClick: function onClick() {},
-  className: ''
+  selected: false,
+  onClick: function onClick() {}
 };
 
 function useMemoizedEmojiListItems(_ref, _ref2) {
@@ -1677,6 +1691,8 @@ function useMemoizedEmojiListItems(_ref, _ref2) {
       logger = _ref2.logger,
       userId = _ref2.userId,
       emojiAllList = _ref2.emojiAllList;
+
+  /* eslint-disable react/prop-types */
   return useMemo(function () {
     return function (_ref3) {
       var parentRef = _ref3.parentRef,
@@ -1691,7 +1707,7 @@ function useMemoizedEmojiListItems(_ref, _ref2) {
         return null;
       }
 
-      return React.createElement(EmojiListItems, {
+      return /*#__PURE__*/React__default.createElement(EmojiListItems, {
         parentRef: parentRef,
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
@@ -1701,7 +1717,7 @@ function useMemoizedEmojiListItems(_ref, _ref2) {
           return reaction.key === emoji.key;
         })[0];
         var isReacted = reactedReaction ? !(reactedReaction.userIds.indexOf(userId) < 0) : false;
-        return React.createElement(ReactionButton, {
+        return /*#__PURE__*/React__default.createElement(ReactionButton, {
           key: emoji.key,
           width: "36px",
           height: "36px",
@@ -1710,11 +1726,11 @@ function useMemoizedEmojiListItems(_ref, _ref2) {
             closeDropdown();
             toggleReaction(message, emoji.key, isReacted);
           }
-        }, React.createElement(ImageRenderer, {
+        }, /*#__PURE__*/React__default.createElement(ImageRenderer, {
           url: emoji.url,
           width: "28px",
           height: "28px",
-          defaultComponent: React.createElement(Icon, {
+          defaultComponent: /*#__PURE__*/React__default.createElement(Icon, {
             width: "28px",
             height: "28px",
             type: IconTypes.QUESTION
@@ -1747,10 +1763,9 @@ function useToggleReactionCallback(_ref, _ref2) {
 }
 
 function MessageStatus(_ref) {
-  var message = _ref.message,
-      status = _ref.status,
-      className = _ref.className;
-  var injectingClassName = Array.isArray(className) ? className : [className];
+  var className = _ref.className,
+      message = _ref.message,
+      status = _ref.status;
 
   var label = function label() {
     switch (status) {
@@ -1764,7 +1779,7 @@ function MessageStatus(_ref) {
       case MessageStatusType.DELIVERED:
       case MessageStatusType.READ:
         {
-          return React.createElement(Label, {
+          return /*#__PURE__*/React__default.createElement(Label, {
             className: "sendbird-message-status__text",
             type: LabelTypography.CAPTION_3,
             color: LabelColors.ONBACKGROUND_2
@@ -1777,99 +1792,110 @@ function MessageStatus(_ref) {
   };
 
   var icon = {
-    PENDING: React.createElement(Loader, {
+    PENDING: /*#__PURE__*/React__default.createElement(Loader, {
       className: "sendbird-message-status__icon",
       width: "16px",
       height: "16px"
-    }, React.createElement(Icon, {
+    }, /*#__PURE__*/React__default.createElement(Icon, {
       type: IconTypes.SPINNER,
+      fillColor: IconColors.PRIMARY,
       width: "16px",
-      height: "16px",
-      fillColor: IconColors.PRIMARY
+      height: "16px"
     })),
-    SENT: React.createElement(Icon, {
+    SENT: /*#__PURE__*/React__default.createElement(Icon, {
       className: "sendbird-message-status__icon",
-      width: "16px",
-      height: "16px",
       type: IconTypes.DONE,
-      fillColor: IconColors.SENT
-    }),
-    DELIVERED: React.createElement(Icon, {
-      className: "sendbird-message-status__icon",
+      fillColor: IconColors.SENT,
       width: "16px",
-      height: "16px",
+      height: "16px"
+    }),
+    DELIVERED: /*#__PURE__*/React__default.createElement(Icon, {
+      className: "sendbird-message-status__icon",
       type: IconTypes.DONE_ALL,
-      fillColor: IconColors.SENT
-    }),
-    READ: React.createElement(Icon, {
-      className: "sendbird-message-status__icon",
+      fillColor: IconColors.SENT,
       width: "16px",
-      height: "16px",
+      height: "16px"
+    }),
+    READ: /*#__PURE__*/React__default.createElement(Icon, {
+      className: "sendbird-message-status__icon",
       type: IconTypes.DONE_ALL,
-      fillColor: IconColors.READ
-    }),
-    FAILED: React.createElement(Icon, {
-      className: "sendbird-message-status__icon",
+      fillColor: IconColors.READ,
       width: "16px",
-      height: "16px",
+      height: "16px"
+    }),
+    FAILED: /*#__PURE__*/React__default.createElement(Icon, {
+      className: "sendbird-message-status__icon",
       type: IconTypes.ERROR,
-      fillColor: IconColors.ERROR
+      fillColor: IconColors.ERROR,
+      width: "16px",
+      height: "16px"
     })
   };
-  return React.createElement("div", {
-    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-message-status']).join(' ')
-  }, icon[status], React.createElement("br", null), label());
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: [].concat(_toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-message-status']).join(' ')
+  }, icon[status], /*#__PURE__*/React__default.createElement("br", null), label());
 }
 MessageStatus.propTypes = {
-  message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])),
-  status: PropTypes.string,
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  message: PropTypes.shape({
+    createdAt: PropTypes.number,
+    sender: PropTypes.shape({
+      friendName: PropTypes.string,
+      nickname: PropTypes.string,
+      userId: PropTypes.string,
+      profileUrl: PropTypes.string
+    })
+  }),
+  status: PropTypes.string
 };
 MessageStatus.defaultProps = {
+  className: '',
   message: null,
-  status: '',
-  className: ''
+  status: ''
 };
 
-var ReactionBadge = React.forwardRef(function (props, ref) {
+var ReactionBadge = /*#__PURE__*/React__default.forwardRef(function (props, ref) {
   var className = props.className,
       children = props.children,
       count = props.count,
       selected = props.selected,
       isAdd = props.isAdd,
       onClick = props.onClick;
-  var injectingClassName = Array.isArray(className) ? className : [className];
 
-  if (selected && !isAdd) {
-    injectingClassName.unshift('sendbird-reaction-badge--selected');
-  } else if (isAdd) {
-    injectingClassName.push('sendbird-reaction-badge--is-add');
-  } else {
-    injectingClassName.unshift('sendbird-reaction-badge');
-  }
+  var getClassNameTail = function getClassNameTail() {
+    if (selected && !isAdd) {
+      return '--selected';
+    }
 
-  return React.createElement("div", {
-    ref: ref,
-    tabIndex: 0,
+    if (isAdd) {
+      return '--is-add';
+    }
+
+    return '';
+  };
+
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: [].concat(_toConsumableArray(Array.isArray(className) ? className : [className]), ["sendbird-reaction-badge".concat(getClassNameTail())]).join(' '),
     role: "button",
-    className: injectingClassName.join(' '),
+    ref: ref,
     onClick: onClick,
-    onKeyDown: onClick
-  }, React.createElement("div", {
+    onKeyDown: onClick,
+    tabIndex: 0
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-reaction-badge__inner"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-reaction-badge__inner__icon"
-  }, children), React.createElement(Label, {
-    className: children && count ? 'sendbird-reaction-badge__inner__count' : '',
+  }, children), /*#__PURE__*/React__default.createElement(Label, {
+    className: children && count && 'sendbird-reaction-badge__inner__count',
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_1
   }, count)));
 });
 ReactionBadge.propTypes = {
+  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   children: PropTypes.element.isRequired,
   count: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   selected: PropTypes.bool,
-  className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   isAdd: PropTypes.bool,
   onClick: PropTypes.func
 };
@@ -1881,16 +1907,15 @@ ReactionBadge.defaultProps = {
   onClick: function onClick() {}
 };
 
-var CLASS_NAME = 'sendbird-tooltip';
 function Tooltip(_ref) {
   var className = _ref.className,
       children = _ref.children;
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.unshift(CLASS_NAME);
-  return React.createElement("div", {
-    className: injectingClassName.join(' ')
-  }, React.createElement(Label, {
-    className: "".concat(CLASS_NAME, "__text")
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: [].concat(_toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-tooltip']).join(' ')
+  }, /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-tooltip__text",
+    type: LabelTypography.CAPTION_2,
+    color: LabelColors.ONCONTENT_1
   }, children));
 }
 Tooltip.propTypes = {
@@ -1902,13 +1927,11 @@ Tooltip.defaultProps = {
   children: ''
 };
 
-var CLASS_NAME$1 = 'sendbird-tooltip-wrapper';
 var SPACE_FROM_TRIGGER = 8;
 function TooltipWrapper(_ref) {
   var className = _ref.className,
       children = _ref.children,
       hoverTooltip = _ref.hoverTooltip;
-  var injectingClassName = Array.isArray(className) ? [CLASS_NAME$1].concat(_toConsumableArray(className)) : [CLASS_NAME$1, className];
 
   var _useState = useState(false),
       _useState2 = _slicedToArray(_useState, 2),
@@ -1916,8 +1939,8 @@ function TooltipWrapper(_ref) {
       setShowHoverTooltip = _useState2[1];
 
   var childrenRef = useRef(null);
-  return React.createElement("div", {
-    className: injectingClassName.join(' '),
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: [].concat(_toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-tooltip-wrapper']).join(' '),
     onMouseOver: function onMouseOver() {
       setShowHoverTooltip(true);
     },
@@ -1930,18 +1953,18 @@ function TooltipWrapper(_ref) {
     onBlur: function onBlur() {
       setShowHoverTooltip(false);
     }
-  }, React.createElement("div", {
-    className: "".concat(CLASS_NAME$1, "__children"),
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-tooltip-wrapper__children",
     ref: childrenRef
-  }, children), showHoverTooltip && React.createElement("div", {
-    className: "".concat(CLASS_NAME$1, "__hover-tooltip"),
+  }, children), showHoverTooltip && /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-tooltip-wrapper__hover-tooltip",
     style: {
       bottom: "calc(100% + ".concat(SPACE_FROM_TRIGGER, "px)")
     }
-  }, React.createElement("div", {
-    className: "".concat(CLASS_NAME$1, "__hover-tooltip__inner")
-  }, React.createElement("div", {
-    className: "".concat(CLASS_NAME$1, "__hover-tooltip__inner__tooltip-container"),
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-tooltip-wrapper__hover-tooltip__inner"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-tooltip-wrapper__hover-tooltip__inner__tooltip-container",
     style: {
       left: childrenRef.current && "calc(".concat(childrenRef.current.offsetWidth / 2, "px - 50%)")
     }
@@ -1964,8 +1987,6 @@ function EmojiReactions(_ref) {
       membersMap = _ref.membersMap,
       toggleReaction = _ref.toggleReaction,
       memoizedEmojiListItems = _ref.memoizedEmojiListItems;
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.unshift('sendbird-emoji-reactions');
   var MemoizedEmojiListItems = memoizedEmojiListItems;
   var imageWidth = '20px';
   var imageHeight = '20px';
@@ -1977,11 +1998,12 @@ function EmojiReactions(_ref) {
   var _useContext = useContext(LocalizationContext),
       stringSet = _useContext.stringSet;
 
-  return React.createElement("div", {
-    className: injectingClassName.join(' ')
-  }, React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: [].concat(_toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-emoji-reactions']).join(' ')
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-emoji-reactions--inner"
   }, messageReactions && messageReactions.map(function (reaction) {
+    // function component
     var _reaction$userIds = reaction.userIds,
         userIds = _reaction$userIds === void 0 ? [] : _reaction$userIds;
     var emojiUrl = emojiAllMap.get(reaction.key) || '';
@@ -1993,35 +2015,35 @@ function EmojiReactions(_ref) {
       return membersMap.get(currentUserId) || stringSet.TOOLTIP__UNKOWN_USER;
     });
     var stringSetForMe = nicknames.length > 0 ? stringSet.TOOLTIP__AND_YOU : stringSet.TOOLTIP__YOU;
-    return React.createElement(TooltipWrapper, {
+    return /*#__PURE__*/React__default.createElement(TooltipWrapper, {
       className: "sendbird-emoji-reactions__emoji-reaction",
       key: reaction.key,
-      hoverTooltip: userIds.length > 0 && React.createElement(Tooltip, null, React.createElement(React.Fragment, null, "".concat(nicknames.join(', ')).concat(reactedByMe ? stringSetForMe : '')))
-    }, React.createElement(ReactionBadge, {
+      hoverTooltip: userIds.length > 0 && /*#__PURE__*/React__default.createElement(Tooltip, null, /*#__PURE__*/React__default.createElement(React__default.Fragment, null, "".concat(nicknames.join(', ')).concat(reactedByMe ? stringSetForMe : '')))
+    }, /*#__PURE__*/React__default.createElement(ReactionBadge, {
       count: reactedUserCount,
       selected: reactedByMe,
       onClick: function onClick() {
         return toggleReaction(message, reaction.key, reactedByMe);
       }
-    }, React.createElement(ImageRenderer, {
+    }, /*#__PURE__*/React__default.createElement(ImageRenderer, {
       circle: true,
       url: emojiUrl,
       width: imageWidth,
       height: imageHeight,
-      defaultComponent: React.createElement(Icon, {
+      defaultComponent: /*#__PURE__*/React__default.createElement(Icon, {
         width: imageWidth,
         height: imageHeight,
         type: IconTypes.QUESTION
       })
     })));
-  }), messageReactions.length < emojiAllMap.size && React.createElement(ContextMenu, {
+  }), messageReactions.length < emojiAllMap.size && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(ReactionBadge, {
+      return /*#__PURE__*/React__default.createElement(ReactionBadge, {
+        className: "sendbird-emoji-reactions__emoji-reaction-add",
         isAdd: true,
         onClick: toggleDropdown,
-        className: "sendbird-emoji-reactions__emoji-reaction-add",
         ref: emojiReactionAddRef
-      }, React.createElement(Icon, {
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         width: imageWidth,
         height: imageHeight,
         fillColor: IconColors.ON_BACKGROUND_3,
@@ -2029,7 +2051,7 @@ function EmojiReactions(_ref) {
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MemoizedEmojiListItems, {
+      return /*#__PURE__*/React__default.createElement(MemoizedEmojiListItems, {
         message: message,
         parentRef: emojiReactionAddRef,
         parentContainRef: emojiReactionAddRef,
@@ -2042,8 +2064,8 @@ function EmojiReactions(_ref) {
   })));
 }
 EmojiReactions.propTypes = {
-  userId: PropTypes.string,
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  userId: PropTypes.string,
   message: PropTypes.shape({
     reactions: PropTypes.arrayOf(PropTypes.shape({}))
   }).isRequired,
@@ -2054,15 +2076,15 @@ EmojiReactions.propTypes = {
 };
 EmojiReactions.defaultProps = {
   className: '',
-  membersMap: new Map(),
   userId: '',
+  membersMap: new Map(),
   toggleReaction: function toggleReaction() {},
   memoizedEmojiListItems: function memoizedEmojiListItems() {
     return '';
   }
 };
 
-function useMemoizedMessageText(_ref) {
+function useMemoizedMessageText$1(_ref) {
   var message = _ref.message,
       updatedAt = _ref.updatedAt,
       className = _ref.className,
@@ -2077,12 +2099,12 @@ function useMemoizedMessageText(_ref) {
     return function () {
       var splitMessage = message.split(/\r/);
       var matchedMessage = splitMessage.map(function (word) {
-        return word !== '' ? word : React.createElement("br", null);
+        return word !== '' ? word : /*#__PURE__*/React__default.createElement("br", null);
       });
 
       if (updatedAt > 0) {
-        matchedMessage.push(React.createElement(Label, {
-          key: uuidv4$1(),
+        matchedMessage.push( /*#__PURE__*/React__default.createElement(Label, {
+          key: uuidv4(),
           className: className,
           type: WORD_TYPOGRAPHY,
           color: EDITED_COLOR
@@ -2115,24 +2137,30 @@ var useMouseHover = function useMouseHover(_ref) {
 
   useEffect(function () {
     var current = ref.current;
-    current.addEventListener(MOUSE_ENTER, handleMouseOver);
-    current.addEventListener(MOUSE_LEAVE, handleMouseOut);
+
+    if (current) {
+      current.addEventListener(MOUSE_ENTER, handleMouseOver);
+      current.addEventListener(MOUSE_LEAVE, handleMouseOut);
+    }
+
     return function () {
-      current.removeEventListener(MOUSE_ENTER, handleMouseOver);
-      current.removeEventListener(MOUSE_LEAVE, handleMouseOut);
+      if (current) {
+        current.removeEventListener(MOUSE_ENTER, handleMouseOver);
+        current.removeEventListener(MOUSE_LEAVE, handleMouseOut);
+      }
     };
   });
 };
 
-var noop = function noop() {};
+var noop$5 = function noop() {};
 
-var GROUPING_PADDING = '1px';
-var NORMAL_PADDING = '8px';
+var GROUPING_PADDING$3 = '1px';
+var NORMAL_PADDING$3 = '8px';
 function Message(props) {
-  var isByMe = props.isByMe,
-      userId = props.userId,
+  var className = props.className,
       message = props.message,
-      className = props.className,
+      isByMe = props.isByMe,
+      userId = props.userId,
       resendMessage = props.resendMessage,
       disabled = props.disabled,
       showEdit = props.showEdit,
@@ -2146,22 +2174,20 @@ function Message(props) {
       chainTop = props.chainTop,
       chainBottom = props.chainBottom;
   if (!message) return null;
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.push("sendbird-message".concat(isByMe ? '--outgoing' : '--incoming'));
-  var outgoingMemoizedMessageText = useMemoizedMessageText({
-    message: message.message,
-    updatedAt: message.updatedAt,
-    className: 'sendbird-user-message-word'
-  });
-  var incomingMemoizedMessageText = useMemoizedMessageText({
-    message: message.message,
-    updatedAt: message.updatedAt,
+  var outgoingMemoizedMessageText = useMemoizedMessageText$1({
     className: 'sendbird-user-message-word',
+    message: message.message,
+    updatedAt: message.updatedAt
+  });
+  var incomingMemoizedMessageText = useMemoizedMessageText$1({
+    className: 'sendbird-user-message-word',
+    message: message.message,
+    updatedAt: message.updatedAt,
     incoming: true
   });
-  return React.createElement("div", {
-    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-message']).join(' ')
-  }, isByMe ? React.createElement(OutgoingUserMessage, {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: [].concat(_toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-message', "sendbird-message".concat(isByMe ? '--outgoing' : '--incoming')]).join(' ')
+  }, isByMe ? /*#__PURE__*/React__default.createElement(OutgoingUserMessage, {
     userId: userId,
     message: message,
     resendMessage: resendMessage,
@@ -2177,7 +2203,7 @@ function Message(props) {
     memoizedEmojiListItems: memoizedEmojiListItems,
     chainTop: chainTop,
     chainBottom: chainBottom
-  }) : React.createElement(IncomingUserMessage, {
+  }) : /*#__PURE__*/React__default.createElement(IncomingUserMessage, {
     userId: userId,
     message: message,
     useReaction: useReaction,
@@ -2212,14 +2238,14 @@ Message.defaultProps = {
   isByMe: false,
   disabled: false,
   userId: '',
-  resendMessage: noop,
+  resendMessage: noop$5,
   className: '',
-  showEdit: noop,
-  showRemove: noop,
+  showEdit: noop$5,
+  showRemove: noop$5,
   status: '',
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop,
+  toggleReaction: noop$5,
   memoizedEmojiListItems: function memoizedEmojiListItems() {
     return '';
   },
@@ -2250,7 +2276,6 @@ function OutgoingUserMessage(_ref) {
   var parentRefReactions = useRef(null);
   var parentRefMenus = useRef(null);
   var parentContainRef = useRef(null);
-  var isMessageSent = getIsSentFromStatus$2(status);
 
   var _useState = useState(false),
       _useState2 = _slicedToArray(_useState, 2),
@@ -2267,6 +2292,9 @@ function OutgoingUserMessage(_ref) {
       menuDisplaying = _useState6[0],
       setMenuDisplaying = _useState6[1];
 
+  var isMessageSent = getIsSentFromStatus$2(status);
+  var showReactionAddButton = useReaction && emojiAllMap.size > 0 && getIsSentFromSendingStatus$2(message);
+
   var handleMoreIconClick = function handleMoreIconClick() {
     setMoreActive(true);
   };
@@ -2279,23 +2307,23 @@ function OutgoingUserMessage(_ref) {
     ref: messageRef,
     setHover: setMousehover
   });
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-user-message--outgoing",
     ref: messageRef,
     style: {
-      paddingTop: chainTop ? GROUPING_PADDING : NORMAL_PADDING,
-      paddingBottom: chainBottom ? GROUPING_PADDING : NORMAL_PADDING
+      paddingTop: chainTop ? GROUPING_PADDING$3 : NORMAL_PADDING$3,
+      paddingBottom: chainBottom ? GROUPING_PADDING$3 : NORMAL_PADDING$3
     }
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-user-message--inner"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-user-message__left-padding"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-user-message__more",
     ref: parentContainRef
-  }, React.createElement(ContextMenu, {
+  }, /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
+      return /*#__PURE__*/React__default.createElement(IconButton, {
         className: "sendbird-user-message__more__menu",
         ref: parentRefMenus,
         width: "32px",
@@ -2308,11 +2336,11 @@ function OutgoingUserMessage(_ref) {
         onBlur: function onBlur() {
           handleMoreIconBlur();
         }
-      }, React.createElement(Icon, {
-        width: "24px",
-        height: "24px",
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.MORE,
-        fillColor: IconColors.CONTENT_INVERSE
+        fillColor: IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(close) {
@@ -2321,7 +2349,7 @@ function OutgoingUserMessage(_ref) {
         setMenuDisplaying(false);
       };
 
-      return React.createElement(MenuItems
+      return /*#__PURE__*/React__default.createElement(MenuItems
       /**
        * parentRef: For catching location(x, y) of MenuItems
        * parentContainRef: For toggling more options(menus & reactions)
@@ -2331,13 +2359,13 @@ function OutgoingUserMessage(_ref) {
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
         openLeft: true
-      }, isMessageSent && React.createElement(MenuItem, {
+      }, isMessageSent && /*#__PURE__*/React__default.createElement(MenuItem, {
         className: "sendbird-user-message--copy",
         onClick: function onClick() {
           copyToClipboard$1(message.message);
           closeDropdown();
         }
-      }, "Copy"), isMessageSent && React.createElement(MenuItem, {
+      }, "Copy"), isMessageSent && /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           if (disabled) {
             return;
@@ -2346,12 +2374,12 @@ function OutgoingUserMessage(_ref) {
           showEdit(true);
           closeDropdown();
         }
-      }, "Edit"), message && message.isResendable && message.isResendable() && React.createElement(MenuItem, {
+      }, "Edit"), message && message.isResendable && message.isResendable() && /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           resendMessage(message);
           closeDropdown();
         }
-      }, "Resend"), React.createElement(MenuItem, {
+      }, "Resend"), /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           if (disabled) {
             return;
@@ -2362,9 +2390,9 @@ function OutgoingUserMessage(_ref) {
         }
       }, "Delete"));
     }
-  }), isMessageSent && useReaction && emojiAllMap.size > 0 && React.createElement(ContextMenu, {
+  }), isMessageSent && showReactionAddButton && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
+      return /*#__PURE__*/React__default.createElement(IconButton, {
         className: "sendbird-user-message__more__add-reaction",
         ref: parentRefReactions,
         width: "32px",
@@ -2377,7 +2405,7 @@ function OutgoingUserMessage(_ref) {
         onBlur: function onBlur() {
           handleMoreIconBlur();
         }
-      }, React.createElement(Icon, {
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         width: "24px",
         height: "24px",
         type: IconTypes.EMOJI_MORE,
@@ -2390,7 +2418,7 @@ function OutgoingUserMessage(_ref) {
         setMenuDisplaying(false);
       };
 
-      return React.createElement(MemoizedEmojiListItems, {
+      return /*#__PURE__*/React__default.createElement(MemoizedEmojiListItems, {
         message: message,
         parentRef: parentRefReactions,
         parentContainRef: parentContainRef,
@@ -2400,22 +2428,22 @@ function OutgoingUserMessage(_ref) {
         }
       });
     }
-  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React.createElement("div", {
+  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-user-message__status"
-  }, React.createElement(MessageStatus, {
+  }, /*#__PURE__*/React__default.createElement(MessageStatus, {
     message: message,
     status: status
-  }))), React.createElement("div", {
+  }))), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-user-message__text-balloon"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-user-message__text-balloon__inner"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-user-message__text-balloon__inner__text-place"
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-user-message__text-balloon__inner__text-place__text",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONCONTENT_1
-  }, React.createElement(MemoizedMessageText, null))), useReaction && message.reactions && message.reactions.length > 0 && React.createElement(EmojiReactions, {
+  }, /*#__PURE__*/React__default.createElement(MemoizedMessageText, null))), useReaction && message.reactions && message.reactions.length > 0 && /*#__PURE__*/React__default.createElement(EmojiReactions, {
     className: "sendbird-user-message__text-balloon__inner__emoji-reactions",
     userId: userId,
     message: message,
@@ -2445,7 +2473,7 @@ function IncomingUserMessage(_ref2) {
   var parentContainRef = useRef(null);
   var avatarRef = useRef(null);
 
-  var _React$useContext = React.useContext(UserProfileContext),
+  var _React$useContext = React__default.useContext(UserProfileContext),
       disableUserProfile = _React$useContext.disableUserProfile,
       renderUserProfile = _React$useContext.renderUserProfile;
 
@@ -2479,20 +2507,20 @@ function IncomingUserMessage(_ref2) {
     ref: messageRef,
     setHover: setMousehover
   });
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     ref: messageRef,
     className: "sendbird-user-message--incoming",
     style: {
-      paddingTop: chainTop ? GROUPING_PADDING : NORMAL_PADDING,
-      paddingBottom: chainBottom ? GROUPING_PADDING : NORMAL_PADDING
+      paddingTop: chainTop ? GROUPING_PADDING$3 : NORMAL_PADDING$3,
+      paddingBottom: chainBottom ? GROUPING_PADDING$3 : NORMAL_PADDING$3
     }
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-user-message--inner"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-user-message--body"
-  }, !chainBottom && React.createElement(ContextMenu, {
+  }, !chainBottom && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(Avatar, {
+      return /*#__PURE__*/React__default.createElement(Avatar, {
         ref: avatarRef,
         onClick: function onClick() {
           if (!disableUserProfile) {
@@ -2506,7 +2534,7 @@ function IncomingUserMessage(_ref2) {
       });
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems
+      return /*#__PURE__*/React__default.createElement(MenuItems
       /**
        * parentRef: For catching location(x, y) of MenuItems
        * parentContainRef: For toggling more options(menus & reactions)
@@ -2522,26 +2550,26 @@ function IncomingUserMessage(_ref2) {
       }, renderUserProfile ? renderUserProfile({
         user: message.sender,
         close: closeDropdown
-      }) : React.createElement(UserProfile, {
+      }) : /*#__PURE__*/React__default.createElement(ConnectedUserProfile, {
         user: message.sender,
         onSuccess: closeDropdown
       }));
     }
-  }), !chainTop && React.createElement(Label, {
+  }), !chainTop && /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-user-message__sender-name",
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
-  }, getSenderName$1(message)), React.createElement("div", {
+  }, getSenderName$1(message)), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-user-message__text-balloon"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-user-message__text-balloon__inner"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-user-message__text-balloon__inner__text-place"
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-user-message__text-balloon__inner__text-place__text",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, React.createElement(MemoizedMessageText, null))), showEmojiReactions && React.createElement(EmojiReactions, {
+  }, /*#__PURE__*/React__default.createElement(MemoizedMessageText, null))), showEmojiReactions && /*#__PURE__*/React__default.createElement(EmojiReactions, {
     className: "sendbird-user-message__text-balloon__inner__emoji-reactions",
     userId: userId,
     message: message,
@@ -2549,17 +2577,17 @@ function IncomingUserMessage(_ref2) {
     membersMap: membersMap,
     toggleReaction: toggleReaction,
     memoizedEmojiListItems: memoizedEmojiListItems
-  })))), React.createElement("div", {
+  })))), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-user-message__right-padding"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-user-message__more",
     ref: parentContainRef,
     style: {
       top: chainTop ? '6px' : '22px'
     }
-  }, showReactionAddButton && React.createElement(ContextMenu, {
+  }, showReactionAddButton && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
+      return /*#__PURE__*/React__default.createElement(IconButton, {
         ref: parentRefReactions,
         width: "32px",
         height: "32px",
@@ -2571,7 +2599,7 @@ function IncomingUserMessage(_ref2) {
         onBlur: function onBlur() {
           handleMoreIconBlur();
         }
-      }, React.createElement(Icon, {
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         width: "24px",
         height: "24px",
         type: IconTypes.EMOJI_MORE,
@@ -2584,7 +2612,7 @@ function IncomingUserMessage(_ref2) {
         setMenuDisplaying(false);
       };
 
-      return React.createElement(MemoizedEmojiListItems, {
+      return /*#__PURE__*/React__default.createElement(MemoizedEmojiListItems, {
         parentRef: parentRefReactions,
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
@@ -2594,9 +2622,9 @@ function IncomingUserMessage(_ref2) {
         }
       });
     }
-  }), React.createElement(ContextMenu, {
+  }), /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
+      return /*#__PURE__*/React__default.createElement(IconButton, {
         ref: parentRefMenus,
         width: "32px",
         height: "32px",
@@ -2608,7 +2636,7 @@ function IncomingUserMessage(_ref2) {
         onBlur: function onBlur() {
           handleMoreIconBlur();
         }
-      }, React.createElement(Icon, {
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         width: "24px",
         height: "24px",
         type: IconTypes.MORE,
@@ -2621,11 +2649,11 @@ function IncomingUserMessage(_ref2) {
         setMenuDisplaying(false);
       };
 
-      return React.createElement(MenuItems, {
+      return /*#__PURE__*/React__default.createElement(MenuItems, {
         parentRef: parentRefMenus,
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown
-      }, React.createElement(MenuItem, {
+      }, /*#__PURE__*/React__default.createElement(MenuItem, {
         className: "sendbird-user-message--copy",
         onClick: function onClick() {
           copyToClipboard$1(message.message);
@@ -2633,7 +2661,7 @@ function IncomingUserMessage(_ref2) {
         }
       }, "Copy"));
     }
-  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React.createElement(Label, {
+  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-user-message__sent-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
@@ -2656,7 +2684,7 @@ IncomingUserMessage.defaultProps = {
   message: {},
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop,
+  toggleReaction: noop$5,
   memoizedEmojiListItems: function memoizedEmojiListItems() {
     return '';
   }
@@ -2680,13 +2708,13 @@ OutgoingUserMessage.propTypes = {
 };
 OutgoingUserMessage.defaultProps = {
   message: {},
-  resendMessage: noop,
-  showEdit: noop,
-  showRemove: noop,
+  resendMessage: noop$5,
+  showEdit: noop$5,
+  showRemove: noop$5,
   disabled: false,
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop,
+  toggleReaction: noop$5,
   memoizedEmojiListItems: function memoizedEmojiListItems() {
     return '';
   }
@@ -2696,22 +2724,24 @@ function AdminMessage(_ref) {
   var className = _ref.className,
       message = _ref.message;
 
-  if (!message.messageType || message.messageType !== 'admin') {
-    // change to use message.isAdminMessage()
+  if (!(message.isAdminMessage || message.messageType) || !message.isAdminMessage() || message.messageType !== 'admin') {
     return null;
   }
 
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  return React.createElement("div", {
-    className: [].concat(_toConsumableArray(injectingClassName), ['sendbird-admin-message']).join(' ')
-  }, React.createElement(Label, {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: [].concat(_toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-admin-message']).join(' ')
+  }, /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-admin-message__text",
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
   }, message.message));
 }
 AdminMessage.propTypes = {
-  message: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool, PropTypes.array, PropTypes.object])),
+  message: PropTypes.shape({
+    message: PropTypes.string,
+    messageType: PropTypes.string,
+    isAdminMessage: PropTypes.func
+  }),
   className: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)])
 };
 AdminMessage.defaultProps = {
@@ -2719,19 +2749,28 @@ AdminMessage.defaultProps = {
   className: ''
 };
 
-var getMessageCreatedAt$1 = function getMessageCreatedAt(message) {
+var getMessageCreatedAt$2 = function getMessageCreatedAt(message) {
   return format(message.createdAt, 'p');
 };
-var getIsSentFromStatus = function getIsSentFromStatus(status) {
+var getIsSentFromStatus$1 = function getIsSentFromStatus(status) {
   return status === MessageStatusType.SENT || status === MessageStatusType.DELIVERED || status === MessageStatusType.READ;
 };
+var getIsSentFromSendingStatus$1 = function getIsSentFromSendingStatus() {
+  var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-var noop$1 = function noop() {};
+  if (message.sendingStatus && typeof message.sendingStatus === 'string') {
+    return message.sendingStatus === 'none' || message.sendingStatus === 'succeeded';
+  }
+
+  return false;
+};
+
+var noop$4 = function noop() {};
 
 var OUTGOING_THUMBNAIL_MESSAGE = 'sendbird-outgoing-thumbnail-message';
 var INCOMING_THUMBNAIL_MESSAGE = 'sendbird-incoming-thumbnail-message';
-var GROUPING_PADDING$1 = '1px';
-var NORMAL_PADDING$1 = '8px';
+var GROUPING_PADDING$2 = '1px';
+var NORMAL_PADDING$2 = '8px';
 function ThumbnailMessage(_ref) {
   var _ref$message = _ref.message,
       message = _ref$message === void 0 ? {} : _ref$message,
@@ -2749,7 +2788,7 @@ function ThumbnailMessage(_ref) {
       memoizedEmojiListItems = _ref.memoizedEmojiListItems,
       chainTop = _ref.chainTop,
       chainBottom = _ref.chainBottom;
-  return isByMe ? React.createElement(OutgoingThumbnailMessage, {
+  return isByMe ? /*#__PURE__*/React__default.createElement(OutgoingThumbnailMessage, {
     userId: userId,
     status: status,
     message: message,
@@ -2764,7 +2803,7 @@ function ThumbnailMessage(_ref) {
     resendMessage: resendMessage,
     toggleReaction: toggleReaction,
     memoizedEmojiListItems: memoizedEmojiListItems
-  }) : React.createElement(IncomingThumbnailMessage, {
+  }) : /*#__PURE__*/React__default.createElement(IncomingThumbnailMessage, {
     userId: userId,
     status: status,
     message: message,
@@ -2822,10 +2861,27 @@ function OutgoingThumbnailMessage(_ref2) {
       _useState6 = _slicedToArray(_useState5, 2),
       menuDisplaying = _useState6[0],
       setMenuDisplaying = _useState6[1];
+  /* eslint-disable react/prop-types */
 
-  var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
+
+  var memorizedThumbnailPlaceHolder = useMemo(function () {
+    return function (iconType) {
+      return function (_ref3) {
+        var style = _ref3.style;
+        return /*#__PURE__*/React__default.createElement("div", {
+          style: style
+        }, /*#__PURE__*/React__default.createElement(Icon, {
+          type: iconType,
+          fillColor: IconColors.ON_BACKGROUND_2,
+          width: "56px",
+          height: "56px"
+        }));
+      };
+    };
+  }, []);
+  var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0 && getIsSentFromSendingStatus$1(message);
   var MemoizedEmojiListItems = memoizedEmojiListItems;
-  var isMessageSent = getIsSentFromStatus(status);
+  var isMessageSent = getIsSentFromStatus$1(status);
 
   var handleMoreIconClick = function handleMoreIconClick() {
     setMoreActive(true);
@@ -2839,23 +2895,23 @@ function OutgoingThumbnailMessage(_ref2) {
     ref: messageRef,
     setHover: setMousehover
   });
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     className: OUTGOING_THUMBNAIL_MESSAGE,
     ref: messageRef,
     style: {
-      paddingTop: chainTop ? GROUPING_PADDING$1 : NORMAL_PADDING$1,
-      paddingBottom: chainBottom ? GROUPING_PADDING$1 : NORMAL_PADDING$1
+      paddingTop: chainTop ? GROUPING_PADDING$2 : NORMAL_PADDING$2,
+      paddingBottom: chainBottom ? GROUPING_PADDING$2 : NORMAL_PADDING$2
     }
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "--inner")
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "__left-padding")
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-left-padding__more"),
     ref: parentContainRef
-  }, React.createElement(ContextMenu, {
+  }, /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
+      return /*#__PURE__*/React__default.createElement(IconButton, {
         ref: menuRef,
         width: "32px",
         height: "32px",
@@ -2867,11 +2923,11 @@ function OutgoingThumbnailMessage(_ref2) {
         onBlur: function onBlur() {
           handleMoreIconBlur();
         }
-      }, React.createElement(Icon, {
-        width: "24px",
-        height: "24px",
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.MORE,
-        fillColor: IconColors.CONTENT_INVERSE
+        fillColor: IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(close) {
@@ -2880,7 +2936,7 @@ function OutgoingThumbnailMessage(_ref2) {
         setMenuDisplaying(false);
       };
 
-      return React.createElement(MenuItems
+      return /*#__PURE__*/React__default.createElement(MenuItems
       /**
        * parentRef: For catching location(x, y) of MenuItems
        * parentContainRef: For toggling more options(menus & reactions)
@@ -2890,12 +2946,12 @@ function OutgoingThumbnailMessage(_ref2) {
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
         openLeft: true
-      }, message && message.isResendable && message.isResendable() && React.createElement(MenuItem, {
+      }, message && message.isResendable && message.isResendable() && /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           resendMessage(message);
           closeDropdown();
         }
-      }, stringSet.CONTEXT_MENU_DROPDOWN__RESEND), React.createElement(MenuItem, {
+      }, stringSet.CONTEXT_MENU_DROPDOWN__RESEND), /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           if (disabled) {
             return;
@@ -2906,9 +2962,9 @@ function OutgoingThumbnailMessage(_ref2) {
         }
       }, stringSet.CONTEXT_MENU_DROPDOWN__DELETE));
     }
-  }), isMessageSent && showReactionAddButton && React.createElement(ContextMenu, {
+  }), isMessageSent && showReactionAddButton && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
+      return /*#__PURE__*/React__default.createElement(IconButton, {
         ref: reactionAddRef,
         width: "32px",
         height: "32px",
@@ -2920,11 +2976,11 @@ function OutgoingThumbnailMessage(_ref2) {
         onBlur: function onBlur() {
           handleMoreIconBlur();
         }
-      }, React.createElement(Icon, {
-        width: "24px",
-        height: "24px",
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.EMOJI_MORE,
-        fillColor: IconColors.CONTENT_INVERSE
+        fillColor: IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(close) {
@@ -2933,7 +2989,7 @@ function OutgoingThumbnailMessage(_ref2) {
         setMenuDisplaying(false);
       };
 
-      return React.createElement(MemoizedEmojiListItems, {
+      return /*#__PURE__*/React__default.createElement(MemoizedEmojiListItems, {
         message: message,
         parentRef: reactionAddRef,
         parentContainRef: parentContainRef,
@@ -2943,69 +2999,84 @@ function OutgoingThumbnailMessage(_ref2) {
         }
       });
     }
-  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React.createElement(MessageStatus, {
+  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && /*#__PURE__*/React__default.createElement(MessageStatus, {
+    className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-left-padding__status"),
     message: message,
-    status: status,
-    className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-left-padding__status")
-  })), React.createElement("div", {
+    status: status
+  })), /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "__body")
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__wrap")
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__wrap--inner"),
+    role: "button",
     onClick: isMessageSent ? function () {
       return onClick(true);
     } : function () {},
     onKeyDown: isMessageSent ? function () {
       return onClick(true);
     } : function () {},
-    tabIndex: 0,
-    role: "button"
-  }, isVideo(type) && React.createElement(React.Fragment, null, thumbnailUrl ? React.createElement(ImageRenderer, {
+    tabIndex: 0
+  }, isVideo(type) && /*#__PURE__*/React__default.createElement(React__default.Fragment, null, thumbnailUrl ? /*#__PURE__*/React__default.createElement(ImageRenderer, {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__video"),
     url: thumbnailUrl,
     alt: "video/thumbnail",
     width: "404px",
     height: "280px",
-    defaultComponent: React.createElement("div", {
+    defaultComponent: /*#__PURE__*/React__default.createElement("div", {
       className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "__thumbnail-placeholder--video")
-    }, React.createElement(Icon, {
+    }, /*#__PURE__*/React__default.createElement(Icon, {
       type: IconTypes.PLAY,
       fillColor: IconColors.ON_BACKGROUND_2,
       width: "56px",
       height: "56px"
-    }))
+    })),
+    placeHolder: memorizedThumbnailPlaceHolder(IconTypes.PLAY)
   }) :
+  /*#__PURE__*/
+
   /* eslint-disable-next-line jsx-a11y/media-has-caption */
-  React.createElement("video", {
+  React__default.createElement("video", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__video")
-  }, React.createElement("source", {
+  }, /*#__PURE__*/React__default.createElement("source", {
     src: url || localUrl,
     type: type
-  })), React.createElement(Icon, {
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__video-icon--wrap")
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__video-icon"),
     type: IconTypes.PLAY,
-    width: "56px",
-    height: "56px"
-  })), isImage(type) && React.createElement(ImageRenderer, {
+    fillColor: IconColors.ON_BACKGROUND_2,
+    width: "34px",
+    height: "34px"
+  }))), isImage(type) && /*#__PURE__*/React__default.createElement(React__default.Fragment, null, /*#__PURE__*/React__default.createElement(ImageRenderer, {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__img"),
     url: thumbnailUrl || url || localUrl,
     alt: "image/thumbnail",
     width: "404px",
     height: "280px",
-    defaultComponent: React.createElement("div", {
-      className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "__thumbnail-placeholder--video")
-    }, React.createElement(Icon, {
+    defaultComponent: /*#__PURE__*/React__default.createElement("div", {
+      className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "__thumbnail-placeholder--image")
+    }, /*#__PURE__*/React__default.createElement(Icon, {
       type: IconTypes.PHOTO,
       fillColor: IconColors.ON_BACKGROUND_2,
       width: "56px",
       height: "56px"
-    }))
-  }), unSupported(type) && React.createElement("div", {
+    })),
+    placeHolder: memorizedThumbnailPlaceHolder(IconTypes.PHOTO)
+  }), isGif(type) && /*#__PURE__*/React__default.createElement("div", {
+    className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__gif-icon--wrap")
+  }, /*#__PURE__*/React__default.createElement(Icon, {
+    className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__gif-icon"),
+    type: IconTypes.GIF,
+    fillColor: IconColors.ON_BACKGROUND_2,
+    width: "34px",
+    height: "34px"
+  }))), unSupported(type) && /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__other")
-  }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React.createElement("div", {
+  }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__wrap__overlay")
-  })), useReaction && message.reactions && message.reactions.length > 0 && React.createElement(EmojiReactions, {
+  })), useReaction && message.reactions && message.reactions.length > 0 && /*#__PURE__*/React__default.createElement(EmojiReactions, {
     className: "".concat(OUTGOING_THUMBNAIL_MESSAGE, "-body__wrap__emoji-reactions"),
     userId: userId,
     message: message,
@@ -3015,26 +3086,26 @@ function OutgoingThumbnailMessage(_ref2) {
     memoizedEmojiListItems: memoizedEmojiListItems
   })))));
 }
-function IncomingThumbnailMessage(_ref3) {
-  var _ref3$message = _ref3.message,
-      message = _ref3$message === void 0 ? {} : _ref3$message,
-      userId = _ref3.userId,
-      onClick = _ref3.onClick,
-      status = _ref3.status,
-      useReaction = _ref3.useReaction,
-      emojiAllMap = _ref3.emojiAllMap,
-      membersMap = _ref3.membersMap,
-      toggleReaction = _ref3.toggleReaction,
-      memoizedEmojiListItems = _ref3.memoizedEmojiListItems,
-      chainTop = _ref3.chainTop,
-      chainBottom = _ref3.chainBottom;
+function IncomingThumbnailMessage(_ref4) {
+  var _ref4$message = _ref4.message,
+      message = _ref4$message === void 0 ? {} : _ref4$message,
+      userId = _ref4.userId,
+      onClick = _ref4.onClick,
+      status = _ref4.status,
+      useReaction = _ref4.useReaction,
+      emojiAllMap = _ref4.emojiAllMap,
+      membersMap = _ref4.membersMap,
+      toggleReaction = _ref4.toggleReaction,
+      memoizedEmojiListItems = _ref4.memoizedEmojiListItems,
+      chainTop = _ref4.chainTop,
+      chainBottom = _ref4.chainBottom;
   var type = message.type,
       url = message.url,
       localUrl = message.localUrl,
       thumbnails = message.thumbnails;
   var thumbnailUrl = thumbnails && thumbnails.length > 0 && thumbnails[0].url || null;
 
-  var _React$useContext = React.useContext(UserProfileContext),
+  var _React$useContext = React__default.useContext(UserProfileContext),
       disableUserProfile = _React$useContext.disableUserProfile,
       renderUserProfile = _React$useContext.renderUserProfile;
 
@@ -3060,10 +3131,27 @@ function IncomingThumbnailMessage(_ref3) {
       _useState12 = _slicedToArray(_useState11, 2),
       menuDisplaying = _useState12[0],
       setMenuDisplaying = _useState12[1];
+  /* eslint-disable react/prop-types */
 
+
+  var memorizedThumbnailPlaceHolder = useMemo(function () {
+    return function (iconType) {
+      return function (_ref5) {
+        var style = _ref5.style;
+        return /*#__PURE__*/React__default.createElement("div", {
+          style: style
+        }, /*#__PURE__*/React__default.createElement(Icon, {
+          type: iconType,
+          fillColor: IconColors.ON_BACKGROUND_2,
+          width: "56px",
+          height: "56px"
+        }));
+      };
+    };
+  }, []);
   var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
   var MemoizedEmojiListItems = memoizedEmojiListItems;
-  var isMessageSent = getIsSentFromStatus(status);
+  var isMessageSent = getIsSentFromStatus$1(status);
 
   var handleMoreIconClick = function handleMoreIconClick() {
     setMoreActive(true);
@@ -3077,40 +3165,40 @@ function IncomingThumbnailMessage(_ref3) {
     ref: messageRef,
     setHover: setMousehover
   });
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     className: INCOMING_THUMBNAIL_MESSAGE,
     ref: messageRef,
     style: {
-      paddingTop: chainTop ? GROUPING_PADDING$1 : NORMAL_PADDING$1,
-      paddingBottom: chainBottom ? GROUPING_PADDING$1 : NORMAL_PADDING$1
+      paddingTop: chainTop ? GROUPING_PADDING$2 : NORMAL_PADDING$2,
+      paddingBottom: chainBottom ? GROUPING_PADDING$2 : NORMAL_PADDING$2
     }
-  }, !chainTop && React.createElement(Label, {
+  }, !chainTop && /*#__PURE__*/React__default.createElement(Label, {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__sender-name"),
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
-  }, getSenderName$2(message) || ''), React.createElement("div", {
+  }, getSenderName$2(message) || ''), /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "--inner")
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__body")
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "-body__wrap")
-  }, !chainBottom && React.createElement(ContextMenu, {
+  }, !chainBottom && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(Avatar, {
+      return /*#__PURE__*/React__default.createElement(Avatar, {
+        className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__avatar"),
         ref: avatarRef,
         onClick: function onClick() {
           if (!disableUserProfile) {
             toggleDropdown();
           }
         },
-        className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__avatar"),
         src: getSenderProfileUrl$2(message),
         width: "28px",
         height: "28px"
       });
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems
+      return /*#__PURE__*/React__default.createElement(MenuItems
       /**
        * parentRef: For catching location(x, y) of MenuItems
        * parentContainRef: For toggling more options(menus & reactions)
@@ -3126,66 +3214,81 @@ function IncomingThumbnailMessage(_ref3) {
       }, renderUserProfile ? renderUserProfile({
         user: message.sender,
         close: closeDropdown
-      }) : React.createElement(UserProfile, {
+      }) : /*#__PURE__*/React__default.createElement(ConnectedUserProfile, {
         user: message.sender,
         onSuccess: closeDropdown
       }));
     }
-  }), React.createElement("div", {
+  }), /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "-body__wrap--inner"),
     role: "button",
-    tabIndex: 0,
     onClick: isMessageSent ? function () {
       return onClick(true);
     } : function () {},
     onKeyDown: isMessageSent ? function () {
       return onClick(true);
-    } : function () {}
-  }, isVideo(type) && React.createElement(React.Fragment, null, thumbnailUrl ? React.createElement(ImageRenderer, {
+    } : function () {},
+    tabIndex: 0
+  }, isVideo(type) && /*#__PURE__*/React__default.createElement(React__default.Fragment, null, thumbnailUrl ? /*#__PURE__*/React__default.createElement(ImageRenderer, {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__video"),
     url: thumbnailUrl,
     alt: "video/thumbnail",
     width: "404px",
     height: "280px",
-    defaultComponent: React.createElement("div", {
+    defaultComponent: /*#__PURE__*/React__default.createElement("div", {
       className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__thumbnail-placeholder--video")
-    }, React.createElement(Icon, {
+    }, /*#__PURE__*/React__default.createElement(Icon, {
       type: IconTypes.PLAY,
       fillColor: IconColors.ON_BACKGROUND_2,
       width: "56px",
       height: "56px"
-    }))
+    })),
+    placeHolder: memorizedThumbnailPlaceHolder(IconTypes.PLAY)
   }) :
+  /*#__PURE__*/
+
   /* eslint-disable-next-line jsx-a11y/media-has-caption */
-  React.createElement("video", {
+  React__default.createElement("video", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__video")
-  }, React.createElement("source", {
+  }, /*#__PURE__*/React__default.createElement("source", {
     src: url || localUrl,
     type: type
-  })), React.createElement(Icon, {
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__video-icon--wrap")
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__video-icon"),
     type: IconTypes.PLAY,
-    width: "56px",
-    height: "56px"
-  })), isImage(type) && React.createElement(ImageRenderer, {
+    fillColor: IconColors.ON_BACKGROUND_2,
+    width: "34px",
+    height: "34px"
+  }))), isImage(type) && /*#__PURE__*/React__default.createElement(React__default.Fragment, null, /*#__PURE__*/React__default.createElement(ImageRenderer, {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__img"),
     url: thumbnailUrl || url || localUrl,
     alt: "image/thumbnail",
     width: "404px",
     height: "280px",
-    defaultComponent: React.createElement("div", {
+    defaultComponent: /*#__PURE__*/React__default.createElement("div", {
       className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__thumbnail-placeholder--image")
-    }, React.createElement(Icon, {
+    }, /*#__PURE__*/React__default.createElement(Icon, {
       type: IconTypes.PHOTO,
       fillColor: IconColors.ON_BACKGROUND_2,
       width: "56px",
       height: "56px"
-    }))
-  }), unSupported(type) && React.createElement("div", {
+    })),
+    placeHolder: memorizedThumbnailPlaceHolder(IconTypes.PHOTO)
+  }), isGif(type) && /*#__PURE__*/React__default.createElement("div", {
+    className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__gif-icon--wrap")
+  }, /*#__PURE__*/React__default.createElement(Icon, {
+    className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__gif-icon"),
+    type: IconTypes.GIF,
+    fillColor: IconColors.ON_BACKGROUND_2,
+    width: "34px",
+    height: "34px"
+  }))), unSupported(type) && /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__other")
-  }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React.createElement("div", {
+  }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "-body__wrap-overlay")
-  })), useReaction && message.reactions && message.reactions.length > 0 && React.createElement(EmojiReactions, {
+  })), useReaction && message.reactions && message.reactions.length > 0 && /*#__PURE__*/React__default.createElement(EmojiReactions, {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__wrap__emoji-reactions"),
     userId: userId,
     message: message,
@@ -3193,18 +3296,18 @@ function IncomingThumbnailMessage(_ref3) {
     membersMap: membersMap,
     toggleReaction: toggleReaction,
     memoizedEmojiListItems: memoizedEmojiListItems
-  }))), React.createElement("div", {
+  }))), /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__right-padding")
-  }, !chainBottom && !(mousehover || moreActive || menuDisplaying) && React.createElement(Label, {
+  }, !chainBottom && !(mousehover || moreActive || menuDisplaying) && /*#__PURE__*/React__default.createElement(Label, {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__sent-at"),
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
-  }, getMessageCreatedAt$1(message)), React.createElement("div", {
+  }, getMessageCreatedAt$2(message)), /*#__PURE__*/React__default.createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__more"),
     ref: parentContainRef
-  }, showReactionAddButton && React.createElement(ContextMenu, {
+  }, showReactionAddButton && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
+      return /*#__PURE__*/React__default.createElement(IconButton, {
         ref: reactionAddRef,
         width: "32px",
         height: "32px",
@@ -3216,7 +3319,7 @@ function IncomingThumbnailMessage(_ref3) {
         onBlur: function onBlur() {
           handleMoreIconBlur();
         }
-      }, React.createElement(Icon, {
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.EMOJI_MORE,
         fillColor: IconColors.CONTENT_INVERSE,
         width: "24px",
@@ -3229,7 +3332,7 @@ function IncomingThumbnailMessage(_ref3) {
         setMenuDisplaying(false);
       };
 
-      return React.createElement(MemoizedEmojiListItems, {
+      return /*#__PURE__*/React__default.createElement(MemoizedEmojiListItems, {
         message: message,
         parentRef: reactionAddRef,
         parentContainRef: parentContainRef,
@@ -3265,14 +3368,14 @@ ThumbnailMessage.propTypes = {
 ThumbnailMessage.defaultProps = {
   isByMe: false,
   disabled: false,
-  resendMessage: noop$1,
-  onClick: noop$1,
-  showRemove: noop$1,
+  resendMessage: noop$4,
+  onClick: noop$4,
+  showRemove: noop$4,
   status: '',
   userId: '',
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$1,
+  toggleReaction: noop$4,
   memoizedEmojiListItems: function memoizedEmojiListItems() {
     return '';
   },
@@ -3325,9 +3428,9 @@ IncomingThumbnailMessage.defaultProps = {
 
 var MAX_TRUNCATE_LENGTH = 40;
 var GROUPAING_PADDING = '1px';
-var NORMAL_PADDING$2 = '8px';
+var NORMAL_PADDING$1 = '8px';
 
-var noop$2 = function noop() {};
+var noop$3 = function noop() {};
 
 function checkFileType(fileUrl) {
   var result = null;
@@ -3343,12 +3446,13 @@ function checkFileType(fileUrl) {
   return result;
 }
 
-function OutgoingFileMessage(_ref) {
+var MessageSwitch = function MessageSwitch(_ref) {
   var message = _ref.message,
       userId = _ref.userId,
-      status = _ref.status,
-      showRemove = _ref.showRemove,
       disabled = _ref.disabled,
+      isByMe = _ref.isByMe,
+      showRemove = _ref.showRemove,
+      status = _ref.status,
       resendMessage = _ref.resendMessage,
       useReaction = _ref.useReaction,
       emojiAllMap = _ref.emojiAllMap,
@@ -3357,7 +3461,82 @@ function OutgoingFileMessage(_ref) {
       memoizedEmojiListItems = _ref.memoizedEmojiListItems,
       chainTop = _ref.chainTop,
       chainBottom = _ref.chainBottom;
-  var url = message.plainUrl || message.url;
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-file-message".concat(isByMe ? '--outgoing' : '--incoming')
+  }, isByMe ? /*#__PURE__*/React__default.createElement(OutgoingFileMessage, {
+    message: message,
+    userId: userId,
+    disabled: disabled,
+    showRemove: showRemove,
+    status: status,
+    resendMessage: resendMessage,
+    useReaction: useReaction,
+    emojiAllMap: emojiAllMap,
+    membersMap: membersMap,
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems,
+    chainTop: chainTop,
+    chainBottom: chainBottom
+  }) : /*#__PURE__*/React__default.createElement(IncomingFileMessage, {
+    userId: userId,
+    message: message,
+    useReaction: useReaction,
+    emojiAllMap: emojiAllMap,
+    membersMap: membersMap,
+    toggleReaction: toggleReaction,
+    memoizedEmojiListItems: memoizedEmojiListItems,
+    chainTop: chainTop,
+    chainBottom: chainBottom
+  }));
+};
+
+MessageSwitch.propTypes = {
+  message: PropTypes.shape({}),
+  userId: PropTypes.string,
+  isByMe: PropTypes.bool,
+  disabled: PropTypes.bool,
+  showRemove: PropTypes.func,
+  resendMessage: PropTypes.func,
+  status: PropTypes.string.isRequired,
+  useReaction: PropTypes.bool.isRequired,
+  emojiAllMap: PropTypes.instanceOf(Map),
+  membersMap: PropTypes.instanceOf(Map),
+  toggleReaction: PropTypes.func,
+  memoizedEmojiListItems: PropTypes.func,
+  chainTop: PropTypes.bool,
+  chainBottom: PropTypes.bool
+};
+MessageSwitch.defaultProps = {
+  message: {},
+  isByMe: false,
+  disabled: false,
+  showRemove: noop$3,
+  resendMessage: noop$3,
+  userId: '',
+  emojiAllMap: new Map(),
+  membersMap: new Map(),
+  toggleReaction: noop$3,
+  memoizedEmojiListItems: function memoizedEmojiListItems() {
+    return '';
+  },
+  chainTop: false,
+  chainBottom: false
+};
+function OutgoingFileMessage(_ref2) {
+  var message = _ref2.message,
+      userId = _ref2.userId,
+      status = _ref2.status,
+      showRemove = _ref2.showRemove,
+      disabled = _ref2.disabled,
+      resendMessage = _ref2.resendMessage,
+      useReaction = _ref2.useReaction,
+      emojiAllMap = _ref2.emojiAllMap,
+      membersMap = _ref2.membersMap,
+      toggleReaction = _ref2.toggleReaction,
+      memoizedEmojiListItems = _ref2.memoizedEmojiListItems,
+      chainTop = _ref2.chainTop,
+      chainBottom = _ref2.chainBottom;
+  var url = message.url;
 
   var openFileUrl = function openFileUrl() {
     window.open(url);
@@ -3383,10 +3562,10 @@ function OutgoingFileMessage(_ref) {
       menuDisplaying = _useState6[0],
       setMenuDisplaying = _useState6[1];
 
-  var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
   var MemoizedEmojiListItems = memoizedEmojiListItems;
   var isMessageSent = getIsSentFromStatus$3(status);
-  var showEmojiReactions = isMessageSent && useReaction && message.reactions && message.reactions.length > 0;
+  var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0 && getIsSentFromSendingStatus$3(message);
+  var showEmojiReactions = isMessageSent && useReaction && message.reactions && message.reactions.length > 0 && getIsSentFromSendingStatus$3(message);
 
   var handleMoreIconClick = function handleMoreIconClick() {
     setMoreActive(true);
@@ -3400,23 +3579,23 @@ function OutgoingFileMessage(_ref) {
     ref: messageRef,
     setHover: setMousehover
   });
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-file-message__outgoing",
     ref: messageRef,
     style: {
-      paddingTop: chainTop ? GROUPAING_PADDING : NORMAL_PADDING$2,
-      paddingBottom: chainBottom ? GROUPAING_PADDING : NORMAL_PADDING$2
+      paddingTop: chainTop ? GROUPAING_PADDING : NORMAL_PADDING$1,
+      paddingBottom: chainBottom ? GROUPAING_PADDING : NORMAL_PADDING$1
     }
-  }, React.createElement("div", {
-    className: "sendbird-file-message--inner"
-  }, React.createElement("div", {
-    className: "sendbird-file-message__left-padding"
-  }, React.createElement("div", {
-    className: "sendbird-file-message__more",
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-file-message__outgoing--inner"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-file-message__outgoing__left-padding"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-file-message__outgoing__left-padding__more",
     ref: parentContainRef
-  }, React.createElement(ContextMenu, {
+  }, /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
+      return /*#__PURE__*/React__default.createElement(IconButton, {
         ref: menuRef,
         width: "32px",
         height: "32px",
@@ -3428,7 +3607,7 @@ function OutgoingFileMessage(_ref) {
         onBlur: function onBlur() {
           handleMoreIconBlur();
         }
-      }, React.createElement(Icon, {
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.MORE,
         fillColor: IconColors.CONTENT_INVERSE,
         width: "24px",
@@ -3441,7 +3620,7 @@ function OutgoingFileMessage(_ref) {
         setMenuDisplaying(false);
       };
 
-      return React.createElement(MenuItems
+      return /*#__PURE__*/React__default.createElement(MenuItems
       /**
        * parentRef: For catching location(x, y) of MenuItems
        * parentContainRef: For toggling more options(menus & reactions)
@@ -3451,12 +3630,12 @@ function OutgoingFileMessage(_ref) {
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
         openLeft: true
-      }, message && message.isResendable && message.isResendable() && React.createElement(MenuItem, {
+      }, message && message.isResendable && message.isResendable() && /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           resendMessage(message);
           closeDropdown();
         }
-      }, "Resend"), React.createElement(MenuItem, {
+      }, "Resend"), /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           if (disabled) {
             return;
@@ -3467,9 +3646,9 @@ function OutgoingFileMessage(_ref) {
         }
       }, "Delete"));
     }
-  }), showReactionAddButton && React.createElement(ContextMenu, {
+  }), showReactionAddButton && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
+      return /*#__PURE__*/React__default.createElement(IconButton, {
         ref: reactionAddButtonRef,
         width: "32px",
         height: "32px",
@@ -3481,11 +3660,11 @@ function OutgoingFileMessage(_ref) {
         onBlur: function onBlur() {
           handleMoreIconBlur();
         }
-      }, React.createElement(Icon, {
-        width: "24px",
-        height: "24px",
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.EMOJI_MORE,
-        fillColor: IconColors.CONTENT_INVERSE
+        fillColor: IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(close) {
@@ -3494,7 +3673,7 @@ function OutgoingFileMessage(_ref) {
         setMenuDisplaying(false);
       };
 
-      return React.createElement(MemoizedEmojiListItems, {
+      return /*#__PURE__*/React__default.createElement(MemoizedEmojiListItems, {
         message: message,
         parentRef: reactionAddButtonRef,
         parentContainRef: parentContainRef,
@@ -3504,32 +3683,32 @@ function OutgoingFileMessage(_ref) {
         }
       });
     }
-  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React.createElement("div", {
-    className: "sendbird-file-message__status"
-  }, React.createElement(MessageStatus, {
+  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-file-message__outgoing__left-padding__status"
+  }, /*#__PURE__*/React__default.createElement(MessageStatus, {
     message: message,
     status: status
-  }))), React.createElement("div", {
-    className: "sendbird-file-message__tooltip"
-  }, React.createElement("div", {
-    className: "sendbird-file-message__tooltip__inner"
-  }, checkFileType(url) ? React.createElement("div", {
-    className: "sendbird-file-message__tooltip__icon-box"
-  }, React.createElement(Icon, {
-    className: "sendbird-file-message__tooltip__icon-box__icon",
+  }))), /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-file-message__outgoing__tooltip"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-file-message__outgoing__tooltip__inner"
+  }, checkFileType(url) ? /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-file-message__outgoing__tooltip__icon-box"
+  }, /*#__PURE__*/React__default.createElement(Icon, {
+    className: "sendbird-file-message__outgoing__tooltip__icon-box__icon",
     type: checkFileType(url),
     fillColor: IconColors.PRIMARY,
     width: "24px",
     height: "24px"
-  })) : null, React.createElement(TextButton, {
-    className: "sendbird-file-message__tooltip__text",
+  })) : null, /*#__PURE__*/React__default.createElement(TextButton, {
+    className: "sendbird-file-message__outgoing__tooltip__text",
     onClick: openFileUrl,
     color: LabelColors.ONCONTENT_1
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     type: LabelTypography.BODY_1,
     color: LabelColors.ONCONTENT_1
-  }, truncate(message.name || message.url, MAX_TRUNCATE_LENGTH)))), showEmojiReactions && React.createElement(EmojiReactions, {
-    className: "sendbird-file-message__tooltip__emoji-reactions",
+  }, truncate(message.name || message.url, MAX_TRUNCATE_LENGTH)))), showEmojiReactions && /*#__PURE__*/React__default.createElement(EmojiReactions, {
+    className: "sendbird-file-message__outgoing__tooltip__emoji-reactions",
     userId: userId,
     message: message,
     emojiAllMap: emojiAllMap,
@@ -3538,16 +3717,16 @@ function OutgoingFileMessage(_ref) {
     memoizedEmojiListItems: memoizedEmojiListItems
   }))));
 }
-function IncomingFileMessage(_ref2) {
-  var message = _ref2.message,
-      userId = _ref2.userId,
-      useReaction = _ref2.useReaction,
-      emojiAllMap = _ref2.emojiAllMap,
-      membersMap = _ref2.membersMap,
-      toggleReaction = _ref2.toggleReaction,
-      memoizedEmojiListItems = _ref2.memoizedEmojiListItems,
-      chainTop = _ref2.chainTop,
-      chainBottom = _ref2.chainBottom;
+function IncomingFileMessage(_ref3) {
+  var message = _ref3.message,
+      userId = _ref3.userId,
+      useReaction = _ref3.useReaction,
+      emojiAllMap = _ref3.emojiAllMap,
+      membersMap = _ref3.membersMap,
+      toggleReaction = _ref3.toggleReaction,
+      memoizedEmojiListItems = _ref3.memoizedEmojiListItems,
+      chainTop = _ref3.chainTop,
+      chainBottom = _ref3.chainBottom;
 
   var openFileUrl = function openFileUrl() {
     window.open(message.url);
@@ -3555,7 +3734,7 @@ function IncomingFileMessage(_ref2) {
 
   var messageRef = useRef(null);
 
-  var _React$useContext = React.useContext(UserProfileContext),
+  var _React$useContext = React__default.useContext(UserProfileContext),
       disableUserProfile = _React$useContext.disableUserProfile,
       renderUserProfile = _React$useContext.renderUserProfile;
 
@@ -3593,34 +3772,34 @@ function IncomingFileMessage(_ref2) {
     ref: messageRef,
     setHover: setMousehover
   });
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-file-message__incoming",
     ref: messageRef,
     style: {
-      paddingTop: chainTop ? GROUPAING_PADDING : NORMAL_PADDING$2,
-      paddingBottom: chainBottom ? GROUPAING_PADDING : NORMAL_PADDING$2
+      paddingTop: chainTop ? GROUPAING_PADDING : NORMAL_PADDING$1,
+      paddingBottom: chainBottom ? GROUPAING_PADDING : NORMAL_PADDING$1
     }
-  }, React.createElement("div", {
-    className: "sendbird-file-message--inner"
-  }, React.createElement("div", {
-    className: "sendbird-file-message__body"
-  }, !chainBottom && React.createElement(ContextMenu, {
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-file-message__incoming--inner"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-file-message__incoming__body"
+  }, !chainBottom && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(Avatar, {
+      return /*#__PURE__*/React__default.createElement(Avatar, {
         ref: avatarRef,
         onClick: function onClick() {
           if (!disableUserProfile) {
             toggleDropdown();
           }
         },
-        className: "sendbird-file-message__avatar",
+        className: "sendbird-file-message__incoming__body__avatar",
         src: getSenderProfileUrl$2(message),
         width: "28px",
         height: "28px"
       });
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems
+      return /*#__PURE__*/React__default.createElement(MenuItems
       /**
        * parentRef: For catching location(x, y) of MenuItems
        * parentContainRef: For toggling more options(menus & reactions)
@@ -3636,49 +3815,52 @@ function IncomingFileMessage(_ref2) {
       }, renderUserProfile ? renderUserProfile({
         user: message.sender,
         close: closeDropdown
-      }) : React.createElement(UserProfile, {
+      }) : /*#__PURE__*/React__default.createElement(ConnectedUserProfile, {
         user: message.sender,
         onSuccess: closeDropdown
       }));
     }
-  }), !chainTop && React.createElement(Label, {
-    className: "sendbird-file-message__sender-name",
+  }), !chainTop && /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-file-message__incoming__body__sender-name",
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
-  }, getSenderName$2(message)), React.createElement("div", {
-    className: "sendbird-file-message__tooltip"
-  }, React.createElement("div", {
-    className: "sendbird-file-message__tooltip__inner"
-  }, checkFileType(message.url) ? React.createElement("div", {
-    className: "sendbird-file-message__tooltip__icon-box"
-  }, React.createElement(Icon, {
-    className: "sendbird-file-message__tooltip__icon-box__icon",
+  }, getSenderName$2(message)), /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-file-message__incoming__body__tooltip"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-file-message__incoming__body__tooltip__inner"
+  }, checkFileType(message.url) ? /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-file-message__incoming__body__tooltip__icon-box"
+  }, /*#__PURE__*/React__default.createElement(Icon, {
+    className: "sendbird-file-message__incoming__body__tooltip__icon-box__icon",
     type: checkFileType(message.url),
     fillColor: IconColors.PRIMARY,
     width: "24px",
     height: "24px"
-  })) : null, React.createElement(TextButton, {
-    className: "sendbird-file-message__tooltip__text",
+  })) : null, /*#__PURE__*/React__default.createElement(TextButton, {
+    className: "sendbird-file-message__incoming__body__tooltip__text",
     onClick: openFileUrl
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, truncate(message.name || message.url, MAX_TRUNCATE_LENGTH)))), useReaction && message.reactions && message.reactions.length > 0 && React.createElement(EmojiReactions, {
-    className: "sendbird-file-message__tooltip__emoji-reactions",
+  }, truncate(message.name || message.url, MAX_TRUNCATE_LENGTH)))), useReaction && message.reactions && message.reactions.length > 0 && /*#__PURE__*/React__default.createElement(EmojiReactions, {
+    className: "sendbird-file-message__incoming__body__tooltip__emoji-reactions",
     userId: userId,
     message: message,
     emojiAllMap: emojiAllMap,
     membersMap: membersMap,
     toggleReaction: toggleReaction,
     memoizedEmojiListItems: memoizedEmojiListItems
-  }))), React.createElement("div", {
-    className: "sendbird-file-message__right-padding"
-  }, React.createElement("div", {
-    className: "sendbird-file-message__more",
-    ref: parentContainRef
-  }, showReactionAddButton && React.createElement(ContextMenu, {
+  }))), /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-file-message__incoming__right-padding"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-file-message__incoming__right-padding__more",
+    ref: parentContainRef,
+    style: {
+      top: chainTop ? 6 : 18
+    }
+  }, showReactionAddButton && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
+      return /*#__PURE__*/React__default.createElement(IconButton, {
         ref: reactionAddButtonRef,
         width: "32px",
         height: "32px",
@@ -3690,7 +3872,7 @@ function IncomingFileMessage(_ref2) {
         onBlur: function onBlur() {
           handleMoreIconBlur();
         }
-      }, React.createElement(Icon, {
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         width: "24px",
         height: "24px",
         type: IconTypes.EMOJI_MORE,
@@ -3703,7 +3885,7 @@ function IncomingFileMessage(_ref2) {
         setMenuDisplaying(false);
       };
 
-      return React.createElement(MemoizedEmojiListItems, {
+      return /*#__PURE__*/React__default.createElement(MemoizedEmojiListItems, {
         message: message,
         parentRef: reactionAddButtonRef,
         parentContainRef: parentContainRef,
@@ -3713,8 +3895,8 @@ function IncomingFileMessage(_ref2) {
         }
       });
     }
-  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React.createElement(Label, {
-    className: "sendbird-file-message__sent-at",
+  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-file-message__incoming__right-padding__sent-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
   }, getMessageCreatedAt$4(message)))));
@@ -3736,14 +3918,14 @@ OutgoingFileMessage.propTypes = {
 };
 OutgoingFileMessage.defaultProps = {
   status: '',
-  showRemove: noop$2,
-  resendMessage: noop$2,
+  showRemove: noop$3,
+  resendMessage: noop$3,
   message: {},
   userId: '',
   disabled: false,
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$2,
+  toggleReaction: noop$3,
   memoizedEmojiListItems: function memoizedEmojiListItems() {
     return '';
   }
@@ -3764,87 +3946,10 @@ IncomingFileMessage.defaultProps = {
   userId: '',
   emojiAllMap: new Map(),
   membersMap: new Map(),
-  toggleReaction: noop$2,
+  toggleReaction: noop$3,
   memoizedEmojiListItems: function memoizedEmojiListItems() {
     return '';
   }
-};
-
-var MessageSwitch = function MessageSwitch(_ref3) {
-  var message = _ref3.message,
-      userId = _ref3.userId,
-      disabled = _ref3.disabled,
-      isByMe = _ref3.isByMe,
-      showRemove = _ref3.showRemove,
-      status = _ref3.status,
-      resendMessage = _ref3.resendMessage,
-      useReaction = _ref3.useReaction,
-      emojiAllMap = _ref3.emojiAllMap,
-      membersMap = _ref3.membersMap,
-      toggleReaction = _ref3.toggleReaction,
-      memoizedEmojiListItems = _ref3.memoizedEmojiListItems,
-      chainTop = _ref3.chainTop,
-      chainBottom = _ref3.chainBottom;
-  return React.createElement("div", {
-    className: "sendbird-file-message".concat(isByMe ? '--outgoing' : '--incoming')
-  }, isByMe ? React.createElement(OutgoingFileMessage, {
-    message: message,
-    userId: userId,
-    disabled: disabled,
-    showRemove: showRemove,
-    status: status,
-    resendMessage: resendMessage,
-    useReaction: useReaction,
-    emojiAllMap: emojiAllMap,
-    membersMap: membersMap,
-    toggleReaction: toggleReaction,
-    memoizedEmojiListItems: memoizedEmojiListItems,
-    chainTop: chainTop,
-    chainBottom: chainBottom
-  }) : React.createElement(IncomingFileMessage, {
-    userId: userId,
-    message: message,
-    useReaction: useReaction,
-    emojiAllMap: emojiAllMap,
-    membersMap: membersMap,
-    toggleReaction: toggleReaction,
-    memoizedEmojiListItems: memoizedEmojiListItems,
-    chainTop: chainTop,
-    chainBottom: chainBottom
-  }));
-};
-
-MessageSwitch.propTypes = {
-  message: PropTypes.shape({}),
-  userId: PropTypes.string,
-  isByMe: PropTypes.bool,
-  disabled: PropTypes.bool,
-  showRemove: PropTypes.func,
-  resendMessage: PropTypes.func,
-  status: PropTypes.string.isRequired,
-  useReaction: PropTypes.bool.isRequired,
-  emojiAllMap: PropTypes.instanceOf(Map),
-  membersMap: PropTypes.instanceOf(Map),
-  toggleReaction: PropTypes.func,
-  memoizedEmojiListItems: PropTypes.func,
-  chainTop: PropTypes.bool,
-  chainBottom: PropTypes.bool
-};
-MessageSwitch.defaultProps = {
-  message: {},
-  isByMe: false,
-  disabled: false,
-  showRemove: noop$2,
-  resendMessage: noop$2,
-  userId: '',
-  emojiAllMap: new Map(),
-  membersMap: new Map(),
-  toggleReaction: noop$2,
-  memoizedEmojiListItems: function memoizedEmojiListItems() {
-    return '';
-  },
-  chainTop: false,
-  chainBottom: false
 };
 
 var RemoveMessage = function RemoveMessage(props) {
@@ -3854,7 +3959,7 @@ var RemoveMessage = function RemoveMessage(props) {
   var _useContext = useContext(LocalizationContext),
       stringSet = _useContext.stringSet;
 
-  return React.createElement(Modal, {
+  return /*#__PURE__*/React__default.createElement(Modal, {
     onCancel: onCloseModal,
     onSubmit: onDeleteMessage,
     submitText: "Delete",
@@ -3867,13 +3972,12 @@ RemoveMessage.propTypes = {
   onDeleteMessage: PropTypes.func.isRequired
 };
 
-var getMessageCreatedAt$2 = function getMessageCreatedAt(message) {
+var getMessageCreatedAt$1 = function getMessageCreatedAt(message) {
   return format(message.createdAt, 'p');
 };
 
-var CLASS_NAME$2 = 'sendbird-unknown-message';
-var GROUPING_PADDING$2 = '1px';
-var NORMAL_PADDING$3 = '8px';
+var GROUPING_PADDING$1 = '1px';
+var NORMAL_PADDING = '8px';
 function UnknownMessage(_ref) {
   var message = _ref.message,
       isByMe = _ref.isByMe,
@@ -3882,18 +3986,15 @@ function UnknownMessage(_ref) {
       showRemove = _ref.showRemove,
       chainTop = _ref.chainTop,
       chainBottom = _ref.chainBottom;
-  var injectingClassName = Array.isArray(className) ? className : [className];
-  injectingClassName.unshift(CLASS_NAME$2);
-  injectingClassName.push("".concat(CLASS_NAME$2).concat(isByMe ? '--outgoing' : '--incoming'));
-  return React.createElement("div", {
-    className: injectingClassName.join(' ')
-  }, isByMe ? React.createElement(OutgoingUnknownMessage, {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: [].concat(_toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-unknown-message', "sendbird-unknown-message".concat(isByMe ? '--outgoing' : '--incoming')]).join(' ')
+  }, isByMe ? /*#__PURE__*/React__default.createElement(OutgoingUnknownMessage, {
     status: status,
     message: message,
     chainTop: chainTop,
     showRemove: showRemove,
     chainBottom: chainBottom
-  }) : React.createElement(IncomingUnknownMessage, {
+  }) : /*#__PURE__*/React__default.createElement(IncomingUnknownMessage, {
     message: message,
     chainTop: chainTop,
     chainBottom: chainBottom
@@ -3923,7 +4024,6 @@ function OutgoingUnknownMessage(_ref2) {
       showRemove = _ref2.showRemove,
       chainTop = _ref2.chainTop,
       chainBottom = _ref2.chainBottom;
-  var className = 'sendbird-outgoing-unknown-message';
   var messageRef = useRef(null);
   var parentContainRef = useRef(null);
   var menuRef = useRef(null);
@@ -3958,24 +4058,24 @@ function OutgoingUnknownMessage(_ref2) {
     ref: messageRef,
     setHover: setMousehover
   });
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-unknown-message",
     ref: messageRef,
-    className: className,
     style: {
-      paddingTop: chainTop ? GROUPING_PADDING$2 : NORMAL_PADDING$3,
-      paddingBottom: chainBottom ? GROUPING_PADDING$2 : NORMAL_PADDING$3
+      paddingTop: chainTop ? GROUPING_PADDING$1 : NORMAL_PADDING,
+      paddingBottom: chainBottom ? GROUPING_PADDING$1 : NORMAL_PADDING
     }
-  }, React.createElement("div", {
-    className: "".concat(className, "--inner")
-  }, React.createElement("div", {
-    className: "".concat(className, "--left-padding")
-  }, React.createElement("div", {
-    className: "".concat(className, "__more"),
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-unknown-message--inner"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-unknown-message--left-padding"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-unknown-message__more",
     ref: parentContainRef
-  }, React.createElement(ContextMenu, {
+  }, /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
-        className: "".concat(className, "__more__menu"),
+      return /*#__PURE__*/React__default.createElement(IconButton, {
+        className: "sendbird-outgoing-unknown-message__more__menu",
         ref: menuRef,
         width: "32px",
         height: "32px",
@@ -3987,11 +4087,11 @@ function OutgoingUnknownMessage(_ref2) {
         onBlur: function onBlur() {
           handleMoreIconBlur();
         }
-      }, React.createElement(Icon, {
-        width: "24px",
-        height: "24px",
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.MORE,
-        fillColor: IconColors.CONTENT_INVERSE
+        fillColor: IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(close) {
@@ -4000,7 +4100,7 @@ function OutgoingUnknownMessage(_ref2) {
         setMenuDisplaying(false);
       };
 
-      return React.createElement(MenuItems
+      return /*#__PURE__*/React__default.createElement(MenuItems
       /**
        * parentRef: For catching location(x, y) of MenuItems
        * parentContainRef: For toggling more options(menus & reactions)
@@ -4010,28 +4110,28 @@ function OutgoingUnknownMessage(_ref2) {
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
         openLeft: true
-      }, React.createElement(MenuItem, {
+      }, /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           showRemove(true);
           closeDropdown();
         }
       }, "Delete"));
     }
-  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && React.createElement("div", {
-    className: "".concat(className, "__message-status")
-  }, React.createElement(MessageStatus, {
+  })), !chainBottom && !(mousehover || moreActive || menuDisplaying) && /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-unknown-message__message-status"
+  }, /*#__PURE__*/React__default.createElement(MessageStatus, {
     message: message,
     status: status
-  }))), React.createElement("div", {
-    className: "".concat(className, "__body")
-  }, React.createElement("div", {
-    className: "".concat(className, "__body__text-balloon")
-  }, React.createElement(Label, {
-    className: "".concat(className, "__body__text-balloon__header"),
+  }))), /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-unknown-message__body"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-unknown-message__body__text-balloon"
+  }, /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-outgoing-unknown-message__body__text-balloon__header",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React.createElement(Label, {
-    className: "".concat(className, "__body__text-balloon__description"),
+  }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-outgoing-unknown-message__body__text-balloon__description",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_2
   }, stringSet.UNKNOWN__CANNOT_READ_MESSAGE)))));
@@ -4041,45 +4141,44 @@ function IncomingUnknownMessage(_ref3) {
   var message = _ref3.message,
       chainTop = _ref3.chainTop,
       chainBottom = _ref3.chainBottom;
-  var className = 'sendbird-incoming-unknown-message';
   var sender = message.sender;
   var avatarRef = useRef(null);
 
   var _useContext2 = useContext(LocalizationContext),
       stringSet = _useContext2.stringSet;
 
-  var _React$useContext = React.useContext(UserProfileContext),
+  var _React$useContext = React__default.useContext(UserProfileContext),
       disableUserProfile = _React$useContext.disableUserProfile,
       renderUserProfile = _React$useContext.renderUserProfile;
 
-  return React.createElement("div", {
-    className: className,
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-unknown-message",
     style: {
-      paddingTop: chainTop ? GROUPING_PADDING$2 : NORMAL_PADDING$3,
-      paddingBottom: chainBottom ? GROUPING_PADDING$2 : NORMAL_PADDING$3
+      paddingTop: chainTop ? GROUPING_PADDING$1 : NORMAL_PADDING,
+      paddingBottom: chainBottom ? GROUPING_PADDING$1 : NORMAL_PADDING
     }
-  }, React.createElement("div", {
-    className: "".concat(className, "--inner")
-  }, React.createElement("div", {
-    className: "".concat(className, "__left")
-  }, !chainBottom && React.createElement(ContextMenu, {
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-unknown-message--inner"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-unknown-message__left"
+  }, !chainBottom && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(Avatar, {
+      return /*#__PURE__*/React__default.createElement(Avatar, {
+        className: "sendbird-incoming-unknown-message__left__sender-profile-image",
         ref: avatarRef,
+        src: sender.profileUrl,
+        alt: "sender-profile-image",
+        width: "28px",
+        height: "28px",
         onClick: function onClick() {
           if (!disableUserProfile) {
             toggleDropdown();
           }
-        },
-        className: "".concat(className, "__left__sender-profile-image"),
-        src: sender.profileUrl,
-        width: "28px",
-        height: "28px",
-        alt: "sender-profile-image"
+        }
       });
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems
+      return /*#__PURE__*/React__default.createElement(MenuItems
       /**
        * parentRef: For catching location(x, y) of MenuItems
        * parentContainRef: For toggling more options(menus & reactions)
@@ -4095,34 +4194,34 @@ function IncomingUnknownMessage(_ref3) {
       }, renderUserProfile ? renderUserProfile({
         user: message.sender,
         close: closeDropdown
-      }) : React.createElement(UserProfile, {
+      }) : /*#__PURE__*/React__default.createElement(ConnectedUserProfile, {
         user: message.sender,
         onSuccess: closeDropdown
       }));
     }
-  })), React.createElement("div", {
-    className: "".concat(className, "__body")
-  }, !chainTop && React.createElement(Label, {
-    className: "".concat(className, "__body__sender-name"),
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-unknown-message__body"
+  }, !chainTop && /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-incoming-unknown-message__body__sender-name",
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
-  }, sender.nickname || stringSet.NO_NAME), React.createElement("div", {
-    className: "".concat(className, "__body__text-balloon")
-  }, React.createElement(Label, {
-    className: "".concat(className, "__body__text-balloon__header"),
+  }, sender.nickname || stringSet.NO_NAME), /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-unknown-message__body__text-balloon"
+  }, /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-incoming-unknown-message__body__text-balloon__header",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_1
-  }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), React.createElement(Label, {
-    className: "".concat(className, "__body__text-balloon__description"),
+  }, stringSet.UNKNOWN__UNKNOWN_MESSAGE_TYPE), /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-incoming-unknown-message__body__text-balloon__description",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_2
-  }, stringSet.UNKNOWN__CANNOT_READ_MESSAGE))), React.createElement("div", {
-    className: "".concat(className, "--right-padding")
-  }, !chainBottom && React.createElement(Label, {
-    className: "".concat(className, "__sent-at"),
+  }, stringSet.UNKNOWN__CANNOT_READ_MESSAGE))), /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-unknown-message--right-padding"
+  }, !chainBottom && /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-incoming-unknown-message__sent-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
-  }, getMessageCreatedAt$2(message)))));
+  }, getMessageCreatedAt$1(message)))));
 }
 
 OutgoingUnknownMessage.propTypes = {
@@ -4146,17 +4245,12 @@ IncomingUnknownMessage.propTypes = {
   chainBottom: PropTypes.bool.isRequired
 };
 
-var URL_REG = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
-var OG_MESSAGE = 'sendbird-og-message';
-var OUTGOING_OG_MESSAGE = 'sendbird-outgoing-og-message';
-var INCOMING_OG_MESSAGE = 'sendbird-incoming-og-message';
-
 var createUrlTester = function createUrlTester(regexp) {
   return function (text) {
     return regexp.test(text);
   };
 };
-var getIsSentFromStatus$1 = function getIsSentFromStatus(status) {
+var getIsSentFromStatus = function getIsSentFromStatus(status) {
   return status === MessageStatusType.SENT || status === MessageStatusType.DELIVERED || status === MessageStatusType.READ;
 };
 var copyToClipboard = function copyToClipboard(text) {
@@ -4195,7 +4289,7 @@ var getSenderProfileUrl = function getSenderProfileUrl(message) {
 var getSenderName = function getSenderName(message) {
   return message.sender && (message.sender.friendName || message.sender.nickname || message.sender.userId);
 };
-var getMessageCreatedAt$3 = function getMessageCreatedAt(message) {
+var getMessageCreatedAt = function getMessageCreatedAt(message) {
   return format(message.createdAt, 'p');
 };
 var checkOGIsEnalbed = function checkOGIsEnalbed(message) {
@@ -4213,9 +4307,20 @@ var checkOGIsEnalbed = function checkOGIsEnalbed(message) {
 
   return true;
 };
+var getIsSentFromSendingStatus = function getIsSentFromSendingStatus() {
+  var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  if (message.sendingStatus && typeof message.sendingStatus === 'string') {
+    return message.sendingStatus === 'none' || message.sendingStatus === 'succeeded';
+  }
+
+  return false;
+};
+
+var URL_REG = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
 
 var isUrl = createUrlTester(URL_REG);
-function useMemoizedMessageText$1(_ref) {
+function useMemoizedMessageText(_ref) {
   var message = _ref.message,
       updatedAt = _ref.updatedAt,
       className = _ref.className,
@@ -4232,14 +4337,14 @@ function useMemoizedMessageText$1(_ref) {
     return function () {
       var splitMessage = message.split(' ');
       var matchedMessage = splitMessage.map(function (word) {
-        return isUrl(word) ? React.createElement(LinkLabel, {
-          key: uuidv4$1(),
+        return isUrl(word) ? /*#__PURE__*/React__default.createElement(LinkLabel, {
+          key: uuidv4(),
           className: className,
           src: word,
           type: WORD_TYPOGRAPHY,
           color: WORD_COLOR
-        }, word) : React.createElement(Label, {
-          key: uuidv4$1(),
+        }, word) : /*#__PURE__*/React__default.createElement(Label, {
+          key: uuidv4(),
           className: className,
           type: WORD_TYPOGRAPHY,
           color: WORD_COLOR
@@ -4247,8 +4352,8 @@ function useMemoizedMessageText$1(_ref) {
       });
 
       if (updatedAt > 0) {
-        matchedMessage.push(React.createElement(Label, {
-          key: uuidv4$1(),
+        matchedMessage.push( /*#__PURE__*/React__default.createElement(Label, {
+          key: uuidv4(),
           className: className,
           type: WORD_TYPOGRAPHY,
           color: EDITED_COLOR
@@ -4260,18 +4365,18 @@ function useMemoizedMessageText$1(_ref) {
   }, [message, updatedAt, className]);
 }
 
-var GROUPING_PADDING$3 = '1px';
+var GROUPING_PADDING = '1px';
 var NORAML_PADDING = '8px';
 
 var OGMessageSwitch = function OGMessageSwitch(_ref) {
-  var isByMe = _ref.isByMe,
+  var className = _ref.className,
+      isByMe = _ref.isByMe,
       userId = _ref.userId,
       status = _ref.status,
       message = _ref.message,
       disabled = _ref.disabled,
       showEdit = _ref.showEdit,
       chainTop = _ref.chainTop,
-      className = _ref.className,
       membersMap = _ref.membersMap,
       showRemove = _ref.showRemove,
       useReaction = _ref.useReaction,
@@ -4281,7 +4386,6 @@ var OGMessageSwitch = function OGMessageSwitch(_ref) {
       toggleReaction = _ref.toggleReaction,
       memoizedEmojiListItems = _ref.memoizedEmojiListItems;
   var ogMetaData = message.ogMetaData;
-  var injectingClassName = Array.isArray(className) ? className : [className];
 
   var openLink = function openLink() {
     if (checkOGIsEnalbed(message)) {
@@ -4290,20 +4394,20 @@ var OGMessageSwitch = function OGMessageSwitch(_ref) {
     }
   };
 
-  var outoingMemoizedMessageText = useMemoizedMessageText$1({
+  var outoingMemoizedMessageText = useMemoizedMessageText({
     message: message.message,
     updatedAt: message.updatedAt,
     className: 'sendbird-og-message-word'
   });
-  var incomingMemoizedMessageText = useMemoizedMessageText$1({
+  var incomingMemoizedMessageText = useMemoizedMessageText({
     message: message.message,
     updatedAt: message.updatedAt,
     className: 'sendbird-og-message-word',
     incoming: true
   });
-  return React.createElement("div", {
-    className: "".concat(OG_MESSAGE, " ").concat(OG_MESSAGE).concat(isByMe ? '--outgoing' : '--incoming', " ").concat(injectingClassName.join(' '))
-  }, isByMe ? React.createElement(OutgoingOGMessage, {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: [].concat(_toConsumableArray(Array.isArray(className) ? className : [className]), ['sendbird-og-message', "sendbird-og-message".concat(isByMe ? '--outgoing' : '--incoming')]).join(' ')
+  }, isByMe ? /*#__PURE__*/React__default.createElement(OutgoingOGMessage, {
     status: status,
     userId: userId,
     message: message,
@@ -4320,7 +4424,7 @@ var OGMessageSwitch = function OGMessageSwitch(_ref) {
     toggleReaction: toggleReaction,
     memoizedMessageText: outoingMemoizedMessageText,
     memoizedEmojiListItems: memoizedEmojiListItems
-  }) : React.createElement(IncomingOGMessage, {
+  }) : /*#__PURE__*/React__default.createElement(IncomingOGMessage, {
     userId: userId,
     message: message,
     openLink: openLink,
@@ -4354,17 +4458,18 @@ function OutgoingOGMessage(props) {
       memoizedEmojiListItems = props.memoizedEmojiListItems;
   var ogMetaData = message.ogMetaData;
   var defaultImage = ogMetaData.defaultImage;
+  var MemoizedMessageText = memoizedMessageText;
+  var MemoizedEmojiListItems = memoizedEmojiListItems;
 
   var _useContext = useContext(LocalizationContext),
       stringSet = _useContext.stringSet;
 
-  var MemoizedMessageText = memoizedMessageText;
-  var MemoizedEmojiListItems = memoizedEmojiListItems;
+  var isMessageSent = getIsSentFromStatus(status);
+  var showEmojiReactions = useReaction && message.reactions && message.reactions.length > 0 && getIsSentFromSendingStatus(message);
   var messageRef = useRef(null);
-  var parentRefReactions = useRef(null);
-  var parentRefMenus = useRef(null);
   var parentContainRef = useRef(null);
-  var isMessageSent = getIsSentFromStatus$1(status);
+  var parentRefMenus = useRef(null);
+  var parentRefReactions = useRef(null);
 
   var _useState = useState(false),
       _useState2 = _slicedToArray(_useState, 2),
@@ -4375,8 +4480,6 @@ function OutgoingOGMessage(props) {
       _useState4 = _slicedToArray(_useState3, 2),
       moreActive = _useState4[0],
       setMoreActive = _useState4[1];
-
-  var showEmojiReactions = useReaction && message.reactions && message.reactions.length > 0;
 
   var handleMoreIconClick = function handleMoreIconClick() {
     setMoreActive(true);
@@ -4390,24 +4493,24 @@ function OutgoingOGMessage(props) {
     ref: messageRef,
     setHover: setMousehover
   });
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-og-message",
     ref: messageRef,
-    className: OUTGOING_OG_MESSAGE,
     style: {
-      paddingTop: chainTop ? GROUPING_PADDING$3 : NORAML_PADDING,
-      paddingBottom: chainBottom ? GROUPING_PADDING$3 : NORAML_PADDING
+      paddingTop: chainTop ? GROUPING_PADDING : NORAML_PADDING,
+      paddingBottom: chainBottom ? GROUPING_PADDING : NORAML_PADDING
     }
-  }, React.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "--inner")
-  }, React.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "--left-padding")
-  }, React.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__more"),
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-og-message--inner"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-og-message--left-padding"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-og-message__more",
     ref: parentContainRef
-  }, React.createElement(ContextMenu, {
+  }, /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
-        className: "".concat(OUTGOING_OG_MESSAGE, "__more__menu"),
+      return /*#__PURE__*/React__default.createElement(IconButton, {
+        className: "sendbird-outgoing-og-message__more__menu",
         ref: parentRefMenus,
         width: "32px",
         height: "32px",
@@ -4418,28 +4521,28 @@ function OutgoingOGMessage(props) {
         onBlur: function onBlur() {
           handleMoreIconBlur();
         }
-      }, React.createElement(Icon, {
-        width: "24px",
-        height: "24px",
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.MORE,
-        fillColor: IconColors.CONTENT_INVERSE
+        fillColor: IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
+      return /*#__PURE__*/React__default.createElement(MenuItems, {
         parentRef: parentRefMenus // for catching location(x, y) of MenuItems
         ,
         parentContainRef: parentContainRef // for toggling more options(menus & reactions)
         ,
         closeDropdown: closeDropdown,
         openLeft: true
-      }, isMessageSent && React.createElement(MenuItem, {
-        className: "".concat(OUTGOING_OG_MESSAGE, "__more__menu__copy"),
+      }, isMessageSent && /*#__PURE__*/React__default.createElement(MenuItem, {
+        className: "sendbird-outgoing-og-message__more__menu__copy",
         onClick: function onClick() {
           copyToClipboard(message.message);
           closeDropdown();
         }
-      }, stringSet.CONTEXT_MENU_DROPDOWN__COPY), isMessageSent && React.createElement(MenuItem, {
+      }, stringSet.CONTEXT_MENU_DROPDOWN__COPY), isMessageSent && /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           if (disabled) {
             return;
@@ -4448,12 +4551,12 @@ function OutgoingOGMessage(props) {
           showEdit(true);
           closeDropdown();
         }
-      }, stringSet.CONTEXT_MENU_DROPDOWN__EDIT), message && message.isResendable && message.isResendable() && React.createElement(MenuItem, {
+      }, stringSet.CONTEXT_MENU_DROPDOWN__EDIT), message && message.isResendable && message.isResendable() && /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           resendMessage(message);
           closeDropdown();
         }
-      }, stringSet.CONTEXT_MENU_DROPDOWN__RESEND), React.createElement(MenuItem, {
+      }, stringSet.CONTEXT_MENU_DROPDOWN__RESEND), /*#__PURE__*/React__default.createElement(MenuItem, {
         onClick: function onClick() {
           if (disabled) {
             return;
@@ -4464,23 +4567,23 @@ function OutgoingOGMessage(props) {
         }
       }, stringSet.CONTEXT_MENU_DROPDOWN__DELETE));
     }
-  }), isMessageSent && useReaction && emojiAllMap.size > 0 && React.createElement(ContextMenu, {
+  }), isMessageSent && useReaction && emojiAllMap.size > 0 && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
-        className: "".concat(OUTGOING_OG_MESSAGE, "__more__add-reaction"),
+      return /*#__PURE__*/React__default.createElement(IconButton, {
+        className: "sendbird-outgoing-og-message__more__add-reaction",
         ref: parentRefReactions,
         width: "32px",
         height: "32px",
         onClick: toggleDropdown
-      }, React.createElement(Icon, {
-        width: "24px",
-        height: "24px",
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.EMOJI_MORE,
-        fillColor: IconColors.CONTENT_INVERSE
+        fillColor: IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MemoizedEmojiListItems, {
+      return /*#__PURE__*/React__default.createElement(MemoizedEmojiListItems, {
         message: message,
         parentRef: parentRefReactions,
         parentContainRef: parentContainRef,
@@ -4490,67 +4593,67 @@ function OutgoingOGMessage(props) {
         }
       });
     }
-  })), !chainBottom && !(mousehover || moreActive) && React.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__message-status")
-  }, React.createElement(MessageStatus, {
+  })), !chainBottom && !(mousehover || moreActive) && /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-og-message__message-status"
+  }, /*#__PURE__*/React__default.createElement(MessageStatus, {
     message: message,
     status: status
-  }))), React.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "--body")
-  }, React.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__text-balloon")
-  }, React.createElement(MemoizedMessageText, null)), React.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__thumbnail ").concat(checkOGIsEnalbed(message) ? '' : "".concat(OUTGOING_OG_MESSAGE, "__thumbnail--disabled")),
+  }))), /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-og-message--body"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-og-message__text-balloon"
+  }, /*#__PURE__*/React__default.createElement(MemoizedMessageText, null)), /*#__PURE__*/React__default.createElement("div", {
+    className: ['sendbird-outgoing-og-message__thumbnail', checkOGIsEnalbed(message) ? '' : 'sendbird-outgoing-og-message__thumbnail--disabled'].join(' '),
+    role: "button",
     onClick: openLink,
     onKeyDown: openLink,
-    role: "button",
     tabIndex: 0
-  }, defaultImage && React.createElement(ImageRenderer, {
+  }, defaultImage && /*#__PURE__*/React__default.createElement(ImageRenderer, {
+    className: "sendbird-outgoing-og-message__thumbnail__image",
     url: defaultImage.url || '',
     alt: defaultImage.alt,
-    className: "".concat(OUTGOING_OG_MESSAGE, "__thumbnail__image"),
     width: "320px",
     height: "180px",
-    defaultComponent: React.createElement("div", {
-      className: "".concat(OUTGOING_OG_MESSAGE, "__thumbnail__image__placeholder")
-    }, React.createElement(Icon, {
+    defaultComponent: /*#__PURE__*/React__default.createElement("div", {
+      className: "sendbird-outgoing-og-message__thumbnail__image__placeholder"
+    }, /*#__PURE__*/React__default.createElement(Icon, {
+      type: IconTypes.THUMBNAIL_NONE,
       width: "56px",
-      height: "56px",
-      type: IconTypes.THUMBNAIL_NONE
+      height: "56px"
     }))
-  })), React.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__og-tag ").concat(checkOGIsEnalbed(message) ? '' : "".concat(OUTGOING_OG_MESSAGE, "__og-tag--disabled")),
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: ['sendbird-outgoing-og-message__og-tag', checkOGIsEnalbed(message) ? '' : 'sendbird-outgoing-og-message__og-tag--disabled'].join(' '),
+    role: "button",
     onClick: openLink,
     onKeyDown: openLink,
-    role: "button",
     tabIndex: 0
-  }, ogMetaData.title && React.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__og-tag__title")
-  }, React.createElement(Label, {
+  }, ogMetaData.title && /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-og-message__og-tag__title"
+  }, /*#__PURE__*/React__default.createElement(Label, {
     type: LabelTypography.SUBTITLE_2,
     color: LabelColors.ONBACKGROUND_1
-  }, ogMetaData.title)), ogMetaData.description && React.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__og-tag__description")
-  }, React.createElement(Label, {
+  }, ogMetaData.title)), ogMetaData.description && /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-og-message__og-tag__description"
+  }, /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-outgoing-og-message__og-tag__description__label",
     type: LabelTypography.BODY_2,
-    color: LabelColors.ONBACKGROUND_1,
-    className: "".concat(OUTGOING_OG_MESSAGE, "__og-tag__description__label")
-  }, ogMetaData.description)), ogMetaData.url && React.createElement(Label, {
+    color: LabelColors.ONBACKGROUND_1
+  }, ogMetaData.description)), ogMetaData.url && /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-outgoing-og-message__og-tag__url",
     type: LabelTypography.CAPTION_3,
-    color: LabelColors.ONBACKGROUND_2,
-    className: "".concat(OUTGOING_OG_MESSAGE, "__og-tag__url")
-  }, ogMetaData.url), showEmojiReactions && React.createElement("div", {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__og-tag__emoji-reactions--wrapper"),
+    color: LabelColors.ONBACKGROUND_2
+  }, ogMetaData.url), showEmojiReactions && /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-outgoing-og-message__og-tag__emoji-reactions--wrapper",
+    role: "button",
     onClick: function onClick(event) {
       return event.stopPropagation();
     },
     onKeyDown: function onKeyDown(event) {
       return event.stopPropagation();
     },
-    role: "button",
     tabIndex: 0
-  }, React.createElement(EmojiReactions, {
-    className: "".concat(OUTGOING_OG_MESSAGE, "__og-tag__emoji-reactions"),
+  }, /*#__PURE__*/React__default.createElement(EmojiReactions, {
+    className: "sendbird-outgoing-og-message__og-tag__emoji-reactions",
     userId: userId,
     message: message,
     membersMap: membersMap,
@@ -4580,13 +4683,15 @@ function IncomingOGMessage(props) {
 
   var MemoizedMessageText = memoizedMessageText;
   var MemoizedEmojiListItems = memoizedEmojiListItems;
+  var showEmojiReactions = useReaction && message.reactions && message.reactions.length > 0;
+  var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
   var messageRef = useRef(null);
   var avatarRef = useRef(null);
   var parentRefReactions = useRef(null);
   var parentRefMenus = useRef(null);
   var parentContainRef = useRef(null);
 
-  var _React$useContext = React.useContext(UserProfileContext),
+  var _React$useContext = React__default.useContext(UserProfileContext),
       disableUserProfile = _React$useContext.disableUserProfile,
       renderUserProfile = _React$useContext.renderUserProfile;
 
@@ -4600,9 +4705,6 @@ function IncomingOGMessage(props) {
       moreActive = _useState8[0],
       setMoreActive = _useState8[1];
 
-  var showEmojiReactions = useReaction && message.reactions && message.reactions.length > 0;
-  var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0;
-
   var handleMoreIconClick = function handleMoreIconClick() {
     setMoreActive(true);
   };
@@ -4615,35 +4717,35 @@ function IncomingOGMessage(props) {
     ref: messageRef,
     setHover: setMousehover
   });
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-og-message",
     ref: messageRef,
-    className: INCOMING_OG_MESSAGE,
     style: {
-      paddingTop: chainTop ? GROUPING_PADDING$3 : NORAML_PADDING,
-      paddingBottom: chainBottom ? GROUPING_PADDING$3 : NORAML_PADDING
+      paddingTop: chainTop ? GROUPING_PADDING : NORAML_PADDING,
+      paddingBottom: chainBottom ? GROUPING_PADDING : NORAML_PADDING
     }
-  }, React.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "--inner")
-  }, React.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "--body")
-  }, !chainBottom && React.createElement(ContextMenu, {
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-og-message--inner"
+  }, /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-og-message--body"
+  }, !chainBottom && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(Avatar, {
+      return /*#__PURE__*/React__default.createElement(Avatar, {
         ref: avatarRef,
         onClick: function onClick() {
           if (!disableUserProfile) {
             toggleDropdown();
           }
         },
-        className: "".concat(INCOMING_OG_MESSAGE, "__avatar"),
+        className: "sendbird-incoming-og-message__avatar",
         src: getSenderProfileUrl(message),
+        alt: "sender-profile-image",
         width: "28px",
-        height: "28px",
-        alt: "sender-profile-image"
+        height: "28px"
       });
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
+      return /*#__PURE__*/React__default.createElement(MenuItems, {
         parentRef: avatarRef // for catching location(x, y) of MenuItems
         ,
         parentContainRef: avatarRef // for toggling more options(menus & reactions)
@@ -4656,89 +4758,89 @@ function IncomingOGMessage(props) {
       }, renderUserProfile ? renderUserProfile({
         user: message.sender,
         close: closeDropdown
-      }) : React.createElement(UserProfile, {
+      }) : /*#__PURE__*/React__default.createElement(ConnectedUserProfile, {
         user: message.sender,
         onSuccess: closeDropdown
       }));
     }
-  }), !chainTop && React.createElement(Label, {
-    className: "".concat(INCOMING_OG_MESSAGE, "__sender-name"),
+  }), !chainTop && /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-incoming-og-message__sender-name",
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
-  }, getSenderName(message)), React.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__text-balloon")
-  }, React.createElement(MemoizedMessageText, null)), React.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__thumbnail ").concat(checkOGIsEnalbed(message) ? '' : "".concat(INCOMING_OG_MESSAGE, "__thumbnail--disabled")),
+  }, getSenderName(message)), /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-og-message__text-balloon"
+  }, /*#__PURE__*/React__default.createElement(MemoizedMessageText, null)), /*#__PURE__*/React__default.createElement("div", {
+    className: ['sendbird-incoming-og-message__thumbnail', checkOGIsEnalbed(message) ? '' : 'sendbird-incoming-og-message__thumbnail--disabled'].join(' '),
+    role: "button",
     onClick: openLink,
     onKeyDown: openLink,
-    role: "button",
     tabIndex: 0
-  }, defaultImage && React.createElement(ImageRenderer, {
+  }, defaultImage && /*#__PURE__*/React__default.createElement(ImageRenderer, {
     url: defaultImage.url || '',
     alt: defaultImage.alt || '',
-    className: "".concat(INCOMING_OG_MESSAGE, "__thumbnail__image"),
+    className: "sendbird-incoming-og-message__thumbnail__image",
     width: "320px",
     height: "180px",
-    defaultComponent: React.createElement("div", {
-      className: "".concat(INCOMING_OG_MESSAGE, "__thumbnail__image__placeholder")
-    }, React.createElement(Icon, {
+    defaultComponent: /*#__PURE__*/React__default.createElement("div", {
+      className: "sendbird-incoming-og-message__thumbnail__image__placeholder"
+    }, /*#__PURE__*/React__default.createElement(Icon, {
+      type: IconTypes.THUMBNAIL_NONE,
       width: "56px",
-      height: "56px",
-      type: IconTypes.THUMBNAIL_NONE
+      height: "56px"
     }))
-  })), React.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag ").concat(checkOGIsEnalbed(message) ? '' : "".concat(INCOMING_OG_MESSAGE, "__og-tag--disabled")),
+  })), /*#__PURE__*/React__default.createElement("div", {
+    className: ['sendbird-incoming-og-message__og-tag', checkOGIsEnalbed(message) ? '' : 'sendbird-incoming-og-message__og-tag--disabled'].join(' '),
+    role: "button",
     onClick: openLink,
     onKeyDown: openLink,
-    role: "button",
     tabIndex: 0
-  }, ogMetaData.title && React.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag__title")
-  }, React.createElement(Label, {
+  }, ogMetaData.title && /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-og-message__og-tag__title"
+  }, /*#__PURE__*/React__default.createElement(Label, {
     type: LabelTypography.SUBTITLE_2,
     color: LabelColors.ONBACKGROUND_1
-  }, ogMetaData.title)), ogMetaData.description && React.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag__description")
-  }, React.createElement(Label, {
+  }, ogMetaData.title)), ogMetaData.description && /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-og-message__og-tag__description"
+  }, /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-incoming-og-message__og-tag__description__label",
     type: LabelTypography.BODY_2,
-    color: LabelColors.ONBACKGROUND_1,
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag__description__label")
-  }, ogMetaData.description)), ogMetaData.url && React.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag__url")
-  }, React.createElement(Label, {
+    color: LabelColors.ONBACKGROUND_1
+  }, ogMetaData.description)), ogMetaData.url && /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-og-message__og-tag__url"
+  }, /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-incoming-og-message__og-tag__url__label",
     type: LabelTypography.CAPTION_3,
-    color: LabelColors.ONBACKGROUND_2,
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag__url__label")
-  }, ogMetaData.url)), showEmojiReactions && React.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag__emoji-reactions--wrapper"),
+    color: LabelColors.ONBACKGROUND_2
+  }, ogMetaData.url)), showEmojiReactions && /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-og-message__og-tag__emoji-reactions--wrapper",
+    role: "button",
     onClick: function onClick(event) {
       return event.stopPropagation();
     },
     onKeyDown: function onKeyDown(event) {
       return event.stopPropagation();
     },
-    role: "button",
     tabIndex: 0
-  }, React.createElement(EmojiReactions, {
-    className: "".concat(INCOMING_OG_MESSAGE, "__og-tag__emoji-reactions"),
+  }, /*#__PURE__*/React__default.createElement(EmojiReactions, {
+    className: "sendbird-incoming-og-message__og-tag__emoji-reactions",
     userId: userId,
     message: message,
     membersMap: membersMap,
     emojiAllMap: emojiAllMap,
     toggleReaction: toggleReaction,
     memoizedEmojiListItems: memoizedEmojiListItems
-  })))), React.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "--right-padding")
-  }, !chainBottom && !(mousehover || moreActive) && React.createElement(Label, {
-    className: "".concat(INCOMING_OG_MESSAGE, "__sent-at"),
+  })))), /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-og-message--right-padding"
+  }, !chainBottom && !(mousehover || moreActive) && /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-incoming-og-message__sent-at",
     type: LabelTypography.CAPTION_3,
     color: LabelColors.ONBACKGROUND_2
-  }, getMessageCreatedAt$3(message)), React.createElement("div", {
-    className: "".concat(INCOMING_OG_MESSAGE, "__more"),
+  }, getMessageCreatedAt(message)), /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-incoming-og-message__more",
     ref: parentContainRef
-  }, showReactionAddButton && React.createElement(ContextMenu, {
+  }, showReactionAddButton && /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
+      return /*#__PURE__*/React__default.createElement(IconButton, {
         ref: parentRefReactions,
         width: "32px",
         height: "32px",
@@ -4749,15 +4851,15 @@ function IncomingOGMessage(props) {
         onBlur: function onBlur() {
           handleMoreIconBlur();
         }
-      }, React.createElement(Icon, {
-        width: "24px",
-        height: "24px",
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.EMOJI_MORE,
-        fillColor: IconColors.CONTENT_INVERSE
+        fillColor: IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MemoizedEmojiListItems, {
+      return /*#__PURE__*/React__default.createElement(MemoizedEmojiListItems, {
         parentRef: parentRefReactions,
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown,
@@ -4767,9 +4869,9 @@ function IncomingOGMessage(props) {
         }
       });
     }
-  }), React.createElement(ContextMenu, {
+  }), /*#__PURE__*/React__default.createElement(ContextMenu, {
     menuTrigger: function menuTrigger(toggleDropdown) {
-      return React.createElement(IconButton, {
+      return /*#__PURE__*/React__default.createElement(IconButton, {
         ref: parentRefMenus,
         width: "32px",
         height: "32px",
@@ -4780,20 +4882,20 @@ function IncomingOGMessage(props) {
         onBlur: function onBlur() {
           handleMoreIconBlur();
         }
-      }, React.createElement(Icon, {
-        width: "24px",
-        height: "24px",
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         type: IconTypes.MORE,
-        fillColor: IconColors.CONTENT_INVERSE
+        fillColor: IconColors.CONTENT_INVERSE,
+        width: "24px",
+        height: "24px"
       }));
     },
     menuItems: function menuItems(closeDropdown) {
-      return React.createElement(MenuItems, {
+      return /*#__PURE__*/React__default.createElement(MenuItems, {
         parentRef: parentRefMenus,
         parentContainRef: parentContainRef,
         closeDropdown: closeDropdown
-      }, React.createElement(MenuItem, {
-        className: "".concat(INCOMING_OG_MESSAGE, "__more__menu__copy"),
+      }, /*#__PURE__*/React__default.createElement(MenuItem, {
+        className: "sendbird-incoming-og-message__more__menu__copy",
         onClick: function onClick() {
           copyToClipboard(message.message);
           closeDropdown();
@@ -4803,7 +4905,7 @@ function IncomingOGMessage(props) {
   })))));
 }
 
-var noop$3 = function noop() {};
+var noop$2 = function noop() {};
 
 OGMessageSwitch.propTypes = {
   isByMe: PropTypes.bool.isRequired,
@@ -4841,13 +4943,13 @@ OGMessageSwitch.defaultProps = {
   className: '',
   status: '',
   disabled: false,
-  showEdit: noop$3,
-  showRemove: noop$3,
-  resendMessage: noop$3,
-  toggleReaction: noop$3,
+  showEdit: noop$2,
+  showRemove: noop$2,
+  resendMessage: noop$2,
+  toggleReaction: noop$2,
   membersMap: new Map(),
   emojiAllMap: new Map(),
-  memoizedEmojiListItems: noop$3,
+  memoizedEmojiListItems: noop$2,
   chainTop: false,
   chainBottom: false
 };
@@ -4987,19 +5089,19 @@ function MessageHoc(_ref) {
   var isByMe = userId === sender.userId || message.requestState === 'pending' || message.requestState === 'failed';
 
   if (RenderedMessage) {
-    return React.createElement("div", {
+    return /*#__PURE__*/React__default.createElement("div", {
       ref: useMessageScrollRef,
       className: "\n          sendbird-msg-hoc sendbird-msg--scroll-ref\n          ".concat(isAnimated ? 'sendbird-msg-hoc__highlighted' : '', "\n        ")
-    }, hasSeperator && React.createElement(DateSeparator, null, React.createElement(Label, {
+    }, hasSeperator && /*#__PURE__*/React__default.createElement(DateSeparator, null, /*#__PURE__*/React__default.createElement(Label, {
       type: LabelTypography.CAPTION_2,
       color: LabelColors.ONBACKGROUND_2
-    }, format(message.createdAt, 'MMMM dd, yyyy'))), React.createElement(RenderedMessage, {
+    }, format(message.createdAt, 'MMMM dd, yyyy'))), /*#__PURE__*/React__default.createElement(RenderedMessage, {
       message: message
     }));
   }
 
   if (showEdit) {
-    return React.createElement(MessageInput, {
+    return /*#__PURE__*/React__default.createElement(MessageInput, {
       isEdit: true,
       disabled: editDisabled,
       ref: editMessageInputRef,
@@ -5012,15 +5114,15 @@ function MessageHoc(_ref) {
     });
   }
 
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     ref: useMessageScrollRef,
     className: "\n        sendbird-msg-hoc sendbird-msg--scroll-ref\n        ".concat(isAnimated ? 'sendbird-msg-hoc__animated' : '', "\n      ")
-  }, hasSeperator && React.createElement(DateSeparator, null, React.createElement(Label, {
+  }, hasSeperator && /*#__PURE__*/React__default.createElement(DateSeparator, null, /*#__PURE__*/React__default.createElement(Label, {
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
-  }, format(message.createdAt, 'MMMM dd, yyyy'))), (_MessageTypes$ADMIN$M = {}, _defineProperty(_MessageTypes$ADMIN$M, MessageTypes.ADMIN, React.createElement(AdminMessage, {
+  }, format(message.createdAt, 'MMMM dd, yyyy'))), (_MessageTypes$ADMIN$M = {}, _defineProperty(_MessageTypes$ADMIN$M, MessageTypes.ADMIN, /*#__PURE__*/React__default.createElement(AdminMessage, {
     message: message
-  })), _defineProperty(_MessageTypes$ADMIN$M, MessageTypes.FILE, React.createElement(MessageSwitch, {
+  })), _defineProperty(_MessageTypes$ADMIN$M, MessageTypes.FILE, /*#__PURE__*/React__default.createElement(MessageSwitch, {
     message: message,
     userId: userId,
     disabled: disabled,
@@ -5035,7 +5137,7 @@ function MessageHoc(_ref) {
     memoizedEmojiListItems: memoizedEmojiListItems,
     chainTop: chainTop,
     chainBottom: chainBottom
-  })), _defineProperty(_MessageTypes$ADMIN$M, MessageTypes.OG, React.createElement(OGMessageSwitch, {
+  })), _defineProperty(_MessageTypes$ADMIN$M, MessageTypes.OG, /*#__PURE__*/React__default.createElement(OGMessageSwitch, {
     message: message,
     status: status,
     isByMe: isByMe,
@@ -5051,7 +5153,7 @@ function MessageHoc(_ref) {
     memoizedEmojiListItems: memoizedEmojiListItems,
     chainTop: chainTop,
     chainBottom: chainBottom
-  })), _defineProperty(_MessageTypes$ADMIN$M, MessageTypes.THUMBNAIL, React.createElement(ThumbnailMessage, {
+  })), _defineProperty(_MessageTypes$ADMIN$M, MessageTypes.THUMBNAIL, /*#__PURE__*/React__default.createElement(ThumbnailMessage, {
     disabled: disabled,
     message: message,
     userId: userId,
@@ -5067,7 +5169,7 @@ function MessageHoc(_ref) {
     memoizedEmojiListItems: memoizedEmojiListItems,
     chainTop: chainTop,
     chainBottom: chainBottom
-  })), _defineProperty(_MessageTypes$ADMIN$M, MessageTypes.USER, React.createElement(Message, {
+  })), _defineProperty(_MessageTypes$ADMIN$M, MessageTypes.USER, /*#__PURE__*/React__default.createElement(Message, {
     message: message,
     disabled: disabled,
     isByMe: isByMe,
@@ -5083,14 +5185,14 @@ function MessageHoc(_ref) {
     memoizedEmojiListItems: memoizedEmojiListItems,
     chainTop: chainTop,
     chainBottom: chainBottom
-  })), _MessageTypes$ADMIN$M)[getMessageType(message)], showRemove && React.createElement(RemoveMessage, {
+  })), _MessageTypes$ADMIN$M)[getMessageType(message)], showRemove && /*#__PURE__*/React__default.createElement(RemoveMessage, {
     onCloseModal: function onCloseModal() {
       return setShowRemove(false);
     },
     onDeleteMessage: function onDeleteMessage() {
       deleteMessage(message);
     }
-  }), showFileViewer && React.createElement(FileViewer, {
+  }), showFileViewer && /*#__PURE__*/React__default.createElement(FileViewer, {
     onClose: function onClose() {
       return setShowFileViewer(false);
     },
@@ -5101,7 +5203,7 @@ function MessageHoc(_ref) {
       });
     },
     isByMe: isByMe
-  }), !(message.isFileMessage && message.isFileMessage() || message.messageType === 'file') && !(message.isAdminMessage && message.isAdminMessage()) && !(message.isUserMessage && message.isUserMessage() || message.messageType === 'user') && !showFileViewer && React.createElement(UnknownMessage, {
+  }), !(message.isFileMessage && message.isFileMessage() || message.messageType === 'file') && !(message.isAdminMessage && message.isAdminMessage()) && !(message.isUserMessage && message.isUserMessage() || message.messageType === 'user') && !showFileViewer && /*#__PURE__*/React__default.createElement(UnknownMessage, {
     message: message,
     status: status,
     isByMe: isByMe,
@@ -5163,14 +5265,12 @@ MessageHoc.defaultProps = {
   }
 };
 
-var ConversationScroll =
-/*#__PURE__*/
-function (_Component) {
+var ConversationScroll = /*#__PURE__*/function (_Component) {
   _inherits(ConversationScroll, _Component);
 
-  function ConversationScroll() {
-    var _getPrototypeOf2;
+  var _super = _createSuper(ConversationScroll);
 
+  function ConversationScroll() {
     var _this;
 
     _classCallCheck(this, ConversationScroll);
@@ -5179,7 +5279,7 @@ function (_Component) {
       args[_key] = arguments[_key];
     }
 
-    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(ConversationScroll)).call.apply(_getPrototypeOf2, [this].concat(args)));
+    _this = _super.call.apply(_super, [this].concat(args));
 
     _defineProperty(_assertThisInitialized(_this), "onScroll", function (e) {
       var _this$props = _this.props,
@@ -5276,21 +5376,21 @@ function (_Component) {
           onClickScrollBot = _this$props2.onClickScrollBot;
 
       if (allMessages.length < 1) {
-        return React.createElement(PlaceHolder, {
+        return /*#__PURE__*/React__default.createElement(PlaceHolder, {
           className: "sendbird-conversation__no-messages",
           type: PlaceHolderTypes.NO_MESSAGES
         });
       }
 
-      return React.createElement("div", {
+      return /*#__PURE__*/React__default.createElement("div", {
         className: "sendbird-conversation__messages"
-      }, React.createElement("div", {
+      }, /*#__PURE__*/React__default.createElement("div", {
         ref: scrollRef,
         className: "sendbird-conversation__scroll-container",
         onScroll: this.onScroll
-      }, React.createElement("div", {
+      }, /*#__PURE__*/React__default.createElement("div", {
         className: "sendbird-conversation__padding"
-      }), React.createElement("div", {
+      }), /*#__PURE__*/React__default.createElement("div", {
         className: "sendbird-conversation__messages-padding"
       }, allMessages.map(function (m, idx) {
         var previousMessage = allMessages[idx - 1];
@@ -5307,7 +5407,7 @@ function (_Component) {
         var hasSeperator = !(previousMessageCreatedAt && isSameDay(currentCreatedAt, previousMessageCreatedAt));
 
         if (renderChatItem) {
-          return React.createElement("div", {
+          return /*#__PURE__*/React__default.createElement("div", {
             key: m.messageId || m.reqId,
             className: "sendbird-msg--scroll-ref"
           }, renderChatItem({
@@ -5323,7 +5423,7 @@ function (_Component) {
           }));
         }
 
-        return React.createElement(MessageHoc, {
+        return /*#__PURE__*/React__default.createElement(MessageHoc, {
           highLightedMessageId: highLightedMessageId,
           renderCustomMessage: renderCustomMessage,
           key: m.messageId || m.reqId,
@@ -5346,17 +5446,17 @@ function (_Component) {
           toggleReaction: toggleReaction,
           memoizedEmojiListItems: memoizedEmojiListItems
         });
-      }))), showScrollBot && React.createElement("div", {
+      }))), showScrollBot && /*#__PURE__*/React__default.createElement("div", {
         className: "sendbird-conversation__scroll-bottom-button",
         onClick: onClickScrollBot,
         onKeyDown: onClickScrollBot,
         tabIndex: 0,
         role: "button"
-      }, React.createElement(Icon, {
+      }, /*#__PURE__*/React__default.createElement(Icon, {
         width: "24px",
         height: "24px",
         type: IconTypes.CHEVRON_DOWN,
-        fillColor: IconColors.CONTENT
+        fillColor: IconColors.PRIMARY
       })));
     }
   }]);
@@ -5432,15 +5532,17 @@ function Notification(_ref) {
 
   var timeArray = time.split(' ');
   timeArray.splice(-2, 0, stringSet.CHANNEL__MESSAGE_LIST__NOTIFICATION__ON);
-  return (// eslint-disable-next-line
-    React.createElement("div", {
+  return (
+    /*#__PURE__*/
+    // eslint-disable-next-line
+    React__default.createElement("div", {
       className: "sendbird-notification",
       onClick: onClick
-    }, React.createElement(Label, {
+    }, /*#__PURE__*/React__default.createElement(Label, {
       className: "sendbird-notification__text",
       color: LabelColors.ONCONTENT_1,
       type: LabelTypography.CAPTION_2
-    }, "".concat(count, " "), stringSet.CHANNEL__MESSAGE_LIST__NOTIFICATION__NEW_MESSAGE, " ".concat(timeArray.join(' '))), React.createElement(Icon, {
+    }, "".concat(count, " "), stringSet.CHANNEL__MESSAGE_LIST__NOTIFICATION__NEW_MESSAGE, " ".concat(timeArray.join(' '))), /*#__PURE__*/React__default.createElement(Icon, {
       width: "24px",
       height: "24px",
       type: IconTypes.CHEVRON_DOWN,
@@ -5460,9 +5562,9 @@ Notification.defaultProps = {
 
 var FrozenNotification = function FrozenNotification() {
   var stringSet = useContext(LocalizationContext).stringSet;
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-notification sendbird-notification--frozen"
-  }, React.createElement(Label, {
+  }, /*#__PURE__*/React__default.createElement(Label, {
     className: "sendbird-notification__text",
     type: LabelTypography.CAPTION_2
   }, stringSet.CHANNEL_FROZEN));
@@ -5494,7 +5596,7 @@ function TypingIndicator(_ref2) {
       sb = _ref2.sb,
       logger = _ref2.logger;
 
-  var _useState = useState(uuidv4$1()),
+  var _useState = useState(uuidv4()),
       _useState2 = _slicedToArray(_useState, 2),
       handlerId = _useState2[0],
       setHandlerId = _useState2[1];
@@ -5507,7 +5609,7 @@ function TypingIndicator(_ref2) {
   useEffect(function () {
     if (sb && sb.ChannelHandler) {
       sb.removeChannelHandler(handlerId);
-      var newHandlerId = uuidv4$1();
+      var newHandlerId = uuidv4();
       var handler = new sb.ChannelHandler(); // there is a possible warning in here - setState called after unmount
 
       handler.onTypingStatusUpdated = function (groupChannel) {
@@ -5531,10 +5633,10 @@ function TypingIndicator(_ref2) {
       }
     };
   }, [channelUrl]);
-  return React.createElement(Label, {
+  return /*#__PURE__*/React__default.createElement(Label, {
     type: LabelTypography.CAPTION_2,
     color: LabelColors.ONBACKGROUND_2
-  }, React.createElement(TypingIndicatorText, {
+  }, /*#__PURE__*/React__default.createElement(TypingIndicatorText, {
     members: typingMembers
   }));
 }
@@ -5580,7 +5682,7 @@ var MessageInputWrapper = function MessageInputWrapper(_a, ref) {
   } // other conditions
 
 
-  return React.createElement(MessageInput, {
+  return /*#__PURE__*/React__default.createElement(MessageInput, {
     placeholder: isDisabledBecauseFrozen(channel) && stringSet.CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__DISABLED || isDisabledBecauseMuted(channel) && stringSet.CHANNEL__MESSAGE_INPUT__PLACE_HOLDER__MUTED,
     ref: ref,
     disabled: disabled,
@@ -5592,45 +5694,25 @@ var MessageInputWrapper = function MessageInputWrapper(_a, ref) {
   });
 };
 
-var MessageInputWrapper$1 = React.forwardRef(MessageInputWrapper);
+var MessageInputWrapper$1 = /*#__PURE__*/React__default.forwardRef(MessageInputWrapper);
 
 function ConnectionStatus() {
   var _useContext = useContext(LocalizationContext),
       stringSet = _useContext.stringSet;
 
-  return React.createElement("div", {
-    className: "sendbird-conversation__connection-status"
-  }, React.createElement(Label, {
+  return /*#__PURE__*/React__default.createElement("div", {
+    className: "sendbird-connection-status"
+  }, /*#__PURE__*/React__default.createElement(Label, {
     type: LabelTypography.BODY_2,
     color: LabelColors.ONBACKGROUND_2
-  }, stringSet.TRYING_TO_CONNECT), React.createElement(Icon, {
+  }, stringSet.TRYING_TO_CONNECT), /*#__PURE__*/React__default.createElement(Icon, {
     type: IconTypes.DISCONNECTED,
     fillColor: IconColors.SENT,
-    height: "14px",
-    width: "14px"
+    width: "14px",
+    height: "14px"
   }));
 }
 
-var prettyDate = function prettyDate(date) {
-  return formatDistanceToNowStrict(date, {
-    addSuffix: true
-  });
-};
-var getOthersLastSeenAt = function getOthersLastSeenAt(channel) {
-  if (!channel || !channel.getReadStatus || !channel.members || channel.members.length !== 2) {
-    return '';
-  }
-
-  var lastSeenList = _toConsumableArray(Object.values(channel.getReadStatus()));
-
-  var lastSeenAt = lastSeenList.length > 0 ? lastSeenList[0].last_seen_at : 0;
-
-  if (lastSeenAt === 0) {
-    return '';
-  }
-
-  return prettyDate(lastSeenAt);
-};
 var getChannelTitle = function getChannelTitle() {
   var channel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var currentUserId = arguments.length > 1 ? arguments[1] : undefined;
@@ -5657,97 +5739,64 @@ var getChannelTitle = function getChannelTitle() {
   }).join(', ');
 };
 
-function AutoRefresh(_ref) {
-  var repeatFunc = _ref.repeatFunc;
-
-  var _useState = useState(repeatFunc()),
-      _useState2 = _slicedToArray(_useState, 2),
-      label = _useState2[0],
-      setLabel = _useState2[1];
-
-  useEffect(function () {
-    var interval = setInterval(function () {
-      if (label !== repeatFunc()) {
-        setLabel(repeatFunc());
-      }
-    }, 10000);
-    return function () {
-      clearInterval(interval);
-    };
-  }, []);
-  return React.createElement("div", {
-    className: "sendbird-repeat-text"
-  }, label);
-}
-AutoRefresh.propTypes = {
-  repeatFunc: PropTypes.func.isRequired
-};
-
-var noop$4 = function noop() {};
+var noop$1 = function noop() {};
 
 function ChatHeader(props) {
   var currentGroupChannel = props.currentGroupChannel,
       currentUser = props.currentUser,
       title = props.title,
       subTitle = props.subTitle,
-      isActive = props.isActive,
       isMuted = props.isMuted,
+      theme = props.theme,
       showSearchIcon = props.showSearchIcon,
       onSearchClick = props.onSearchClick,
-      onActionClick = props.onActionClick,
-      theme = props.theme;
+      onActionClick = props.onActionClick;
   var userId = currentUser.userId;
 
   var _useContext = useContext(LocalizationContext),
       stringSet = _useContext.stringSet;
 
-  return React.createElement("div", {
+  return /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-chat-header"
-  }, React.createElement("div", {
+  }, /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-chat-header__left"
-  }, React.createElement(ChannelAvatar, {
+  }, /*#__PURE__*/React__default.createElement(ChannelAvatar, {
     theme: theme,
     channel: currentGroupChannel,
     userId: userId,
     height: 32,
     width: 32
-  }), React.createElement(Label, {
-    className: "sendbird-chat-header__title",
+  }), /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-chat-header__left__title",
     type: LabelTypography.H_2,
     color: LabelColors.ONBACKGROUND_1
-  }, title || getChannelTitle(currentGroupChannel, userId, stringSet)), typeof isActive === 'string' && isActive === 'true' || typeof isActive === 'boolean' && isActive ? React.createElement("div", {
-    className: "sendbird-chat-header__active"
-  }) : null, React.createElement(Label, {
-    className: "sendbird-chat-header__subtitle",
+  }, title || getChannelTitle(currentGroupChannel, userId, stringSet)), /*#__PURE__*/React__default.createElement(Label, {
+    className: "sendbird-chat-header__left__subtitle",
     type: LabelTypography.BODY_1,
     color: LabelColors.ONBACKGROUND_2
-  }, subTitle || React.createElement(AutoRefresh, {
-    repeatFunc: function repeatFunc() {
-      return getOthersLastSeenAt(currentGroupChannel);
-    }
-  }))), React.createElement("div", {
+  }, subTitle)), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-chat-header__right"
-  }, typeof isMuted === 'string' && isMuted === 'true' || typeof isMuted === 'boolean' && isMuted ? React.createElement(Icon, {
-    className: "sendbird-chat-header__mute",
+  }, (typeof isMuted === 'string' && isMuted === 'true' || typeof isMuted === 'boolean' && isMuted) && /*#__PURE__*/React__default.createElement(Icon, {
+    className: "sendbird-chat-header__right__mute",
     type: IconTypes.NOTIFICATIONS_OFF_FILLED,
     width: "24px",
     height: "24px"
-  }) : null, showSearchIcon && React.createElement(IconButton, {
-    className: "sendbird-chat-header__search",
+  }), showSearchIcon && /*#__PURE__*/React__default.createElement(IconButton, {
+    className: "sendbird-chat-header__right__search",
     width: "32px",
     height: "32px",
     onClick: onSearchClick
-  }, React.createElement(Icon, {
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     type: IconTypes.SEARCH,
     fillColor: IconColors.PRIMARY,
     width: "24px",
     height: "24px"
-  })), React.createElement(IconButton, {
-    className: "sendbird-chat-header__info",
+  })), /*#__PURE__*/React__default.createElement(IconButton, {
+    className: "sendbird-chat-header__right__info",
     width: "32px",
     height: "32px",
     onClick: onActionClick
-  }, React.createElement(Icon, {
+  }, /*#__PURE__*/React__default.createElement(Icon, {
     type: IconTypes.INFO,
     fillColor: IconColors.PRIMARY,
     width: "24px",
@@ -5759,32 +5808,30 @@ ChatHeader.propTypes = {
     members: PropTypes.arrayOf(PropTypes.shape({})),
     coverUrl: PropTypes.string
   }),
-  theme: PropTypes.string,
   currentUser: PropTypes.shape({
     userId: PropTypes.string
   }),
-  onSearchClick: PropTypes.func,
-  showSearchIcon: PropTypes.bool,
   title: PropTypes.string,
   subTitle: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
-  isActive: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
   isMuted: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  theme: PropTypes.string,
+  showSearchIcon: PropTypes.bool,
+  onSearchClick: PropTypes.func,
   onActionClick: PropTypes.func
 };
 ChatHeader.defaultProps = {
   currentGroupChannel: {},
-  title: '',
-  theme: 'light',
-  subTitle: '',
-  isActive: false,
-  onSearchClick: noop$4,
-  showSearchIcon: false,
-  isMuted: false,
   currentUser: {},
-  onActionClick: function onActionClick() {}
+  title: '',
+  subTitle: '',
+  isMuted: false,
+  theme: 'light',
+  showSearchIcon: false,
+  onSearchClick: noop$1,
+  onActionClick: noop$1
 };
 
-var noop$5 = function noop() {};
+var noop = function noop() {};
 
 var ConversationPanel = function ConversationPanel(props) {
   var channelUrl = props.channelUrl,
@@ -5880,11 +5927,12 @@ var ConversationPanel = function ConversationPanel(props) {
     return usingReaction ? getAllEmojisMapFromEmojiContainer(emojiContainer) : new Map();
   }, [emojiContainer]);
   var emojiAllList = useMemo(function () {
-    return usingReaction ? getAllEmojisFromEmojiContainer(emojiContainer) : [];
+    return usingReaction ? getAllEmojisFromEmojiContainer$1(emojiContainer) : [];
   }, [emojiContainer]);
   var nicknamesMap = useMemo(function () {
     return usingReaction ? getNicknamesMapFromMembers(currentGroupChannel.members) : new Map();
-  }, [currentGroupChannel.members]);
+  }, [currentGroupChannel.members]); // Scrollup is default scroll for channel
+
   var onScrollCallback = useScrollCallback({
     currentGroupChannel: currentGroupChannel,
     lastMessageTimeStamp: lastMessageTimeStamp,
@@ -5894,7 +5942,10 @@ var ConversationPanel = function ConversationPanel(props) {
     logger: logger,
     messagesDispatcher: messagesDispatcher,
     sdk: sdk
-  });
+  }); // onScrollDownCallback is added for navigation to different timestamps on messageSearch
+  // hasMoreToBottom, onScrollDownCallback -> scroll down
+  // hasMore, onScrollCallback -> scroll up(default behavior)
+
   var onScrollDownCallback = useScrollDownCallback({
     currentGroupChannel: currentGroupChannel,
     latestFetchedMessageTimeStamp: latestFetchedMessageTimeStamp,
@@ -5919,6 +5970,7 @@ var ConversationPanel = function ConversationPanel(props) {
     userId: userId,
     emojiAllList: emojiAllList
   }); // to create message-datasource
+  // this hook sets currentGroupChannel asynchronously
 
   useSetChannel({
     channelUrl: channelUrl,
@@ -5938,7 +5990,11 @@ var ConversationPanel = function ConversationPanel(props) {
     sdk: sdk,
     logger: logger,
     scrollRef: scrollRef
-  });
+  }); // hook that fetches messages when channel changes
+  // to be clear here useGetChannel sets currentGroupChannel
+  // and useInitialMessagesFetch executes when currentGroupChannel changes
+  // p.s This one executes on intialTimeStamp change too
+
   useInitialMessagesFetch({
     currentGroupChannel: currentGroupChannel,
     userFilledMessageListQuery: userFilledMessageListQuery,
@@ -5973,7 +6029,8 @@ var ConversationPanel = function ConversationPanel(props) {
     currentGroupChannel: currentGroupChannel,
     messagesDispatcher: messagesDispatcher,
     userFilledMessageListQuery: userFilledMessageListQuery
-  });
+  }); // callbacks for Message CURD actions
+
   var deleteMessage = useDeleteMessageCallback({
     currentGroupChannel: currentGroupChannel,
     messagesDispatcher: messagesDispatcher
@@ -6023,25 +6080,25 @@ var ConversationPanel = function ConversationPanel(props) {
       onSendFileMessage = _useSendFileMessageCa2[0];
 
   if (!channelUrl) {
-    return React.createElement("div", {
+    return /*#__PURE__*/React__default.createElement("div", {
       className: "sendbird-conversation"
-    }, React.createElement(PlaceHolder, {
+    }, /*#__PURE__*/React__default.createElement(PlaceHolder, {
       type: PlaceHolderTypes.NO_CHANNELS
     }));
   }
 
   if (isInvalid) {
-    return React.createElement("div", {
+    return /*#__PURE__*/React__default.createElement("div", {
       className: "sendbird-conversation"
-    }, React.createElement(PlaceHolder, {
+    }, /*#__PURE__*/React__default.createElement(PlaceHolder, {
       type: PlaceHolderTypes.WRONG
     }));
   }
 
   if (sdkError) {
-    return React.createElement("div", {
+    return /*#__PURE__*/React__default.createElement("div", {
       className: "sendbird-conversation"
-    }, React.createElement(PlaceHolder, {
+    }, /*#__PURE__*/React__default.createElement(PlaceHolder, {
       type: PlaceHolderTypes.WRONG,
       retryToConnect: function retryToConnect() {
         logger.info('Channel: reconnecting');
@@ -6050,14 +6107,14 @@ var ConversationPanel = function ConversationPanel(props) {
     }));
   }
 
-  return React.createElement(UserProfileProvider, {
+  return /*#__PURE__*/React__default.createElement(UserProfileProvider, {
     className: "sendbird-conversation",
     disableUserProfile: userDefinedDisableUserProfile,
     renderUserProfile: userDefinedRenderProfile
   }, renderChatHeader ? renderChatHeader({
     channel: currentGroupChannel,
     user: user
-  }) : React.createElement(ChatHeader, {
+  }) : /*#__PURE__*/React__default.createElement(ChatHeader, {
     theme: theme,
     currentGroupChannel: currentGroupChannel,
     currentUser: user,
@@ -6065,9 +6122,8 @@ var ConversationPanel = function ConversationPanel(props) {
     onSearchClick: onSearchClick,
     onActionClick: onChatHeaderActionClick,
     subTitle: currentGroupChannel.members && currentGroupChannel.members.length !== 2,
-    isActive: false,
     isMuted: false
-  }), isFrozen && React.createElement(FrozenNotification, null), unreadCount > 0 && React.createElement(Notification, {
+  }), isFrozen && /*#__PURE__*/React__default.createElement(FrozenNotification, null), unreadCount > 0 && /*#__PURE__*/React__default.createElement(Notification, {
     count: unreadCount,
     onClick: function onClick() {
       if (intialTimeStamp) {
@@ -6085,11 +6141,11 @@ var ConversationPanel = function ConversationPanel(props) {
       }
     },
     time: unreadSince
-  }), loading ? React.createElement("div", {
+  }), loading ? /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-conversation"
-  }, React.createElement(PlaceHolder, {
+  }, /*#__PURE__*/React__default.createElement(PlaceHolder, {
     type: PlaceHolderTypes.LOADING
-  })) : React.createElement(ConversationScroll, {
+  })) : /*#__PURE__*/React__default.createElement(ConversationScroll, {
     swapParams: sdk && sdk.getErrorFirstCallback && sdk.getErrorFirstCallback(),
     highLightedMessageId: highLightedMessageId,
     userId: userId,
@@ -6120,9 +6176,9 @@ var ConversationPanel = function ConversationPanel(props) {
     messagesDispatcher: messagesDispatcher,
     currentGroupChannel: currentGroupChannel,
     memoizedEmojiListItems: memoizedEmojiListItems
-  }), React.createElement("div", {
+  }), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-conversation__footer"
-  }, React.createElement(MessageInputWrapper$1, {
+  }, /*#__PURE__*/React__default.createElement(MessageInputWrapper$1, {
     channel: currentGroupChannel,
     user: user,
     ref: messageInputRef,
@@ -6131,13 +6187,13 @@ var ConversationPanel = function ConversationPanel(props) {
     renderMessageInput: renderMessageInput,
     isOnline: isOnline,
     initialized: initialized
-  }), React.createElement("div", {
+  }), /*#__PURE__*/React__default.createElement("div", {
     className: "sendbird-conversation__typing-indicator"
-  }, React.createElement(TypingIndicator, {
+  }, /*#__PURE__*/React__default.createElement(TypingIndicator, {
     channelUrl: channelUrl,
     sb: sdk,
     logger: logger
-  })), !isOnline && React.createElement(ConnectionStatus, {
+  })), !isOnline && /*#__PURE__*/React__default.createElement(ConnectionStatus, {
     sdkInit: sdkInit,
     sb: sdk,
     logger: logger
@@ -6234,17 +6290,17 @@ ConversationPanel.defaultProps = {
   renderChatHeader: null,
   useReaction: true,
   showSearchIcon: false,
-  onSearchClick: noop$5,
+  onSearchClick: noop,
   disableUserProfile: false,
   renderUserProfile: null,
   useMessageGrouping: true,
-  onChatHeaderActionClick: noop$5
+  onChatHeaderActionClick: noop
 };
-var getEmojiCategoriesFromEmojiContainer$1 = getEmojiCategoriesFromEmojiContainer,
-    getAllEmojisFromEmojiContainer$1 = getAllEmojisFromEmojiContainer,
-    getEmojisFromEmojiContainer$1 = getEmojisFromEmojiContainer;
+var getEmojiCategoriesFromEmojiContainer = getEmojiCategoriesFromEmojiContainer$1,
+    getAllEmojisFromEmojiContainer = getAllEmojisFromEmojiContainer$1,
+    getEmojisFromEmojiContainer = getEmojisFromEmojiContainer$1;
 var Conversation = withSendbirdContext(ConversationPanel);
 
 export default Conversation;
-export { ConversationPanel, getAllEmojisFromEmojiContainer$1 as getAllEmojisFromEmojiContainer, getEmojiCategoriesFromEmojiContainer$1 as getEmojiCategoriesFromEmojiContainer, getEmojisFromEmojiContainer$1 as getEmojisFromEmojiContainer };
+export { ConversationPanel, getAllEmojisFromEmojiContainer, getEmojiCategoriesFromEmojiContainer, getEmojisFromEmojiContainer };
 //# sourceMappingURL=Channel.js.map
