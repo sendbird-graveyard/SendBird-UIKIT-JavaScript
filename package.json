@@ -1,6 +1,6 @@
 {
   "name": "sendbird-uikit",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "React based UI kit for sendbird",
   "main": "dist/cjs/index.js",
   "module": "index.js",
@@ -30,8 +30,8 @@
     "prop-types": "^15.7.2",
     "css-vars-ponyfill": "^2.3.2",
     "date-fns": "^2.16.1",
-    "react": "^16.8.6 | ^17.0.0",
-    "react-dom": "^16.8.6 | ^17.0.0",
+    "react": "^16.8.6 || ^17.0.0",
+    "react-dom": "^16.8.6 || ^17.0.0",
     "sendbird": "^3.0.140"
   },
   "bugs": {
