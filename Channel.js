@@ -1,15 +1,15 @@
-import { e as _toConsumableArray, a as _objectSpread2, u as uuidv4, b as _slicedToArray, f as _defineProperty, c as LocalizationContext, h as _inherits, i as _createSuper, j as _createClass, k as _classCallCheck, l as _assertThisInitialized, w as withSendbirdContext } from './LocalizationContext-5502b61d.js';
+import { e as _toConsumableArray, a as _objectSpread2, u as uuidv4, b as _slicedToArray, f as _defineProperty, c as LocalizationContext, h as _inherits, i as _createSuper, j as _createClass, k as _classCallCheck, l as _assertThisInitialized, w as withSendbirdContext } from './LocalizationContext-61e3c047.js';
 import React__default, { useEffect, useCallback, useRef, useMemo, useState, useContext, useLayoutEffect, Component, useReducer } from 'react';
 import PropTypes from 'prop-types';
-import { g as format, i as ImageRenderer, I as Icon, c as IconTypes, e as Loader, d as IconColors, L as Label, a as LabelTypography, b as LabelColors, A as Avatar, P as PlaceHolder, j as PlaceHolderTypes, h as LabelStringSet } from './index-4fb99a01.js';
-import { M as MessageStatusType } from './type-cfe68896.js';
-import { k as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, l as SEND_FILE_MESSAGE, j as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, E as EmojiListItems, C as ContextMenu, I as IconButton, b as MenuItems, c as MenuItem, U as UserProfileContext, f as ConnectedUserProfile, a as TextButton, M as Modal, h as UserProfileProvider } from './index-bd743b97.js';
-import { i as isImage, a as isVideo, c as compareIds, b as isGif, u as unSupported, L as LinkLabel, D as DateSeparator, M as MessageInput, F as FileViewer } from './index-586eeef1.js';
-import { i as isSameDay } from './index-0a658dd3.js';
-import { g as getMessageCreatedAt$4, a as getSenderName$2, b as getSenderProfileUrl$2 } from './utils-9606270f.js';
-import { g as getIsSentFromSendingStatus$2, c as copyToClipboard$1, a as getSenderProfileUrl$1, b as getSenderName$1, d as getMessageCreatedAt$5, e as getIsSentFromStatus$2 } from './utils-9ee7329c.js';
-import { g as getIsSentFromSendingStatus$3, t as truncate, a as getIsSentFromStatus$3 } from './utils-3464ac37.js';
-import { C as ChannelAvatar } from './index-cbd77cfb.js';
+import { g as format, i as ImageRenderer, I as Icon, c as IconTypes, e as Loader, d as IconColors, L as Label, a as LabelTypography, b as LabelColors, A as Avatar, P as PlaceHolder, j as PlaceHolderTypes, h as LabelStringSet } from './index-596c5f0c.js';
+import { M as MessageStatusType } from './type-58833f13.js';
+import { k as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, l as SEND_FILE_MESSAGE, j as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, E as EmojiListItems, C as ContextMenu, I as IconButton, b as MenuItems, c as MenuItem, U as UserProfileContext, f as ConnectedUserProfile, a as TextButton, M as Modal, h as UserProfileProvider } from './index-1ab03a57.js';
+import { i as isImage, a as isVideo, c as compareIds, b as isGif, u as unSupported, L as LinkLabel, D as DateSeparator, M as MessageInput, F as FileViewer } from './index-8c25373a.js';
+import { a as filterMessageListParams, b as getIsSentFromSendingStatus$3, t as truncate, c as getIsSentFromStatus$3 } from './utils-7d975c75.js';
+import { i as isSameDay } from './index-cd260eec.js';
+import { g as getMessageCreatedAt$4, a as getSenderName$2, b as getSenderProfileUrl$2 } from './utils-07256c7e.js';
+import { g as getIsSentFromSendingStatus$2, c as copyToClipboard$1, a as getSenderProfileUrl$1, b as getSenderName$1, d as getMessageCreatedAt$5, e as getIsSentFromStatus$2 } from './utils-046f9fef.js';
+import { C as ChannelAvatar } from './index-8a5ef965.js';
 import 'react-dom';
 
 var RESET_MESSAGES = 'RESET_MESSAGES';
@@ -34,6 +34,7 @@ var MARK_AS_READ = 'MARK_AS_READ';
 var ON_REACTION_UPDATED = 'ON_REACTION_UPDATED';
 var SET_EMOJI_CONTAINER = 'SET_EMOJI_CONTAINER';
 var SET_READ_STATUS = 'SET_READ_STATUS';
+var MESSAGE_LIST_PARAMS_CHANGED = 'MESSAGE_LIST_PARAMS_CHANGED';
 
 var MessageTypes = {
   ADMIN: 'ADMIN',
@@ -344,7 +345,8 @@ var messagesInitialState = {
   readStatus: {},
   unreadCount: 0,
   unreadSince: null,
-  isInvalid: false
+  isInvalid: false,
+  messageListParams: null
 };
 
 var SUCCEEDED = SendingMessageStatus.SUCCEEDED,
@@ -530,16 +532,13 @@ function reducer(state, action) {
 
         var _currentGroupChannelUrl = _currentGroupChannel3.url;
 
-        if (!compareIds(_channel.url, _currentGroupChannelUrl)) {
-          return state;
-        } // Excluded overlapping messages
-
-
-        if (!(state.allMessages.map(function (msg) {
+        if (!compareIds(_channel.url, _currentGroupChannelUrl) || !(state.allMessages.map(function (msg) {
           return msg.messageId;
-        }).indexOf(message.messageId) < 0)) {
-          return state;
-        }
+        }).indexOf(message.messageId) < 0) // Excluded overlapping messages
+        || state.messageListParams && !filterMessageListParams(state.messageListParams, message) // Filter by userFilledQuery
+        ) {
+            return state;
+          }
 
         _unreadCount = state.unreadCount + 1; // reset unreadCount if have to scrollToEnd
 
@@ -561,11 +560,24 @@ function reducer(state, action) {
       }
 
     case ON_MESSAGE_UPDATED:
-      return _objectSpread2(_objectSpread2({}, state), {}, {
-        allMessages: state.allMessages.map(function (m) {
-          return compareIds(m.messageId, action.payload.message.messageId) ? action.payload.message : m;
-        })
-      });
+      {
+        var _message = action.payload.message;
+
+        if (state.messageListParams && !filterMessageListParams(state.messageListParams, _message)) {
+          // Delete the message if it doesn't match to the params anymore
+          return _objectSpread2(_objectSpread2({}, state), {}, {
+            allMessages: state.allMessages.filter(function (m) {
+              return !compareIds(m.messageId, action.payload);
+            })
+          });
+        }
+
+        return _objectSpread2(_objectSpread2({}, state), {}, {
+          allMessages: state.allMessages.map(function (m) {
+            return compareIds(m.messageId, action.payload.message.messageId) ? action.payload.message : m;
+          })
+        });
+      }
 
     case RESEND_MESSAGEGE_START:
       return _objectSpread2(_objectSpread2({}, state), {}, {
@@ -622,6 +634,13 @@ function reducer(state, action) {
 
             return m;
           })
+        });
+      }
+
+    case MESSAGE_LIST_PARAMS_CHANGED:
+      {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
+          messageListParams: action.payload
         });
       }
 
@@ -884,6 +903,11 @@ function useInitialMessagesFetch(_ref, _ref2) {
       if (userFilledMessageListQuery) {
         Object.keys(userFilledMessageListQuery).forEach(function (key) {
           messageListParams[key] = userFilledMessageListQuery[key];
+        });
+        logger.info('Channel useInitialMessagesFetch: Setup messageListParams', messageListParams);
+        messagesDispatcher({
+          type: MESSAGE_LIST_PARAMS_CHANGED,
+          payload: messageListParams
         });
       }
 

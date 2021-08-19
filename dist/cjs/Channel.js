@@ -2,18 +2,18 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var LocalizationContext = require('./LocalizationContext-253833e3.js');
+var LocalizationContext = require('./LocalizationContext-7cb222bc.js');
 var React = require('react');
 var PropTypes = require('prop-types');
-var index$2 = require('./index-b36bb0d8.js');
-var type = require('./type-a2e61165.js');
-var index$1 = require('./index-ba566fa2.js');
-var index = require('./index-c74bfd29.js');
-var index$3 = require('./index-478e7242.js');
-var utils = require('./utils-34763613.js');
-var utils$1 = require('./utils-26f911d4.js');
-var utils$2 = require('./utils-7a073a7a.js');
-var index$4 = require('./index-d30bcb18.js');
+var index$2 = require('./index-d9a48d62.js');
+var type = require('./type-f3590c9e.js');
+var index$1 = require('./index-284f5043.js');
+var index = require('./index-116eaede.js');
+var utils = require('./utils-e7969a98.js');
+var index$3 = require('./index-24ba9387.js');
+var utils$1 = require('./utils-211c9c74.js');
+var utils$2 = require('./utils-d642da91.js');
+var index$4 = require('./index-8400d9b2.js');
 require('react-dom');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -43,6 +43,7 @@ var MARK_AS_READ = 'MARK_AS_READ';
 var ON_REACTION_UPDATED = 'ON_REACTION_UPDATED';
 var SET_EMOJI_CONTAINER = 'SET_EMOJI_CONTAINER';
 var SET_READ_STATUS = 'SET_READ_STATUS';
+var MESSAGE_LIST_PARAMS_CHANGED = 'MESSAGE_LIST_PARAMS_CHANGED';
 
 var MessageTypes = {
   ADMIN: 'ADMIN',
@@ -353,7 +354,8 @@ var messagesInitialState = {
   readStatus: {},
   unreadCount: 0,
   unreadSince: null,
-  isInvalid: false
+  isInvalid: false,
+  messageListParams: null
 };
 
 var SUCCEEDED = SendingMessageStatus.SUCCEEDED,
@@ -539,16 +541,13 @@ function reducer(state, action) {
 
         var _currentGroupChannelUrl = _currentGroupChannel3.url;
 
-        if (!index.compareIds(_channel.url, _currentGroupChannelUrl)) {
-          return state;
-        } // Excluded overlapping messages
-
-
-        if (!(state.allMessages.map(function (msg) {
+        if (!index.compareIds(_channel.url, _currentGroupChannelUrl) || !(state.allMessages.map(function (msg) {
           return msg.messageId;
-        }).indexOf(message.messageId) < 0)) {
-          return state;
-        }
+        }).indexOf(message.messageId) < 0) // Excluded overlapping messages
+        || state.messageListParams && !utils.filterMessageListParams(state.messageListParams, message) // Filter by userFilledQuery
+        ) {
+            return state;
+          }
 
         _unreadCount = state.unreadCount + 1; // reset unreadCount if have to scrollToEnd
 
@@ -570,11 +569,24 @@ function reducer(state, action) {
       }
 
     case ON_MESSAGE_UPDATED:
-      return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
-        allMessages: state.allMessages.map(function (m) {
-          return index.compareIds(m.messageId, action.payload.message.messageId) ? action.payload.message : m;
-        })
-      });
+      {
+        var _message = action.payload.message;
+
+        if (state.messageListParams && !utils.filterMessageListParams(state.messageListParams, _message)) {
+          // Delete the message if it doesn't match to the params anymore
+          return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+            allMessages: state.allMessages.filter(function (m) {
+              return !index.compareIds(m.messageId, action.payload);
+            })
+          });
+        }
+
+        return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+          allMessages: state.allMessages.map(function (m) {
+            return index.compareIds(m.messageId, action.payload.message.messageId) ? action.payload.message : m;
+          })
+        });
+      }
 
     case RESEND_MESSAGEGE_START:
       return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
@@ -631,6 +643,13 @@ function reducer(state, action) {
 
             return m;
           })
+        });
+      }
+
+    case MESSAGE_LIST_PARAMS_CHANGED:
+      {
+        return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+          messageListParams: action.payload
         });
       }
 
@@ -893,6 +912,11 @@ function useInitialMessagesFetch(_ref, _ref2) {
       if (userFilledMessageListQuery) {
         Object.keys(userFilledMessageListQuery).forEach(function (key) {
           messageListParams[key] = userFilledMessageListQuery[key];
+        });
+        logger.info('Channel useInitialMessagesFetch: Setup messageListParams', messageListParams);
+        messagesDispatcher({
+          type: MESSAGE_LIST_PARAMS_CHANGED,
+          payload: messageListParams
         });
       }
 
@@ -1792,7 +1816,7 @@ function MessageStatus(_ref) {
             className: "sendbird-message-status__text",
             type: index$2.LabelTypography.CAPTION_3,
             color: index$2.LabelColors.ONBACKGROUND_2
-          }, utils.getMessageCreatedAt(message));
+          }, utils$1.getMessageCreatedAt(message));
         }
 
       default:
@@ -2301,8 +2325,8 @@ function OutgoingUserMessage(_ref) {
       menuDisplaying = _useState6[0],
       setMenuDisplaying = _useState6[1];
 
-  var isMessageSent = utils$1.getIsSentFromStatus(status);
-  var showReactionAddButton = useReaction && emojiAllMap.size > 0 && utils$1.getIsSentFromSendingStatus(message);
+  var isMessageSent = utils$2.getIsSentFromStatus(status);
+  var showReactionAddButton = useReaction && emojiAllMap.size > 0 && utils$2.getIsSentFromSendingStatus(message);
 
   var handleMoreIconClick = function handleMoreIconClick() {
     setMoreActive(true);
@@ -2371,7 +2395,7 @@ function OutgoingUserMessage(_ref) {
       }, isMessageSent && /*#__PURE__*/React__default['default'].createElement(index$1.MenuItem, {
         className: "sendbird-user-message--copy",
         onClick: function onClick() {
-          utils$1.copyToClipboard(message.message);
+          utils$2.copyToClipboard(message.message);
           closeDropdown();
         }
       }, "Copy"), isMessageSent && /*#__PURE__*/React__default['default'].createElement(index$1.MenuItem, {
@@ -2537,7 +2561,7 @@ function IncomingUserMessage(_ref2) {
           }
         },
         className: "sendbird-user-message__avatar",
-        src: utils$1.getSenderProfileUrl(message),
+        src: utils$2.getSenderProfileUrl(message),
         width: "28px",
         height: "28px"
       });
@@ -2568,7 +2592,7 @@ function IncomingUserMessage(_ref2) {
     className: "sendbird-user-message__sender-name",
     type: index$2.LabelTypography.CAPTION_2,
     color: index$2.LabelColors.ONBACKGROUND_2
-  }, utils$1.getSenderName(message)), /*#__PURE__*/React__default['default'].createElement("div", {
+  }, utils$2.getSenderName(message)), /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-user-message__text-balloon"
   }, /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-user-message__text-balloon__inner"
@@ -2665,7 +2689,7 @@ function IncomingUserMessage(_ref2) {
       }, /*#__PURE__*/React__default['default'].createElement(index$1.MenuItem, {
         className: "sendbird-user-message--copy",
         onClick: function onClick() {
-          utils$1.copyToClipboard(message.message);
+          utils$2.copyToClipboard(message.message);
           closeDropdown();
         }
       }, "Copy"));
@@ -2674,7 +2698,7 @@ function IncomingUserMessage(_ref2) {
     className: "sendbird-user-message__sent-at",
     type: index$2.LabelTypography.CAPTION_3,
     color: index$2.LabelColors.ONBACKGROUND_2
-  }, utils$1.getMessageCreatedAt(message)))));
+  }, utils$2.getMessageCreatedAt(message)))));
 }
 
 IncomingUserMessage.propTypes = {
@@ -3185,7 +3209,7 @@ function IncomingThumbnailMessage(_ref4) {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__sender-name"),
     type: index$2.LabelTypography.CAPTION_2,
     color: index$2.LabelColors.ONBACKGROUND_2
-  }, utils.getSenderName(message) || ''), /*#__PURE__*/React__default['default'].createElement("div", {
+  }, utils$1.getSenderName(message) || ''), /*#__PURE__*/React__default['default'].createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "--inner")
   }, /*#__PURE__*/React__default['default'].createElement("div", {
     className: "".concat(INCOMING_THUMBNAIL_MESSAGE, "__body")
@@ -3201,7 +3225,7 @@ function IncomingThumbnailMessage(_ref4) {
             toggleDropdown();
           }
         },
-        src: utils.getSenderProfileUrl(message),
+        src: utils$1.getSenderProfileUrl(message),
         width: "28px",
         height: "28px"
       });
@@ -3572,9 +3596,9 @@ function OutgoingFileMessage(_ref2) {
       setMenuDisplaying = _useState6[1];
 
   var MemoizedEmojiListItems = memoizedEmojiListItems;
-  var isMessageSent = utils$2.getIsSentFromStatus(status);
-  var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0 && utils$2.getIsSentFromSendingStatus(message);
-  var showEmojiReactions = isMessageSent && useReaction && message.reactions && message.reactions.length > 0 && utils$2.getIsSentFromSendingStatus(message);
+  var isMessageSent = utils.getIsSentFromStatus(status);
+  var showReactionAddButton = useReaction && emojiAllMap && emojiAllMap.size > 0 && utils.getIsSentFromSendingStatus(message);
+  var showEmojiReactions = isMessageSent && useReaction && message.reactions && message.reactions.length > 0 && utils.getIsSentFromSendingStatus(message);
 
   var handleMoreIconClick = function handleMoreIconClick() {
     setMoreActive(true);
@@ -3716,7 +3740,7 @@ function OutgoingFileMessage(_ref2) {
   }, /*#__PURE__*/React__default['default'].createElement(index$2.Label, {
     type: index$2.LabelTypography.BODY_1,
     color: index$2.LabelColors.ONCONTENT_1
-  }, utils$2.truncate(message.name || message.url, MAX_TRUNCATE_LENGTH)))), showEmojiReactions && /*#__PURE__*/React__default['default'].createElement(EmojiReactions, {
+  }, utils.truncate(message.name || message.url, MAX_TRUNCATE_LENGTH)))), showEmojiReactions && /*#__PURE__*/React__default['default'].createElement(EmojiReactions, {
     className: "sendbird-file-message__outgoing__tooltip__emoji-reactions",
     userId: userId,
     message: message,
@@ -3802,7 +3826,7 @@ function IncomingFileMessage(_ref3) {
           }
         },
         className: "sendbird-file-message__incoming__body__avatar",
-        src: utils.getSenderProfileUrl(message),
+        src: utils$1.getSenderProfileUrl(message),
         width: "28px",
         height: "28px"
       });
@@ -3833,7 +3857,7 @@ function IncomingFileMessage(_ref3) {
     className: "sendbird-file-message__incoming__body__sender-name",
     type: index$2.LabelTypography.CAPTION_2,
     color: index$2.LabelColors.ONBACKGROUND_2
-  }, utils.getSenderName(message)), /*#__PURE__*/React__default['default'].createElement("div", {
+  }, utils$1.getSenderName(message)), /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-file-message__incoming__body__tooltip"
   }, /*#__PURE__*/React__default['default'].createElement("div", {
     className: "sendbird-file-message__incoming__body__tooltip__inner"
@@ -3851,7 +3875,7 @@ function IncomingFileMessage(_ref3) {
   }, /*#__PURE__*/React__default['default'].createElement(index$2.Label, {
     type: index$2.LabelTypography.BODY_1,
     color: index$2.LabelColors.ONBACKGROUND_1
-  }, utils$2.truncate(message.name || message.url, MAX_TRUNCATE_LENGTH)))), useReaction && message.reactions && message.reactions.length > 0 && /*#__PURE__*/React__default['default'].createElement(EmojiReactions, {
+  }, utils.truncate(message.name || message.url, MAX_TRUNCATE_LENGTH)))), useReaction && message.reactions && message.reactions.length > 0 && /*#__PURE__*/React__default['default'].createElement(EmojiReactions, {
     className: "sendbird-file-message__incoming__body__tooltip__emoji-reactions",
     userId: userId,
     message: message,
@@ -3908,7 +3932,7 @@ function IncomingFileMessage(_ref3) {
     className: "sendbird-file-message__incoming__right-padding__sent-at",
     type: index$2.LabelTypography.CAPTION_3,
     color: index$2.LabelColors.ONBACKGROUND_2
-  }, utils.getMessageCreatedAt(message)))));
+  }, utils$1.getMessageCreatedAt(message)))));
 }
 OutgoingFileMessage.propTypes = {
   message: PropTypes__default['default'].objectOf(PropTypes__default['default'].oneOfType([PropTypes__default['default'].string, PropTypes__default['default'].number, PropTypes__default['default'].bool, PropTypes__default['default'].array, PropTypes__default['default'].object])),

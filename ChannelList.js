@@ -1,18 +1,18 @@
-import { a as _objectSpread2, e as _toConsumableArray, c as LocalizationContext, w as withSendbirdContext, b as _slicedToArray, u as uuidv4 } from './LocalizationContext-5502b61d.js';
+import { a as _objectSpread2, e as _toConsumableArray, c as LocalizationContext, w as withSendbirdContext, b as _slicedToArray, u as uuidv4 } from './LocalizationContext-61e3c047.js';
 import React__default, { useContext, useRef, useState, useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { U as UPDATE_USER_INFO } from './actionTypes-fc3fc1c2.js';
-import { I as IconButton, M as Modal, T as Type, a as TextButton, C as ContextMenu, b as MenuItems, c as MenuItem, i as CREATE_CHANNEL$1, j as UPDATE_USER_MESSAGE, L as LEAVE_CHANNEL, S as SEND_MESSAGE_START, h as UserProfileProvider } from './index-bd743b97.js';
-import { C as ChannelAvatar } from './index-cbd77cfb.js';
-import { B as Badge, i as isBroadcastChannelEnabled, a as isSuperGroupChannelEnabled, I as InviteMembers, c as createDefaultUserListQuery, b as createChannel, L as LeaveChannel } from './LeaveChannel-352fa9f0.js';
-import { g as format, h as LabelStringSet, I as Icon, c as IconTypes, d as IconColors, L as Label, a as LabelTypography, b as LabelColors, A as Avatar, P as PlaceHolder, f as PlaceHolderTypes } from './index-4fb99a01.js';
-import { i as isToday, a as isYesterday } from './index-786e1490.js';
-import { t as truncate } from './utils-3464ac37.js';
-import { I as InputLabel, a as Input } from './index-66022763.js';
-import { n as noop$1 } from './utils-9606270f.js';
+import { U as UPDATE_USER_INFO } from './actionTypes-96bd4f9a.js';
+import { I as IconButton, M as Modal, T as Type, a as TextButton, C as ContextMenu, b as MenuItems, c as MenuItem, i as CREATE_CHANNEL$1, j as UPDATE_USER_MESSAGE, L as LEAVE_CHANNEL, S as SEND_MESSAGE_START, h as UserProfileProvider } from './index-1ab03a57.js';
+import { f as filterChannelListParams, g as getChannelsWithUpsertedChannel, t as truncate } from './utils-7d975c75.js';
+import { C as ChannelAvatar } from './index-8a5ef965.js';
+import { B as Badge, i as isBroadcastChannelEnabled, a as isSuperGroupChannelEnabled, I as InviteMembers, c as createDefaultUserListQuery, b as createChannel, L as LeaveChannel } from './LeaveChannel-6efa8681.js';
+import { g as format, h as LabelStringSet, I as Icon, c as IconTypes, d as IconColors, L as Label, a as LabelTypography, b as LabelColors, A as Avatar, P as PlaceHolder, f as PlaceHolderTypes } from './index-596c5f0c.js';
+import { i as isToday, a as isYesterday } from './index-3a4f8133.js';
+import { I as InputLabel, a as Input } from './index-da803cf5.js';
+import { n as noop$1 } from './utils-07256c7e.js';
 import 'react-dom';
-import './index-0a658dd3.js';
-import './type-cfe68896.js';
+import './type-58833f13.js';
+import './index-cd260eec.js';
 
 var RESET_CHANNEL_LIST = 'RESET_CHANNEL_LIST';
 var CREATE_CHANNEL = 'CREATE_CHANNEL';
@@ -37,6 +37,7 @@ var ON_CHANNEL_UNFROZEN = 'ON_CHANNEL_UNFROZEN';
 var ON_READ_RECEIPT_UPDATED = 'ON_READ_RECEIPT_UPDATED';
 var ON_DELIVERY_RECEIPT_UPDATED = 'ON_DELIVERY_RECEIPT_UPDATED';
 var CHANNEL_REPLACED_TO_TOP = 'CHANNEL_REPLACED_TO_TOP';
+var CHANNEL_LIST_PARAMS_UPDATED = 'CHANNEL_LIST_PARAMS_UPDATED';
 
 var channelListInitialState = {
   // we might not need this initialized state -> should remove
@@ -44,7 +45,9 @@ var channelListInitialState = {
   loading: false,
   allChannels: [],
   currentChannel: null,
-  showSettings: false
+  showSettings: false,
+  channelListQuery: null,
+  currentUserId: ''
 };
 
 function reducer(state, action) {
@@ -83,64 +86,92 @@ function reducer(state, action) {
 
     case CREATE_CHANNEL:
       {
+        var channel = action.payload;
+
+        if (state.channelListQuery) {
+          if (filterChannelListParams(state.channelListQuery, channel, state.currentUserId)) {
+            return _objectSpread2(_objectSpread2({}, state), getChannelsWithUpsertedChannel(state.allChannels, channel));
+          }
+
+          return _objectSpread2(_objectSpread2({}, state), {}, {
+            currentChannel: channel.url
+          });
+        }
+
         return _objectSpread2(_objectSpread2({}, state), {}, {
-          allChannels: [action.payload].concat(_toConsumableArray(state.allChannels.filter(function (channel) {
-            return channel.url !== action.payload.url;
-          }))),
-          currentChannel: action.payload.url
+          currentChannel: channel.url,
+          allChannels: [channel].concat(_toConsumableArray(state.allChannels.filter(function (ch) {
+            return ch.url !== channel.url;
+          })))
         });
       }
 
     case ON_CHANNEL_ARCHIVED:
+      {
+        var _channel = action.payload;
+
+        if (state.channelListQuery) {
+          if (filterChannelListParams(state.channelListQuery, _channel, state.currentUserId)) {
+            return _objectSpread2(_objectSpread2({}, state), {}, {
+              allChannels: getChannelsWithUpsertedChannel(state.allChannels, _channel)
+            });
+          }
+        }
+
+        return _objectSpread2(_objectSpread2({}, state), {}, {
+          currentChannel: _channel.url === state.currentChannel ? state.allChannels[state.allChannels[0].url === _channel.url ? 1 : 0].url : state.currentChannel,
+          allChannels: state.allChannels.filter(function (_ref2) {
+            var url = _ref2.url;
+            return url !== _channel.url;
+          })
+        });
+      }
+
     case LEAVE_CHANNEL_SUCCESS:
     case ON_CHANNEL_DELETED:
       {
         var channelUrl = action.payload;
-        var leftCurrentChannel = state.currentChannel === channelUrl;
-        var newAllChannels = state.allChannels.filter(function (_ref2) {
-          var url = _ref2.url;
-          return url !== channelUrl;
-        });
-        var currentChannel = leftCurrentChannel ? function () {
-          return newAllChannels.length > 0 ? newAllChannels[0].url : '';
-        }() : state.currentChannel;
         return _objectSpread2(_objectSpread2({}, state), {}, {
-          currentChannel: currentChannel,
-          allChannels: newAllChannels
+          currentChannel: channelUrl === state.currentChannel ? state.allChannels[0].url : state.currentChannel,
+          allChannels: state.allChannels.filter(function (_ref3) {
+            var url = _ref3.url;
+            return url !== channelUrl;
+          })
         });
       }
 
     case ON_USER_LEFT:
       {
         var _action$payload = action.payload,
-            channel = _action$payload.channel,
+            _channel2 = _action$payload.channel,
             isMe = _action$payload.isMe;
-        var url = channel.url;
 
-        if (isMe) {
-          var _leftCurrentChannel = url === state.currentChannel;
+        if (state.channelListQuery) {
+          if (filterChannelListParams(state.channelListQuery, _channel2, state.currentUserId)) {
+            var _filteredChannels2 = getChannelsWithUpsertedChannel(state.allChannels, _channel2);
 
-          var _newAllChannels2 = state.allChannels.filter(function (c) {
-            return c.url !== url;
-          });
-
-          var _currentChannel = _leftCurrentChannel ? function () {
-            return _newAllChannels2.length > 0 ? _newAllChannels2[0].url : '';
-          }() : state.currentChannel;
+            return _objectSpread2(_objectSpread2({}, state), {}, {
+              currentChannel: isMe && _channel2.url === state.currentChannel ? _filteredChannels2[0].url : state.currentChannel,
+              allChannels: _filteredChannels2
+            });
+          }
 
           return _objectSpread2(_objectSpread2({}, state), {}, {
-            currentChannel: _currentChannel,
-            allChannels: _newAllChannels2
+            currentChannel: _channel2.url === state.currentChannel ? state.allChannels[0].url : state.currentChannel,
+            allChannels: state.allChannels.filter(function (_ref4) {
+              var url = _ref4.url;
+              return url !== _channel2.url;
+            })
           });
-        } // other user left
+        }
 
-
-        var _newAllChannels = state.allChannels.map(function (c) {
-          return c.url === url ? channel : c;
+        var _filteredChannels = state.allChannels.filter(function (c) {
+          return c.url !== _channel2.url;
         });
 
         return _objectSpread2(_objectSpread2({}, state), {}, {
-          allChannels: _newAllChannels
+          currentChannel: isMe && _channel2.url === state.currentChannel ? _filteredChannels[0].url : state.currentChannel,
+          allChannels: _filteredChannels
         });
       }
 
@@ -151,38 +182,59 @@ function reducer(state, action) {
       {
         var _state$allChannels = state.allChannels,
             allChannels = _state$allChannels === void 0 ? [] : _state$allChannels;
-        var unreadMessageCount = action.payload.unreadMessageCount;
-        var _channel = action.payload;
+        var _channel3 = action.payload;
+        var unreadMessageCount = _channel3.unreadMessageCount;
+        if (!_channel3.lastMessage) return state;
 
-        if (!_channel.lastMessage) {
-          return state;
+        if (state.channelListQuery) {
+          if (filterChannelListParams(state.channelListQuery, _channel3, state.currentUserId)) {
+            // if its only an unread message count change, dont push to top
+            if (unreadMessageCount === 0) {
+              var currentChannel = allChannels.find(function (_ref5) {
+                var url = _ref5.url;
+                return url === _channel3.url;
+              });
+              var currentUnreadCount = currentChannel && currentChannel.unreadMessageCount;
+
+              if (currentUnreadCount === 0) {
+                return _objectSpread2(_objectSpread2({}, state), {}, {
+                  allChannels: getChannelsWithUpsertedChannel(allChannels, _channel3)
+                });
+              }
+            }
+          }
+
+          return _objectSpread2(_objectSpread2({}, state), {}, {
+            currentChannel: _channel3.url === state.currentChannel ? state.allChannels[state.allChannels[0].url === _channel3.url ? 1 : 0].url // if coming channel is first of channel list, current channel will be the next one
+            : state.currentChannel,
+            allChannels: state.allChannels.filter(function (_ref6) {
+              var url = _ref6.url;
+              return url !== _channel3.url;
+            })
+          });
         } // if its only an unread message count change, dont push to top
 
 
         if (unreadMessageCount === 0) {
-          var _currentChannel2 = allChannels.find(function (_ref3) {
-            var url = _ref3.url;
-            return url === _channel.url;
+          var _currentChannel = allChannels.find(function (_ref7) {
+            var url = _ref7.url;
+            return url === _channel3.url;
           });
 
-          var currentUnReadCount = _currentChannel2 && _currentChannel2.unreadMessageCount;
+          var _currentUnreadCount = _currentChannel && _currentChannel.unreadMessageCount;
 
-          if (currentUnReadCount === 0) {
+          if (_currentUnreadCount === 0) {
             return _objectSpread2(_objectSpread2({}, state), {}, {
-              allChannels: allChannels.map(function (c) {
-                if (c.url === _channel.url) {
-                  return _channel;
-                }
-
-                return c;
+              allChannels: state.allChannels.map(function (ch) {
+                return ch.url === _channel3.url ? _channel3 : ch;
               })
             });
           }
         }
 
         return _objectSpread2(_objectSpread2({}, state), {}, {
-          allChannels: [action.payload].concat(_toConsumableArray(state.allChannels.filter(function (_ref4) {
-            var url = _ref4.url;
+          allChannels: [_channel3].concat(_toConsumableArray(state.allChannels.filter(function (_ref8) {
+            var url = _ref8.url;
             return url !== action.payload.url;
           })))
         });
@@ -206,45 +258,91 @@ function reducer(state, action) {
     case ON_LAST_MESSAGE_UPDATED:
       return _objectSpread2(_objectSpread2({}, state), {}, {
         allChannels: state.allChannels.map(function (channel) {
-          if (channel.url === action.payload.url) {
-            return action.payload;
-          }
-
-          return channel;
+          return channel.url === action.payload.url ? action.payload : channel;
         })
       });
 
     case ON_CHANNEL_FROZEN:
-      return _objectSpread2(_objectSpread2({}, state), {}, {
-        allChannels: state.allChannels.map(function (channel) {
-          if (channel.url === action.payload.url) {
-            // eslint-disable-next-line no-param-reassign
-            channel.isFrozen = true;
-            return channel;
+      {
+        var _channel4 = action.payload;
+
+        if (state.channelListQuery) {
+          if (filterChannelListParams(state.channelListQuery, _channel4, state.currentUserId)) {
+            return _objectSpread2(_objectSpread2({}, state), {}, {
+              allChannels: getChannelsWithUpsertedChannel(state.allChannels, _channel4)
+            });
           }
 
-          return channel;
-        })
-      });
+          return _objectSpread2(_objectSpread2({}, state), {}, {
+            currentChannel: _channel4.url === state.currentChannel ? state.allChannels[state.allChannels[0].url === _channel4.url ? 1 : 0].url // if coming channel is first of channel list, current channel will be the next one
+            : state.currentChannel,
+            allChannels: state.allChannels.filter(function (_ref9) {
+              var url = _ref9.url;
+              return url !== _channel4.url;
+            })
+          });
+        }
+
+        return _objectSpread2(_objectSpread2({}, state), {}, {
+          allChannels: state.allChannels.map(function (ch) {
+            if (ch.url === _channel4.url) {
+              // eslint-disable-next-line no-param-reassign
+              ch.isFrozen = true;
+              return ch;
+            }
+
+            return ch;
+          })
+        });
+      }
 
     case ON_CHANNEL_UNFROZEN:
-      return _objectSpread2(_objectSpread2({}, state), {}, {
-        allChannels: state.allChannels.map(function (channel) {
-          if (channel.url === action.payload.url) {
-            // eslint-disable-next-line no-param-reassign
-            channel.isFrozen = false;
-            return channel;
+      {
+        var _channel5 = action.payload;
+
+        if (state.channelListQuery) {
+          if (filterChannelListParams(state.channelListQuery, _channel5, state.currentUserId)) {
+            return _objectSpread2(_objectSpread2({}, state), {}, {
+              allChannels: getChannelsWithUpsertedChannel(state.allChannels, _channel5)
+            });
           }
 
-          return channel;
-        })
-      });
+          return _objectSpread2(_objectSpread2({}, state), {}, {
+            currentChannel: _channel5.url === state.currentChannel ? state.allChannels[state.allChannels[0].url === _channel5.url ? 1 : 0].url // if coming channel is first of channel list, current channel will be the next one
+            : state.currentChannel,
+            allChannels: state.allChannels.filter(function (_ref10) {
+              var url = _ref10.url;
+              return url !== _channel5.url;
+            })
+          });
+        }
+
+        return _objectSpread2(_objectSpread2({}, state), {}, {
+          allChannels: state.allChannels.map(function (ch) {
+            if (ch.url === _channel5.url) {
+              // eslint-disable-next-line no-param-reassign
+              ch.isFrozen = false;
+              return ch;
+            }
+
+            return ch;
+          })
+        });
+      }
 
     case CHANNEL_REPLACED_TO_TOP:
+      {
+        return _objectSpread2(_objectSpread2({}, state), {}, {
+          allChannels: [action.payload].concat(_toConsumableArray(state.allChannels.filter(function (channel) {
+            return channel.url !== action.payload.url;
+          })))
+        });
+      }
+
+    case CHANNEL_LIST_PARAMS_UPDATED:
       return _objectSpread2(_objectSpread2({}, state), {}, {
-        allChannels: [action.payload].concat(_toConsumableArray(state.allChannels.filter(function (channel) {
-          return channel.url !== action.payload.url;
-        })))
+        currentUserId: action.payload.currentUserId,
+        channelListQuery: action.payload.channelListQuery
       });
 
     default:
@@ -953,7 +1051,7 @@ var createEventHandler = function createEventHandler(_ref) {
     logger.info('ChannelList: onChannelHidden', channel);
     channelListDispatcher({
       type: ON_CHANNEL_ARCHIVED,
-      payload: channel.url
+      payload: channel
     });
   };
 
@@ -1029,6 +1127,18 @@ function setupChannelList(_ref3) {
   channelListDispatcher({
     type: INIT_CHANNELS_START
   });
+
+  if (userFilledChannelListQuery) {
+    logger.info('ChannelList - setting up channelListQuery', channelListQuery);
+    channelListDispatcher({
+      type: CHANNEL_LIST_PARAMS_UPDATED,
+      payload: {
+        channelListQuery: channelListQuery,
+        currentUserId: sdk && sdk.currentUser && sdk.currentUser.userId
+      }
+    });
+  }
+
   logger.info('ChannelList - fetching channels');
 
   if (channelListQuery.hasNext) {

@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.3.2.alpha] (Aug 19 2021)
+
+- Bugfix:
+ * Add filtering logics for channel events by custom message list params
+ * Add filtering logics for channel list events by custom channel list query
+
 ## [2.3.0](Jul 27 2021)
 
 - Bugfix:
