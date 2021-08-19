@@ -1,20 +1,20 @@
 'use strict';
 
-var LocalizationContext = require('./LocalizationContext-253833e3.js');
+var LocalizationContext = require('./LocalizationContext-7cb222bc.js');
 var React = require('react');
 var PropTypes = require('prop-types');
-var actionTypes = require('./actionTypes-5d643716.js');
-var index$3 = require('./index-ba566fa2.js');
-var index$2 = require('./index-d30bcb18.js');
-var LeaveChannel = require('./LeaveChannel-8e141138.js');
-var index$1 = require('./index-b36bb0d8.js');
-var index = require('./index-4cbbd5f7.js');
-var utils = require('./utils-7a073a7a.js');
-var index$4 = require('./index-8f452e47.js');
-var utils$1 = require('./utils-34763613.js');
+var actionTypes = require('./actionTypes-0ab3ab91.js');
+var index$3 = require('./index-284f5043.js');
+var utils = require('./utils-e7969a98.js');
+var index$2 = require('./index-8400d9b2.js');
+var LeaveChannel = require('./LeaveChannel-beddeac5.js');
+var index$1 = require('./index-d9a48d62.js');
+var index = require('./index-5acad8f4.js');
+var index$4 = require('./index-b1f63a15.js');
+var utils$1 = require('./utils-211c9c74.js');
 require('react-dom');
-require('./index-478e7242.js');
-require('./type-a2e61165.js');
+require('./type-f3590c9e.js');
+require('./index-24ba9387.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -44,6 +44,7 @@ var ON_CHANNEL_UNFROZEN = 'ON_CHANNEL_UNFROZEN';
 var ON_READ_RECEIPT_UPDATED = 'ON_READ_RECEIPT_UPDATED';
 var ON_DELIVERY_RECEIPT_UPDATED = 'ON_DELIVERY_RECEIPT_UPDATED';
 var CHANNEL_REPLACED_TO_TOP = 'CHANNEL_REPLACED_TO_TOP';
+var CHANNEL_LIST_PARAMS_UPDATED = 'CHANNEL_LIST_PARAMS_UPDATED';
 
 var channelListInitialState = {
   // we might not need this initialized state -> should remove
@@ -51,7 +52,9 @@ var channelListInitialState = {
   loading: false,
   allChannels: [],
   currentChannel: null,
-  showSettings: false
+  showSettings: false,
+  channelListQuery: null,
+  currentUserId: ''
 };
 
 function reducer(state, action) {
@@ -90,64 +93,92 @@ function reducer(state, action) {
 
     case CREATE_CHANNEL:
       {
+        var channel = action.payload;
+
+        if (state.channelListQuery) {
+          if (utils.filterChannelListParams(state.channelListQuery, channel, state.currentUserId)) {
+            return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), utils.getChannelsWithUpsertedChannel(state.allChannels, channel));
+          }
+
+          return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+            currentChannel: channel.url
+          });
+        }
+
         return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
-          allChannels: [action.payload].concat(LocalizationContext._toConsumableArray(state.allChannels.filter(function (channel) {
-            return channel.url !== action.payload.url;
-          }))),
-          currentChannel: action.payload.url
+          currentChannel: channel.url,
+          allChannels: [channel].concat(LocalizationContext._toConsumableArray(state.allChannels.filter(function (ch) {
+            return ch.url !== channel.url;
+          })))
         });
       }
 
     case ON_CHANNEL_ARCHIVED:
+      {
+        var _channel = action.payload;
+
+        if (state.channelListQuery) {
+          if (utils.filterChannelListParams(state.channelListQuery, _channel, state.currentUserId)) {
+            return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+              allChannels: utils.getChannelsWithUpsertedChannel(state.allChannels, _channel)
+            });
+          }
+        }
+
+        return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+          currentChannel: _channel.url === state.currentChannel ? state.allChannels[state.allChannels[0].url === _channel.url ? 1 : 0].url : state.currentChannel,
+          allChannels: state.allChannels.filter(function (_ref2) {
+            var url = _ref2.url;
+            return url !== _channel.url;
+          })
+        });
+      }
+
     case LEAVE_CHANNEL_SUCCESS:
     case ON_CHANNEL_DELETED:
       {
         var channelUrl = action.payload;
-        var leftCurrentChannel = state.currentChannel === channelUrl;
-        var newAllChannels = state.allChannels.filter(function (_ref2) {
-          var url = _ref2.url;
-          return url !== channelUrl;
-        });
-        var currentChannel = leftCurrentChannel ? function () {
-          return newAllChannels.length > 0 ? newAllChannels[0].url : '';
-        }() : state.currentChannel;
         return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
-          currentChannel: currentChannel,
-          allChannels: newAllChannels
+          currentChannel: channelUrl === state.currentChannel ? state.allChannels[0].url : state.currentChannel,
+          allChannels: state.allChannels.filter(function (_ref3) {
+            var url = _ref3.url;
+            return url !== channelUrl;
+          })
         });
       }
 
     case ON_USER_LEFT:
       {
         var _action$payload = action.payload,
-            channel = _action$payload.channel,
+            _channel2 = _action$payload.channel,
             isMe = _action$payload.isMe;
-        var url = channel.url;
 
-        if (isMe) {
-          var _leftCurrentChannel = url === state.currentChannel;
+        if (state.channelListQuery) {
+          if (utils.filterChannelListParams(state.channelListQuery, _channel2, state.currentUserId)) {
+            var _filteredChannels2 = utils.getChannelsWithUpsertedChannel(state.allChannels, _channel2);
 
-          var _newAllChannels2 = state.allChannels.filter(function (c) {
-            return c.url !== url;
-          });
-
-          var _currentChannel = _leftCurrentChannel ? function () {
-            return _newAllChannels2.length > 0 ? _newAllChannels2[0].url : '';
-          }() : state.currentChannel;
+            return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+              currentChannel: isMe && _channel2.url === state.currentChannel ? _filteredChannels2[0].url : state.currentChannel,
+              allChannels: _filteredChannels2
+            });
+          }
 
           return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
-            currentChannel: _currentChannel,
-            allChannels: _newAllChannels2
+            currentChannel: _channel2.url === state.currentChannel ? state.allChannels[0].url : state.currentChannel,
+            allChannels: state.allChannels.filter(function (_ref4) {
+              var url = _ref4.url;
+              return url !== _channel2.url;
+            })
           });
-        } // other user left
+        }
 
-
-        var _newAllChannels = state.allChannels.map(function (c) {
-          return c.url === url ? channel : c;
+        var _filteredChannels = state.allChannels.filter(function (c) {
+          return c.url !== _channel2.url;
         });
 
         return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
-          allChannels: _newAllChannels
+          currentChannel: isMe && _channel2.url === state.currentChannel ? _filteredChannels[0].url : state.currentChannel,
+          allChannels: _filteredChannels
         });
       }
 
@@ -158,38 +189,59 @@ function reducer(state, action) {
       {
         var _state$allChannels = state.allChannels,
             allChannels = _state$allChannels === void 0 ? [] : _state$allChannels;
-        var unreadMessageCount = action.payload.unreadMessageCount;
-        var _channel = action.payload;
+        var _channel3 = action.payload;
+        var unreadMessageCount = _channel3.unreadMessageCount;
+        if (!_channel3.lastMessage) return state;
 
-        if (!_channel.lastMessage) {
-          return state;
+        if (state.channelListQuery) {
+          if (utils.filterChannelListParams(state.channelListQuery, _channel3, state.currentUserId)) {
+            // if its only an unread message count change, dont push to top
+            if (unreadMessageCount === 0) {
+              var currentChannel = allChannels.find(function (_ref5) {
+                var url = _ref5.url;
+                return url === _channel3.url;
+              });
+              var currentUnreadCount = currentChannel && currentChannel.unreadMessageCount;
+
+              if (currentUnreadCount === 0) {
+                return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+                  allChannels: utils.getChannelsWithUpsertedChannel(allChannels, _channel3)
+                });
+              }
+            }
+          }
+
+          return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+            currentChannel: _channel3.url === state.currentChannel ? state.allChannels[state.allChannels[0].url === _channel3.url ? 1 : 0].url // if coming channel is first of channel list, current channel will be the next one
+            : state.currentChannel,
+            allChannels: state.allChannels.filter(function (_ref6) {
+              var url = _ref6.url;
+              return url !== _channel3.url;
+            })
+          });
         } // if its only an unread message count change, dont push to top
 
 
         if (unreadMessageCount === 0) {
-          var _currentChannel2 = allChannels.find(function (_ref3) {
-            var url = _ref3.url;
-            return url === _channel.url;
+          var _currentChannel = allChannels.find(function (_ref7) {
+            var url = _ref7.url;
+            return url === _channel3.url;
           });
 
-          var currentUnReadCount = _currentChannel2 && _currentChannel2.unreadMessageCount;
+          var _currentUnreadCount = _currentChannel && _currentChannel.unreadMessageCount;
 
-          if (currentUnReadCount === 0) {
+          if (_currentUnreadCount === 0) {
             return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
-              allChannels: allChannels.map(function (c) {
-                if (c.url === _channel.url) {
-                  return _channel;
-                }
-
-                return c;
+              allChannels: state.allChannels.map(function (ch) {
+                return ch.url === _channel3.url ? _channel3 : ch;
               })
             });
           }
         }
 
         return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
-          allChannels: [action.payload].concat(LocalizationContext._toConsumableArray(state.allChannels.filter(function (_ref4) {
-            var url = _ref4.url;
+          allChannels: [_channel3].concat(LocalizationContext._toConsumableArray(state.allChannels.filter(function (_ref8) {
+            var url = _ref8.url;
             return url !== action.payload.url;
           })))
         });
@@ -213,45 +265,91 @@ function reducer(state, action) {
     case ON_LAST_MESSAGE_UPDATED:
       return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
         allChannels: state.allChannels.map(function (channel) {
-          if (channel.url === action.payload.url) {
-            return action.payload;
-          }
-
-          return channel;
+          return channel.url === action.payload.url ? action.payload : channel;
         })
       });
 
     case ON_CHANNEL_FROZEN:
-      return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
-        allChannels: state.allChannels.map(function (channel) {
-          if (channel.url === action.payload.url) {
-            // eslint-disable-next-line no-param-reassign
-            channel.isFrozen = true;
-            return channel;
+      {
+        var _channel4 = action.payload;
+
+        if (state.channelListQuery) {
+          if (utils.filterChannelListParams(state.channelListQuery, _channel4, state.currentUserId)) {
+            return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+              allChannels: utils.getChannelsWithUpsertedChannel(state.allChannels, _channel4)
+            });
           }
 
-          return channel;
-        })
-      });
+          return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+            currentChannel: _channel4.url === state.currentChannel ? state.allChannels[state.allChannels[0].url === _channel4.url ? 1 : 0].url // if coming channel is first of channel list, current channel will be the next one
+            : state.currentChannel,
+            allChannels: state.allChannels.filter(function (_ref9) {
+              var url = _ref9.url;
+              return url !== _channel4.url;
+            })
+          });
+        }
+
+        return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+          allChannels: state.allChannels.map(function (ch) {
+            if (ch.url === _channel4.url) {
+              // eslint-disable-next-line no-param-reassign
+              ch.isFrozen = true;
+              return ch;
+            }
+
+            return ch;
+          })
+        });
+      }
 
     case ON_CHANNEL_UNFROZEN:
-      return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
-        allChannels: state.allChannels.map(function (channel) {
-          if (channel.url === action.payload.url) {
-            // eslint-disable-next-line no-param-reassign
-            channel.isFrozen = false;
-            return channel;
+      {
+        var _channel5 = action.payload;
+
+        if (state.channelListQuery) {
+          if (utils.filterChannelListParams(state.channelListQuery, _channel5, state.currentUserId)) {
+            return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+              allChannels: utils.getChannelsWithUpsertedChannel(state.allChannels, _channel5)
+            });
           }
 
-          return channel;
-        })
-      });
+          return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+            currentChannel: _channel5.url === state.currentChannel ? state.allChannels[state.allChannels[0].url === _channel5.url ? 1 : 0].url // if coming channel is first of channel list, current channel will be the next one
+            : state.currentChannel,
+            allChannels: state.allChannels.filter(function (_ref10) {
+              var url = _ref10.url;
+              return url !== _channel5.url;
+            })
+          });
+        }
+
+        return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+          allChannels: state.allChannels.map(function (ch) {
+            if (ch.url === _channel5.url) {
+              // eslint-disable-next-line no-param-reassign
+              ch.isFrozen = false;
+              return ch;
+            }
+
+            return ch;
+          })
+        });
+      }
 
     case CHANNEL_REPLACED_TO_TOP:
+      {
+        return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
+          allChannels: [action.payload].concat(LocalizationContext._toConsumableArray(state.allChannels.filter(function (channel) {
+            return channel.url !== action.payload.url;
+          })))
+        });
+      }
+
+    case CHANNEL_LIST_PARAMS_UPDATED:
       return LocalizationContext._objectSpread2(LocalizationContext._objectSpread2({}, state), {}, {
-        allChannels: [action.payload].concat(LocalizationContext._toConsumableArray(state.allChannels.filter(function (channel) {
-          return channel.url !== action.payload.url;
-        })))
+        currentUserId: action.payload.currentUserId,
+        channelListQuery: action.payload.channelListQuery
       });
 
     default:
@@ -960,7 +1058,7 @@ var createEventHandler = function createEventHandler(_ref) {
     logger.info('ChannelList: onChannelHidden', channel);
     channelListDispatcher({
       type: ON_CHANNEL_ARCHIVED,
-      payload: channel.url
+      payload: channel
     });
   };
 
@@ -1036,6 +1134,18 @@ function setupChannelList(_ref3) {
   channelListDispatcher({
     type: INIT_CHANNELS_START
   });
+
+  if (userFilledChannelListQuery) {
+    logger.info('ChannelList - setting up channelListQuery', channelListQuery);
+    channelListDispatcher({
+      type: CHANNEL_LIST_PARAMS_UPDATED,
+      payload: {
+        channelListQuery: channelListQuery,
+        currentUserId: sdk && sdk.currentUser && sdk.currentUser.userId
+      }
+    });
+  }
+
   logger.info('ChannelList - fetching channels');
 
   if (channelListQuery.hasNext) {
