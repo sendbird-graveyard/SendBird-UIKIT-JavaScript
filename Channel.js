@@ -1,15 +1,15 @@
-import { e as _toConsumableArray, a as _objectSpread2, u as uuidv4, b as _slicedToArray, f as _defineProperty, c as LocalizationContext, h as _inherits, i as _createSuper, j as _createClass, k as _classCallCheck, l as _assertThisInitialized, w as withSendbirdContext } from './LocalizationContext-61e3c047.js';
+import { e as _toConsumableArray, a as _objectSpread2, u as uuidv4, b as _slicedToArray, f as _defineProperty, c as LocalizationContext, h as _inherits, i as _createSuper, j as _createClass, k as _classCallCheck, l as _assertThisInitialized, w as withSendbirdContext } from './LocalizationContext-ec52e278.js';
 import React__default, { useEffect, useCallback, useRef, useMemo, useState, useContext, useLayoutEffect, Component, useReducer } from 'react';
 import PropTypes from 'prop-types';
-import { g as format, i as ImageRenderer, I as Icon, c as IconTypes, e as Loader, d as IconColors, L as Label, a as LabelTypography, b as LabelColors, A as Avatar, P as PlaceHolder, j as PlaceHolderTypes, h as LabelStringSet } from './index-596c5f0c.js';
-import { M as MessageStatusType } from './type-58833f13.js';
-import { k as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, l as SEND_FILE_MESSAGE, j as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, E as EmojiListItems, C as ContextMenu, I as IconButton, b as MenuItems, c as MenuItem, U as UserProfileContext, f as ConnectedUserProfile, a as TextButton, M as Modal, h as UserProfileProvider } from './index-1ab03a57.js';
-import { i as isImage, a as isVideo, c as compareIds, b as isGif, u as unSupported, L as LinkLabel, D as DateSeparator, M as MessageInput, F as FileViewer } from './index-8c25373a.js';
-import { a as filterMessageListParams, b as getIsSentFromSendingStatus$3, t as truncate, c as getIsSentFromStatus$3 } from './utils-7d975c75.js';
-import { i as isSameDay } from './index-cd260eec.js';
-import { g as getMessageCreatedAt$4, a as getSenderName$2, b as getSenderProfileUrl$2 } from './utils-07256c7e.js';
-import { g as getIsSentFromSendingStatus$2, c as copyToClipboard$1, a as getSenderProfileUrl$1, b as getSenderName$1, d as getMessageCreatedAt$5, e as getIsSentFromStatus$2 } from './utils-046f9fef.js';
-import { C as ChannelAvatar } from './index-8a5ef965.js';
+import { g as format, i as ImageRenderer, I as Icon, c as IconTypes, e as Loader, d as IconColors, L as Label, a as LabelTypography, b as LabelColors, A as Avatar, P as PlaceHolder, j as PlaceHolderTypes, h as LabelStringSet } from './index-4456ba1e.js';
+import { M as MessageStatusType } from './type-d77d0e67.js';
+import { k as SEND_USER_MESSAGE, S as SEND_MESSAGE_START, l as SEND_FILE_MESSAGE, j as UPDATE_USER_MESSAGE, D as DELETE_MESSAGE, E as EmojiListItems, C as ContextMenu, I as IconButton, b as MenuItems, c as MenuItem, U as UserProfileContext, f as ConnectedUserProfile, a as TextButton, M as Modal, h as UserProfileProvider } from './index-e9eccbb4.js';
+import { i as isImage, a as isVideo, c as compareIds, b as isGif, u as unSupported, L as LinkLabel, D as DateSeparator, M as MessageInput, F as FileViewer } from './index-65112a6a.js';
+import { a as filterMessageListParams, b as getIsSentFromSendingStatus$3, t as truncate, c as getIsSentFromStatus$3 } from './utils-818b10da.js';
+import { i as isSameDay } from './index-a8ebe06c.js';
+import { g as getMessageCreatedAt$4, a as getSenderName$2, b as getSenderProfileUrl$2 } from './utils-eb6e2fbe.js';
+import { g as getIsSentFromSendingStatus$2, c as copyToClipboard$1, a as getSenderProfileUrl$1, b as getSenderName$1, d as getMessageCreatedAt$5, e as getIsSentFromStatus$2 } from './utils-cf944c28.js';
+import { C as ChannelAvatar } from './index-3e543129.js';
 import 'react-dom';
 
 var RESET_MESSAGES = 'RESET_MESSAGES';

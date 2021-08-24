@@ -1,20 +1,20 @@
 'use strict';
 
-var LocalizationContext = require('./LocalizationContext-7cb222bc.js');
+var LocalizationContext = require('./LocalizationContext-9319934a.js');
 var React = require('react');
 var PropTypes = require('prop-types');
-var actionTypes = require('./actionTypes-0ab3ab91.js');
-var index$3 = require('./index-284f5043.js');
-var utils = require('./utils-e7969a98.js');
-var index$2 = require('./index-8400d9b2.js');
-var LeaveChannel = require('./LeaveChannel-beddeac5.js');
-var index$1 = require('./index-d9a48d62.js');
-var index = require('./index-5acad8f4.js');
-var index$4 = require('./index-b1f63a15.js');
-var utils$1 = require('./utils-211c9c74.js');
+var actionTypes = require('./actionTypes-881e675a.js');
+var index$3 = require('./index-b65c7b33.js');
+var utils = require('./utils-cff6dc93.js');
+var index$2 = require('./index-5e5ae32b.js');
+var LeaveChannel = require('./LeaveChannel-98ec2568.js');
+var index$1 = require('./index-3f565819.js');
+var index = require('./index-0af05ad6.js');
+var index$4 = require('./index-6f3ccdcb.js');
+var utils$1 = require('./utils-1590929e.js');
 require('react-dom');
-require('./type-f3590c9e.js');
-require('./index-24ba9387.js');
+require('./type-0e0e9a10.js');
+require('./index-6be24c2e.js');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
