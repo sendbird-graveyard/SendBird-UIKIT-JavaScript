@@ -3358,7 +3358,10 @@ var OpenchannelConversation = function OpenchannelConversation(props) {
       if (channel && channelUrl === channel.url) {
         messagesDispatcher({
           type: SENDING_MESSAGE_START,
-          payload: message
+          payload: {
+            channel,
+            message,
+          },
         });
       }
     }));
